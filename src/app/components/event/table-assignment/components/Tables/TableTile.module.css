@@ -1,0 +1,111 @@
+.tableTile {
+  position: absolute;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: linear-gradient(180deg, rgba(255,255,255,0.9), var(--primary-background));
+  cursor: grab;
+  transition: transform 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
+  pointer-events: auto;
+  z-index: 1;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.tableTile:active {
+  cursor: grabbing;
+}
+
+.tableTile:hover {
+  transform: translateY(-1px);
+  border-color: rgba(0,0,0,0.18);
+  box-shadow: 0 8px 22px rgba(0,0,0,0.12);
+}
+
+.tableTileSelected {
+  border-color: rgba(92, 107, 192, 0.9);
+  box-shadow: 0 12px 36px rgba(92, 107, 192, 0.18);
+}
+
+.tableTileOver {
+  border-color: rgba(60, 150, 90, 0.9);
+  box-shadow: 0 12px 28px rgba(60, 150, 90, 0.18);
+}
+
+.tableRound {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  text-align: center;
+}
+
+.tableSquare {
+  width: 120px;
+  height: 120px;
+  border-radius: 10px;
+}
+
+.tableRectangular {
+  width: 180px;
+  height: 100px;
+  border-radius: 10px;
+}
+
+.tableRound .tableTileHeader {
+  justify-content: center;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.tableRound .tableMeta {
+  text-align: center;
+}
+
+.tableTileHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+}
+
+.occupancyBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.occupancyBadge :global(.ant-badge-count) {
+  font-size: 12px;
+  font-weight: 700;
+  min-width: 44px;
+  height: 28px;
+  padding: 0 8px;
+  border-radius: 14px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.tableMeta {
+  display: inline-block;
+  margin-top: 6px;
+}
+
+.shapeIcon {
+  display: inline-flex;
+  width: 22px;
+  height: 22px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.shapeIconLarge {
+  display: inline-flex;
+  width: 34px;
+  height: 34px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.04);
+}

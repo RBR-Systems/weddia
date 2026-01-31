@@ -2,14 +2,14 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Card, Input, Button, List, Avatar, message, Spin, Tag } from "antd";
 import { SendOutlined, RobotOutlined, UserOutlined } from "@ant-design/icons";
-import styles from "./seating-ai-chat.module.css";
+import styles from "./SeatingAIChat.module.css";
 import {
   getSeatingRecommendation,
   HFGuest,
   HFTable,
   SeatingResponse,
   testHuggingFaceConnection,
-} from "./huggingface.service";
+} from "../../services/huggingface.service";
 
 interface MessageItem {
   id: string;
@@ -128,7 +128,7 @@ const SeatingAIChat: React.FC<SeatingAIChatProps> = ({
   return (
     <Card
       title={
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        <div className={styles.cardTitle}>
           <RobotOutlined />
           AI Seating Assistant
         </div>
@@ -151,10 +151,11 @@ const SeatingAIChat: React.FC<SeatingAIChatProps> = ({
                   icon={
                     msg.type === "user" ? <UserOutlined /> : <RobotOutlined />
                   }
-                  style={{
-                    backgroundColor:
-                      msg.type === "user" ? "#1890ff" : "#52c41a",
-                  }}
+                  className={
+                    msg.type === "user"
+                      ? styles.avatarUser
+                      : styles.avatarAssistant
+                  }
                 />
               </div>
               <div className={styles.messageContent}>

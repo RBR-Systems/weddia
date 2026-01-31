@@ -1,0 +1,15 @@
+.draggableGuest {
+  width: 100%;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+}
+
+.dragging {
+  cursor: grabbing;
+  opacity: 0.6;
+}
+
+.fullWidth {
+  width: 100%;
+}

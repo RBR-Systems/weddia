@@ -4,6 +4,12 @@
   flex-direction: column;
 }
 
+.cardTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .chatCard :global(.ant-card-body) {
   flex: 1;
   display: flex;
@@ -32,6 +38,14 @@
 
 .messageAvatar {
   flex-shrink: 0;
+}
+
+.avatarUser {
+  background-color: #1890ff;
+}
+
+.avatarAssistant {
+  background-color: #52c41a;
 }
 
 .messageContent {

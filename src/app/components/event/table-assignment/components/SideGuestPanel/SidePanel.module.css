@@ -1,0 +1,67 @@
+.sideCard {
+  height: 100%;
+  position: relative;
+  width: 340px;
+  min-width: 300px;
+  max-width: 25vw;
+  z-index: 20;
+  overflow: hidden;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  flex: 1 0 auto;
+}
+
+.closed {
+  display: none;
+}
+
+.sideTop {
+  margin-bottom: 10px;
+}
+
+.sideBody {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  height: calc(100% - 44px);
+}
+
+.sideList {
+  flex: 1;
+  overflow: auto;
+  padding-right: 4px;
+}
+
+.guestRow :global(.ant-list-item-meta-title) {
+  margin-bottom: 2px;
+}
+
+.tableDetailsHeader {
+  padding: 8px 8px 0 8px;
+}
+
+.tableTitle {
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.tableSubtitle {
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.spaceMargin {
+  margin: 12px;
+}
+
+.sideListHeight180 {
+  height: calc(100% - 180px);
+}
+
+.sideListHeight80 {
+  height: calc(100% - 80px);
+}
+
+.fullWidth {
+  width: 100%;
+}
