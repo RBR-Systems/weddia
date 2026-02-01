@@ -90,7 +90,8 @@ export function TableAssignmentProvider({
       if (a.table_id !== tableId) continue;
       const g = guestsById.get(a.guest_id);
       const ps = g?.party_size ?? (g?.plus_one ? 2 : 1);
-      for (let s = a.seat_number; s < a.seat_number + ps; s += 1) occupied.add(s);
+      for (let s = a.seat_number; s < a.seat_number + ps; s += 1)
+        occupied.add(s);
     }
     for (let s = startSeat; s < startSeat + partySize; s += 1) {
       if (occupied.has(s)) return false;
@@ -202,15 +203,27 @@ export function TableAssignmentProvider({
         if (!occupant) {
           const g = guestsById.get(guestId);
           const partySize = g?.party_size ?? (g?.plus_one ? 2 : 1);
-          if (!seatsFitAt(tableId, seatNumber, partySize, state.assignments, guestId)) {
-            notifier.error("Not enough contiguous seats for that guest's party");
+          if (
+            !seatsFitAt(
+              tableId,
+              seatNumber,
+              partySize,
+              state.assignments,
+              guestId,
+            )
+          ) {
+            notifier.error(
+              "Not enough contiguous seats for that guest's party",
+            );
             return;
           }
           dispatch({
             type: "MOVE_GUEST_SEAT",
             payload: { guestId, tableId, seatNumber },
           });
-          notifier.success(g ? `${fullName(g)} assigned to ${tableId}` : "Assigned");
+          notifier.success(
+            g ? `${fullName(g)} assigned to ${tableId}` : "Assigned",
+          );
           return;
         }
 
@@ -222,35 +235,48 @@ export function TableAssignmentProvider({
           const occSize = occGuest?.party_size ?? (occGuest?.plus_one ? 2 : 1);
           // conservative: only allow swaps when both parties are single-seat
           if (gSize > 1 || occSize > 1) {
-            notifier.error("Cannot swap seats for multi-person parties. Unassign and reassign instead.");
+            notifier.error(
+              "Cannot swap seats for multi-person parties. Unassign and reassign instead.",
+            );
             return;
           }
           dispatch({
             type: "MOVE_GUEST_SEAT",
             payload: { guestId, tableId, seatNumber },
           });
-          notifier.success(g ? `${fullName(g)} moved to seat ${seatNumber}` : "Moved");
+          notifier.success(
+            g ? `${fullName(g)} moved to seat ${seatNumber}` : "Moved",
+          );
           return;
         }
 
         // If occupied and guest was unassigned, fallback to assigning to next available seat
-          const g = guestsById.get(guestId);
-          const partySize = g?.party_size ?? (g?.plus_one ? 2 : 1);
-          // find first contiguous fit starting at 1..capacity
-          const capacity = targetTable.total_number ?? 0;
-          let foundSeat: number | null = null;
-          for (let s = 1; s <= capacity; s += 1) {
-            if (seatsFitAt(tableId, s, partySize, state.assignments, guestId)) {
-              foundSeat = s;
-              break;
-            }
+        const g = guestsById.get(guestId);
+        const partySize = g?.party_size ?? (g?.plus_one ? 2 : 1);
+        // find first contiguous fit starting at 1..capacity
+        const capacity = targetTable.total_number ?? 0;
+        let foundSeat: number | null = null;
+        for (let s = 1; s <= capacity; s += 1) {
+          if (seatsFitAt(tableId, s, partySize, state.assignments, guestId)) {
+            foundSeat = s;
+            break;
           }
-          if (!foundSeat) {
-            notifier.warning("That table does not have enough contiguous seats for that party");
-            return;
-          }
-          dispatch({ type: "ASSIGN_GUEST", payload: { tableId, guestId, seatNumber: foundSeat } });
-          notifier.success(g ? `${fullName(g)} reassigned to ${tableId}` : `Reassigned to ${tableId}`);
+        }
+        if (!foundSeat) {
+          notifier.warning(
+            "That table does not have enough contiguous seats for that party",
+          );
+          return;
+        }
+        dispatch({
+          type: "ASSIGN_GUEST",
+          payload: { tableId, guestId, seatNumber: foundSeat },
+        });
+        notifier.success(
+          g
+            ? `${fullName(g)} reassigned to ${tableId}`
+            : `Reassigned to ${tableId}`,
+        );
         return;
       }
 
@@ -258,7 +284,9 @@ export function TableAssignmentProvider({
       const tableMatch = overId.match(/^table:([^:]+)$/);
       if (tableMatch) {
         const tableId = tableMatch[1];
-        const targetTable = tablesForActiveLayout.find((t: any) => t.table_id === tableId);
+        const targetTable = tablesForActiveLayout.find(
+          (t: any) => t.table_id === tableId,
+        );
         if (!targetTable) return;
         const g = guestsById.get(guestId);
         const partySize = g?.party_size ?? (g?.plus_one ? 2 : 1);
@@ -272,16 +300,28 @@ export function TableAssignmentProvider({
         }
         const notifier = messageApi ?? message;
         if (!foundSeat) {
-          notifier.warning("That table does not have enough contiguous seats for that party");
+          notifier.warning(
+            "That table does not have enough contiguous seats for that party",
+          );
           return;
         }
-        const guestAssigned = state.assignments.find((a: any) => a.guest_id === guestId);
+        const guestAssigned = state.assignments.find(
+          (a: any) => a.guest_id === guestId,
+        );
         if (guestAssigned) {
-          dispatch({ type: "MOVE_GUEST_SEAT", payload: { guestId, tableId, seatNumber: foundSeat } });
+          dispatch({
+            type: "MOVE_GUEST_SEAT",
+            payload: { guestId, tableId, seatNumber: foundSeat },
+          });
           notifier.success(g ? `${fullName(g)} moved to ${tableId}` : "Moved");
         } else {
-          dispatch({ type: "ASSIGN_GUEST", payload: { tableId, guestId, seatNumber: foundSeat } });
-          notifier.success(g ? `${fullName(g)} assigned to ${tableId}` : "Assigned");
+          dispatch({
+            type: "ASSIGN_GUEST",
+            payload: { tableId, guestId, seatNumber: foundSeat },
+          });
+          notifier.success(
+            g ? `${fullName(g)} assigned to ${tableId}` : "Assigned",
+          );
         }
         return;
       }
@@ -397,8 +437,11 @@ export function TableAssignmentProvider({
           return name.includes(q) || email.includes(q);
         })
         .filter((g: any) => {
-          if (!state.assignedFilter || state.assignedFilter === "all") return true;
-          const isAssigned = state.assignments.some((a: any) => a.guest_id === g.guest_id);
+          if (!state.assignedFilter || state.assignedFilter === "all")
+            return true;
+          const isAssigned = state.assignments.some(
+            (a: any) => a.guest_id === g.guest_id,
+          );
           return state.assignedFilter === "assigned" ? isAssigned : !isAssigned;
         })
         .slice()
@@ -424,18 +467,37 @@ export function TableAssignmentProvider({
         const notifier = messageApi ?? message;
         const g = guestsById.get(guestId);
         const movingSize = g?.party_size ?? (g?.plus_one ? 2 : 1);
-        const table = tablesForActiveLayout.find((t: any) => t.table_id === tableId);
+        const table = tablesForActiveLayout.find(
+          (t: any) => t.table_id === tableId,
+        );
         const capacity = table?.total_number ?? 0;
 
-        const oldAssign = state.assignments.find((a: any) => a.guest_id === guestId);
+        const oldAssign = state.assignments.find(
+          (a: any) => a.guest_id === guestId,
+        );
         if (!oldAssign) {
           // unassigned -> try to find first contiguous block starting at seatNumber
-          if (!seatsFitAt(tableId, seatNumber, movingSize, state.assignments, guestId)) {
-            notifier.error("Not enough contiguous seats for that guest's party");
+          if (
+            !seatsFitAt(
+              tableId,
+              seatNumber,
+              movingSize,
+              state.assignments,
+              guestId,
+            )
+          ) {
+            notifier.error(
+              "Not enough contiguous seats for that guest's party",
+            );
             return false;
           }
-          dispatch({ type: "ASSIGN_GUEST", payload: { tableId, guestId, seatNumber } });
-          notifier.success(g ? `${fullName(g)} assigned to ${tableId}` : "Assigned");
+          dispatch({
+            type: "ASSIGN_GUEST",
+            payload: { tableId, guestId, seatNumber },
+          });
+          notifier.success(
+            g ? `${fullName(g)} assigned to ${tableId}` : "Assigned",
+          );
           return true;
         }
 
@@ -445,7 +507,9 @@ export function TableAssignmentProvider({
         const targetEnd = targetStart + movingSize - 1;
 
         if (targetEnd > capacity) {
-          notifier.error("Not enough seats on table to place that party at the requested position");
+          notifier.error(
+            "Not enough seats on table to place that party at the requested position",
+          );
           return false;
         }
 
@@ -458,17 +522,34 @@ export function TableAssignmentProvider({
         if (targetStart < oldStart) {
           const intervalStart = targetStart;
           const intervalEnd = oldStart - 1;
-          const affected = state.assignments.filter((a: any) => a.table_id === tableId && !(a.guest_id === guestId) && (a.seat_number <= intervalEnd) && ((a.seat_number + (guestsById.get(a.guest_id)?.party_size ?? (guestsById.get(a.guest_id)?.plus_one ? 2 : 1)) - 1) >= intervalStart));
+          const affected = state.assignments.filter(
+            (a: any) =>
+              a.table_id === tableId &&
+              !(a.guest_id === guestId) &&
+              a.seat_number <= intervalEnd &&
+              a.seat_number +
+                (guestsById.get(a.guest_id)?.party_size ??
+                  (guestsById.get(a.guest_id)?.plus_one ? 2 : 1)) -
+                1 >=
+                intervalStart,
+          );
           // check capacity after shifting right by movingSize
           for (const a of affected) {
-            const aSize = guestsById.get(a.guest_id)?.party_size ?? (guestsById.get(a.guest_id)?.plus_one ? 2 : 1);
+            const aSize =
+              guestsById.get(a.guest_id)?.party_size ??
+              (guestsById.get(a.guest_id)?.plus_one ? 2 : 1);
             const aEnd = a.seat_number + aSize - 1;
             if (aEnd + movingSize > capacity) {
-              notifier.error("Not enough room to shift adjacent guests to make space");
+              notifier.error(
+                "Not enough room to shift adjacent guests to make space",
+              );
               return false;
             }
           }
-          dispatch({ type: "MOVE_GUEST_SEAT", payload: { guestId, tableId, seatNumber } });
+          dispatch({
+            type: "MOVE_GUEST_SEAT",
+            payload: { guestId, tableId, seatNumber },
+          });
           notifier.success(g ? `${fullName(g)} moved to ${tableId}` : "Moved");
           return true;
         }
@@ -477,15 +558,30 @@ export function TableAssignmentProvider({
         if (targetStart > oldStart) {
           const intervalStart = oldEnd + 1;
           const intervalEnd = targetEnd;
-          const affected = state.assignments.filter((a: any) => a.table_id === tableId && !(a.guest_id === guestId) && (a.seat_number <= intervalEnd) && ((a.seat_number + (guestsById.get(a.guest_id)?.party_size ?? (guestsById.get(a.guest_id)?.plus_one ? 2 : 1)) - 1) >= intervalStart));
+          const affected = state.assignments.filter(
+            (a: any) =>
+              a.table_id === tableId &&
+              !(a.guest_id === guestId) &&
+              a.seat_number <= intervalEnd &&
+              a.seat_number +
+                (guestsById.get(a.guest_id)?.party_size ??
+                  (guestsById.get(a.guest_id)?.plus_one ? 2 : 1)) -
+                1 >=
+                intervalStart,
+          );
           for (const a of affected) {
             const newStart = a.seat_number - movingSize;
             if (newStart < 1) {
-              notifier.error("Not enough room to shift adjacent guests to make space");
+              notifier.error(
+                "Not enough room to shift adjacent guests to make space",
+              );
               return false;
             }
           }
-          dispatch({ type: "MOVE_GUEST_SEAT", payload: { guestId, tableId, seatNumber } });
+          dispatch({
+            type: "MOVE_GUEST_SEAT",
+            payload: { guestId, tableId, seatNumber },
+          });
           notifier.success(g ? `${fullName(g)} moved to ${tableId}` : "Moved");
           return true;
         }

@@ -28,12 +28,17 @@ function SeatTile({
     id: `table:${tableId}:seat:${num}`,
     data: { tableId, seatNumber: num },
   });
-  const partySize = guest ? guest.party_size ?? (guest.plus_one ? 2 : 1) : 1;
-  const idx = typeof (arguments[0] as any)?.indexInParty === "number" ? (arguments[0] as any).indexInParty : 0;
+  const partySize = guest ? (guest.party_size ?? (guest.plus_one ? 2 : 1)) : 1;
+  const idx =
+    typeof (arguments[0] as any)?.indexInParty === "number"
+      ? (arguments[0] as any).indexInParty
+      : 0;
   const nameLabel = guest
     ? `${guest.first_name}${idx > 0 ? ` +${idx}` : ""}`
     : "—";
-  const titleLabel = guest ? `${guest.first_name} ${guest.last_name}` : `Seat ${num}`;
+  const titleLabel = guest
+    ? `${guest.first_name} ${guest.last_name}`
+    : `Seat ${num}`;
   return (
     <div
       ref={setSeatRef}
@@ -120,7 +125,7 @@ export default memo(function DroppableTableTile({
         // find an assignment that covers this seat (start seat + party_size)
         const assign = assignments.find((a) => {
           const g = guestsById?.get(a.guest_id);
-          const ps = g ? g.party_size ?? (g.plus_one ? 2 : 1) : 1;
+          const ps = g ? (g.party_size ?? (g.plus_one ? 2 : 1)) : 1;
           return n >= a.seat_number && n < a.seat_number + ps;
         });
         const guest = assign ? guestsById?.get(assign.guest_id) : null;
@@ -139,7 +144,7 @@ export default memo(function DroppableTableTile({
     </div>
   );
 
-      const buttonEl = (
+  const buttonEl = (
     <button
       ref={setRefs}
       type="button"
@@ -153,7 +158,11 @@ export default memo(function DroppableTableTile({
       onClick={onSelect}
       {...attributes}
       {...listeners}
-      onMouseEnter={() => !showSeats && !(ctx.state?.activeDragId?.toString?.().startsWith?.("guest:")) && setPopoverOpen(true)}
+      onMouseEnter={() =>
+        !showSeats &&
+        !ctx.state?.activeDragId?.toString?.().startsWith?.("guest:") &&
+        setPopoverOpen(true)
+      }
       onMouseLeave={() => !showSeats && setPopoverOpen(false)}
     >
       <TableTileContent
@@ -169,7 +178,7 @@ export default memo(function DroppableTableTile({
           {Array.from({ length: seatCount }, (_, i) => i + 1).map((n) => {
             const assign = assignments.find((a) => {
               const g = guestsById?.get(a.guest_id);
-              const ps = g ? g.party_size ?? (g.plus_one ? 2 : 1) : 1;
+              const ps = g ? (g.party_size ?? (g.plus_one ? 2 : 1)) : 1;
               return n >= a.seat_number && n < a.seat_number + ps;
             });
             const guest = assign ? guestsById?.get(assign.guest_id) : null;
@@ -187,7 +196,10 @@ export default memo(function DroppableTableTile({
           })}
         </div>
       ) : (
-        <div className={styles.seatCompact} title={`${occupancy}/${table.total_number} seated`}>
+        <div
+          className={styles.seatCompact}
+          title={`${occupancy}/${table.total_number} seated`}
+        >
           {occupancy}/{table.total_number}
         </div>
       )}

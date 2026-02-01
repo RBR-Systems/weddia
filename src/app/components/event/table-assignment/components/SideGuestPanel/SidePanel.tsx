@@ -215,7 +215,8 @@ const SidePanel = (props: Props) => {
                       {selectedTable.table_id}
                     </div>
                     <div className={styles.tableSubtitle}>
-                      Capacity {selectedTable.total_number} • {selectedTablePeopleCount} seated
+                      Capacity {selectedTable.total_number} •{" "}
+                      {selectedTablePeopleCount} seated
                     </div>
                   </div>
                 </Space>
@@ -263,7 +264,10 @@ const SidePanel = (props: Props) => {
                                 ctx.moveGuestSeat?.(
                                   a.guest_id,
                                   selectedTable.table_id,
-                                  Math.min(selectedTable.total_number, a.seat_number + 1),
+                                  Math.min(
+                                    selectedTable.total_number,
+                                    a.seat_number + 1,
+                                  ),
                                 );
                                 ctx.messageApi?.success("Seat moved");
                               }}

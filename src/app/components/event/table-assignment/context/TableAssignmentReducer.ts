@@ -209,7 +209,8 @@ export function reducer(state: State, action: Action): State {
     case "MOVE_GUEST_SEAT": {
       const { guestId, tableId, seatNumber } = (action as any).payload;
       const oldAssign = state.assignments.find((a) => a.guest_id === guestId);
-      const movingSize = state.guests.find((g) => g.guest_id === guestId)?.party_size ?? 1;
+      const movingSize =
+        state.guests.find((g) => g.guest_id === guestId)?.party_size ?? 1;
 
       // If guest wasn't assigned previously, just assign (caller should have validated)
       if (!oldAssign) {
@@ -228,13 +229,17 @@ export function reducer(state: State, action: Action): State {
       const newStart = seatNumber;
       const newEnd = newStart + movingSize - 1;
 
-      const capacity = state.tables.find((t) => t.table_id === tableId)?.total_number ?? 0;
+      const capacity =
+        state.tables.find((t) => t.table_id === tableId)?.total_number ?? 0;
 
       if (newEnd > capacity) {
         // cannot move: would overflow table capacity
         try {
           // eslint-disable-next-line no-console
-          console.warn("MOVE_GUEST_SEAT aborted: new end exceeds table capacity", { guestId, tableId, newStart, newEnd, capacity });
+          console.warn(
+            "MOVE_GUEST_SEAT aborted: new end exceeds table capacity",
+            { guestId, tableId, newStart, newEnd, capacity },
+          );
         } catch (e) {}
         return state;
       }
@@ -248,10 +253,9 @@ export function reducer(state: State, action: Action): State {
         .map((a) => ({ ...a }))
         .sort((a, b) => a.seat_number - b.seat_number);
 
-      
-
       // Helper to get party size for an assignment
-      const getSize = (a: any) => state.guests.find((g) => g.guest_id === a.guest_id)?.party_size ?? 1;
+      const getSize = (a: any) =>
+        state.guests.find((g) => g.guest_id === a.guest_id)?.party_size ?? 1;
 
       // If moving earlier: shift affected assignments right by movingSize
       if (newStart < oldStart) {
@@ -265,16 +269,26 @@ export function reducer(state: State, action: Action): State {
 
         // perform shift: remove affected from remaining, then place mover at newStart, then place shifted affected in order
         const remaining = state.assignments.filter(
-          (a) => !(a.table_id === tableId && affected.some((x) => x.guest_id === a.guest_id)) && a.guest_id !== guestId,
+          (a) =>
+            !(
+              a.table_id === tableId &&
+              affected.some((x) => x.guest_id === a.guest_id)
+            ) && a.guest_id !== guestId,
         );
 
         const newAssignments: any[] = [...remaining];
 
         // Add mover at newStart
-        newAssignments.push({ table_id: tableId, guest_id: guestId, seat_number: newStart });
+        newAssignments.push({
+          table_id: tableId,
+          guest_id: guestId,
+          seat_number: newStart,
+        });
 
         // Shift affected in ascending order
-        for (const a of affected.sort((x, y) => x.seat_number - y.seat_number)) {
+        for (const a of affected.sort(
+          (x, y) => x.seat_number - y.seat_number,
+        )) {
           const aSize = getSize(a);
           const newAStart = a.seat_number + movingSize;
           // ensure within capacity
@@ -282,13 +296,23 @@ export function reducer(state: State, action: Action): State {
             // abort and return previous state
             return state;
           }
-          newAssignments.push({ table_id: tableId, guest_id: a.guest_id, seat_number: newAStart });
+          newAssignments.push({
+            table_id: tableId,
+            guest_id: a.guest_id,
+            seat_number: newAStart,
+          });
         }
 
         // keep other table assignments (already in remaining)
         try {
           // eslint-disable-next-line no-console
-          console.log("MOVE_GUEST_SEAT_SHIFT_RIGHT", { guestId, tableId, newStart, movingSize, newAssignments });
+          console.log("MOVE_GUEST_SEAT_SHIFT_RIGHT", {
+            guestId,
+            tableId,
+            newStart,
+            movingSize,
+            newAssignments,
+          });
         } catch (e) {}
         return { ...state, assignments: newAssignments };
       }
@@ -304,26 +328,46 @@ export function reducer(state: State, action: Action): State {
         });
 
         const remaining = state.assignments.filter(
-          (a) => !(a.table_id === tableId && affected.some((x) => x.guest_id === a.guest_id)) && a.guest_id !== guestId,
+          (a) =>
+            !(
+              a.table_id === tableId &&
+              affected.some((x) => x.guest_id === a.guest_id)
+            ) && a.guest_id !== guestId,
         );
         const newAssignments: any[] = [...remaining];
 
         // Add mover at newStart
-        newAssignments.push({ table_id: tableId, guest_id: guestId, seat_number: newStart });
+        newAssignments.push({
+          table_id: tableId,
+          guest_id: guestId,
+          seat_number: newStart,
+        });
 
         // Shift affected in ascending order (we need to preserve order but compute new starts left)
-        for (const a of affected.sort((x, y) => x.seat_number - y.seat_number)) {
+        for (const a of affected.sort(
+          (x, y) => x.seat_number - y.seat_number,
+        )) {
           const aSize = getSize(a);
           const newAStart = a.seat_number - movingSize;
           if (newAStart < 1) {
             return state;
           }
-          newAssignments.push({ table_id: tableId, guest_id: a.guest_id, seat_number: newAStart });
+          newAssignments.push({
+            table_id: tableId,
+            guest_id: a.guest_id,
+            seat_number: newAStart,
+          });
         }
 
         try {
           // eslint-disable-next-line no-console
-          console.log("MOVE_GUEST_SEAT_SHIFT_LEFT", { guestId, tableId, newStart, movingSize, newAssignments });
+          console.log("MOVE_GUEST_SEAT_SHIFT_LEFT", {
+            guestId,
+            tableId,
+            newStart,
+            movingSize,
+            newAssignments,
+          });
         } catch (e) {}
 
         return { ...state, assignments: newAssignments };
