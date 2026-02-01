@@ -1,10 +1,17 @@
 import React, { memo, useMemo } from "react";
 import { useDraggable } from "@dnd-kit/core";
-import { Space, Tag, Typography } from "antd";
+import { Space, Tag, Typography, Select, Button } from "antd";
 import type { CSSProperties } from "react";
 import styles from "./DraggableGuestRow.module.css";
 import type { Guest } from "../../models/types";
-import { fullName } from "../../utils/Table-Utils";
+import {
+  fullName,
+  getNextAvailableSeatNumber,
+  getTableLabel,
+} from "../../utils/Table-Utils";
+import { WarningOutlined } from "@ant-design/icons";
+import { useTableAssignmentContext } from "../../context/TableAssignmentContext";
+import { DeleteOutlined, FolderOpenOutlined } from "@ant-design/icons";
 
 export default memo(function DraggableGuestRow({
   guest,
@@ -15,53 +22,171 @@ export default memo(function DraggableGuestRow({
   relationName?: string;
   isAssigned: boolean;
 }) {
+  const {
+    tablesForActiveLayout,
+    assignmentsByTable,
+    dispatch,
+    guestsById,
+    messageApi,
+  } = useTableAssignmentContext();
+
+  const assignedTableId = useMemo(() => {
+    const assignmentsMap = assignmentsByTable as Map<string, any[]>;
+    for (const [tableId, arr] of Array.from(assignmentsMap.entries())) {
+      if (arr.some((a: any) => a.guest_id === guest.guest_id)) return tableId;
+    }
+    return null;
+  }, [assignmentsByTable, guest.guest_id]);
+
+  const assignedAssignment = useMemo(() => {
+    const assignmentsMap = assignmentsByTable as Map<string, any[]>;
+    for (const [, arr] of Array.from(assignmentsMap.entries())) {
+      const a = arr.find((x: any) => x.guest_id === guest.guest_id);
+      if (a) return a;
+    }
+    return null;
+  }, [assignmentsByTable, guest.guest_id]);
+
+  const partySize = guest.party_size ?? (guest.plus_one ? 2 : 1);
+
+  const tableOptions = useMemo(() => {
+    return tablesForActiveLayout
+      .map((t: any) => {
+        const assignments = assignmentsByTable.get(t.table_id) ?? [];
+        const usedOccupancy = assignments.reduce((sum: number, a: any) => {
+          const g = guestsById.get(a.guest_id);
+          return sum + (g?.party_size ?? 1);
+        }, 0);
+        const available = Math.max(0, t.total_number - usedOccupancy);
+        const isAssignedHere = assignments.some(
+          (a: any) => a.guest_id === guest.guest_id,
+        );
+        if (available >= (guest.party_size ?? 1) || isAssignedHere) {
+          return {
+            value: t.table_id,
+            label: getTableLabel(t),
+          };
+        }
+        return null;
+      })
+      .filter(Boolean) as { value: string; label: string }[];
+  }, [tablesForActiveLayout, assignmentsByTable, guestsById, guest.party_size]);
+
   const dragId = `guest:${guest.guest_id}`;
-  const { attributes, listeners, setNodeRef, transform, isDragging } =
+  const { attributes, listeners, setNodeRef, /* transform, */ isDragging } =
     useDraggable({
       id: dragId,
       data: { guestId: guest.guest_id },
     });
 
-  const style: CSSProperties = useMemo(
-    () =>
-      transform
-        ? { transform: `translate3d(${transform.x}px, ${transform.y}px, 0)` }
-        : {},
-    [transform],
-  );
+  // We intentionally don't apply `transform` to the original row so the
+  // DragOverlay is the only visual moving element. Original row remains
+  // in place while dragging; non-name content is hidden below when active.
+  const style: CSSProperties = {};
 
   return (
     <div
       ref={setNodeRef}
+      // attach listeners/attributes to the whole row so drag can start
+      // from anywhere on the component
+      {...listeners}
+      {...attributes}
       style={style}
       className={[
         styles.draggableGuest,
         isDragging ? styles.dragging : "",
       ].join(" ")}
-      {...listeners}
-      {...attributes}
     >
       <Space direction="vertical" size={6} className={styles.fullWidth}>
         <Space size={8} wrap>
-          <Typography.Text strong>{fullName(guest)}</Typography.Text>
-          {isAssigned ? (
-            <Tag color="green">Assigned</Tag>
-          ) : (
-            <Tag>Unassigned</Tag>
+          <Typography.Text strong className={styles.dragHandle}>
+            {!isAssigned ? (
+              <>
+                <WarningOutlined style={{ color: "orange", marginRight: 6 }} />
+                {fullName(guest)}
+              </>
+            ) : (
+              fullName(guest)
+            )}
+          </Typography.Text>
+          {!isDragging && (
+            <>
+              {relationName ? (
+                <Tag color="gold">{relationName}</Tag>
+              ) : (
+                <Tag>Unknown relation</Tag>
+              )}
+              {!isAssigned && <Tag>Unassigned</Tag>}
+              {guest.plus_one ? <Tag color="purple">+1</Tag> : null}
+              {assignedAssignment ? (
+                <Tag color="blue">
+                  {`Seat${partySize > 1 ? "(s)" : ""} ${Array.from({ length: partySize }, (_, i) => assignedAssignment.seat_number + i).join(", ")}`}
+                </Tag>
+              ) : null}
+              {guest.dietary_restrictions ? (
+                <Tag color="green">{guest.dietary_restrictions}</Tag>
+              ) : null}
+              {guest.accessibility_needs ? (
+                <Tag color="red">{guest.accessibility_needs}</Tag>
+              ) : null}
+            </>
           )}
-          {guest.plus_one ? <Tag color="purple">+1</Tag> : null}
         </Space>
-        <Space size={6} wrap>
-          {relationName ? (
-            <Tag color="gold">{relationName}</Tag>
-          ) : (
-            <Tag>Unknown relation</Tag>
-          )}
-          {guest.dietary_restrictions ? (
-            <Tag color="green">{guest.dietary_restrictions}</Tag>
-          ) : null}
-          {guest.accessibility_needs ? (
-            <Tag color="red">{guest.accessibility_needs}</Tag>
+
+        <Space
+          size={10}
+          align="center"
+          style={{ width: "100%", margin: "10px 0px 10px 0px" }}
+        >
+          <Select
+            placeholder="Assign to table"
+            options={tableOptions}
+            value={assignedTableId ?? undefined}
+            style={{ minWidth: 160, flex: 1 }}
+            onMouseDown={(e) => e.stopPropagation()}
+            onChange={(tableId: string) => {
+              const targetTable = tablesForActiveLayout.find(
+                (t: any) => t.table_id === tableId,
+              );
+              if (!targetTable) return;
+              if (tableId === assignedTableId) return;
+              const usedSeatNumbers = (
+                assignmentsByTable.get(tableId) ?? []
+              ).map((a: any) => a.seat_number);
+              const seat = getNextAvailableSeatNumber(
+                targetTable.total_number,
+                usedSeatNumbers,
+              );
+              if (!seat) {
+                messageApi?.warning("That table is full");
+                return;
+              }
+              dispatch({
+                type: "ASSIGN_GUEST",
+                payload: { tableId, guestId: guest.guest_id, seatNumber: seat },
+              });
+              messageApi?.success(
+                `${fullName(guest)} reassigned to ${tableId}`,
+              );
+            }}
+          />
+
+          {isAssigned ? (
+            !isDragging ? (
+              <Button
+                danger
+                onMouseDown={(e) => e.stopPropagation()}
+                onPointerDown={(e) => e.stopPropagation()}
+                onClick={() => {
+                  dispatch({
+                    type: "UNASSIGN_GUEST",
+                    payload: { guestId: guest.guest_id },
+                  });
+                  messageApi?.success("Guest unassigned");
+                }}
+                icon={<DeleteOutlined />}
+              ></Button>
+            ) : null
           ) : null}
         </Space>
       </Space>

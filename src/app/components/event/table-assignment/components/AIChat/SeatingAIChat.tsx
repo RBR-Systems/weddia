@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
-import { Card, Input, Button, List, Avatar, message, Spin, Tag } from "antd";
+import { Card, Input, Button, List, Avatar, Spin, Tag } from "antd";
+import { useTableAssignmentContext } from "../../context/TableAssignmentContext";
 import { SendOutlined, RobotOutlined, UserOutlined } from "@ant-design/icons";
 import styles from "./SeatingAIChat.module.css";
 import {
@@ -58,6 +59,8 @@ const SeatingAIChat: React.FC<SeatingAIChatProps> = ({
     });
   }, []);
 
+  const { messageApi } = useTableAssignmentContext();
+
   const handleSend = async () => {
     if (!input.trim()) return;
 
@@ -90,13 +93,13 @@ const SeatingAIChat: React.FC<SeatingAIChatProps> = ({
       setMessages((prev) => [...prev, assistantMessage]);
 
       if (response.conflicts && response.conflicts.length > 0) {
-        message.warning(
+        messageApi?.warning(
           `Potential issues: ${response.conflicts.join(", ")}`,
           5,
         );
       }
     } catch (error) {
-      message.error(
+      messageApi?.error(
         error instanceof Error ? error.message : "Failed to get AI response",
       );
 
@@ -118,7 +121,7 @@ const SeatingAIChat: React.FC<SeatingAIChatProps> = ({
   const handleApply = (data: SeatingResponse, msgId: string) => {
     onApplySeating(data.assignments);
     setAppliedMessageId(msgId);
-    message.success({
+    messageApi?.success({
       content:
         "Seating arrangement approved and applied! Your event layout has been updated.",
       duration: 3,
@@ -126,15 +129,7 @@ const SeatingAIChat: React.FC<SeatingAIChatProps> = ({
   };
 
   return (
-    <Card
-      title={
-        <div className={styles.cardTitle}>
-          <RobotOutlined />
-          AI Seating Assistant
-        </div>
-      }
-      className={styles.chatCard}
-    >
+    <Card className={styles.chatCard}>
       <div className={styles.messagesContainer}>
         <List
           dataSource={messages}

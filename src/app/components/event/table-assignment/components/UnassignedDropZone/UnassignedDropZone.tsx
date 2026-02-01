@@ -17,9 +17,6 @@ export default memo(function UnassignedDropZone() {
         <UserOutlined />
         <Typography.Text strong>Drop here to unassign</Typography.Text>
       </Space>
-      <Typography.Text type="secondary" className={styles.dropZoneHint}>
-        Drag a guest onto a table tile to assign.
-      </Typography.Text>
     </div>
   );
 });

@@ -63,6 +63,7 @@ export type State = {
   selectedTableId: string | null;
   guestSearch: string;
   relationFilter?: string;
+  assignedFilter?: "all" | "assigned" | "unassigned";
   sideView: "guests" | "table";
   sidePanelOpen: boolean;
   aiChatOpen: boolean;

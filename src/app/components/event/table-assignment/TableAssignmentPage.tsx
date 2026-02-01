@@ -1,13 +1,33 @@
 "use client";
 import styles from "./TableAssignmentPage.module.css";
-import { Card, Empty, Space, Typography, Button, FloatButton } from "antd";
+import {
+  Card,
+  Empty,
+  Space,
+  Typography,
+  Button,
+  FloatButton,
+  InputNumber,
+  Tag,
+} from "antd";
+import {
+  INITIAL_METERS_TO_PIXELS,
+  DEFAULT_VENUE_WIDTH_METERS,
+} from "./constants/constants";
 import { DndContext, DragOverlay, pointerWithin } from "@dnd-kit/core";
 import {
   TeamOutlined,
   MessageOutlined,
   CloseOutlined,
+  UndoOutlined,
+  PlusOutlined,
+  MinusOutlined,
+  ZoomOutOutlined,
+  ZoomInOutlined,
+  PlusSquareOutlined,
 } from "@ant-design/icons";
 import React from "react";
+import { message } from "antd";
 import TableCanvas from "./components/Tables/TableCanvas/TableCanvas";
 import SeatingAIChat from "./components/AIChat/SeatingAIChat";
 import { useTableAssignmentContext } from "./context/TableAssignmentContext";
@@ -15,8 +35,11 @@ import { TableAssignmentProvider } from "./context/TableAssignmentContext";
 import SidePanel from "./components/SideGuestPanel/SidePanel";
 
 const TableAssignmentPage = () => {
+  const [messageApi, contextHolder] = message.useMessage();
+
   return (
-    <TableAssignmentProvider>
+    <TableAssignmentProvider messageApi={messageApi}>
+      {contextHolder}
       <TableAssignmentContent />
     </TableAssignmentProvider>
   );
@@ -39,6 +62,7 @@ function TableAssignmentContent() {
     onDragCancel,
     dragOverlayContent,
     handleZoomIn,
+    handleZoomFit,
     handleZoomOut,
     handleZoomReset,
     sideView,
@@ -55,13 +79,18 @@ function TableAssignmentContent() {
     selectedTablePeopleCount,
     relationsById,
     assignedGuestIds,
+    assignedFilter,
+    setAssignedFilter,
     filteredGuests,
     guestSearch,
     setGuestSearch,
     relationFilter,
     setRelationFilter,
     relationOptions,
+    dispatch,
   } = useTableAssignmentContext();
+
+  const canvasWrapperRef = React.useRef<HTMLDivElement | null>(null);
 
   if (!activeLayout) {
     return (
@@ -98,15 +127,54 @@ function TableAssignmentContent() {
           <Card
             className={styles.canvasCard}
             title={
-              <Space size={8}>
+              <Space size={8} align="center">
                 <TeamOutlined />
                 <span>Seating chart</span>
+                <Tag color="blue" style={{ marginLeft: 6 }}>
+                  {Array.from(guestsById.values()).length} guests
+                </Tag>
+                <Tag color="orange" style={{ marginLeft: 6 }}>
+                  {Array.from(guestsById.values()).length -
+                    (assignedGuestIds?.size ?? 0)}{" "}
+                  unassigned
+                </Tag>
               </Space>
             }
             extra={
-              <Typography.Text type="secondary">
-                Grid {activeLayout.x_grid_size}×{activeLayout.y_grid_size}
-              </Typography.Text>
+              <Space align="center" size={8}>
+                <Typography.Text type="secondary">Grid</Typography.Text>
+                <InputNumber
+                  min={1}
+                  value={activeLayout.x_grid_size}
+                  onChange={(v) =>
+                    typeof v === "number" &&
+                    dispatch({
+                      type: "SET_ACTIVE_LAYOUT_GRID",
+                      payload: {
+                        x_grid_size: v,
+                        y_grid_size: activeLayout.y_grid_size,
+                      },
+                    })
+                  }
+                  size="small"
+                />
+                <span>×</span>
+                <InputNumber
+                  min={1}
+                  value={activeLayout.y_grid_size}
+                  onChange={(v) =>
+                    typeof v === "number" &&
+                    dispatch({
+                      type: "SET_ACTIVE_LAYOUT_GRID",
+                      payload: {
+                        x_grid_size: activeLayout.x_grid_size,
+                        y_grid_size: v,
+                      },
+                    })
+                  }
+                  size="small"
+                />
+              </Space>
             }
           >
             <div className={styles.zoomControls}>
@@ -114,21 +182,46 @@ function TableAssignmentContent() {
                 size="small"
                 onClick={handleZoomOut}
                 aria-label="Zoom out"
-              >
-                -
-              </Button>
+                icon={<ZoomOutOutlined />}
+              ></Button>
               <Button
                 size="small"
                 onClick={handleZoomReset}
                 aria-label="Reset zoom"
+                icon={<UndoOutlined />}
+              ></Button>
+              <Button
+                size="small"
+                onClick={() => {
+                  const w = canvasWrapperRef.current?.clientWidth ?? 800;
+                  const h = canvasWrapperRef.current?.clientHeight ?? 600;
+                  handleZoomFit(w, h);
+                }}
+                aria-label="Fit"
+                icon={<PlusSquareOutlined />}
+              ></Button>
+              <Button
+                size="small"
+                onClick={handleZoomIn}
+                aria-label="Zoom in"
+                icon={<ZoomInOutlined />}
+              ></Button>
+              <Typography.Text
+                className={styles.zoomPercentage}
+                type="secondary"
               >
-                Reset
-              </Button>
-              <Button size="small" onClick={handleZoomIn} aria-label="Zoom in">
-                +
-              </Button>
+                {Math.round((metersToPixels / INITIAL_METERS_TO_PIXELS) * 100)}%
+              </Typography.Text>
             </div>
-            <div className={styles.canvasWrapper}>
+            <div
+              className={styles.canvasWrapper}
+              ref={canvasWrapperRef}
+              style={
+                {
+                  ["--grid-size"]: `${(DEFAULT_VENUE_WIDTH_METERS / activeLayout.x_grid_size) * metersToPixels}px`,
+                } as React.CSSProperties
+              }
+            >
               <TableCanvas
                 tableOrder={tableOrder}
                 tablesForActiveLayoutById={tablesForActiveLayoutById}
@@ -152,6 +245,8 @@ function TableAssignmentContent() {
             setGuestSearch={setGuestSearch}
             relationFilter={relationFilter}
             setRelationFilter={setRelationFilter}
+            assignedFilter={assignedFilter}
+            setAssignedFilter={setAssignedFilter}
             filteredGuests={filteredGuests}
             relationsById={relationsById}
             assignedGuestIds={assignedGuestIds}
@@ -159,6 +254,12 @@ function TableAssignmentContent() {
             selectedTableAssignments={selectedTableAssignments}
             selectedTablePeopleCount={selectedTablePeopleCount}
             guestsById={guestsById}
+            tableOrder={tableOrder}
+            tablesForActiveLayoutById={tablesForActiveLayoutById}
+            onSelectTable={onSelectTable}
+            onClearSelectedTable={() =>
+              dispatch({ type: "SET_SELECTED_TABLE", payload: null })
+            }
           />
 
           <FloatButton
@@ -175,13 +276,6 @@ function TableAssignmentContent() {
                   <MessageOutlined className={styles.aiChatIcon} />
                   AI Seating Assistant
                 </span>
-                <FloatButton
-                  icon={<CloseOutlined />}
-                  type="default"
-                  className={styles.floatButtonClose}
-                  onClick={() => setAIChatOpen(false)}
-                  tooltip={"Close"}
-                />
               </div>
               <div className={styles.aiChatContent}>
                 <SeatingAIChat

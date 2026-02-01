@@ -1,14 +1,51 @@
-import React, { memo } from "react";
+import React, { memo, useState } from "react";
 import { useDraggable, useDroppable } from "@dnd-kit/core";
 import type { CSSProperties } from "react";
 import styles from "../TableTile.module.css";
-import type { Table } from "../../../models/types";
+import { Popover } from "antd";
+import { useTableAssignmentContext } from "../../../context/TableAssignmentContext";
+import type { Table, TableAssignment, Guest } from "../../../models/types";
 import TableTileContent from "../TableTileContent/TableTileContent";
 import {
   getTableLabel,
   getBadgeColor,
   getTableShapeClass,
 } from "../../../utils/Table-Utils";
+
+function SeatTile({
+  tableId,
+  num,
+  assign,
+  guest,
+}: {
+  tableId: string;
+  num: number;
+  assign?: TableAssignment | undefined;
+  guest?: Guest | null | undefined;
+  indexInParty?: number;
+}) {
+  const { setNodeRef: setSeatRef, isOver: seatOver } = useDroppable({
+    id: `table:${tableId}:seat:${num}`,
+    data: { tableId, seatNumber: num },
+  });
+  const partySize = guest ? guest.party_size ?? (guest.plus_one ? 2 : 1) : 1;
+  const idx = typeof (arguments[0] as any)?.indexInParty === "number" ? (arguments[0] as any).indexInParty : 0;
+  const nameLabel = guest
+    ? `${guest.first_name}${idx > 0 ? ` +${idx}` : ""}`
+    : "—";
+  const titleLabel = guest ? `${guest.first_name} ${guest.last_name}` : `Seat ${num}`;
+  return (
+    <div
+      ref={setSeatRef}
+      key={num}
+      className={[styles.seat, seatOver ? styles.seatOver : ""].join(" ")}
+      title={titleLabel}
+    >
+      <div className={styles.seatNumber}>{num}</div>
+      <div className={styles.seatName}>{nameLabel}</div>
+    </div>
+  );
+}
 
 export default memo(function DroppableTableTile({
   table,
@@ -17,6 +54,8 @@ export default memo(function DroppableTableTile({
   full,
   onSelect,
   metersToPixels,
+  assignments = [],
+  guestsById,
 }: {
   table: Table;
   occupancy: number;
@@ -24,7 +63,10 @@ export default memo(function DroppableTableTile({
   full: boolean;
   onSelect: () => void;
   metersToPixels: number;
+  assignments?: TableAssignment[];
+  guestsById?: Map<string, Guest>;
 }) {
+  const ctx = useTableAssignmentContext();
   const dropId = `table:${table.table_id}`;
   const { setNodeRef: setDropRef, isOver } = useDroppable({
     id: dropId,
@@ -44,8 +86,8 @@ export default memo(function DroppableTableTile({
 
   const left = (table.x_m ?? 0) * metersToPixels;
   const top = (table.y_m ?? 0) * metersToPixels;
-  const width = (table.width_m ?? 1.8) * metersToPixels;
-  const height = (table.height_m ?? 1.8) * metersToPixels;
+  const width = (table.width_m ?? 0) * metersToPixels;
+  const height = (table.height_m ?? 0) * metersToPixels;
 
   const style: CSSProperties = {
     left: `${left}px`,
@@ -64,7 +106,40 @@ export default memo(function DroppableTableTile({
     setDragRef(el);
   };
 
-  return (
+  const [popoverOpen, setPopoverOpen] = useState(false);
+
+  const seatCount = table.total_number ?? 0;
+  const PER_SEAT_SPACE = 34; // approximate px per seat including gap
+  const neededWidth = seatCount * PER_SEAT_SPACE;
+  const padding = 20; // allow some padding inside table
+  const showSeats = neededWidth <= Math.max(0, width - padding);
+
+  const popContent = (
+    <div className={styles.popoverSeats}>
+      {Array.from({ length: seatCount }, (_, i) => i + 1).map((n) => {
+        // find an assignment that covers this seat (start seat + party_size)
+        const assign = assignments.find((a) => {
+          const g = guestsById?.get(a.guest_id);
+          const ps = g ? g.party_size ?? (g.plus_one ? 2 : 1) : 1;
+          return n >= a.seat_number && n < a.seat_number + ps;
+        });
+        const guest = assign ? guestsById?.get(assign.guest_id) : null;
+        const indexInParty = assign ? n - assign.seat_number : 0;
+        return (
+          <SeatTile
+            key={`popover-seat-${n}`}
+            tableId={table.table_id}
+            num={n}
+            assign={assign}
+            guest={guest}
+            indexInParty={indexInParty}
+          />
+        );
+      })}
+    </div>
+  );
+
+      const buttonEl = (
     <button
       ref={setRefs}
       type="button"
@@ -78,6 +153,8 @@ export default memo(function DroppableTableTile({
       onClick={onSelect}
       {...attributes}
       {...listeners}
+      onMouseEnter={() => !showSeats && !(ctx.state?.activeDragId?.toString?.().startsWith?.("guest:")) && setPopoverOpen(true)}
+      onMouseLeave={() => !showSeats && setPopoverOpen(false)}
     >
       <TableTileContent
         table={table}
@@ -87,6 +164,49 @@ export default memo(function DroppableTableTile({
         badgeColor={getBadgeColor(occupancy, table.total_number)}
         metersToPixels={metersToPixels}
       />
+      {showSeats ? (
+        <div className={styles.seatContainer}>
+          {Array.from({ length: seatCount }, (_, i) => i + 1).map((n) => {
+            const assign = assignments.find((a) => {
+              const g = guestsById?.get(a.guest_id);
+              const ps = g ? g.party_size ?? (g.plus_one ? 2 : 1) : 1;
+              return n >= a.seat_number && n < a.seat_number + ps;
+            });
+            const guest = assign ? guestsById?.get(assign.guest_id) : null;
+            const indexInParty = assign ? n - assign.seat_number : 0;
+            return (
+              <SeatTile
+                key={`seat-${n}`}
+                tableId={table.table_id}
+                num={n}
+                assign={assign}
+                guest={guest}
+                indexInParty={indexInParty}
+              />
+            );
+          })}
+        </div>
+      ) : (
+        <div className={styles.seatCompact} title={`${occupancy}/${table.total_number} seated`}>
+          {occupancy}/{table.total_number}
+        </div>
+      )}
     </button>
   );
+
+  if (!showSeats) {
+    return (
+      <Popover
+        content={popContent}
+        open={popoverOpen}
+        onOpenChange={(v) => setPopoverOpen(v)}
+        placement="right"
+        getPopupContainer={() => document.body}
+      >
+        {buttonEl}
+      </Popover>
+    );
+  }
+
+  return buttonEl;
 });

@@ -1,11 +1,18 @@
 .tableTile {
   position: absolute;
   border: 1px solid rgba(0, 0, 0, 0.08);
-  background: linear-gradient(180deg, rgba(255,255,255,0.9), var(--primary-background));
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.9),
+    var(--primary-background)
+  );
   cursor: grab;
-  transition: transform 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
+  transition:
+    transform 120ms ease,
+    border-color 120ms ease,
+    box-shadow 120ms ease;
   pointer-events: auto;
-  z-index: 1;
+  z-index: 2;
   padding: 10px;
   display: flex;
   flex-direction: column;
@@ -18,13 +25,14 @@
 
 .tableTile:hover {
   transform: translateY(-1px);
-  border-color: rgba(0,0,0,0.18);
-  box-shadow: 0 8px 22px rgba(0,0,0,0.12);
+  border-color: rgba(0, 0, 0, 0.18);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.12);
 }
 
 .tableTileSelected {
-  border-color: rgba(92, 107, 192, 0.9);
-  box-shadow: 0 12px 36px rgba(92, 107, 192, 0.18);
+  border-color: rgba(92, 107, 192, 0.95);
+  box-shadow: 0 20px 48px rgba(92, 107, 192, 0.22);
+  transform: translateY(-2px) scale(1.02);
 }
 
 .tableTileOver {
@@ -108,4 +116,59 @@
   justify-content: center;
   border-radius: 10px;
   background: rgba(0, 0, 0, 0.04);
+}
+
+.seatContainer {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.seat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 32px;
+  border-radius: 6px;
+  background: rgba(0,0,0,0.03);
+  padding: 4px 6px;
+  font-size: 11px;
+  color: rgba(0,0,0,0.7);
+}
+
+.seatOver {
+  background: rgba(60,150,90,0.14);
+  box-shadow: 0 6px 18px rgba(60,150,90,0.12);
+}
+
+.seatNumber {
+  font-weight: 700;
+  font-size: 11px;
+}
+
+.seatName {
+  font-size: 10px;
+  color: rgba(0,0,0,0.55);
+}
+
+.seatCompact {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 8px;
+  font-size: 12px;
+  color: rgba(0,0,0,0.65);
+  min-height: 28px;
+}
+
+.popoverSeats {
+  display: flex;
+  gap: 6px;
+  padding: 8px;
+  flex-wrap: wrap;
+  max-width: 260px;
 }

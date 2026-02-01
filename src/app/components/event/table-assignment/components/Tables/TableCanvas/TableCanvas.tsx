@@ -35,47 +35,52 @@ export default memo(function TablesCanvas({
     activeLayout?.x_grid_size ?? DEFAULT_VENUE_WIDTH_METERS;
   const eventHeightMeters =
     activeLayout?.y_grid_size ?? DEFAULT_VENUE_HEIGHT_METERS;
-  const maxMeters = Math.max(eventWidthMeters, eventHeightMeters);
-  const canvasSize = maxMeters * metersToPixels;
 
   return (
     <div className={styles.tablesCanvas}>
-      <div
-        className={styles.canvasInner}
-        style={{ width: `${canvasSize}px`, height: `${canvasSize}px` }}
-      >
+      <div className={styles.canvasInner}>
         <div
-          className={styles.venueOutline}
+          className={styles.venueWrap}
           style={{
             width: `${eventWidthMeters * metersToPixels}px`,
             height: `${eventHeightMeters * metersToPixels}px`,
           }}
-        />
-        {tableOrder
-          .map((id) => tablesForActiveLayoutById.get(id))
-          .filter((t): t is Table => Boolean(t))
-          .map((t) => {
-            const occupancy = (assignmentsByTable.get(t.table_id) ?? []).reduce(
-              (sum, a) => {
+        >
+          <div
+            className={styles.venueOutline}
+            style={{
+              width: `${eventWidthMeters * metersToPixels}px`,
+              height: `${eventHeightMeters * metersToPixels}px`,
+            }}
+          />
+
+          {tableOrder
+            .map((id) => tablesForActiveLayoutById.get(id))
+            .filter((t): t is Table => Boolean(t))
+            .map((t) => {
+              const occupancy = (
+                assignmentsByTable.get(t.table_id) ?? []
+              ).reduce((sum, a) => {
                 const g = guestsById.get(a.guest_id);
                 return sum + (g?.party_size ?? 1);
-              },
-              0,
-            );
-            const isSelected = t.table_id === selectedTableId;
-            const full = occupancy >= t.total_number;
-            return (
-              <DroppableTableTile
-                key={t.table_id}
-                table={t}
-                occupancy={occupancy}
-                isSelected={isSelected}
-                full={full}
-                onSelect={() => onSelectTable(t.table_id)}
-                metersToPixels={metersToPixels}
-              />
-            );
-          })}
+              }, 0);
+              const isSelected = t.table_id === selectedTableId;
+              const full = occupancy >= t.total_number;
+              return (
+                <DroppableTableTile
+                  key={t.table_id}
+                  table={t}
+                  occupancy={occupancy}
+                  isSelected={isSelected}
+                  full={full}
+                  onSelect={() => onSelectTable(t.table_id)}
+                  metersToPixels={metersToPixels}
+                  assignments={assignmentsByTable.get(t.table_id) ?? []}
+                  guestsById={guestsById}
+                />
+              );
+            })}
+        </div>
       </div>
     </div>
   );

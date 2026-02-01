@@ -19,7 +19,8 @@ export default memo(function TableTileContent({
   metersToPixels: number;
 }) {
   const widthPx = (table.width_m ?? 1.8) * metersToPixels;
-  const tooSmall = widthPx < 150;
+  // Reduce threshold so labels show for smaller tables
+  const tooSmall = widthPx < 120;
   return (
     <>
       <div className={styles.tableTileHeader}>
