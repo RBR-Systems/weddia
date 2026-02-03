@@ -1,6 +1,6 @@
 import React, { memo } from "react";
 import { Badge, Space, Typography } from "antd";
-import styles from "../TableTile.module.css";
+import styles from "./TableTile.module.css";
 import type { Table } from "../../../models/types";
 
 export default memo(function TableTileContent({

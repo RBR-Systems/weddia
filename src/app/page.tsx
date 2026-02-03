@@ -15,6 +15,7 @@ import EventsHub from "./components/event/event-hub/events-hub";
 import EventList from "./components/events-list/event-list";
 import TableAssignmentPage from "./components/event/table-assignment/TableAssignmentPage";
 import CreateEventModal from "./components/event/create-event-modal/create-event-modal";
+import { Schedule } from "./components/event/schedule";
 export default function Home() {
   type MenuItem = Required<MenuProps>["items"][number];
 
@@ -28,6 +29,8 @@ export default function Home() {
         return <EventList />;
       case "table-assignment":
         return <TableAssignmentPage />;
+      case "schedule":
+        return <Schedule />;
       default:
         return <EventsHub />;
     }
@@ -36,7 +39,7 @@ export default function Home() {
   const items: MenuItem[] = [
     {
       key: "events",
-      label: "Events",
+      label: "Event Pages",
       icon: <ScheduleOutlined />,
       children: [
         {
@@ -46,16 +49,16 @@ export default function Home() {
           onClick: () => setCurrentView("events-hub"),
         },
         {
-          key: "events-list",
-          label: "Events List",
-          icon: <UnorderedListOutlined />,
-          onClick: () => setCurrentView("events-list"),
-        },
-        {
           key: "table-assignment",
           label: "Table Assignment",
           icon: <TeamOutlined />,
           onClick: () => setCurrentView("table-assignment"),
+        },
+        {
+          key: "schedule",
+          label: "Schedule",
+          icon: <ScheduleOutlined />,
+          onClick: () => setCurrentView("schedule"),
         },
       ],
     },
@@ -63,15 +66,19 @@ export default function Home() {
       type: "divider",
     },
     {
-      key: "sub4",
-      label: "Navigation Three",
+      key: "planner",
+      label: "Planner",
       icon: <SettingOutlined />,
       children: [
         { key: "9", label: "Option 9" },
         { key: "10", label: "Option 10" },
-        { key: "11", label: "Option 11" },
-        { key: "12", label: "Option 12" },
       ],
+    },
+    {
+      key: "events-list",
+      label: "Events List",
+      icon: <UnorderedListOutlined />,
+      onClick: () => setCurrentView("events-list"),
     },
   ];
 
@@ -79,7 +86,11 @@ export default function Home() {
 
   return (
     <div className={styles["page"]}>
-      <NavBar state={collapsed} setCollapsed={setCollapsed} />
+      <NavBar
+        state={collapsed}
+        setCollapsed={setCollapsed}
+        currentView={currentView}
+      />
       <div className={styles["page-container"]}>
         <div className={styles["menu-container"]}>
           <Menu

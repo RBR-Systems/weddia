@@ -1,0 +1,60 @@
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 16px;
+}
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.item {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  cursor: pointer;
+}
+.timeCol {
+  width: 90px;
+  flex-shrink: 0;
+  color: #333;
+  font-weight: 600;
+}
+.content {
+  flex: 1;
+}
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.typeBadge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  background: #eee;
+}
+.meta {
+  font-size: 13px;
+  color: #666;
+}
+.expanded {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed #eee;
+}
+
+@media (max-width: 480px) {
+  .item { flex-direction: column; }
+  .timeCol { width: auto; }
+}

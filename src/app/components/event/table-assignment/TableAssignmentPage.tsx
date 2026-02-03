@@ -235,32 +235,34 @@ function TableAssignmentContent() {
             </div>
           </Card>
 
-          <SidePanel
-            sideView={sideView}
-            setSideView={setSideView}
-            sidePanelOpen={sidePanelOpen}
-            segmentedOptions={segmentedOptions}
-            relationOptions={relationOptions}
-            guestSearch={guestSearch}
-            setGuestSearch={setGuestSearch}
-            relationFilter={relationFilter}
-            setRelationFilter={setRelationFilter}
-            assignedFilter={assignedFilter}
-            setAssignedFilter={setAssignedFilter}
-            filteredGuests={filteredGuests}
-            relationsById={relationsById}
-            assignedGuestIds={assignedGuestIds}
-            selectedTable={selectedTable}
-            selectedTableAssignments={selectedTableAssignments}
-            selectedTablePeopleCount={selectedTablePeopleCount}
-            guestsById={guestsById}
-            tableOrder={tableOrder}
-            tablesForActiveLayoutById={tablesForActiveLayoutById}
-            onSelectTable={onSelectTable}
-            onClearSelectedTable={() =>
-              dispatch({ type: "SET_SELECTED_TABLE", payload: null })
-            }
-          />
+          <div className={styles.sideContainer}>
+            <SidePanel
+              sideView={sideView}
+              setSideView={setSideView}
+              sidePanelOpen={sidePanelOpen}
+              segmentedOptions={segmentedOptions}
+              relationOptions={relationOptions}
+              guestSearch={guestSearch}
+              setGuestSearch={setGuestSearch}
+              relationFilter={relationFilter}
+              setRelationFilter={setRelationFilter}
+              assignedFilter={assignedFilter}
+              setAssignedFilter={setAssignedFilter}
+              filteredGuests={filteredGuests}
+              relationsById={relationsById}
+              assignedGuestIds={assignedGuestIds}
+              selectedTable={selectedTable}
+              selectedTableAssignments={selectedTableAssignments}
+              selectedTablePeopleCount={selectedTablePeopleCount}
+              guestsById={guestsById}
+              tableOrder={tableOrder}
+              tablesForActiveLayoutById={tablesForActiveLayoutById}
+              onSelectTable={onSelectTable}
+              onClearSelectedTable={() =>
+                dispatch({ type: "SET_SELECTED_TABLE", payload: null })
+              }
+            />
+          </div>
 
           <FloatButton
             icon={<MessageOutlined />}

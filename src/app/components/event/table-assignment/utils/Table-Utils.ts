@@ -1,5 +1,5 @@
 import { Guest, Table } from "../models/types";
-import styles from "../components/Tables/TableTile.module.css";
+import styles from "../components/Tables/TableTileContent/TableTile.module.css";
 
 export function fullName(g: Pick<Guest, "first_name" | "last_name">) {
   return `${g.first_name} ${g.last_name}`.trim();

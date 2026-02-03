@@ -1,7 +1,7 @@
 import React, { memo, useState } from "react";
 import { useDraggable, useDroppable } from "@dnd-kit/core";
 import type { CSSProperties } from "react";
-import styles from "../TableTile.module.css";
+import styles from "../TableTileContent/TableTile.module.css";
 import { Popover } from "antd";
 import { useTableAssignmentContext } from "../../../context/TableAssignmentContext";
 import type { Table, TableAssignment, Guest } from "../../../models/types";

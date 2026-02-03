@@ -10,9 +10,13 @@ import { EventActions } from "@/app/contexts/EventActions";
 type NavBarProps = {
   state: boolean;
   setCollapsed: React.Dispatch<React.SetStateAction<boolean>>;
+  currentView?: string;
 };
 
-export const NavBar: React.FC<NavBarProps> = ({ setCollapsed }) => {
+export const NavBar: React.FC<NavBarProps> = ({
+  setCollapsed,
+  currentView,
+}) => {
   const {
     state,
     state: {
@@ -51,6 +55,8 @@ export const NavBar: React.FC<NavBarProps> = ({ setCollapsed }) => {
     });
   };
 
+  const eventViews = new Set(["events-hub", "table-assignment"]);
+
   return (
     <div className={styles["navbar"]}>
       <div className={`${styles["navbar-item"]} ${styles["start"]}`}>
@@ -64,14 +70,16 @@ export const NavBar: React.FC<NavBarProps> = ({ setCollapsed }) => {
         </p>
       </div>
       <div className={`${styles["navbar-item"]} ${styles["end"]}`}>
-        <Dropdown menu={menuProps}>
-          <Button>
-            <Space>
-              {selectedEvent?.eventName || "Select Event"}
-              <DownOutlined />
-            </Space>
-          </Button>
-        </Dropdown>
+        {eventViews.has(currentView || "") ? (
+          <Dropdown menu={menuProps}>
+            <Button>
+              <Space>
+                {selectedEvent?.eventName || "Select Event"}
+                <DownOutlined />
+              </Space>
+            </Button>
+          </Dropdown>
+        ) : null}
         <Button
           icon={<PlusOutlined />}
           className={styles["button-color"]}
