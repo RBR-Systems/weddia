@@ -113,3 +113,38 @@ export function getFilteredItems(
 
   return filtered;
 }
+
+export function calculateSetupDuration(item: TimelineItem) {
+  if (!item.setup_time) return null;
+  const setup = new Date(item.setup_time);
+  const start = new Date(item.start_time);
+  if (Number.isNaN(setup.getTime()) || Number.isNaN(start.getTime()))
+    return null;
+  const diffMs = start.getTime() - setup.getTime();
+  if (diffMs <= 0) return null;
+  const diffMins = Math.floor(diffMs / 60000);
+  if (diffMins < 60) return `${diffMins} min`;
+  const hours = Math.floor(diffMins / 60);
+  const mins = diffMins % 60;
+  if (mins === 0) return `${hours} hour${hours > 1 ? "s" : ""}`;
+  return `${hours}h ${mins}m`;
+}
+
+export function suggestSetupTime(activityType: string) {
+  const suggestions: Record<string, number> = {
+    ceremony: 30,
+    reception: 60,
+    photos: 15,
+    meal_service: 45,
+    special_moment: 10,
+    vendor_setup: 30,
+  };
+  return suggestions[activityType] ?? 15;
+}
+
+export function calculateSetupTime(startTime: string, minutesBefore: number) {
+  const start = new Date(startTime);
+  if (Number.isNaN(start.getTime())) return null;
+  const setup = new Date(start.getTime() - minutesBefore * 60000);
+  return setup.toISOString();
+}

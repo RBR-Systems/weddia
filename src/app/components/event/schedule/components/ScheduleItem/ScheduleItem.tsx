@@ -8,9 +8,18 @@ import {
   UpOutlined,
   DownOutlined,
 } from "@ant-design/icons";
-import { EnvironmentOutlined, FieldTimeOutlined } from "@ant-design/icons";
-import { TimelineItem, Status } from "../models/types";
-import { calculateDuration, STATUS_OPTIONS } from "../utils/helpers";
+import {
+  EnvironmentOutlined,
+  FieldTimeOutlined,
+  ToolOutlined,
+} from "@ant-design/icons";
+import { TimelineItem, Status } from "../../models/types";
+import {
+  calculateDuration,
+  calculateSetupDuration,
+  formatTime,
+  STATUS_OPTIONS,
+} from "../../utils/helpers";
 import styles from "./schedule-item.module.css";
 
 type Props = {
@@ -65,7 +74,6 @@ export const ScheduleItem: React.FC<Props> = ({
   onStatusChange,
   timeLabel,
 }) => {
-  // Use the actual stored status for changes; only highlight as "in_progress" when current time
   const actualStatus: Status = (item.status ?? "pending") as Status;
   const displayStatus: Status =
     isNow && actualStatus === "pending" ? "in_progress" : actualStatus;
@@ -73,7 +81,6 @@ export const ScheduleItem: React.FC<Props> = ({
 
   const now = Date.now();
   const isPast = new Date(item.end_time).getTime() < now;
-  // Completed/cancelled state should reflect the stored status (actualStatus)
   const isCompleted = actualStatus === "completed";
   const isCancelled = actualStatus === "cancelled";
 
@@ -87,7 +94,6 @@ export const ScheduleItem: React.FC<Props> = ({
       )
     : 0;
 
-  // Define status order for cycling
   const statusOrder: Status[] = [
     "pending",
     "in_progress",
@@ -99,8 +105,6 @@ export const ScheduleItem: React.FC<Props> = ({
   const handleStatusUp = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!onStatusChange) return;
-
-    // Cycle based on the actual stored status so changes persist even when the item is "now"
     const currentIndex = statusOrder.indexOf(actualStatus);
     const nextIndex =
       currentIndex > 0 ? currentIndex - 1 : statusOrder.length - 1;
@@ -110,22 +114,17 @@ export const ScheduleItem: React.FC<Props> = ({
   const handleStatusDown = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!onStatusChange) return;
-
     const currentIndex = statusOrder.indexOf(actualStatus);
     const nextIndex =
       currentIndex < statusOrder.length - 1 ? currentIndex + 1 : 0;
     onStatusChange(item.timeline_item_id, statusOrder[nextIndex]);
   };
 
-  // edit handler provided via props (destructured above)
-
   return (
     <Card
       size="small"
       bordered={false}
-      bodyStyle={{ padding: 12 }}
       onClick={() => onToggle(item.timeline_item_id)}
-      style={{ width: "100%" }}
       className={[
         styles.scheduleItem,
         isNow ? styles.scheduleItemActive : "",
@@ -149,46 +148,49 @@ export const ScheduleItem: React.FC<Props> = ({
           />
         </div>
       )}
-      <Space direction="vertical" style={{ width: "100%" }} size="small">
-        {/* Header row */}
-        <Space
-          direction="horizontal"
-          style={{
-            justifyContent: "space-between",
-            width: "100%",
-            alignItems: "flex-start",
-          }}
-        >
-          <Space align="start">
-            <div>
-              <Space size={4} wrap>
-                {isNow && (
-                  <Tag color="#ff4d4f" style={{ margin: 0 }}>
-                    Now
-                  </Tag>
-                )}
-                <Tag
-                  color={typeColors[item.type] ?? "default"}
-                  style={{ textTransform: "capitalize", margin: 0 }}
-                >
-                  {item.type.replace(/_/g, " ")}
-                </Tag>
-                <strong
-                  style={{
-                    textDecoration: isCancelled ? "line-through" : "none",
-                    color: isCancelled ? "#999" : "inherit",
-                  }}
-                >
-                  {item.title}
-                </strong>
-              </Space>
-            </div>
-          </Space>
 
-          {/* Status controls + prominent time */}
+      <Space orientation="vertical" className={styles.fullWidth} size="small">
+        {item.setup_time && (
           <div
+            className={styles.setupTimeBlock}
             onClick={(e) => e.stopPropagation()}
-            className={styles.statusControls}
+          >
+            <span className={styles.setupTimeLabel}>
+              {formatTime(item.setup_time)}
+            </span>
+            <ToolOutlined className={styles.setupIcon} />
+            <span className={styles.setupLabel}>
+              Setup: {calculateSetupDuration(item)}
+            </span>
+          </div>
+        )}
+
+        <div className={styles.headerRow}>
+          <div className={styles.titleCenter}>
+            <strong
+              className={isCancelled ? styles.titleCancelled : styles.title}
+            >
+              {item.title}
+            </strong>
+          </div>
+
+          <div className={styles.headerLeft}>
+            <Space size={4} wrap>
+              <Tag
+                className={styles.typeTag}
+                style={{
+                  textTransform: "capitalize",
+                  background: typeColors[item.type] ?? undefined,
+                }}
+              >
+                {item.type.replace(/_/g, " ")}
+              </Tag>
+            </Space>
+          </div>
+
+          <div
+            className={styles.headerRight}
+            onClick={(e) => e.stopPropagation()}
           >
             <Space size={8} align="center">
               <Badge
@@ -203,21 +205,23 @@ export const ScheduleItem: React.FC<Props> = ({
                           ? "error"
                           : "default"
                 }
-                text={<span style={{ fontSize: 13 }}>{statusInfo.label}</span>}
+                text={
+                  <span className={styles.statusLabel}>{statusInfo.label}</span>
+                }
               />
-              <Space size={2} direction="vertical" style={{ marginLeft: 4 }}>
+
+              <Space
+                size={2}
+                orientation="vertical"
+                className={styles.statusButtonsWrap}
+              >
                 <Tooltip title="Previous status">
                   <Button
                     type="text"
                     size="small"
                     icon={<UpOutlined />}
                     onClick={handleStatusUp}
-                    style={{
-                      padding: "0 4px",
-                      height: 18,
-                      fontSize: 10,
-                      lineHeight: 1,
-                    }}
+                    className={styles.smallIconBtn}
                   />
                 </Tooltip>
                 <Tooltip title="Next status">
@@ -226,53 +230,37 @@ export const ScheduleItem: React.FC<Props> = ({
                     size="small"
                     icon={<DownOutlined />}
                     onClick={handleStatusDown}
-                    style={{
-                      padding: "0 4px",
-                      height: 18,
-                      fontSize: 10,
-                      lineHeight: 1,
-                    }}
+                    className={styles.smallIconBtn}
                   />
                 </Tooltip>
               </Space>
 
-              {/* Prominent time label placed after status controls */}
               <div className={styles.timeLabel} aria-hidden={false}>
                 {timeLabel}
               </div>
             </Space>
           </div>
-        </Space>
+        </div>
 
-        {/* Meta row (time moved to header). Location left, actions on right. */}
-        <div
-          style={{
-            color: "#666",
-            display: "flex",
-            gap: 16,
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+        <div className={styles.metaRow}>
+          <div className={styles.metaLeft}>
             {item.location_name && (
-              <span
-                style={{ display: "inline-flex", alignItems: "center", gap: 6 }}
-              >
-                <EnvironmentOutlined style={{ color: "#888" }} />
+              <span className={styles.location}>
+                <EnvironmentOutlined />
                 <span>{item.location_name}</span>
               </span>
             )}
 
-            <span
-              style={{ display: "inline-flex", alignItems: "center", gap: 6 }}
-            >
-              <FieldTimeOutlined style={{ color: "#888" }} />
+            <span className={styles.duration}>
+              <FieldTimeOutlined />
               <span>{calculateDuration(item)}</span>
             </span>
           </div>
 
-          <div className={styles.actionButtons} onClick={(e) => e.stopPropagation()}>
+          <div
+            className={styles.actionButtons}
+            onClick={(e) => e.stopPropagation()}
+          >
             <Button
               type="default"
               size="small"
@@ -289,7 +277,7 @@ export const ScheduleItem: React.FC<Props> = ({
               danger
               size="small"
               icon={<DeleteOutlined />}
-              style={{ marginLeft: 8 }}
+              className={styles.deleteBtn}
               onClick={(e) => {
                 e.stopPropagation();
                 if (onDelete) {
@@ -305,22 +293,20 @@ export const ScheduleItem: React.FC<Props> = ({
         </div>
 
         {expanded && (
-          <div style={{ width: "100%", marginTop: 8 }}>
+          <div className={styles.expandedArea}>
             <Collapse activeKey={["1"]}>
               <Collapse.Panel key="1" header="Details">
                 {item.description && (
-                  <div style={{ marginBottom: 8 }}>{item.description}</div>
+                  <div className={styles.detailLine}>{item.description}</div>
                 )}
                 {item.notes && (
-                  <div style={{ color: "#444" }}>Notes: {item.notes}</div>
+                  <div className={styles.detailNotes}>Notes: {item.notes}</div>
                 )}
               </Collapse.Panel>
             </Collapse>
-            <div style={{ marginTop: 8, display: "flex", justifyContent: "flex-end" }}>
+            <div className={styles.detailsFooter}>
               {isPast && !isCancelled && !isCompleted && (
-                <Tag color="default" style={{ marginRight: 8 }}>
-                  Passed
-                </Tag>
+                <Tag className={styles.passedTag}>Passed</Tag>
               )}
             </div>
           </div>

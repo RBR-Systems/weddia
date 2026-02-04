@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Progress, Space, Tag, Statistic, Row, Col, Card } from "antd";
+import { Progress, Space, Tag, Row, Col, Card } from "antd";
 import {
   CheckCircleOutlined,
   ClockCircleOutlined,
@@ -9,12 +9,11 @@ import {
   WarningOutlined,
   CloseCircleOutlined,
 } from "@ant-design/icons";
-import { calculateProgress, STATUS_OPTIONS } from "../utils/helpers";
-import { TimelineItem } from "../models/types";
+import { calculateProgress, STATUS_OPTIONS } from "../../utils/helpers";
+import { TimelineItem } from "../../models/types";
+import styles from "./StatusProgressBar.module.css";
 
-type Props = {
-  items: TimelineItem[];
-};
+type Props = { items: TimelineItem[] };
 
 const StatusProgressBar: React.FC<Props> = ({ items }) => {
   const progress = calculateProgress(items);
@@ -38,27 +37,13 @@ const StatusProgressBar: React.FC<Props> = ({ items }) => {
   };
 
   return (
-    <Card
-      size="small"
-      style={{ marginBottom: 16 }}
-      bodyStyle={{ padding: "16px" }}
-    >
-      <Space direction="vertical" style={{ width: "100%" }} size="middle">
-        {/* Progress header */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <h3 style={{ margin: 0, fontSize: 16, fontWeight: 600 }}>
-            Event Progress
-          </h3>
+    <Card size="small" className={styles.card}>
+      <Space orientation="vertical" className={styles.fullWidth} size="middle">
+        <div className={styles.progressHeader}>
+          <h3 className={styles.title}>Event Progress</h3>
           <span
+            className={styles.percentage}
             style={{
-              fontSize: 18,
-              fontWeight: "bold",
               color:
                 progress.completion_percentage === 100
                   ? STATUS_OPTIONS.completed.color
@@ -69,31 +54,23 @@ const StatusProgressBar: React.FC<Props> = ({ items }) => {
           </span>
         </div>
 
-        {/* Progress bar */}
         <Progress
           percent={progress.completion_percentage}
-          strokeColor={{
-            from: "#1890ff",
-            to: STATUS_OPTIONS.completed.color,
-          }}
+          strokeColor={{ from: "#1890ff", to: STATUS_OPTIONS.completed.color }}
           status={progress.completion_percentage === 100 ? "success" : "active"}
           showInfo={false}
         />
 
-        {/* Status breakdown */}
         <Row gutter={[8, 8]}>
           <Col span={8}>
-            <div style={{ textAlign: "center" }}>
+            <div className={styles.statCol}>
               <div
-                style={{
-                  fontSize: 24,
-                  fontWeight: "bold",
-                  color: STATUS_OPTIONS.completed.color,
-                }}
+                className={styles.statNumber}
+                style={{ color: STATUS_OPTIONS.completed.color }}
               >
                 {progress.completed}
               </div>
-              <div style={{ fontSize: 12, color: "#666" }}>
+              <div className={styles.statLabel}>
                 <Space size={4}>
                   {statusIcons.completed}
                   <span>Completed</span>
@@ -103,17 +80,14 @@ const StatusProgressBar: React.FC<Props> = ({ items }) => {
           </Col>
 
           <Col span={8}>
-            <div style={{ textAlign: "center" }}>
+            <div className={styles.statCol}>
               <div
-                style={{
-                  fontSize: 24,
-                  fontWeight: "bold",
-                  color: STATUS_OPTIONS.in_progress.color,
-                }}
+                className={styles.statNumber}
+                style={{ color: STATUS_OPTIONS.in_progress.color }}
               >
                 {progress.in_progress}
               </div>
-              <div style={{ fontSize: 12, color: "#666" }}>
+              <div className={styles.statLabel}>
                 <Space size={4}>
                   {statusIcons.in_progress}
                   <span>In Progress</span>
@@ -123,17 +97,14 @@ const StatusProgressBar: React.FC<Props> = ({ items }) => {
           </Col>
 
           <Col span={8}>
-            <div style={{ textAlign: "center" }}>
+            <div className={styles.statCol}>
               <div
-                style={{
-                  fontSize: 24,
-                  fontWeight: "bold",
-                  color: STATUS_OPTIONS.pending.color,
-                }}
+                className={styles.statNumber}
+                style={{ color: STATUS_OPTIONS.pending.color }}
               >
                 {progress.pending}
               </div>
-              <div style={{ fontSize: 12, color: "#666" }}>
+              <div className={styles.statLabel}>
                 <Space size={4}>
                   {statusIcons.pending}
                   <span>Pending</span>
@@ -143,12 +114,8 @@ const StatusProgressBar: React.FC<Props> = ({ items }) => {
           </Col>
         </Row>
 
-        {/* Show delayed/cancelled if any */}
         {(progress.delayed > 0 || progress.cancelled > 0) && (
-          <Space
-            size="middle"
-            style={{ width: "100%", justifyContent: "center" }}
-          >
+          <Space size="middle" className={styles.statusBreakdown}>
             {progress.delayed > 0 && (
               <Tag icon={statusIcons.delayed} color="warning">
                 {progress.delayed} Delayed

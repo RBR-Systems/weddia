@@ -3,14 +3,19 @@
 import React, { useState, useMemo, useRef, useEffect } from "react";
 import { Timeline, Divider, Typography } from "antd";
 import { ClockCircleOutlined } from "@ant-design/icons";
-import { TimelineItem, Status } from "../models/types";
-import ScheduleItem from "./ScheduleItem";
+import { TimelineItem, Status } from "../../models/types";
+import ScheduleItem from "../ScheduleItem/ScheduleItem";
+import styles from "./ScheduleList.module.css";
 
 type Props = {
   items: TimelineItem[];
   onEdit?: (item: TimelineItem) => void;
   onDelete?: (id: string) => void;
   onStatusChange?: (itemId: string, newStatus: Status) => void;
+  // When false, disable the initial auto-scroll (used to prevent scrolling after remounts)
+  allowAutoScroll?: boolean;
+  // Callback to notify parent that auto-scroll happened
+  onAutoScrolled?: () => void;
 };
 
 const { Text } = Typography;
@@ -37,27 +42,23 @@ const ScheduleList: React.FC<Props> = ({
   onEdit,
   onDelete,
   onStatusChange,
+  allowAutoScroll = true,
+  onAutoScrolled,
 }) => {
-  useEffect(() => {
-    // debug: ensure onDelete prop reaches this component
-    // eslint-disable-next-line no-console
-    console.log("ScheduleList onDelete set:", !!onDelete);
-  }, [onDelete]);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [now, setNow] = useState(Date.now());
   const itemRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const lastScrolledId = useRef<string | null>(null);
+  const hasAutoScrolledRef = useRef(false);
   const toggle = (id: string) => setExpandedId((p) => (p === id ? null : id));
 
-  // Update every minute
   React.useEffect(() => {
     const interval = setInterval(() => {
       setNow(Date.now());
-    }, 60000); // 1 minute
+    }, 60000);
     return () => clearInterval(interval);
   }, []);
 
-  // Sort items by start_time
   const sortedItems = useMemo(() => {
     return [...items].sort(
       (a, b) =>
@@ -65,7 +66,6 @@ const ScheduleList: React.FC<Props> = ({
     );
   }, [items]);
 
-  // Auto-scroll to the current event when `now` updates or items change
   useEffect(() => {
     const current = sortedItems.find((item) => {
       const start = new Date(item.start_time).getTime();
@@ -73,26 +73,33 @@ const ScheduleList: React.FC<Props> = ({
       return start <= now && now <= end;
     });
 
-    if (current && lastScrolledId.current !== current.timeline_item_id) {
+    // Auto-scroll only once on initial mount (do not re-scroll after filters/updates)
+    if (
+      current &&
+      allowAutoScroll &&
+      !hasAutoScrolledRef.current &&
+      lastScrolledId.current !== current.timeline_item_id
+    ) {
       const el = itemRefs.current[current.timeline_item_id];
       if (el && typeof el.scrollIntoView === "function") {
-        // Use smooth scroll and center the item in view
         el.scrollIntoView({ behavior: "smooth", block: "center" });
         lastScrolledId.current = current.timeline_item_id;
+        hasAutoScrolledRef.current = true;
+        onAutoScrolled?.();
       }
     }
     if (!current) lastScrolledId.current = null;
   }, [now, sortedItems]);
 
-  // Build Ant Design Timeline `items` array (uses `content`, `color`, `icon`)
   const timelineItems = sortedItems.map((item) => {
     const start = new Date(item.start_time).getTime();
     const end = new Date(item.end_time).getTime();
     const isNow = start <= now && now <= end;
 
-    // Use Ant Design Timeline's `icon` for the clock and `color` for colored dots
     const icon = isNow ? (
-      <ClockCircleOutlined style={{ fontSize: "16px" }} />
+      <span className={styles.iconClock}>
+        <ClockCircleOutlined />
+      </span>
     ) : undefined;
     const color = isNow ? "red" : (typeColors[item.type] ?? undefined);
 
@@ -130,7 +137,7 @@ const ScheduleList: React.FC<Props> = ({
     <Timeline
       mode="end"
       items={timelineItems}
-      style={{ display: "flex", flexDirection: "column", gap: 16 }}
+      className={styles.timelineWrap}
     />
   );
 };

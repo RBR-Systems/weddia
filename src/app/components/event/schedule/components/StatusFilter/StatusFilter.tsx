@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Space, Tag, Switch, Divider, Button } from "antd";
+import { Space, Tag, Switch, Button, Input, Select } from "antd";
 import {
   CheckCircleOutlined,
   ClockCircleOutlined,
@@ -10,9 +10,10 @@ import {
   CloseCircleOutlined,
   FilterOutlined,
 } from "@ant-design/icons";
-import { Status } from "../models/types";
-import { STATUS_OPTIONS, calculateProgress } from "../utils/helpers";
-import { TimelineItem } from "../models/types";
+import { Status } from "../../models/types";
+import { STATUS_OPTIONS, calculateProgress } from "../../utils/helpers";
+import { TimelineItem } from "../../models/types";
+import styles from "./StatusFilter.module.css";
 
 type Props = {
   items: TimelineItem[];
@@ -21,6 +22,14 @@ type Props = {
   hideCompleted: boolean;
   onHideCompletedChange: (hide: boolean) => void;
   onAddClick?: () => void;
+  // New props for filtering/search
+  searchQuery?: string;
+  onSearchChange?: (q: string) => void;
+  types?: string[];
+  selectedTypes?: string[];
+  onTypesChange?: (types: string[]) => void;
+  onClearFilters?: () => void;
+  filteredCount?: number;
 };
 
 const { CheckableTag } = Tag;
@@ -32,6 +41,13 @@ const StatusFilter: React.FC<Props> = ({
   hideCompleted,
   onHideCompletedChange,
   onAddClick,
+  searchQuery,
+  onSearchChange,
+  types = [],
+  selectedTypes = [],
+  onTypesChange,
+  onClearFilters,
+  filteredCount,
 }) => {
   const progress = calculateProgress(items);
 
@@ -43,44 +59,49 @@ const StatusFilter: React.FC<Props> = ({
     cancelled: <CloseCircleOutlined />,
   };
 
-  const getStatusCount = (status: Status | "all") => {
-    if (status === "all") return progress.total;
-    return progress[status] || 0;
-  };
-
   return (
-    <div
-      style={{
-        marginBottom: 16,
-        padding: "12px 16px",
-        background: "#fafafa",
-        borderRadius: 8,
-        border: "1px solid #f0f0f0",
-      }}
-    >
-      <Space direction="vertical" style={{ width: "100%" }} size="small">
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            flexWrap: "wrap",
-            gap: 8,
-          }}
-        >
+    <div className={styles.container}>
+      <Space orientation="vertical" className={styles.fullWidth} size="small">
+        <div className={styles.controlsRow}>
+          <Space size={[8, 8]} className={styles.topRow} align="center">
+            <Input.Search
+              placeholder="Search timeline..."
+              allowClear
+              value={searchQuery}
+              onChange={(e) => onSearchChange?.(e.target.value)}
+              style={{ width: 280 }}
+              size="small"
+            />
+
+            <Select
+              mode="multiple"
+              placeholder="Filter types"
+              value={selectedTypes}
+              onChange={(vals) => onTypesChange?.(vals as string[])}
+              options={types.map((t) => ({ label: t, value: t }))}
+              style={{ minWidth: 200, maxWidth: 360 }}
+              size="small"
+            />
+
+            <Button size="small" onClick={() => onClearFilters?.()}>
+              Clear
+            </Button>
+
+            {typeof filteredCount === "number" && (
+              <Tag color="default" className={styles.filteredTag}>
+                {filteredCount} shown
+              </Tag>
+            )}
+          </Space>
           <Space size={[0, 8]} wrap>
-            <span style={{ color: "#666", fontSize: 13, marginRight: 4 }}>
+            <span className={styles.filterLabel}>
               <FilterOutlined /> Filter:
             </span>
 
             <CheckableTag
               checked={activeFilter === "all"}
               onChange={() => onFilterChange("all")}
-              style={{
-                fontSize: 13,
-                padding: "2px 12px",
-                borderRadius: 16,
-              }}
+              className={styles.tag}
             >
               All ({progress.total})
             </CheckableTag>
@@ -88,11 +109,7 @@ const StatusFilter: React.FC<Props> = ({
             <CheckableTag
               checked={activeFilter === "pending"}
               onChange={() => onFilterChange("pending")}
-              style={{
-                fontSize: 13,
-                padding: "2px 12px",
-                borderRadius: 16,
-              }}
+              className={styles.tag}
             >
               <Space size={4}>
                 {statusIcons.pending}
@@ -103,11 +120,7 @@ const StatusFilter: React.FC<Props> = ({
             <CheckableTag
               checked={activeFilter === "in_progress"}
               onChange={() => onFilterChange("in_progress")}
-              style={{
-                fontSize: 13,
-                padding: "2px 12px",
-                borderRadius: 16,
-              }}
+              className={styles.tag}
             >
               <Space size={4}>
                 {statusIcons.in_progress}
@@ -118,11 +131,7 @@ const StatusFilter: React.FC<Props> = ({
             <CheckableTag
               checked={activeFilter === "completed"}
               onChange={() => onFilterChange("completed")}
-              style={{
-                fontSize: 13,
-                padding: "2px 12px",
-                borderRadius: 16,
-              }}
+              className={styles.tag}
             >
               <Space size={4}>
                 {statusIcons.completed}
@@ -134,11 +143,7 @@ const StatusFilter: React.FC<Props> = ({
               <CheckableTag
                 checked={activeFilter === "delayed"}
                 onChange={() => onFilterChange("delayed")}
-                style={{
-                  fontSize: 13,
-                  padding: "2px 12px",
-                  borderRadius: 16,
-                }}
+                className={styles.tag}
               >
                 <Space size={4}>
                   {statusIcons.delayed}
@@ -151,11 +156,7 @@ const StatusFilter: React.FC<Props> = ({
               <CheckableTag
                 checked={activeFilter === "cancelled"}
                 onChange={() => onFilterChange("cancelled")}
-                style={{
-                  fontSize: 13,
-                  padding: "2px 12px",
-                  borderRadius: 16,
-                }}
+                className={styles.tag}
               >
                 <Space size={4}>
                   {statusIcons.cancelled}
@@ -166,17 +167,15 @@ const StatusFilter: React.FC<Props> = ({
           </Space>
 
           <Space size="small" align="center">
-            {/** Add button placed next to the Hide Completed toggle */}
             <Button
               type="primary"
               size="small"
               onClick={() => onAddClick?.()}
-              style={{ marginRight: 8 }}
+              className={styles.addBtn}
             >
               + Add
             </Button>
-
-            <span style={{ fontSize: 13, color: "#666" }}>Hide Completed</span>
+            <span className={styles.hideLabel}>Hide Completed</span>
             <Switch
               checked={hideCompleted}
               onChange={onHideCompletedChange}

@@ -20,7 +20,7 @@
   padding: 12px;
   background: #fff;
   border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
   cursor: pointer;
 }
 .timeCol {
@@ -55,6 +55,10 @@
 }
 
 @media (max-width: 480px) {
-  .item { flex-direction: column; }
-  .timeCol { width: auto; }
+  .item {
+    flex-direction: column;
+  }
+  .timeCol {
+    width: auto;
+  }
 }
