@@ -16,6 +16,9 @@ import EventList from "./components/events-list/event-list";
 import TableAssignmentPage from "./components/event/table-assignment/TableAssignmentPage";
 import CreateEventModal from "./components/event/create-event-modal/create-event-modal";
 import { Schedule } from "./components/event/schedule";
+import BudgetDashboard from "./components/event/budget/BudgetDashboard";
+import MultiClientPage from "./components/multi-client/MultiClientPage";
+
 export default function Home() {
   type MenuItem = Required<MenuProps>["items"][number];
 
@@ -27,10 +30,14 @@ export default function Home() {
         return <EventsHub />;
       case "events-list":
         return <EventList />;
+      case "multi-client":
+        return <MultiClientPage />;
       case "table-assignment":
         return <TableAssignmentPage />;
       case "schedule":
         return <Schedule />;
+      case "budget":
+        return <BudgetDashboard />;
       default:
         return <EventsHub />;
     }
@@ -47,6 +54,12 @@ export default function Home() {
           label: "Events Hub",
           icon: <HomeOutlined />,
           onClick: () => setCurrentView("events-hub"),
+        },
+        {
+          key: "budget",
+          label: "Budget",
+          icon: <SettingOutlined />,
+          onClick: () => setCurrentView("budget"),
         },
         {
           key: "table-assignment",
@@ -79,6 +92,12 @@ export default function Home() {
       label: "Events List",
       icon: <UnorderedListOutlined />,
       onClick: () => setCurrentView("events-list"),
+    },
+    {
+      key: "multi-client",
+      label: "Multi-Client Budgets",
+      icon: <TeamOutlined />,
+      onClick: () => setCurrentView("multi-client"),
     },
   ];
 

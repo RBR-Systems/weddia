@@ -11,4 +11,6 @@ export interface EventCardProps {
   rsvp: number;
   tasks: number;
   sits: number;
+  budget?: number;
+  spent?: number;
 }

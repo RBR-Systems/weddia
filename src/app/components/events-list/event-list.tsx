@@ -6,10 +6,30 @@ import Header from "@/app/common/Header/header";
 import { EventStatus } from "./models/enums/event-list-enums";
 import { eventList } from "@/app/data/EventList";
 import { EventCardProps } from "./models/event-card-props-model";
-import { Table, Button, Modal, Form, Input, InputNumber, Select } from "antd";
-import { EditOutlined } from "@ant-design/icons";
+import {
+  Table,
+  Button,
+  Modal,
+  Form,
+  Input,
+  InputNumber,
+  Select,
+  Progress,
+  Tag,
+  Tooltip,
+} from "antd";
+import { EditOutlined, DollarOutlined } from "@ant-design/icons";
 
 const { Option } = Select;
+
+const formatCurrency = (value: number) => {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(value);
+};
 
 const EventList = () => {
   const [events, setEvents] = useState<EventCardProps[]>(() => [...eventList]);
@@ -85,7 +105,75 @@ const EventList = () => {
     { title: "Invites", dataIndex: "invites", key: "invites" },
     { title: "RSVP", dataIndex: "rsvp", key: "rsvp" },
     { title: "Tasks", dataIndex: "tasks", key: "tasks" },
-    { title: "Sits", dataIndex: "sits", key: "sits" },
+    {
+      title: "Budget",
+      key: "budget",
+      width: 220,
+      render: (_: unknown, record: EventCardProps) => {
+        if (!record.budget) return <span style={{ color: "#999" }}>—</span>;
+        const spent = record.spent ?? 0;
+        const remaining = record.budget - spent;
+        const percentage = Math.round((spent / record.budget) * 100);
+        const isOverBudget = spent > record.budget;
+
+        return (
+          <div style={{ minWidth: 180 }}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                marginBottom: 4,
+                fontSize: 12,
+              }}
+            >
+              <Tooltip title="Total Budget">
+                <span>
+                  <DollarOutlined /> {formatCurrency(record.budget)}
+                </span>
+              </Tooltip>
+              <Tooltip title={isOverBudget ? "Over Budget!" : "Remaining"}>
+                <Tag
+                  color={
+                    isOverBudget
+                      ? "red"
+                      : remaining < record.budget * 0.2
+                        ? "orange"
+                        : "green"
+                  }
+                  style={{ margin: 0 }}
+                >
+                  {isOverBudget
+                    ? `-${formatCurrency(Math.abs(remaining))}`
+                    : formatCurrency(remaining)}
+                </Tag>
+              </Tooltip>
+            </div>
+            <Progress
+              percent={Math.min(percentage, 100)}
+              size="small"
+              status={
+                isOverBudget
+                  ? "exception"
+                  : percentage >= 90
+                    ? "active"
+                    : "normal"
+              }
+              strokeColor={
+                isOverBudget
+                  ? "#ff4d4f"
+                  : percentage >= 90
+                    ? "#faad14"
+                    : "#52c41a"
+              }
+              format={() => `${percentage}%`}
+            />
+            <div style={{ fontSize: 11, color: "#666", marginTop: 2 }}>
+              Spent: {formatCurrency(spent)}
+            </div>
+          </div>
+        );
+      },
+    },
     { title: "Status", dataIndex: "status", key: "status" },
     {
       title: "Actions",
@@ -152,6 +240,30 @@ const EventList = () => {
           </Form.Item>
           <Form.Item name="sits" label="Sits">
             <InputNumber style={{ width: "100%" }} />
+          </Form.Item>
+          <Form.Item name="budget" label="Budget ($)">
+            <InputNumber
+              style={{ width: "100%" }}
+              min={0}
+              formatter={(value) =>
+                `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+              }
+              parser={(value) =>
+                Number(value?.replace(/\$\s?|(,*)/g, "") || 0) as unknown as 0
+              }
+            />
+          </Form.Item>
+          <Form.Item name="spent" label="Spent ($)">
+            <InputNumber
+              style={{ width: "100%" }}
+              min={0}
+              formatter={(value) =>
+                `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+              }
+              parser={(value) =>
+                Number(value?.replace(/\$\s?|(,*)/g, "") || 0) as unknown as 0
+              }
+            />
           </Form.Item>
           <Form.Item name="status" label="Status">
             <Select>

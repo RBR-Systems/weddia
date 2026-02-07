@@ -13,6 +13,8 @@ export const eventList: EventCardProps[] = [
     rsvp: 142,
     sits: 150,
     tasks: 8,
+    budget: 45000,
+    spent: 32500,
   },
   {
     clients: "Olivia Chen, Noah Williams",
@@ -25,6 +27,8 @@ export const eventList: EventCardProps[] = [
     rsvp: 0,
     sits: 80,
     tasks: 15,
+    budget: 75000,
+    spent: 5000,
   },
   {
     clients: "Ava Johnson, Ethan Davis",
@@ -37,6 +41,8 @@ export const eventList: EventCardProps[] = [
     rsvp: 58,
     sits: 60,
     tasks: 0,
+    budget: 55000,
+    spent: 52800,
   },
   {
     clients: "Sophia Martinez, Mason Brown",
@@ -49,6 +55,8 @@ export const eventList: EventCardProps[] = [
     rsvp: 45,
     sits: 120,
     tasks: 12,
+    budget: 35000,
+    spent: 8500,
   },
   {
     clients: "Isabella Taylor, Lucas Wilson",
@@ -61,6 +69,8 @@ export const eventList: EventCardProps[] = [
     rsvp: 78,
     sits: 90,
     tasks: 5,
+    budget: 62000,
+    spent: 41000,
   },
   {
     clients: "Charlotte Anderson, Jackson Moore",
@@ -73,6 +83,8 @@ export const eventList: EventCardProps[] = [
     rsvp: 0,
     sits: 200,
     tasks: 22,
+    budget: 95000,
+    spent: 12000,
   },
   {
     clients: "Amelia Thomas, Aiden Jackson",
@@ -85,6 +97,8 @@ export const eventList: EventCardProps[] = [
     rsvp: 73,
     sits: 75,
     tasks: 0,
+    budget: 68000,
+    spent: 67200,
   },
   {
     clients: "Mia White, Caden Harris",
@@ -97,5 +111,7 @@ export const eventList: EventCardProps[] = [
     rsvp: 156,
     sits: 180,
     tasks: 3,
+    budget: 82000,
+    spent: 58400,
   },
 ];
