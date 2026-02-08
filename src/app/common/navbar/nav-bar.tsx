@@ -7,6 +7,8 @@ import { EventStatus } from "@/app/components/events-list/models/enums/event-lis
 import { useEvent } from "@/app/contexts/EventContext";
 import { EventActions } from "@/app/contexts/EventActions";
 import { ThemeToggle } from "@/theme/ThemeToggle";
+import { useTranslation } from "react-i18next";
+import LanguageSwitcher from "../LanguageSwitcher/LanguageSwitcher";
 
 type NavBarProps = {
   state: boolean;
@@ -18,6 +20,7 @@ export const NavBar: React.FC<NavBarProps> = ({
   setCollapsed,
   currentView,
 }) => {
+  const { t } = useTranslation();
   const {
     state,
     state: {
@@ -75,7 +78,7 @@ export const NavBar: React.FC<NavBarProps> = ({
           <Dropdown menu={menuProps}>
             <Button>
               <Space>
-                {selectedEvent?.eventName || "Select Event"}
+                {selectedEvent?.eventName || t("common.selectEvent")}
                 <DownOutlined />
               </Space>
             </Button>
@@ -86,11 +89,12 @@ export const NavBar: React.FC<NavBarProps> = ({
           className={styles["button-color"]}
           onClick={handleNewEvent}
         >
-          New Event
+          {t("common.newEvent")}
         </Button>
         <Badge count={3} size="small" className={styles["badge-background"]}>
           <BellOutlined className={styles["icon"]} />
         </Badge>
+        <LanguageSwitcher />
         <ThemeToggle />
       </div>
     </div>

@@ -12,6 +12,7 @@ import {
 } from "../../services/huggingface.service";
 import { useSeatingAI } from "./hooks/useSeatingAI";
 import { formatTime } from "./utils/format";
+import { useTranslation } from "react-i18next";
 
 interface MessageItem {
   id: string;
@@ -33,6 +34,7 @@ const SeatingAIChat: React.FC<SeatingAIChatProps> = ({
   onApplySeating,
 }) => {
   const { messageApi } = useTableAssignmentContext();
+  const { t } = useTranslation();
 
   const {
     messages,
@@ -75,7 +77,7 @@ const SeatingAIChat: React.FC<SeatingAIChatProps> = ({
                 {msg.data && (
                   <div className={styles.messageActions}>
                     <Tag color="blue">
-                      {msg.data.assignments.length} assignments
+                      {t("tableAssignment.aiChat.assignments", { count: msg.data.assignments.length })}
                     </Tag>
                     {appliedMessageId !== msg.id && (
                       <Button
@@ -83,11 +85,11 @@ const SeatingAIChat: React.FC<SeatingAIChatProps> = ({
                         size="small"
                         onClick={() => handleApply(msg.data!, msg.id)}
                       >
-                        Apply This Arrangement
+                        {t("tableAssignment.aiChat.applyArrangement")}
                       </Button>
                     )}
                     {appliedMessageId === msg.id && (
-                      <Tag color="success">Arrangement applied!</Tag>
+                      <Tag color="success">{t("tableAssignment.aiChat.arrangementApplied")}</Tag>
                     )}
                   </div>
                 )}
@@ -100,7 +102,7 @@ const SeatingAIChat: React.FC<SeatingAIChatProps> = ({
         />
         {loading && (
           <div className={styles.loadingMessage}>
-            <Spin /> AI is thinking...
+            <Spin /> {t("tableAssignment.aiChat.aiThinking")}
           </div>
         )}
         <div ref={messagesEndRef} />
@@ -116,7 +118,7 @@ const SeatingAIChat: React.FC<SeatingAIChatProps> = ({
               handleSend();
             }
           }}
-          placeholder="Ask me to arrange the seating... (e.g., 'Put all bride\'s family at tables 1-3')"
+          placeholder={t("tableAssignment.aiChat.placeholder")}
           autoSize={{ minRows: 1, maxRows: 4 }}
           disabled={loading}
         />
@@ -127,7 +129,7 @@ const SeatingAIChat: React.FC<SeatingAIChatProps> = ({
           loading={loading}
           disabled={!input.trim()}
         >
-          Send
+          {t("tableAssignment.aiChat.send")}
         </Button>
       </div>
     </Card>

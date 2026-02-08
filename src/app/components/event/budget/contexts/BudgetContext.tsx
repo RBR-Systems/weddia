@@ -14,7 +14,7 @@ import type {
   Currency,
 } from "../types/budget.types";
 import {
-  DEFAULT_CATEGORIES,
+  getDefaultCategories,
   DEFAULT_CURRENCY,
 } from "../constants/budget.constants";
 import { BudgetService } from "../services/budget.service";
@@ -49,7 +49,7 @@ const initialState: BudgetState = {
     status: "not_started",
     currency: DEFAULT_CURRENCY as Currency,
   },
-  categories: DEFAULT_CATEGORIES.map((c) => ({
+  categories: getDefaultCategories().map((c) => ({
     id: c.id,
     name: c.name,
     allocated: 0,

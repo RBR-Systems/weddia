@@ -1,5 +1,6 @@
 "use client";
 import React, { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Card,
   Calendar,
@@ -14,13 +15,15 @@ import type { Dayjs } from "dayjs";
 import dayjs from "dayjs";
 import { useBudget } from "../../contexts/BudgetContext";
 import { formatCurrency } from "@/utils/formatters";
-import { PAYMENT_STATUS } from "../../constants/budget.constants";
+import { getPaymentStatus } from "../../constants/budget.constants";
 import type { Expense, PaymentStatus } from "../../types/budget.types";
 import calStyles from "./PaymentCalendar.module.css";
 
 const { Text } = Typography;
 
 export default function PaymentCalendar() {
+  const { t } = useTranslation();
+  const PAYMENT_STATUS = getPaymentStatus();
   const { state } = useBudget();
 
   const expensesByDate = useMemo(() => {
@@ -90,7 +93,7 @@ export default function PaymentCalendar() {
           {expenses.length > 3 && (
             <li>
               <Text type="secondary" className={calStyles.calendarMoreText}>
-                +{expenses.length - 3} more
+                {t("common.nMore", { count: expenses.length - 3 })}
               </Text>
             </li>
           )}
@@ -123,7 +126,7 @@ export default function PaymentCalendar() {
         <Text strong>{formatCurrency(total, state.currency)}</Text>
         <br />
         <Text type="secondary" className={calStyles.monthDetail}>
-          {paidCount}/{monthExpenses.length} paid
+          {t("paymentCalendar.paidCount", { paid: paidCount, total: monthExpenses.length })}
         </Text>
       </div>
     );
@@ -153,7 +156,7 @@ export default function PaymentCalendar() {
   return (
     <div>
       <Card
-        title="Upcoming Payments (Next 7 Days)"
+        title={t("paymentCalendar.upcomingPayments")}
         className={calStyles.upcomingCard}
       >
         {upcomingPayments.length > 0 ? (
@@ -167,7 +170,7 @@ export default function PaymentCalendar() {
                 <List.Item>
                   <List.Item.Meta
                     title={item.description}
-                    description={`Due: ${dayjs(item.expense_date).format("MMM D, YYYY")}`}
+                    description={t("paymentCalendar.due", { date: dayjs(item.expense_date).format("MMM D, YYYY") })}
                   />
                   <div className={calStyles.paymentAmount}>
                     <Text strong>
@@ -181,11 +184,11 @@ export default function PaymentCalendar() {
             }}
           />
         ) : (
-          <Empty description="No upcoming payments" />
+          <Empty description={t("paymentCalendar.noUpcoming")} />
         )}
       </Card>
 
-      <Card title="Payment Calendar">
+      <Card title={t("paymentCalendar.paymentCalendar")}>
         <Calendar
           cellRender={(date, info) => {
             if (info.type === "date") return dateCellRender(date);

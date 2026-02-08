@@ -33,8 +33,10 @@ import CurrentTimeIndicator from "./components/CurrentTimeIndicator/CurrentTimeI
 
 import timelineData from "../../../../data/timeline-data.json";
 import pageStyles from "./schedule-page.module.css";
+import { useTranslation } from "react-i18next";
 
 const Schedule: React.FC = () => {
+  const { t } = useTranslation();
   const { message, notification } = App.useApp();
   const [items, setItems] = useState<TimelineItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -102,7 +104,7 @@ const Schedule: React.FC = () => {
         block: "center",
       });
     } else {
-      message.info("Current time is not within the timeline range");
+      message.info(t("schedule.messages.timeNotInRange"));
     }
   };
 
@@ -123,7 +125,7 @@ const Schedule: React.FC = () => {
         if (minutesUntilSetup > 0 && minutesUntilSetup <= 15) {
           if (!setupNotifiedRef.current[item.timeline_item_id]?.nearing) {
             message.info(
-              `Setup for "${item.title}" begins in ${Math.round(minutesUntilSetup)} minutes`,
+              t("schedule.messages.setupBeginsSoon", { title: item.title, minutes: Math.round(minutesUntilSetup) }),
             );
             setupNotifiedRef.current[item.timeline_item_id] = {
               ...(setupNotifiedRef.current[item.timeline_item_id] || {}),
@@ -139,7 +141,7 @@ const Schedule: React.FC = () => {
           item.status === "pending"
         ) {
           if (!setupNotifiedRef.current[item.timeline_item_id]?.missed) {
-            message.warning(`Setup for "${item.title}" should have started`);
+            message.warning(t("schedule.messages.setupMissed", { title: item.title }));
             setupNotifiedRef.current[item.timeline_item_id] = {
               ...(setupNotifiedRef.current[item.timeline_item_id] || {}),
               missed: true,
@@ -170,22 +172,22 @@ const Schedule: React.FC = () => {
     // Show success message
     if (newStatus === "completed") {
       message.success({
-        content: `"${item.title}" marked as completed`,
+        content: t("schedule.messages.markedCompleted", { title: item.title }),
         duration: 2,
       });
     } else if (newStatus === "delayed") {
       message.warning({
-        content: `"${item.title}" marked as delayed`,
+        content: t("schedule.messages.markedDelayed", { title: item.title }),
         duration: 2,
       });
     } else if (newStatus === "cancelled") {
       message.info({
-        content: `"${item.title}" cancelled`,
+        content: t("schedule.messages.markedCancelled", { title: item.title }),
         duration: 2,
       });
     } else {
       message.info({
-        content: `Status updated to ${newStatus.replace("_", " ")}`,
+        content: t("schedule.messages.statusUpdated", { title: item.title }),
         duration: 1.5,
       });
     }
@@ -326,10 +328,10 @@ const Schedule: React.FC = () => {
       }
 
       setItems(sortTimelineItems(newItems));
-      message.success(`"${item.title}" deleted`);
+      message.success(t("schedule.messages.itemDeleted", { title: item.title }));
     } catch (err) {
       setItems(original);
-      message.error("Failed to delete item");
+      message.error(t("schedule.messages.deleteFailed"));
     } finally {
       closeDeleteModal();
     }
@@ -410,12 +412,12 @@ const Schedule: React.FC = () => {
       const end = new Date(latestNew);
       if (end.getHours() >= 23 || end.getHours() < 5)
         warnings.push(
-          "Some activities will be scheduled very late (after 11 PM)",
+          t("schedule.warnings.lateActivities"),
         );
     }
     if ((minutes ?? 0) > 60)
       warnings.push(
-        `Large time shift (${minutes} minutes). Please verify this is correct.`,
+        t("schedule.warnings.largeShift", { minutes }),
       );
     return warnings;
   }
@@ -458,8 +460,8 @@ const Schedule: React.FC = () => {
 
       const key = `adjust-${Date.now()}`;
       notification.open({
-        message: "Timeline adjusted",
-        description: `${affected.length} activities shifted ${mins} minutes ${direction === "behind" ? "later" : "earlier"}`,
+        message: t("schedule.messages.timelineAdjusted"),
+        description: t("schedule.messages.timelineAdjustedDesc", { count: affected.length, minutes: mins, direction: direction === "behind" ? t("schedule.later") : t("schedule.earlier") }),
         btn: (
           <Button
             type="link"
@@ -468,7 +470,7 @@ const Schedule: React.FC = () => {
               notification.destroy(key);
             }}
           >
-            Undo
+            {t("common.undo")}
           </Button>
         ),
         key,
@@ -477,7 +479,7 @@ const Schedule: React.FC = () => {
 
       setAdjustModalOpen(false);
     } catch (err) {
-      message.error("Failed to apply adjustments");
+      message.error(t("schedule.messages.adjustFailed"));
     } finally {
       setIsApplying(false);
     }
@@ -499,11 +501,11 @@ const Schedule: React.FC = () => {
     );
     setItems(sortTimelineItems(restored));
     setAdjustmentHistory((prev) => prev.slice(1));
-    message.success("Adjustment undone");
+    message.success(t("schedule.messages.adjustmentUndone"));
   }
 
   if (loading) return <Spin />;
-  if (!items.length) return <Empty description="No timeline items" />;
+  if (!items.length) return <Empty description={t("schedule.emptyState")} />;
 
   return (
     <div>
@@ -515,20 +517,20 @@ const Schedule: React.FC = () => {
           marginBottom: 12,
         }}
       >
-        <h2 style={{ margin: 0 }}>Schedule</h2>
+        <h2 style={{ margin: 0 }}>{t("schedule.title")}</h2>
         <Space>
           <Button
             icon={<ClockCircleOutlined />}
             onClick={jumpToNow}
-            title="Jump to current time"
+            title={t("schedule.jumpToNow")}
           >
-            Jump to Now
+            {t("schedule.jumpToNow")}
           </Button>
           <Button
             icon={<ClockCircleOutlined />}
             onClick={() => setAdjustModalOpen(true)}
           >
-            Adjust Timeline
+            {t("schedule.adjustTimeline")}
           </Button>
         </Space>
       </div>
@@ -556,7 +558,7 @@ const Schedule: React.FC = () => {
       {/* Timeline list */}
       {filteredItems.length === 0 ? (
         <Empty
-          description={`No ${activeFilter !== "all" ? activeFilter.replace("_", " ") : ""} items found`}
+          description={t("schedule.noFilteredItems", { status: activeFilter !== "all" ? activeFilter.replace("_", " ") : "" })}
           style={{ marginTop: 24 }}
         />
       ) : (
@@ -581,33 +583,33 @@ const Schedule: React.FC = () => {
 
       <Modal
         open={isAdjustModalOpen}
-        title="Adjust Timeline"
+        title={t("schedule.adjustModal.title")}
         onCancel={() => setAdjustModalOpen(false)}
         footer={null}
       >
           <div className={pageStyles.modalSection}>
-            <div className={pageStyles.modalSectionLabel}>Timeline is running:</div>
+            <div className={pageStyles.modalSectionLabel}>{t("schedule.adjustModal.timelineRunning")}</div>
           <Radio.Group
             value={direction}
             onChange={(e) => setDirection(e.target.value)}
           >
             <Radio value="behind">
               <ClockCircleOutlined className={pageStyles.radioIconMargin} />
-              Behind Schedule
+              {t("schedule.adjustModal.behind")}
             </Radio>
             <Radio value="ahead" className={pageStyles.radioSpacing}>
               <ThunderboltOutlined className={pageStyles.radioIconMargin} />
-              Ahead of Schedule
+              {t("schedule.adjustModal.ahead")}
             </Radio>
             <Radio value="on-time" className={pageStyles.radioSpacing}>
               <CheckCircleOutlined className={pageStyles.radioIconMargin} />
-              On Time (reset)
+              {t("schedule.adjustModal.onTime")}
             </Radio>
           </Radio.Group>
         </div>
 
         <div className={pageStyles.modalSection}>
-          <div className={pageStyles.modalSectionLabel}>Adjust by (minutes):</div>
+          <div className={pageStyles.modalSectionLabel}>{t("schedule.adjustModal.adjustByMinutes")}</div>
           <InputNumber
             min={0}
             max={180}
@@ -623,33 +625,33 @@ const Schedule: React.FC = () => {
                 className={pageStyles.quickMinuteBtn}
                 onClick={() => setAdjustmentMinutes(m)}
               >
-                {m} min
+                {t("schedule.adjustModal.minuteShort", { count: m })}
               </Button>
             ))}
           </div>
         </div>
 
         <div className={pageStyles.modalSection}>
-          <div className={pageStyles.modalSectionLabel}>Apply to:</div>
+          <div className={pageStyles.modalSectionLabel}>{t("schedule.adjustModal.applyTo")}</div>
           <Select
             value={applyFrom}
             onChange={(v) => setApplyFrom(v)}
             className={pageStyles.fullWidth}
           >
             <Select.Option value="all-remaining">
-              All remaining activities
+              {t("schedule.adjustModal.allRemaining")}
             </Select.Option>
             <Select.Option value="current">
-              From current activity onward
+              {t("schedule.adjustModal.fromCurrent")}
             </Select.Option>
             <Select.Option value="next">
-              From next activity onward
+              {t("schedule.adjustModal.fromNext")}
             </Select.Option>
             {items.map((it) => (
               <Select.Option
                 key={it.timeline_item_id}
                 value={it.timeline_item_id}
-              >{`From "${it.title}" onward`}</Select.Option>
+              >{t("schedule.adjustModal.fromSpecific", { title: it.title })}</Select.Option>
             ))}
           </Select>
         </div>
@@ -657,17 +659,16 @@ const Schedule: React.FC = () => {
         <div className={pageStyles.modalSection}>
           <div className={pageStyles.previewHeader}>
             <div>
-              <strong>Preview Changes</strong>
+              <strong>{t("schedule.adjustModal.previewChanges")}</strong>
             </div>
             <div className={pageStyles.previewCount}>
-              {
+              {t("schedule.adjustModal.itemsWillUpdate", { count:
                 getAffectedItems(
                   applyFrom === "specific" && selectedItemId
                     ? selectedItemId
                     : applyFrom,
                 ).length
-              }{" "}
-              items will be updated
+              })}
             </div>
           </div>
 
@@ -699,24 +700,24 @@ const Schedule: React.FC = () => {
         </div>
 
         <div className={pageStyles.modalFooter}>
-          <Button onClick={() => setAdjustModalOpen(false)}>Cancel</Button>
+          <Button onClick={() => setAdjustModalOpen(false)}>{t("common.cancel")}</Button>
           <Button
             type="primary"
             onClick={applyAdjustment}
             loading={isApplying}
             disabled={!adjustmentMinutes}
           >
-            Apply Changes
+            {t("schedule.adjustModal.applyChanges")}
           </Button>
         </div>
       </Modal>
 
       <Modal
         open={Boolean(deleteTarget)}
-        title={deleteTarget ? `Delete "${deleteTarget.title}"?` : "Delete item"}
+        title={deleteTarget ? t("schedule.deleteModal.title", { title: deleteTarget.title }) : t("schedule.deleteModal.titleFallback")}
         onOk={confirmDelete}
         onCancel={closeDeleteModal}
-        okText="Delete"
+        okText={t("common.delete")}
         okType="danger"
       >
         {deleteTarget && (
@@ -728,10 +729,11 @@ const Schedule: React.FC = () => {
 
             {analyzeDeleteImpact(deleteTarget).hasGap && (
               <div className={pageStyles.deleteModalGap}>
-                This will create a gap of{" "}
-                {analyzeDeleteImpact(deleteTarget).gapDurationText} between "
-                {analyzeDeleteImpact(deleteTarget)?.previousItem?.title}" and "
-                {analyzeDeleteImpact(deleteTarget)?.nextItem?.title}".
+                {t("schedule.deleteModal.gapWarning", {
+                  gap: analyzeDeleteImpact(deleteTarget).gapDurationText,
+                  prev: analyzeDeleteImpact(deleteTarget)?.previousItem?.title,
+                  next: analyzeDeleteImpact(deleteTarget)?.nextItem?.title,
+                })}
               </div>
             )}
 
@@ -741,7 +743,7 @@ const Schedule: React.FC = () => {
                   checked={shouldCascadeLocal}
                   onChange={(e) => setShouldCascadeLocal(e.target.checked)}
                 >
-                  Shift following items earlier to close the gap
+                  {t("schedule.deleteModal.cascadeShift")}
                 </Checkbox>
               </div>
             )}

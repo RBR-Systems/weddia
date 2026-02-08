@@ -3,6 +3,7 @@
 import React from "react";
 import { Progress, Space, Tag, Row, Col } from "antd";
 import Card from "@/app/common/Card/card";
+import { useTranslation } from "react-i18next";
 import {
   CheckCircleOutlined,
   ClockCircleOutlined,
@@ -10,30 +11,32 @@ import {
   WarningOutlined,
   CloseCircleOutlined,
 } from "@ant-design/icons";
-import { calculateProgress, STATUS_OPTIONS } from "../../utils/helpers";
+import { calculateProgress, getStatusOptions } from "../../utils/helpers";
 import { TimelineItem } from "../../models/types";
 import styles from "./StatusProgressBar.module.css";
 
 type Props = { items: TimelineItem[] };
 
 const StatusProgressBar: React.FC<Props> = ({ items }) => {
+  const { t } = useTranslation();
   const progress = calculateProgress(items);
+  const statusOptions = getStatusOptions();
 
   const statusIcons = {
     completed: (
-      <CheckCircleOutlined style={{ color: STATUS_OPTIONS.completed.color }} />
+      <CheckCircleOutlined style={{ color: statusOptions.completed.color }} />
     ),
     in_progress: (
-      <PlayCircleOutlined style={{ color: STATUS_OPTIONS.in_progress.color }} />
+      <PlayCircleOutlined style={{ color: statusOptions.in_progress.color }} />
     ),
     pending: (
-      <ClockCircleOutlined style={{ color: STATUS_OPTIONS.pending.color }} />
+      <ClockCircleOutlined style={{ color: statusOptions.pending.color }} />
     ),
     delayed: (
-      <WarningOutlined style={{ color: STATUS_OPTIONS.delayed.color }} />
+      <WarningOutlined style={{ color: statusOptions.delayed.color }} />
     ),
     cancelled: (
-      <CloseCircleOutlined style={{ color: STATUS_OPTIONS.cancelled.color }} />
+      <CloseCircleOutlined style={{ color: statusOptions.cancelled.color }} />
     ),
   };
 
@@ -41,13 +44,13 @@ const StatusProgressBar: React.FC<Props> = ({ items }) => {
     <Card size="small" className={styles.card}>
       <Space orientation="vertical" className={styles.fullWidth} size="middle">
         <div className={styles.progressHeader}>
-          <h3 className={styles.title}>Event Progress</h3>
+          <h3 className={styles.title}>{t("schedule.progressBar.eventProgress")}</h3>
           <span
             className={styles.percentage}
             style={{
               color:
                 progress.completion_percentage === 100
-                  ? STATUS_OPTIONS.completed.color
+                  ? statusOptions.completed.color
                     : "var(--status-in-progress)",
             }}
           >
@@ -57,7 +60,7 @@ const StatusProgressBar: React.FC<Props> = ({ items }) => {
 
         <Progress
           percent={progress.completion_percentage}
-            strokeColor={{ from: "var(--status-in-progress)", to: STATUS_OPTIONS.completed.color }}
+            strokeColor={{ from: "var(--status-in-progress)", to: statusOptions.completed.color }}
           status={progress.completion_percentage === 100 ? "success" : "active"}
           showInfo={false}
         />
@@ -67,14 +70,14 @@ const StatusProgressBar: React.FC<Props> = ({ items }) => {
             <div className={styles.statCol}>
               <div
                 className={styles.statNumber}
-                style={{ color: STATUS_OPTIONS.completed.color }}
+                style={{ color: statusOptions.completed.color }}
               >
                 {progress.completed}
               </div>
               <div className={styles.statLabel}>
                 <Space size={4}>
                   {statusIcons.completed}
-                  <span>Completed</span>
+                  <span>{t("schedule.progressBar.completed")}</span>
                 </Space>
               </div>
             </div>
@@ -84,14 +87,14 @@ const StatusProgressBar: React.FC<Props> = ({ items }) => {
             <div className={styles.statCol}>
               <div
                 className={styles.statNumber}
-                style={{ color: STATUS_OPTIONS.in_progress.color }}
+                style={{ color: statusOptions.in_progress.color }}
               >
                 {progress.in_progress}
               </div>
               <div className={styles.statLabel}>
                 <Space size={4}>
                   {statusIcons.in_progress}
-                  <span>In Progress</span>
+                  <span>{t("schedule.progressBar.inProgress")}</span>
                 </Space>
               </div>
             </div>
@@ -101,14 +104,14 @@ const StatusProgressBar: React.FC<Props> = ({ items }) => {
             <div className={styles.statCol}>
               <div
                 className={styles.statNumber}
-                style={{ color: STATUS_OPTIONS.pending.color }}
+                style={{ color: statusOptions.pending.color }}
               >
                 {progress.pending}
               </div>
               <div className={styles.statLabel}>
                 <Space size={4}>
                   {statusIcons.pending}
-                  <span>Pending</span>
+                  <span>{t("schedule.progressBar.pending")}</span>
                 </Space>
               </div>
             </div>
@@ -119,12 +122,12 @@ const StatusProgressBar: React.FC<Props> = ({ items }) => {
           <Space size="middle" className={styles.statusBreakdown}>
             {progress.delayed > 0 && (
               <Tag icon={statusIcons.delayed} color="warning">
-                {progress.delayed} Delayed
+                {progress.delayed} {t("schedule.progressBar.delayed")}
               </Tag>
             )}
             {progress.cancelled > 0 && (
               <Tag icon={statusIcons.cancelled} color="error">
-                {progress.cancelled} Cancelled
+                {progress.cancelled} {t("schedule.progressBar.cancelled")}
               </Tag>
             )}
           </Space>

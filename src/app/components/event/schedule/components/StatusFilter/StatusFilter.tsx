@@ -11,7 +11,8 @@ import {
   FilterOutlined,
 } from "@ant-design/icons";
 import { Status } from "../../models/types";
-import { STATUS_OPTIONS, calculateProgress } from "../../utils/helpers";
+import { useTranslation } from "react-i18next";
+import { getStatusOptions, calculateProgress } from "../../utils/helpers";
 import { TimelineItem } from "../../models/types";
 import styles from "./StatusFilter.module.css";
 
@@ -49,6 +50,7 @@ const StatusFilter: React.FC<Props> = ({
   onClearFilters,
   filteredCount,
 }) => {
+  const { t } = useTranslation();
   const progress = calculateProgress(items);
 
   const statusIcons = {
@@ -65,7 +67,7 @@ const StatusFilter: React.FC<Props> = ({
         <div className={styles.controlsRow}>
           <Space size={[8, 8]} className={styles.topRow} align="center">
             <Input.Search
-              placeholder="Search timeline..."
+              placeholder={t("schedule.statusFilter.searchPlaceholder")}
               allowClear
               value={searchQuery}
               onChange={(e) => onSearchChange?.(e.target.value)}
@@ -103,7 +105,7 @@ const StatusFilter: React.FC<Props> = ({
               onChange={() => onFilterChange("all")}
               className={styles.tag}
             >
-              All ({progress.total})
+              {t("schedule.statusFilter.allStatuses")} ({progress.total})
             </CheckableTag>
 
             <CheckableTag
@@ -113,7 +115,7 @@ const StatusFilter: React.FC<Props> = ({
             >
               <Space size={4}>
                 {statusIcons.pending}
-                <span>Pending ({progress.pending})</span>
+                <span>{t("schedule.status.pending")} ({progress.pending})</span>
               </Space>
             </CheckableTag>
 
@@ -124,7 +126,7 @@ const StatusFilter: React.FC<Props> = ({
             >
               <Space size={4}>
                 {statusIcons.in_progress}
-                <span>In Progress ({progress.in_progress})</span>
+                <span>{t("schedule.status.inProgress")} ({progress.in_progress})</span>
               </Space>
             </CheckableTag>
 
@@ -135,7 +137,7 @@ const StatusFilter: React.FC<Props> = ({
             >
               <Space size={4}>
                 {statusIcons.completed}
-                <span>Completed ({progress.completed})</span>
+                <span>{t("schedule.status.completed")} ({progress.completed})</span>
               </Space>
             </CheckableTag>
 
@@ -147,7 +149,7 @@ const StatusFilter: React.FC<Props> = ({
               >
                 <Space size={4}>
                   {statusIcons.delayed}
-                  <span>Delayed ({progress.delayed})</span>
+                  <span>{t("schedule.status.delayed")} ({progress.delayed})</span>
                 </Space>
               </CheckableTag>
             )}
@@ -160,7 +162,7 @@ const StatusFilter: React.FC<Props> = ({
               >
                 <Space size={4}>
                   {statusIcons.cancelled}
-                  <span>Cancelled ({progress.cancelled})</span>
+                  <span>{t("schedule.status.cancelled")} ({progress.cancelled})</span>
                 </Space>
               </CheckableTag>
             )}

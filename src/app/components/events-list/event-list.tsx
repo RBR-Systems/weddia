@@ -19,6 +19,7 @@ import {
   Tooltip,
 } from "antd";
 import { EditOutlined, DollarOutlined } from "@ant-design/icons";
+import { useTranslation } from "react-i18next";
 
 const { Option } = Select;
 
@@ -32,6 +33,7 @@ const formatCurrency = (value: number) => {
 };
 
 const EventList = () => {
+  const { t } = useTranslation();
   const [events, setEvents] = useState<EventCardProps[]>(() => [...eventList]);
   const [editingEvent, setEditingEvent] = useState<EventCardProps | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -60,8 +62,7 @@ const EventList = () => {
     );
 
     return Object.entries(counts).map(([status, count]) => {
-      const statusText = status.replace(/([A-Z])/g, " $1").trim();
-      return `${count} ${statusText}`;
+      return `${count} ${t(`eventList.status.${status}`)}`;
     });
   };
   const openEditModal = (record: EventCardProps) => {
@@ -89,7 +90,7 @@ const EventList = () => {
 
   const columns = [
     {
-      title: "Event",
+      title: t("eventList.columns.event"),
       dataIndex: "eventName",
       key: "eventName",
       render: (_: any, record: EventCardProps) => (
@@ -99,14 +100,14 @@ const EventList = () => {
         </div>
       ),
     },
-    { title: "Date", dataIndex: "date", key: "date" },
-    { title: "Clients", dataIndex: "clients", key: "clients" },
-    { title: "Location", dataIndex: "location", key: "location" },
-    { title: "Invites", dataIndex: "invites", key: "invites" },
-    { title: "RSVP", dataIndex: "rsvp", key: "rsvp" },
-    { title: "Tasks", dataIndex: "tasks", key: "tasks" },
+    { title: t("eventList.columns.date"), dataIndex: "date", key: "date" },
+    { title: t("eventList.columns.clients"), dataIndex: "clients", key: "clients" },
+    { title: t("eventList.columns.location"), dataIndex: "location", key: "location" },
+    { title: t("eventList.columns.invites"), dataIndex: "invites", key: "invites" },
+    { title: t("eventList.columns.rsvp"), dataIndex: "rsvp", key: "rsvp" },
+    { title: t("eventList.columns.tasks"), dataIndex: "tasks", key: "tasks" },
     {
-      title: "Budget",
+      title: t("eventList.columns.budget"),
       key: "budget",
       width: 220,
       render: (_: unknown, record: EventCardProps) => {
@@ -120,12 +121,12 @@ const EventList = () => {
         return (
           <div className={styles["budgetContainer"]}>
             <div className={styles["budgetRow"]}>
-              <Tooltip title="Total Budget">
+              <Tooltip title={t("eventList.totalBudget")}>
                 <span>
                   <DollarOutlined /> {formatCurrency(record.budget)}
                 </span>
               </Tooltip>
-              <Tooltip title={isOverBudget ? "Over Budget!" : "Remaining"}>
+              <Tooltip title={isOverBudget ? t("eventList.overBudget") : t("eventList.remaining")}>
                 <Tag
                   color={
                     isOverBudget
@@ -162,19 +163,24 @@ const EventList = () => {
               format={() => `${percentage}%`}
             />
             <div className={styles["spentText"]}>
-              Spent: {formatCurrency(spent)}
+              {t("eventList.spent", { amount: formatCurrency(spent) })}
             </div>
           </div>
         );
       },
     },
-    { title: "Status", dataIndex: "status", key: "status" },
     {
-      title: "Actions",
+      title: t("eventList.columns.status"),
+      dataIndex: "status",
+      key: "status",
+      render: (status: string) => t(`eventList.status.${status}`),
+    },
+    {
+      title: t("eventList.columns.actions"),
       key: "actions",
       render: (_: any, record: EventCardProps) => (
         <Button icon={<EditOutlined />} onClick={() => openEditModal(record)}>
-          Edit
+          {t("common.edit")}
         </Button>
       ),
     },
@@ -183,9 +189,9 @@ const EventList = () => {
   return (
     <div className={styles["page-container"]}>
       <Header
-        name="Events"
+        name={t("eventList.title")}
         items={getStatusCounts(events)}
-        subheader="Planning Center"
+        subheader={t("eventList.subheader")}
       ></Header>
       <div className={styles["table-container"]}>
         <Table
@@ -196,7 +202,7 @@ const EventList = () => {
       </div>
 
       <Modal
-        title="Edit Event"
+        title={t("eventList.editEvent")}
         open={isModalOpen}
         onCancel={handleCancel}
         footer={null}
@@ -209,33 +215,33 @@ const EventList = () => {
         >
           <Form.Item
             name="eventName"
-            label="Event name"
+            label={t("eventList.form.eventName")}
             rules={[{ required: true }]}
           >
             <Input />
           </Form.Item>
-          <Form.Item name="date" label="Date">
+          <Form.Item name="date" label={t("eventList.form.date")}>
             <Input />
           </Form.Item>
-          <Form.Item name="clients" label="Clients">
+          <Form.Item name="clients" label={t("eventList.form.clients")}>
             <Input />
           </Form.Item>
-          <Form.Item name="location" label="Location">
+          <Form.Item name="location" label={t("eventList.form.location")}>
             <Input />
           </Form.Item>
-          <Form.Item name="invites" label="Invites">
+          <Form.Item name="invites" label={t("eventList.form.invites")}>
             <InputNumber className={styles["formFullWidth"]} />
           </Form.Item>
-          <Form.Item name="rsvp" label="RSVP">
+          <Form.Item name="rsvp" label={t("eventList.form.rsvp")}>
             <InputNumber className={styles["formFullWidth"]} />
           </Form.Item>
-          <Form.Item name="tasks" label="Tasks">
+          <Form.Item name="tasks" label={t("eventList.form.tasks")}>
             <InputNumber className={styles["formFullWidth"]} />
           </Form.Item>
-          <Form.Item name="sits" label="Sits">
+          <Form.Item name="sits" label={t("eventList.form.sits")}>
             <InputNumber className={styles["formFullWidth"]} />
           </Form.Item>
-          <Form.Item name="budget" label="Budget ($)">
+          <Form.Item name="budget" label={t("eventList.form.budget")}>
             <InputNumber
               className="u-full-width"
               min={0}
@@ -247,7 +253,7 @@ const EventList = () => {
               }
             />
           </Form.Item>
-          <Form.Item name="spent" label="Spent ($)">
+          <Form.Item name="spent" label={t("eventList.form.spent")}>
             <InputNumber
               className="u-full-width"
               min={0}
@@ -259,28 +265,28 @@ const EventList = () => {
               }
             />
           </Form.Item>
-          <Form.Item name="status" label="Status">
+          <Form.Item name="status" label={t("eventList.form.status")}>
             <Select>
               <Option value={EventStatus.NOT_STARTED}>
-                {EventStatus.NOT_STARTED}
+                {t("eventList.status.Not Started")}
               </Option>
               <Option value={EventStatus.IN_PROGRESS}>
-                {EventStatus.IN_PROGRESS}
+                {t("eventList.status.In Progress")}
               </Option>
               <Option value={EventStatus.COMPLETED}>
-                {EventStatus.COMPLETED}
+                {t("eventList.status.Completed")}
               </Option>
               <Option value={EventStatus.CANCELED}>
-                {EventStatus.CANCELED}
+                {t("eventList.status.Canceled")}
               </Option>
             </Select>
           </Form.Item>
 
           <Form.Item>
             <div className={styles["formActions"]}>
-              <Button onClick={handleCancel}>Cancel</Button>
+              <Button onClick={handleCancel}>{t("common.cancel")}</Button>
               <Button type="primary" htmlType="submit">
-                Save
+                {t("common.save")}
               </Button>
             </div>
           </Form.Item>

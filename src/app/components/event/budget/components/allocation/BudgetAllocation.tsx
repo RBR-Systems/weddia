@@ -14,6 +14,7 @@ import {
   Alert,
 } from "antd";
 import Statistic from "@/app/common/AnimatedStatistic/AnimatedStatistic";
+import { useTranslation } from "react-i18next";
 import { useBudget } from "../../contexts/BudgetContext";
 import { formatCurrency } from "@/utils/formatters";
 import type { Category } from "../../types/budget.types";
@@ -23,6 +24,7 @@ const { Title, Text } = Typography;
 
 export default function BudgetAllocation() {
   const { state, updateCategory } = useBudget();
+  const { t } = useTranslation();
 
   const totalBudget = state.summary?.total_budget ?? 0;
   const totalAllocated = state.categories.reduce(
@@ -52,17 +54,17 @@ export default function BudgetAllocation() {
 
   return (
     <Card
-      title="Budget Allocation"
+      title={t("budgetAllocation.title")}
       extra={
         <Space>
-          <Button onClick={distributeEvenly}>Distribute Evenly</Button>
+          <Button onClick={distributeEvenly}>{t("budgetAllocation.distributeEvenly")}</Button>
         </Space>
       }
     >
       <Row gutter={[16, 16]}>
         <Col xs={24} md={8}>
           <Card size="small">
-            <Title level={5}>Total Budget</Title>
+            <Title level={5}>{t("budgetAllocation.totalBudget")}</Title>
               <Statistic
                 value={totalBudget}
                 formatter={(v) => formatCurrency(Number(v), state.currency)}
@@ -71,7 +73,7 @@ export default function BudgetAllocation() {
         </Col>
         <Col xs={24} md={8}>
           <Card size="small">
-            <Title level={5}>Allocated</Title>
+            <Title level={5}>{t("budgetAllocation.allocated")}</Title>
               <Statistic
                 value={totalAllocated}
                 formatter={(v) => formatCurrency(Number(v), state.currency)}
@@ -80,7 +82,7 @@ export default function BudgetAllocation() {
         </Col>
         <Col xs={24} md={8}>
           <Card size="small">
-            <Title level={5}>Unallocated</Title>
+            <Title level={5}>{t("budgetAllocation.unallocated")}</Title>
               <Statistic
                 value={unallocated}
                 formatter={(v) => formatCurrency(Number(v), state.currency)}
@@ -92,8 +94,8 @@ export default function BudgetAllocation() {
 
       {unallocated < 0 && (
         <Alert
-          message="Over-allocated"
-          description={`You've allocated ${formatCurrency(Math.abs(unallocated), state.currency)} more than your total budget.`}
+          message={t("budgetAllocation.overAllocatedTitle")}
+          description={t("budgetAllocation.overAllocatedDesc", { amount: formatCurrency(Math.abs(unallocated), state.currency) })}
           type="warning"
           showIcon
           className={styles.overAllocatedAlert}
@@ -119,7 +121,7 @@ export default function BudgetAllocation() {
                   <Text strong>{category.name}</Text>
                 </Space>
                 <Text type="secondary">
-                  <Statistic value={percentage} suffix="%" /> of budget
+                  <Statistic value={percentage} suffix="%" /> {t("budgetAllocation.ofBudget")}
                 </Text>
               </div>
               <Row gutter={16} align="middle">
@@ -155,14 +157,13 @@ export default function BudgetAllocation() {
               </Row>
               <div className={styles.categoryFooter}>
                 <Text type="secondary" className={styles.smallText}>
-                  Spent: {formatCurrency(category.spent, state.currency)}
+                  {t("budgetAllocation.spent", { amount: formatCurrency(category.spent, state.currency) })}
                 </Text>
                 <Text
                   type={allocated - category.spent < 0 ? "danger" : "secondary"}
                   className={styles.smallText}
                 >
-                  Remaining:{" "}
-                  {formatCurrency(allocated - category.spent, state.currency)}
+                  {t("budgetAllocation.remaining", { amount: formatCurrency(allocated - category.spent, state.currency) })}
                 </Text>
               </div>
             </div>

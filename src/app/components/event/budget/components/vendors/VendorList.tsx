@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import {
   App,
   Table,
@@ -48,6 +49,7 @@ interface VendorListProps {
 }
 
 export default function VendorList({ onViewVendor }: VendorListProps) {
+  const { t } = useTranslation();
   const { message } = App.useApp();
   const { state } = useBudget();
   const [searchTerm, setSearchTerm] = useState("");
@@ -97,7 +99,7 @@ export default function VendorList({ onViewVendor }: VendorListProps) {
 
   const columns: ColumnsType<Vendor> = [
     {
-      title: "Vendor",
+      title: t("vendorList.columns.vendor"),
       key: "vendor",
       render: (_, record) => (
         <Space>
@@ -113,7 +115,7 @@ export default function VendorList({ onViewVendor }: VendorListProps) {
       ),
     },
     {
-      title: "Contact",
+      title: t("vendorList.columns.contact"),
       key: "contact",
       render: (_, record) => (
         <Space direction="vertical" size={0}>
@@ -132,14 +134,14 @@ export default function VendorList({ onViewVendor }: VendorListProps) {
       ),
     },
     {
-      title: "Expenses",
+      title: t("vendorList.columns.expenses"),
       dataIndex: "expense_count",
       key: "expense_count",
       align: "center",
       sorter: (a, b) => a.expense_count - b.expense_count,
     },
     {
-      title: "Total Spent",
+      title: t("vendorList.columns.totalSpent"),
       dataIndex: "total_spent",
       key: "total_spent",
       render: (amount: number) => formatCurrency(amount, state.currency),
@@ -147,17 +149,17 @@ export default function VendorList({ onViewVendor }: VendorListProps) {
       align: "right",
     },
     {
-      title: "Status",
+      title: t("vendorList.columns.status"),
       dataIndex: "status",
       key: "status",
       render: (status: string) => (
         <Tag color={status === "active" ? "green" : "default"}>
-          {status === "active" ? "Active" : "Inactive"}
+          {status === "active" ? t("vendorList.active") : t("vendorList.inactive")}
         </Tag>
       ),
     },
     {
-      title: "Actions",
+      title: t("vendorList.columns.actions"),
       key: "actions",
       render: (_, record) => (
         <Button
@@ -172,7 +174,7 @@ export default function VendorList({ onViewVendor }: VendorListProps) {
   const handleAddVendor = async () => {
     try {
       await form.validateFields();
-      message.success("Vendor added (vendors are auto-created from expenses)");
+      message.success(t("vendorList.vendorAdded"));
       setModalOpen(false);
       form.resetFields();
     } catch {
@@ -185,13 +187,13 @@ export default function VendorList({ onViewVendor }: VendorListProps) {
       <Row gutter={16} className={styles["rowSpacing"]}>
         <Col xs={24} sm={8}>
           <Card size="small">
-            <Statistic title="Total Vendors" value={vendors.length} />
+            <Statistic title={t("vendorList.totalVendors")} value={vendors.length} />
           </Card>
         </Col>
         <Col xs={24} sm={8}>
           <Card size="small">
             <Statistic
-              title="Total Vendor Spending"
+              title={t("vendorList.totalVendorSpending")}
               value={totalVendorSpending}
               formatter={(value) =>
                 formatCurrency(Number(value), state.currency)
@@ -202,7 +204,7 @@ export default function VendorList({ onViewVendor }: VendorListProps) {
         <Col xs={24} sm={8}>
           <Card size="small">
             <Statistic
-              title="Active Vendors"
+              title={t("vendorList.activeVendors")}
               value={vendors.filter((v) => v.status === "active").length}
             />
           </Card>
@@ -210,11 +212,11 @@ export default function VendorList({ onViewVendor }: VendorListProps) {
       </Row>
 
       <Card
-        title="Vendor Directory"
+        title={t("vendorList.vendorDirectory")}
         extra={
           <Space>
             <Search
-              placeholder="Search vendors..."
+              placeholder={t("vendorList.searchPlaceholder")}
               allowClear
               onSearch={setSearchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -225,7 +227,7 @@ export default function VendorList({ onViewVendor }: VendorListProps) {
               icon={<PlusOutlined />}
               onClick={() => setModalOpen(true)}
             >
-              Add Vendor
+              {t("vendorList.addVendor")}
             </Button>
           </Space>
         }
@@ -236,13 +238,13 @@ export default function VendorList({ onViewVendor }: VendorListProps) {
           rowKey="id"
           pagination={{ pageSize: 10 }}
           locale={{
-            emptyText: "No vendors yet. Add expenses with vendor names.",
+            emptyText: t("vendorList.emptyText"),
           }}
         />
       </Card>
 
       <Modal
-        title="Add Vendor"
+        title={t("vendorList.addVendor")}
         open={modalOpen}
         onOk={handleAddVendor}
         onCancel={() => setModalOpen(false)}
@@ -250,19 +252,19 @@ export default function VendorList({ onViewVendor }: VendorListProps) {
         <Form form={form} layout="vertical">
           <Form.Item
             name="name"
-            label="Vendor Name"
+            label={t("vendorList.form.vendorName")}
             rules={[{ required: true }]}
           >
-            <Input placeholder="Enter vendor name" />
+            <Input placeholder={t("vendorList.form.vendorNamePlaceholder")} />
           </Form.Item>
-          <Form.Item name="contact_name" label="Contact Person">
-            <Input placeholder="Contact name" />
+          <Form.Item name="contact_name" label={t("vendorList.form.contactPerson")}>
+            <Input placeholder={t("vendorList.form.contactPlaceholder")} />
           </Form.Item>
-          <Form.Item name="email" label="Email">
-            <Input type="email" placeholder="vendor@example.com" />
+          <Form.Item name="email" label={t("vendorList.form.email")}>
+            <Input type="email" placeholder={t("vendorList.form.emailPlaceholder")} />
           </Form.Item>
-          <Form.Item name="phone" label="Phone">
-            <Input placeholder="+1 (555) 000-0000" />
+          <Form.Item name="phone" label={t("vendorList.form.phone")}>
+            <Input placeholder={t("vendorList.form.phonePlaceholder")} />
           </Form.Item>
         </Form>
       </Modal>

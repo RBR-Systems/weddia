@@ -33,6 +33,7 @@ import SeatingAIChat from "./components/AIChat/SeatingAIChat";
 import { useTableAssignmentContext } from "./context/TableAssignmentContext";
 import { TableAssignmentProvider } from "./context/TableAssignmentContext";
 import SidePanel from "./components/SideGuestPanel/SidePanel";
+import { useTranslation } from "react-i18next";
 
 const TableAssignmentPage = () => {
   const [messageApi, contextHolder] = message.useMessage();
@@ -46,6 +47,7 @@ const TableAssignmentPage = () => {
 };
 
 function TableAssignmentContent() {
+  const { t } = useTranslation();
   const {
     activeLayout,
     tablesForActiveLayout,
@@ -96,7 +98,7 @@ function TableAssignmentContent() {
     return (
       <div className={styles.page}>
         <Card>
-          <Empty description="No table layouts available yet. Create a layout first." />
+          <Empty description={t("tableAssignment.emptyState")} />
         </Card>
       </div>
     );
@@ -114,11 +116,11 @@ function TableAssignmentContent() {
         <div className={styles.headerRow}>
           <div className={styles.headerLeft}>
             <Typography.Title level={2} className={styles.title}>
-              Table Assignment
+              {t("tableAssignment.title")}
             </Typography.Title>
             <Typography.Text type="secondary">
-              {activeLayout.name} • {tablesForActiveLayout.length} tables •{" "}
-              {Array.from(guestsById.values()).length} guests
+              {activeLayout.name} • {t("tableAssignment.tables", { count: tablesForActiveLayout.length })} •{" "}
+              {t("tableAssignment.guests", { count: Array.from(guestsById.values()).length })}
             </Typography.Text>
           </div>
         </div>
@@ -129,20 +131,19 @@ function TableAssignmentContent() {
             title={
               <Space size={8} align="center">
                 <TeamOutlined />
-                <span>Seating chart</span>
+                <span>{t("tableAssignment.seatingChart")}</span>
                 <Tag color="blue" className={styles["tagSpacing"]}>
-                  {Array.from(guestsById.values()).length} guests
+                  {t("tableAssignment.guests", { count: Array.from(guestsById.values()).length })}
                 </Tag>
                 <Tag color="orange" className={styles["tagSpacing"]}>
-                  {Array.from(guestsById.values()).length -
-                    (assignedGuestIds?.size ?? 0)}{" "}
-                  unassigned
+                  {t("tableAssignment.unassigned", { count: Array.from(guestsById.values()).length -
+                    (assignedGuestIds?.size ?? 0) })}
                 </Tag>
               </Space>
             }
             extra={
               <Space align="center" size={8}>
-                <Typography.Text type="secondary">Grid</Typography.Text>
+                <Typography.Text type="secondary">{t("tableAssignment.grid")}</Typography.Text>
                 <InputNumber
                   min={1}
                   value={activeLayout.x_grid_size}
@@ -181,13 +182,13 @@ function TableAssignmentContent() {
               <Button
                 size="small"
                 onClick={handleZoomOut}
-                aria-label="Zoom out"
+                aria-label={t("tableAssignment.zoom.out")}
                 icon={<ZoomOutOutlined />}
               ></Button>
               <Button
                 size="small"
                 onClick={handleZoomReset}
-                aria-label="Reset zoom"
+                aria-label={t("tableAssignment.zoom.reset")}
                 icon={<UndoOutlined />}
               ></Button>
               <Button
@@ -197,13 +198,13 @@ function TableAssignmentContent() {
                   const h = canvasWrapperRef.current?.clientHeight ?? 600;
                   handleZoomFit(w, h);
                 }}
-                aria-label="Fit"
+                aria-label={t("tableAssignment.zoom.fit")}
                 icon={<PlusSquareOutlined />}
               ></Button>
               <Button
                 size="small"
                 onClick={handleZoomIn}
-                aria-label="Zoom in"
+                aria-label={t("tableAssignment.zoom.in")}
                 icon={<ZoomInOutlined />}
               ></Button>
               <Typography.Text
@@ -269,14 +270,14 @@ function TableAssignmentContent() {
             type="primary"
             className={styles.floatButtonFixed}
             onClick={() => setAIChatOpen(!aiChatOpen)}
-            tooltip={aiChatOpen ? undefined : "AI Seating Assistant"}
+            tooltip={aiChatOpen ? undefined : t("tableAssignment.aiAssistant")}
           />
           {aiChatOpen && (
             <div className={styles.aiChatContainer}>
               <div className={styles.aiChatHeader}>
                 <span className={styles.aiChatTitle}>
                   <MessageOutlined className={styles.aiChatIcon} />
-                  AI Seating Assistant
+                  {t("tableAssignment.aiAssistant")}
                 </span>
               </div>
               <div className={styles.aiChatContent}>

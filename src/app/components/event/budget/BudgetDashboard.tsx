@@ -39,10 +39,12 @@ import { BulkOperations } from "./components/planner";
 
 import type { Expense } from "./types/budget.types";
 import dashboardStyles from "./BudgetDashboard.module.css";
+import { useTranslation } from "react-i18next";
 
 const { Title } = Typography;
 
 function DashboardContent() {
+  const { t } = useTranslation();
   const { state, deleteExpense } = useBudget();
   const [expenseModalOpen, setExpenseModalOpen] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState<Expense | null>(null);
@@ -82,7 +84,7 @@ function DashboardContent() {
       key: "dashboard",
       label: (
         <span>
-          <DashboardOutlined /> Dashboard
+          <DashboardOutlined /> {t("budgetDashboard.tabs.dashboard")}
         </span>
       ),
       children: (
@@ -96,7 +98,7 @@ function DashboardContent() {
       key: "expenses",
       label: (
         <span>
-          <UnorderedListOutlined /> Expenses
+          <UnorderedListOutlined /> {t("budgetDashboard.tabs.expenses")}
         </span>
       ),
       children: (
@@ -110,7 +112,7 @@ function DashboardContent() {
       key: "allocation",
       label: (
         <span>
-          <AppstoreOutlined /> Allocation
+          <AppstoreOutlined /> {t("budgetDashboard.tabs.allocation")}
         </span>
       ),
       children: <BudgetAllocation />,
@@ -119,7 +121,7 @@ function DashboardContent() {
       key: "vendors",
       label: (
         <span>
-          <TeamOutlined /> Vendors
+          <TeamOutlined /> {t("budgetDashboard.tabs.vendors")}
         </span>
       ),
       children: <VendorList onViewVendor={handleViewVendor} />,
@@ -128,7 +130,7 @@ function DashboardContent() {
       key: "payments",
       label: (
         <span>
-          <CalendarOutlined /> Payments
+          <CalendarOutlined /> {t("budgetDashboard.tabs.payments")}
         </span>
       ),
       children: (
@@ -137,12 +139,12 @@ function DashboardContent() {
           items={[
             {
               key: "status",
-              label: "Payment Status",
+              label: t("budgetDashboard.subTabs.paymentStatus"),
               children: <PaymentStatus />,
             },
             {
               key: "calendar",
-              label: "Calendar View",
+              label: t("budgetDashboard.subTabs.calendarView"),
               children: <PaymentCalendar />,
             },
           ]}
@@ -153,15 +155,15 @@ function DashboardContent() {
       key: "analytics",
       label: (
         <span>
-          <LineChartOutlined /> Analytics
+          <LineChartOutlined /> {t("budgetDashboard.tabs.analytics")}
         </span>
       ),
       children: (
         <Tabs
           defaultActiveKey="charts"
           items={[
-            { key: "charts", label: "Charts", children: <BudgetCharts /> },
-            { key: "reports", label: "Reports", children: <ReportsPage /> },
+            { key: "charts", label: t("budgetDashboard.subTabs.charts"), children: <BudgetCharts /> },
+            { key: "reports", label: t("budgetDashboard.subTabs.reports"), children: <ReportsPage /> },
           ]}
         />
       ),
@@ -170,7 +172,7 @@ function DashboardContent() {
       key: "tools",
       label: (
         <span>
-          <SettingOutlined /> Tools
+          <SettingOutlined /> {t("budgetDashboard.tabs.tools")}
         </span>
       ),
       children: (
@@ -179,17 +181,17 @@ function DashboardContent() {
           items={[
             {
               key: "templates",
-              label: "Templates",
+              label: t("budgetDashboard.subTabs.templates"),
               children: <BudgetTemplates />,
             },
             {
               key: "estimator",
-              label: "Estimator",
+              label: t("budgetDashboard.subTabs.estimator"),
               children: <BudgetEstimator />,
             },
             {
               key: "activity",
-              label: "Activity Log",
+              label: t("budgetDashboard.subTabs.activityLog"),
               children: <ActivityLog />,
             },
           ]}
@@ -200,7 +202,7 @@ function DashboardContent() {
       key: "notifications",
       label: (
         <span>
-          <BellOutlined /> Alerts
+          <BellOutlined /> {t("budgetDashboard.tabs.alerts")}
         </span>
       ),
       children: <Notifications />,
@@ -209,7 +211,7 @@ function DashboardContent() {
       key: "bulk",
       label: (
         <span>
-          <CloudUploadOutlined /> Bulk Operations
+          <CloudUploadOutlined /> {t("budgetDashboard.tabs.bulkOperations")}
         </span>
       ),
       children: <BulkOperations />,
@@ -219,7 +221,7 @@ function DashboardContent() {
   return (
     <div className={dashboardStyles.dashboardContainer}>
       <Title level={3} className={dashboardStyles.dashboardTitle}>
-        Wedding Budget Manager
+        {t("budgetDashboard.title")}
       </Title>
 
       <Tabs defaultActiveKey="dashboard" items={tabItems} size="large" />

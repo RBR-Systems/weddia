@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Card,
   Row,
@@ -110,6 +111,7 @@ const STYLE_MULTIPLIERS: Record<
 export default function BudgetEstimator() {
   const { state, loadEstimate } = useBudget();
   const { mode } = useTheme();
+  const { t } = useTranslation();
   const semantic = SEMANTIC_CHART_COLORS[mode];
   const [guestCount, setGuestCount] = useState(100);
   const [weddingStyle, setWeddingStyle] = useState<WeddingStyle>("moderate");
@@ -149,13 +151,13 @@ export default function BudgetEstimator() {
         <Card
           title={
             <>
-              <CalculatorOutlined /> Budget Estimator
+              <CalculatorOutlined /> {t("budgetEstimator.title")}
             </>
           }
         >
           <Space direction="vertical" style={{ width: "100%" }} size="large">
             <div>
-              <Text strong>Number of Guests</Text>
+              <Text strong>{t("budgetEstimator.numberOfGuests")}</Text>
               <Row gutter={16} align="middle" style={{ marginTop: 8 }}>
                 <Col flex="auto">
                   <Slider
@@ -184,7 +186,7 @@ export default function BudgetEstimator() {
             </div>
 
             <div>
-              <Text strong>Wedding Style</Text>
+              <Text strong>{t("budgetEstimator.weddingStyle")}</Text>
               <Select
                 value={weddingStyle}
                 onChange={setWeddingStyle}
@@ -209,13 +211,13 @@ export default function BudgetEstimator() {
             <Divider />
 
             <div>
-              <Text strong>Or Enter Custom Budget</Text>
+              <Text strong>{t("budgetEstimator.orEnterCustom")}</Text>
               <InputNumber
                 style={{ width: "100%", marginTop: 8 }}
                 min={0}
                 value={customBudget}
                 onChange={(v) => setCustomBudget(v)}
-                placeholder="Enter custom amount"
+                placeholder={t("budgetEstimator.enterCustomAmount")}
                 formatter={(value) =>
                   `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                 }
@@ -229,7 +231,7 @@ export default function BudgetEstimator() {
                   size="small"
                   onClick={() => setCustomBudget(null)}
                 >
-                  Use calculated estimate instead
+                  {t("budgetEstimator.useCalculated")}
                 </Button>
               )}
             </div>
@@ -242,7 +244,7 @@ export default function BudgetEstimator() {
               }}
             >
               <Statistic
-                title="Estimated Total Budget"
+                title={t("budgetEstimator.estimatedTotal")}
                 value={estimatedBudget}
                 formatter={(value) =>
                   formatCurrency(Number(value), state.currency)
@@ -250,13 +252,12 @@ export default function BudgetEstimator() {
                 valueStyle={{ color: semantic.success, fontSize: 28 }}
               />
               <Text type="secondary">
-                Based on {guestCount} guests ×{" "}
-                {STYLE_MULTIPLIERS[weddingStyle].label} style
+                {t("budgetEstimator.basedOn", { guests: guestCount, style: STYLE_MULTIPLIERS[weddingStyle].label })}
               </Text>
             </Card>
 
             <Button type="primary" block onClick={handleApplyEstimate}>
-              Apply This Estimate to My Budget
+              {t("budgetEstimator.applyEstimate")}
             </Button>
           </Space>
         </Card>
@@ -266,13 +267,13 @@ export default function BudgetEstimator() {
         <Card
           title={
             <>
-              <BulbOutlined /> Suggested Category Breakdown
+              <BulbOutlined /> {t("budgetEstimator.suggestedBreakdown")}
             </>
           }
         >
           <Alert
-            message="Industry Standard Allocations"
-            description="These percentages are based on average wedding spending patterns. Adjust based on your priorities."
+            message={t("budgetEstimator.industryStandard")}
+            description={t("budgetEstimator.industryStandardDesc")}
             type="info"
             showIcon
             style={{ marginBottom: 16 }}
@@ -303,7 +304,7 @@ export default function BudgetEstimator() {
 
           <Row justify="space-between" align="middle">
             <Col>
-              <Text strong>Total</Text>
+              <Text strong>{t("common.total")}</Text>
             </Col>
             <Col>
               <Text strong style={{ fontSize: 18 }}>

@@ -15,6 +15,7 @@ import {
 import { formatCurrency } from "@/utils/formatters";
 import type { Category } from "../../types/budget.types";
 import styles from "./CategoryCard.module.css";
+import { useTranslation } from "react-i18next";
 
 const { Text, Title } = Typography;
 
@@ -40,6 +41,7 @@ export default function CategoryCard({
   currency = "USD",
   onClick,
 }: CategoryCardProps) {
+  const { t } = useTranslation();
   const { name, allocated, spent, expense_count, color } = category;
   const remaining = allocated - spent;
   const percentage = allocated > 0 ? Math.round((spent / allocated) * 100) : 0;
@@ -90,7 +92,7 @@ export default function CategoryCard({
         <div className={styles.statsRow}>
           <div>
             <span className={styles.statLabel}>
-              Spent
+              {t("categoryCard.spent")}
             </span>
             <div>
               <Text strong>{formatCurrency(spent, currency)}</Text>
@@ -98,7 +100,7 @@ export default function CategoryCard({
           </div>
           <div className={styles.statCenter}>
             <span className={styles.statLabel}>
-              Allocated
+              {t("categoryCard.allocated")}
             </span>
             <div>
               <Text>{formatCurrency(allocated, currency)}</Text>
@@ -106,7 +108,7 @@ export default function CategoryCard({
           </div>
           <div className={styles.statRight}>
             <span className={styles.statLabel}>
-              Remaining
+              {t("categoryCard.remaining")}
             </span>
             <div>
               <Text

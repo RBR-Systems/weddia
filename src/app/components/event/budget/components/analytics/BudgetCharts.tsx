@@ -19,6 +19,7 @@ import {
   AreaChart,
   Area,
 } from "recharts";
+import { useTranslation } from "react-i18next";
 import { useBudget } from "../../contexts/BudgetContext";
 import { formatCurrency } from "@/utils/formatters";
 import type { Category, Expense } from "../../types/budget.types";
@@ -29,6 +30,7 @@ const { Title } = Typography;
 
 export default function BudgetCharts() {
   const { state } = useBudget();
+  const { t } = useTranslation();
   const { mode } = useTheme();
 
   // Resolve palettes for current theme
@@ -121,7 +123,7 @@ export default function BudgetCharts() {
   if (state.categories.length === 0 && state.expenses.length === 0) {
     return (
       <Card>
-        <Empty description="Add expenses and categories to see charts" />
+        <Empty description={t("budgetCharts.noData")} />
       </Card>
     );
   }
@@ -130,7 +132,7 @@ export default function BudgetCharts() {
     <Row gutter={[16, 16]}>
       {/* Category Spending Breakdown */}
       <Col xs={24} lg={12}>
-        <Card title="Spending by Category">
+        <Card title={t("budgetCharts.spendingByCategory")}>
           {categoryPieData.length > 0 ? (
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
@@ -168,14 +170,14 @@ export default function BudgetCharts() {
               </PieChart>
             </ResponsiveContainer>
           ) : (
-            <Empty description="No spending data yet" />
+            <Empty description={t("budgetCharts.noSpendingData")} />
           )}
         </Card>
       </Col>
 
       {/* Budget vs Actual */}
       <Col xs={24} lg={12}>
-        <Card title="Budget vs Actual">
+        <Card title={t("budgetCharts.budgetVsActual")}>
           {budgetVsActualData.length > 0 ? (
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={budgetVsActualData}>
@@ -184,19 +186,19 @@ export default function BudgetCharts() {
                 <YAxis />
                 <Tooltip content={<CustomTooltip />} />
                 <Legend />
-                <Bar dataKey="allocated" fill={comparison.primary} name="Allocated" />
-                <Bar dataKey="spent" fill={comparison.secondary} name="Spent" />
+                <Bar dataKey="allocated" fill={comparison.primary} name={t("budgetCharts.allocated")} />
+                <Bar dataKey="spent" fill={comparison.secondary} name={t("budgetCharts.spent")} />
               </BarChart>
             </ResponsiveContainer>
           ) : (
-            <Empty description="No category data yet" />
+            <Empty description={t("budgetCharts.noCategoryData")} />
           )}
         </Card>
       </Col>
 
       {/* Monthly Spending Trend */}
       <Col xs={24} lg={12}>
-        <Card title="Monthly Spending Trend">
+        <Card title={t("budgetCharts.monthlySpendingTrend")}>
           {monthlySpendingData.length > 0 ? (
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={monthlySpendingData}>
@@ -214,19 +216,19 @@ export default function BudgetCharts() {
                   dataKey="amount"
                   stroke={comparison.primary}
                   strokeWidth={2}
-                  name="Spending"
+                  name={t("budgetCharts.spending")}
                 />
               </LineChart>
             </ResponsiveContainer>
           ) : (
-            <Empty description="No spending data yet" />
+            <Empty description={t("budgetCharts.noSpendingData")} />
           )}
         </Card>
       </Col>
 
       {/* Cumulative Spending */}
       <Col xs={24} lg={12}>
-        <Card title="Cumulative Spending vs Budget">
+        <Card title={t("budgetCharts.cumulativeVsBudget")}>
           {cumulativeSpendingData.length > 0 ? (
             <ResponsiveContainer width="100%" height={300}>
               <AreaChart data={cumulativeSpendingData}>
@@ -245,19 +247,19 @@ export default function BudgetCharts() {
                   stroke={semantic.success}
                   fill={semantic.success}
                   fillOpacity={0.3}
-                  name="Cumulative Spent"
+                  name={t("budgetCharts.cumulativeSpent")}
                 />
                 <Line
                   type="monotone"
                   dataKey="budget"
                   stroke={semantic.error}
                   strokeDasharray="5 5"
-                  name="Total Budget"
+                  name={t("budgetCharts.totalBudget")}
                 />
               </AreaChart>
             </ResponsiveContainer>
           ) : (
-            <Empty description="No expense data yet" />
+            <Empty description={t("budgetCharts.noExpenseData")} />
           )}
         </Card>
       </Col>

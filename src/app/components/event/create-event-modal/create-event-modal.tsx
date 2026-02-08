@@ -11,7 +11,7 @@ import {
 } from "antd";
 import { useState } from "react";
 import TextArea from "antd/es/input/TextArea";
-import { WEDDING_THEMES } from "@/app/constants/wedding-themes";
+import { getWeddingThemes } from "@/app/constants/wedding-themes";
 import { useLocale } from "@/app/hooks/useLocale";
 import FormSection from "./FormSection";
 import ClientInfoForm from "./ClientInfoForm";
@@ -21,10 +21,12 @@ import {
   PushpinOutlined,
 } from "@ant-design/icons";
 import styles from "./create-event-modal.module.css";
+import { useTranslation } from "react-i18next";
 
 type RequiredMark = boolean | "optional";
 
 const CreateEventModal = () => {
+  const { t } = useTranslation();
   const [form] = Form.useForm();
   const [requiredMark, setRequiredMarkType] =
     useState<RequiredMark>("optional");
@@ -63,13 +65,13 @@ const CreateEventModal = () => {
     <>
       <Modal
         width={800}
-        title={<span className={styles.modalTitle}>Create Event</span>}
-        closable={{ "aria-label": "Close button" }}
-        cancelText="Cancel"
+        title={<span className={styles.modalTitle}>{t("createEvent.title")}</span>}
+        closable={{ "aria-label": t("createEvent.closeButton") }}
+        cancelText={t("common.cancel")}
         okButtonProps={{
           className: styles.okButton,
         }}
-        okText="Save"
+        okText={t("common.save")}
         open={openCreateOpenModal}
         onOk={closeModal}
         onCancel={closeModal}
@@ -82,10 +84,10 @@ const CreateEventModal = () => {
             onValuesChange={onRequiredTypeChange}
             requiredMark={requiredMark}
           >
-            <FormSection title="Event Info">
-              <Form.Item label="Event Name" name="eventName" required>
+            <FormSection title={t("createEvent.sections.eventInfo")}>
+              <Form.Item label={t("createEvent.form.eventName")} name="eventName" required>
                 <Input
-                  placeholder="Sarah's & Mike's Wedding"
+                  placeholder={t("createEvent.form.eventNamePlaceholder")}
                   addonBefore={
                     <EditOutlined className={styles.iconSecondary} />
                   }
@@ -94,7 +96,7 @@ const CreateEventModal = () => {
               <div className={styles.eventInfoContainer}>
                 <Form.Item
                   className={styles.eventInfoItem}
-                  label="Date and Time"
+                  label={t("createEvent.form.dateTime")}
                   required
                 >
                   <DatePicker
@@ -102,17 +104,17 @@ const CreateEventModal = () => {
                     className={styles.datePicker}
                     showHour
                     showMinute
-                    placeholder="Select date and time"
+                    placeholder={t("createEvent.form.dateTimePlaceholder")}
                     locale={userLocale.DatePicker}
                   />
                 </Form.Item>
                 <Form.Item
                   className={styles.eventInfoItem}
-                  label="Location"
+                  label={t("createEvent.form.location")}
                   required
                 >
                   <Input
-                    placeholder="Location"
+                    placeholder={t("createEvent.form.locationPlaceholder")}
                     addonBefore={
                       <PushpinOutlined className={styles.iconSecondary} />
                     }
@@ -121,10 +123,10 @@ const CreateEventModal = () => {
               </div>
             </FormSection>
 
-            <FormSection title="Details">
-              <Form.Item label="Description" required>
+            <FormSection title={t("createEvent.sections.details")}>
+              <Form.Item label={t("createEvent.form.description")} required>
                 <TextArea
-                  placeholder="Give a brief description"
+                  placeholder={t("createEvent.form.descriptionPlaceholder")}
                   maxLength={250}
                   showCount
                   className={styles.descriptionTextarea}
@@ -133,18 +135,18 @@ const CreateEventModal = () => {
               <div className={styles.detailsContainer}>
                 <Form.Item
                   className={styles.detailsItem}
-                  label="Theme"
+                  label={t("createEvent.form.theme")}
                   required
                 >
                   <Select
-                    placeholder="Select a wedding theme"
-                    options={WEDDING_THEMES}
+                    placeholder={t("createEvent.form.themePlaceholder")}
+                    options={getWeddingThemes()}
                     className={styles.themeSelect}
                   />
                 </Form.Item>
                 <Form.Item
                   className={styles.detailsItem}
-                  label="Budget"
+                  label={t("createEvent.form.budget")}
                   required
                 >
                   <InputNumber
@@ -159,9 +161,9 @@ const CreateEventModal = () => {
                   />
                 </Form.Item>
               </div>
-              <Form.Item label="Comments" required>
+              <Form.Item label={t("createEvent.form.comments")} required>
                 <TextArea
-                  placeholder="Comments about the event"
+                  placeholder={t("createEvent.form.commentsPlaceholder")}
                   maxLength={250}
                   showCount
                   className={styles.commentsTextarea}
@@ -169,16 +171,16 @@ const CreateEventModal = () => {
               </Form.Item>
             </FormSection>
 
-            <FormSection title="Clients">
+            <FormSection title={t("createEvent.sections.clients")}>
               <ClientInfoForm
-                title="Bride"
-                emailPlaceholder="Bride email"
-                phonePlaceholder="Bride phone number"
+                title={t("createEvent.clients.bride")}
+                emailPlaceholder={t("createEvent.clients.brideEmail")}
+                phonePlaceholder={t("createEvent.clients.bridePhone")}
               />
               <ClientInfoForm
-                title="Groom"
-                emailPlaceholder="Groom email"
-                phonePlaceholder="Groom phone number"
+                title={t("createEvent.clients.groom")}
+                emailPlaceholder={t("createEvent.clients.groomEmail")}
+                phonePlaceholder={t("createEvent.clients.groomPhone")}
               />
             </FormSection>
           </Form>

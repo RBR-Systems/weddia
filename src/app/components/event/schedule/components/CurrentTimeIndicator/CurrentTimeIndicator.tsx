@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, forwardRef } from "react";
+import { useTranslation } from "react-i18next";
 import styles from "./CurrentTimeIndicator.module.css";
 
 type Props = {
@@ -14,6 +15,7 @@ type Props = {
 
 const CurrentTimeIndicator = forwardRef<HTMLDivElement, Props>(
   ({ items, containerRef }, ref) => {
+    const { t } = useTranslation();
     const [currentTime, setCurrentTime] = useState(new Date());
     const [position, setPosition] = useState<number | null>(null);
 
@@ -112,7 +114,7 @@ const CurrentTimeIndicator = forwardRef<HTMLDivElement, Props>(
         style={{ top: `${position}px` }}
       >
         <div className={styles.nowLabel}>
-          <span className={styles.nowText}>NOW</span>
+          <span className={styles.nowText}>{t("common.now")}</span>
           <span className={styles.nowTime}>{formattedTime}</span>
         </div>
         <div className={styles.nowDot} />

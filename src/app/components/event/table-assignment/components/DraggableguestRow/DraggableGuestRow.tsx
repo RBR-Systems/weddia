@@ -12,6 +12,7 @@ import {
 import { WarningOutlined } from "@ant-design/icons";
 import { useTableAssignmentContext } from "../../context/TableAssignmentContext";
 import { DeleteOutlined, FolderOpenOutlined } from "@ant-design/icons";
+import { useTranslation } from "react-i18next";
 
 export default memo(function DraggableGuestRow({
   guest,
@@ -29,6 +30,7 @@ export default memo(function DraggableGuestRow({
     guestsById,
     messageApi,
   } = useTableAssignmentContext();
+  const { t } = useTranslation();
 
   const assignedTableId = useMemo(() => {
     const assignmentsMap = assignmentsByTable as Map<string, any[]>;
@@ -114,13 +116,13 @@ export default memo(function DraggableGuestRow({
               {relationName ? (
                 <Tag color="gold">{relationName}</Tag>
               ) : (
-                <Tag>Unknown relation</Tag>
+                <Tag>{t("tableAssignment.unknownRelation")}</Tag>
               )}
-              {!isAssigned && <Tag>Unassigned</Tag>}
+              {!isAssigned && <Tag>{t("tableAssignment.unassignedTag")}</Tag>}
               {guest.plus_one ? <Tag color="purple">+1</Tag> : null}
               {assignedAssignment ? (
                 <Tag color="blue">
-                  {`Seat${partySize > 1 ? "(s)" : ""} ${Array.from({ length: partySize }, (_, i) => assignedAssignment.seat_number + i).join(", ")}`}
+                  {t("tableAssignment.seatLabel", { seats: Array.from({ length: partySize }, (_, i) => assignedAssignment.seat_number + i).join(", ") })}
                 </Tag>
               ) : null}
               {guest.dietary_restrictions ? (
@@ -139,7 +141,7 @@ export default memo(function DraggableGuestRow({
           style={{ width: "100%", margin: "10px 0px 10px 0px" }}
         >
           <Select
-            placeholder="Assign to table"
+            placeholder={t("tableAssignment.assignToTable")}
             options={tableOptions}
             value={assignedTableId ?? undefined}
             style={{ minWidth: 160, flex: 1 }}
@@ -158,7 +160,7 @@ export default memo(function DraggableGuestRow({
                 usedSeatNumbers,
               );
               if (!seat) {
-                messageApi?.warning("That table is full");
+                messageApi?.warning(t("tableAssignment.tableFull"));
                 return;
               }
               dispatch({
@@ -166,7 +168,7 @@ export default memo(function DraggableGuestRow({
                 payload: { tableId, guestId: guest.guest_id, seatNumber: seat },
               });
               messageApi?.success(
-                `${fullName(guest)} reassigned to ${tableId}`,
+                t("tableAssignment.reassigned", { name: fullName(guest), table: tableId }),
               );
             }}
           />
@@ -182,7 +184,7 @@ export default memo(function DraggableGuestRow({
                     type: "UNASSIGN_GUEST",
                     payload: { guestId: guest.guest_id },
                   });
-                  messageApi?.success("Guest unassigned");
+                  messageApi?.success(t("tableAssignment.guestUnassigned"));
                 }}
                 icon={<DeleteOutlined />}
               ></Button>

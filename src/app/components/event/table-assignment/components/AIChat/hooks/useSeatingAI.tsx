@@ -8,6 +8,7 @@ import {
   testHuggingFaceConnection,
 } from "../../../services/huggingface.service";
 import { MessageItem } from "../models/types";
+import { useTranslation } from "react-i18next";
 
 interface UseSeatingAIParams {
   guests: HFGuest[];
@@ -22,12 +23,12 @@ export const useSeatingAI = ({
   onApplySeating,
   messageApi,
 }: UseSeatingAIParams) => {
+  const { t } = useTranslation();
   const [messages, setMessages] = useState<MessageItem[]>([
     {
       id: "0",
       type: "assistant",
-      content:
-        "Hello! I'm your AI seating assistant. I can help you arrange guests at tables based on their relationships and your preferences. Try asking me to:\n\n• Group families together\n• Separate certain guests\n• Fill tables evenly\n• Arrange by age groups\n\nWhat would you like me to do?",
+      content: t("tableAssignment.aiChat.greeting"),
       timestamp: new Date(),
     },
   ]);
@@ -74,7 +75,7 @@ export const useSeatingAI = ({
       const assistantMessage: MessageItem = {
         id: (Date.now() + 1).toString(),
         type: "assistant",
-        content: response.explanation ?? "AI seating suggestion",
+        content: response.explanation ?? t("tableAssignment.aiChat.aiSuggestion"),
         timestamp: new Date(),
         data: response,
       };
@@ -83,20 +84,19 @@ export const useSeatingAI = ({
 
       if (response.conflicts && response.conflicts.length > 0) {
         messageApi?.warning(
-          `Potential issues: ${response.conflicts.join(", ")}`,
+          t("tableAssignment.aiChat.potentialIssues", { issues: response.conflicts.join(", ") }),
           5,
         );
       }
     } catch (error) {
       messageApi?.error(
-        error instanceof Error ? error.message : "Failed to get AI response",
+        error instanceof Error ? error.message : t("tableAssignment.aiChat.failedResponse"),
       );
 
       const errorMessage: MessageItem = {
         id: (Date.now() + 1).toString(),
         type: "assistant",
-        content:
-          "I'm sorry, I encountered an error. Please try again or rephrase your request.",
+        content: t("tableAssignment.aiChat.errorMessage"),
         timestamp: new Date(),
       };
 
@@ -110,8 +110,7 @@ export const useSeatingAI = ({
     onApplySeating(data.assignments);
     setAppliedMessageId(msgId);
     messageApi?.success({
-      content:
-        "Seating arrangement approved and applied! Your event layout has been updated.",
+      content: t("tableAssignment.aiChat.arrangementAppliedSuccess"),
       duration: 3,
     });
   };

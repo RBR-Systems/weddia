@@ -9,6 +9,7 @@ import { UserOutlined, TeamOutlined, WarningOutlined } from "@ant-design/icons";
 import { LeftOutlined, RightOutlined } from "@ant-design/icons";
 import { useTableAssignmentContext } from "../../context/TableAssignmentContext";
 import type { Guest, TableAssignment } from "../../models/types";
+import { useTranslation } from "react-i18next";
 
 type Props = {
   sideView: "guests" | "table";
@@ -63,6 +64,7 @@ const SidePanel = (props: Props) => {
   const tables = tableOrder ?? [];
   const tablesById = tablesForActiveLayoutById ?? new Map();
   const ctx = useTableAssignmentContext();
+  const { t } = useTranslation();
   const handleSelectTable = onSelectTable ?? (() => {});
   const unassignedCount =
     (guestsById?.size ?? 0) - (assignedGuestIds?.size ?? 0);
@@ -82,12 +84,12 @@ const SidePanel = (props: Props) => {
                   {unassignedCount > 0 ? (
                     <>
                       <WarningOutlined style={{ color: "orange" }} />
-                      Guests
+                      {t("tableAssignment.sidePanel.guestsTab")}
                     </>
                   ) : (
                     <>
                       <UserOutlined />
-                      Guests
+                      {t("tableAssignment.sidePanel.guestsTab")}
                     </>
                   )}
                 </Space>
@@ -98,7 +100,7 @@ const SidePanel = (props: Props) => {
               label: (
                 <Space size={6}>
                   <TeamOutlined />
-                  Table
+                  {t("tableAssignment.sidePanel.tableTab")}
                 </Space>
               ),
               value: "table",
@@ -115,13 +117,13 @@ const SidePanel = (props: Props) => {
             <Input.Search
               value={guestSearch}
               onChange={(e) => setGuestSearch(e.target.value)}
-              placeholder="Search guests by name or email"
+              placeholder={t("tableAssignment.sidePanel.searchPlaceholder")}
               allowClear
             />
             <Select
               value={relationFilter}
               onChange={(v) => setRelationFilter(v)}
-              placeholder="Filter by relation"
+              placeholder={t("tableAssignment.sidePanel.filterByRelation")}
               allowClear
               options={relationOptions}
             />
@@ -131,9 +133,9 @@ const SidePanel = (props: Props) => {
                 setAssignedFilter(v as "all" | "assigned" | "unassigned")
               }
               options={[
-                { label: "All", value: "all" },
-                { label: "Assigned", value: "assigned" },
-                { label: "Unassigned", value: "unassigned" },
+                { label: t("tableAssignment.sidePanel.all"), value: "all" },
+                { label: t("tableAssignment.sidePanel.assigned"), value: "assigned" },
+                { label: t("tableAssignment.sidePanel.unassignedTab"), value: "unassigned" },
               ]}
             />
             <div>
@@ -141,10 +143,10 @@ const SidePanel = (props: Props) => {
                 danger
                 onClick={() => {
                   ctx.dispatch({ type: "UNASSIGN_ALL" });
-                  ctx.messageApi?.success("All guests unassigned");
+                  ctx.messageApi?.success(t("tableAssignment.sidePanel.allGuestsUnassigned"));
                 }}
               >
-                Unassign all
+                {t("tableAssignment.sidePanel.unassignAll")}
               </Button>
             </div>
           </Space>
@@ -173,13 +175,13 @@ const SidePanel = (props: Props) => {
           {!selectedTable ? (
             <div>
               {tables.length === 0 ? (
-                <Empty description="No tables available." />
+                <Empty description={t("tableAssignment.sidePanel.noTables")} />
               ) : (
                 <List
                   size="small"
                   dataSource={tables}
                   renderItem={(tableId) => {
-                    const t = tablesById.get(tableId);
+                    const tbl = tablesById.get(tableId);
                     return (
                       <List.Item
                         key={tableId}
@@ -188,10 +190,10 @@ const SidePanel = (props: Props) => {
                       >
                         <div>
                           <div className={styles.tableTitle}>
-                            {t?.table_id ?? tableId}
+                            {tbl?.table_id ?? tableId}
                           </div>
                           <div className={styles.tableSubtitle}>
-                            Capacity {t?.total_number ?? "-"}
+                            {t("tableAssignment.sidePanel.capacity", { count: tbl?.total_number ?? "-" })}
                           </div>
                         </div>
                       </List.Item>
@@ -216,8 +218,7 @@ const SidePanel = (props: Props) => {
                       {selectedTable.table_id}
                     </div>
                     <div className={styles.tableSubtitle}>
-                      Capacity {selectedTable.total_number} •{" "}
-                      {selectedTablePeopleCount} seated
+                      {t("tableAssignment.sidePanel.capacityAndSeated", { capacity: selectedTable.total_number, seated: selectedTablePeopleCount })}
                     </div>
                   </div>
                 </Space>
@@ -225,7 +226,7 @@ const SidePanel = (props: Props) => {
               <div className={styles.sideList + " " + styles.sideListHeight80}>
                 <List
                   size="small"
-                  locale={{ emptyText: "No guests assigned yet." }}
+                  locale={{ emptyText: t("tableAssignment.sidePanel.noGuestsAssigned") }}
                   dataSource={selectedTableAssignments}
                   renderItem={(a) => {
                     const g = guestsById.get(a.guest_id);
@@ -240,7 +241,7 @@ const SidePanel = (props: Props) => {
                           align="center"
                           className={styles.fullWidth}
                         >
-                          <Tag color="geekblue">Seat {a.seat_number}</Tag>
+                          <Tag color="geekblue">{t("tableAssignment.seatNumber", { number: a.seat_number })}</Tag>
                           <DraggableGuestRow
                             guest={g}
                             relationName={relation?.name}
@@ -255,7 +256,7 @@ const SidePanel = (props: Props) => {
                                   selectedTable.table_id,
                                   Math.max(1, a.seat_number - 1),
                                 );
-                                ctx.messageApi?.success("Seat moved");
+                                ctx.messageApi?.success(t("tableAssignment.sidePanel.seatMoved"));
                               }}
                               icon={<LeftOutlined />}
                             />
@@ -270,7 +271,7 @@ const SidePanel = (props: Props) => {
                                     a.seat_number + 1,
                                   ),
                                 );
-                                ctx.messageApi?.success("Seat moved");
+                                ctx.messageApi?.success(t("tableAssignment.sidePanel.seatMoved"));
                               }}
                               icon={<RightOutlined />}
                             />

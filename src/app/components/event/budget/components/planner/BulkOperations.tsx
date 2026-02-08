@@ -28,6 +28,7 @@ import {
 import type { UploadProps } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { useBudget } from "../../contexts/BudgetContext";
+import { useTranslation } from "react-i18next";
 import CategoryTag from "../shared/CategoryTag";
 import { formatCurrency, formatDate } from "@/utils/formatters";
 import type { Expense, PaymentStatus } from "../../types/budget.types";
@@ -36,6 +37,7 @@ import bulkStyles from "./BulkOperations.module.css";
 const { Text, Paragraph, Title } = Typography;
 
 export default function BulkOperations() {
+  const { t } = useTranslation();
   const { message } = App.useApp();
   const { state, deleteExpense, updateExpense } = useBudget();
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
@@ -79,12 +81,12 @@ export default function BulkOperations() {
     a.download = `budget-expenses-export.csv`;
     a.click();
     URL.revokeObjectURL(url);
-    message.success("Expenses exported successfully");
+    message.success(t("bulkOperations.exportSuccess"));
   };
 
   const handleExportSelected = () => {
     if (selectedRowKeys.length === 0) {
-      message.warning("No expenses selected");
+      message.warning(t("bulkOperations.noExpensesSelected"));
       return;
     }
 
@@ -124,7 +126,7 @@ export default function BulkOperations() {
     a.download = `budget-expenses-selected.csv`;
     a.click();
     URL.revokeObjectURL(url);
-    message.success(`Exported ${selectedExpenses.length} expenses`);
+    message.success(t("bulkOperations.exportedCount", { count: selectedExpenses.length }));
   };
 
   const uploadProps: UploadProps = {
@@ -147,7 +149,7 @@ export default function BulkOperations() {
         }, 200);
 
         setTimeout(() => {
-          message.success("Import completed (demo - no actual data imported)");
+          message.success(t("bulkOperations.importCompleted"));
           setImportProgress(null);
         }, 2500);
       };
@@ -161,7 +163,7 @@ export default function BulkOperations() {
       updateExpense?.(key as string, { payment_status: bulkStatus });
     });
     message.success(
-      `Updated ${selectedRowKeys.length} expenses to "${bulkStatus}"`,
+      t("bulkOperations.expensesStatusUpdated", { count: selectedRowKeys.length, status: bulkStatus }),
     );
     setSelectedRowKeys([]);
     setBulkActionModal(null);
@@ -169,14 +171,14 @@ export default function BulkOperations() {
 
   const handleBulkCategoryUpdate = () => {
     if (!bulkCategory) {
-      message.error("Please select a category");
+      message.error(t("bulkOperations.selectCategoryRequired"));
       return;
     }
     selectedRowKeys.forEach((key) => {
       updateExpense?.(key as string, { category_id: bulkCategory });
     });
     message.success(
-      `Updated ${selectedRowKeys.length} expenses to new category`,
+      t("bulkOperations.expensesCategoryUpdated", { count: selectedRowKeys.length }),
     );
     setSelectedRowKeys([]);
     setBulkActionModal(null);
@@ -186,21 +188,21 @@ export default function BulkOperations() {
     selectedRowKeys.forEach((key) => {
       deleteExpense?.(key as string);
     });
-    message.success(`Deleted ${selectedRowKeys.length} expenses`);
+    message.success(t("bulkOperations.expensesDeleted", { count: selectedRowKeys.length }));
     setSelectedRowKeys([]);
     setBulkActionModal(null);
   };
 
   const columns: ColumnsType<Expense> = [
-    { title: "Description", dataIndex: "description", key: "description" },
+    { title: t("common.description"), dataIndex: "description", key: "description" },
     {
-      title: "Amount",
+      title: t("common.amount"),
       dataIndex: "amount",
       key: "amount",
       render: (v: number) => formatCurrency(v, state.currency),
     },
     {
-      title: "Category",
+      title: t("common.category"),
       dataIndex: "category_id",
       key: "category_id",
       render: (id: string) => {
@@ -209,12 +211,17 @@ export default function BulkOperations() {
       },
     },
     {
-      title: "Date",
+      title: t("common.date"),
       dataIndex: "expense_date",
       key: "expense_date",
       render: (v: string) => formatDate(v),
     },
-    { title: "Status", dataIndex: "payment_status", key: "payment_status" },
+    {
+      title: t("common.status"),
+      dataIndex: "payment_status",
+      key: "payment_status",
+      render: (status: string) => t(`statusBadge.${status}`),
+    },
   ];
 
   const rowSelection = {
@@ -226,18 +233,18 @@ export default function BulkOperations() {
     <>
       <Row gutter={[16, 16]}>
         <Col xs={24} lg={12}>
-          <Card title="Import Data">
+          <Card title={t("bulkOperations.importData")}>
             <Space direction="vertical" className={bulkStyles.fullWidth}>
               <Alert
-                message="CSV Import"
-                description="Upload a CSV file with columns: Description, Amount, Category, Vendor, Date, Status"
+                message={t("bulkOperations.csvImport")}
+                description={t("bulkOperations.csvDescription")}
                 type="info"
                 showIcon
               />
 
               <Upload {...uploadProps}>
                 <Button icon={<UploadOutlined />} block>
-                  Select CSV File
+                  {t("bulkOperations.selectCsvFile")}
                 </Button>
               </Upload>
 
@@ -247,7 +254,7 @@ export default function BulkOperations() {
 
               <Divider />
 
-              <Text type="secondary">Download template:</Text>
+              <Text type="secondary">{t("bulkOperations.downloadTemplateLabel")}</Text>
               <Button
                 icon={<DownloadOutlined />}
                 onClick={() => {
@@ -262,21 +269,21 @@ export default function BulkOperations() {
                   URL.revokeObjectURL(url);
                 }}
               >
-                Download Template
+                {t("bulkOperations.downloadTemplate")}
               </Button>
             </Space>
           </Card>
         </Col>
 
         <Col xs={24} lg={12}>
-          <Card title="Export Data">
+          <Card title={t("bulkOperations.exportData")}>
             <Space direction="vertical" className={bulkStyles.fullWidth}>
               <Button
                 icon={<DownloadOutlined />}
                 onClick={handleExportAll}
                 block
               >
-                Export All Expenses ({state.expenses.length})
+                {t("bulkOperations.exportAll", { count: state.expenses.length })}
               </Button>
 
               <Button
@@ -285,42 +292,42 @@ export default function BulkOperations() {
                 disabled={selectedRowKeys.length === 0}
                 block
               >
-                Export Selected ({selectedRowKeys.length})
+                {t("bulkOperations.exportSelected", { count: selectedRowKeys.length })}
               </Button>
 
               <Divider />
 
-              <Text type="secondary">Export formats available: CSV</Text>
+              <Text type="secondary">{t("bulkOperations.exportFormats")}</Text>
             </Space>
           </Card>
         </Col>
       </Row>
 
       <Card
-        title="Bulk Operations"
+        title={t("bulkOperations.title")}
         className={bulkStyles.bulkTable}
         extra={
           selectedRowKeys.length > 0 && (
             <Space>
-              <Text>{selectedRowKeys.length} selected</Text>
+              <Text>{t("bulkOperations.selectedCount", { count: selectedRowKeys.length })}</Text>
               <Button
                 icon={<EditOutlined />}
                 onClick={() => setBulkActionModal("status")}
               >
-                Update Status
+                {t("bulkOperations.updateStatus")}
               </Button>
               <Button
                 icon={<CheckSquareOutlined />}
                 onClick={() => setBulkActionModal("category")}
               >
-                Change Category
+                {t("bulkOperations.changeCategory")}
               </Button>
               <Button
                 danger
                 icon={<DeleteOutlined />}
                 onClick={() => setBulkActionModal("delete")}
               >
-                Delete
+                {t("common.delete")}
               </Button>
             </Space>
           )
@@ -337,22 +344,22 @@ export default function BulkOperations() {
 
       {/* Bulk Status Modal */}
       <Modal
-        title="Update Payment Status"
+        title={t("bulkOperations.updatePaymentStatus")}
         open={bulkActionModal === "status"}
         onOk={handleBulkStatusUpdate}
         onCancel={() => setBulkActionModal(null)}
       >
         <Space direction="vertical" className={bulkStyles.fullWidth}>
-          <Text>Update {selectedRowKeys.length} expenses to:</Text>
+          <Text>{t("bulkOperations.updateExpensesTo", { count: selectedRowKeys.length })}</Text>
           <Select
             value={bulkStatus}
             onChange={setBulkStatus}
             className="u-full-width"
             options={[
-              { value: "paid", label: "Paid" },
-              { value: "pending", label: "Pending" },
-              { value: "overdue", label: "Overdue" },
-              { value: "partial", label: "Partial" },
+              { value: "paid", label: t("statusBadge.paid") },
+              { value: "pending", label: t("statusBadge.pending") },
+              { value: "overdue", label: t("statusBadge.overdue") },
+              { value: "partial", label: t("statusBadge.partial") },
             ]}
           />
         </Space>
@@ -360,18 +367,18 @@ export default function BulkOperations() {
 
       {/* Bulk Category Modal */}
       <Modal
-        title="Change Category"
+        title={t("bulkOperations.changeCategory")}
         open={bulkActionModal === "category"}
         onOk={handleBulkCategoryUpdate}
         onCancel={() => setBulkActionModal(null)}
       >
         <Space direction="vertical" className={bulkStyles.fullWidth}>
-          <Text>Move {selectedRowKeys.length} expenses to:</Text>
+          <Text>{t("bulkOperations.moveExpensesTo", { count: selectedRowKeys.length })}</Text>
           <Select
             value={bulkCategory}
             onChange={setBulkCategory}
             className="u-full-width"
-            placeholder="Select category"
+            placeholder={t("bulkOperations.selectCategoryPlaceholder")}
             options={state.categories.map(
               (c: { id: string; name: string }) => ({
                 value: c.id,
@@ -384,16 +391,16 @@ export default function BulkOperations() {
 
       {/* Bulk Delete Modal */}
       <Modal
-        title="Confirm Delete"
+        title={t("bulkOperations.confirmDelete")}
         open={bulkActionModal === "delete"}
         onOk={handleBulkDelete}
         onCancel={() => setBulkActionModal(null)}
-        okText="Delete"
+        okText={t("common.delete")}
         okButtonProps={{ danger: true }}
       >
         <Alert
-          message={`Are you sure you want to delete ${selectedRowKeys.length} expense(s)?`}
-          description="This action cannot be undone."
+          message={t("bulkOperations.deleteConfirm", { count: selectedRowKeys.length })}
+          description={t("bulkOperations.cannotUndo")}
           type="warning"
           showIcon
         />

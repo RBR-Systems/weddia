@@ -21,6 +21,7 @@ import CategoryCard from "./CategoryCard";
 import type { Category } from "../../types/budget.types";
 import { CHART_COLORS } from "@/theme/chartColors";
 import { useTheme } from "@/theme/ThemeProvider";
+import { useTranslation } from "react-i18next";
 
 const { Search } = Input;
 
@@ -28,6 +29,7 @@ export default function CategoryList() {
   const { message } = App.useApp();
   const { state, addCategory, updateCategory, deleteCategory } = useBudget();
   const { mode } = useTheme();
+  const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
@@ -63,7 +65,7 @@ export default function CategoryList() {
 
       if (editingCategory) {
         updateCategory?.(editingCategory.id, { ...values, color: colorValue });
-        message.success("Category updated");
+        message.success(t("categoryList.categoryUpdated"));
       } else {
         addCategory?.({
           id: `cat_${Date.now()}`,
@@ -74,7 +76,7 @@ export default function CategoryList() {
           color: colorValue,
           expense_count: 0,
         });
-        message.success("Category added");
+        message.success(t("categoryList.categoryAdded"));
       }
       setModalOpen(false);
       form.resetFields();
@@ -86,7 +88,7 @@ export default function CategoryList() {
   const handleDelete = () => {
     if (editingCategory) {
       deleteCategory?.(editingCategory.id);
-      message.success("Category deleted");
+      message.success(t("categoryList.categoryDeleted"));
       setModalOpen(false);
     }
   };
@@ -98,11 +100,11 @@ export default function CategoryList() {
   return (
     <>
       <Card
-        title="Budget Categories"
+        title={t("categoryList.title")}
         extra={
           <Space>
             <Search
-              placeholder="Search categories"
+              placeholder={t("categoryList.searchPlaceholder")}
               allowClear
               onSearch={setSearchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -113,13 +115,13 @@ export default function CategoryList() {
               icon={<PlusOutlined />}
               onClick={handleAddCategory}
             >
-              Add Category
+              {t("categoryList.addCategory")}
             </Button>
           </Space>
         }
       >
         {filteredCategories.length === 0 ? (
-          <Empty description="No categories found" />
+          <Empty description={t("categoryList.noCategories")} />
         ) : (
           <Row gutter={[16, 16]}>
             {filteredCategories.map((category: Category) => (
@@ -136,36 +138,36 @@ export default function CategoryList() {
       </Card>
 
       <Modal
-        title={editingCategory ? "Edit Category" : "Add Category"}
+        title={editingCategory ? t("categoryList.editCategory") : t("categoryList.addCategory")}
         open={modalOpen}
         onOk={handleSave}
         onCancel={() => setModalOpen(false)}
         footer={[
           editingCategory && (
             <Button key="delete" danger onClick={handleDelete}>
-              Delete
+              {t("common.delete")}
             </Button>
           ),
           <Button key="cancel" onClick={() => setModalOpen(false)}>
-            Cancel
+            {t("common.cancel")}
           </Button>,
           <Button key="save" type="primary" onClick={handleSave}>
-            Save
+            {t("common.save")}
           </Button>,
         ]}
       >
         <Form form={form} layout="vertical">
           <Form.Item
             name="name"
-            label="Category Name"
-            rules={[{ required: true, message: "Please enter a name" }]}
+            label={t("categoryList.categoryName")}
+            rules={[{ required: true, message: t("categoryList.categoryNameRequired") }]}
           >
-            <Input placeholder="e.g., Venue, Catering, Photography" />
+            <Input placeholder={t("categoryList.categoryNamePlaceholder")} />
           </Form.Item>
           <Form.Item
             name="allocated"
-            label="Allocated Budget"
-            rules={[{ required: true, message: "Please enter an amount" }]}
+            label={t("categoryList.allocatedBudget")}
+            rules={[{ required: true, message: t("categoryList.allocatedBudgetRequired") }]}
           >
             <InputNumber
               className="u-full-width"
@@ -179,7 +181,7 @@ export default function CategoryList() {
               }
             />
           </Form.Item>
-          <Form.Item name="color" label="Color">
+          <Form.Item name="color" label={t("categoryList.color")}>
             <ColorPicker />
           </Form.Item>
         </Form>

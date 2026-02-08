@@ -19,10 +19,11 @@ import {
 } from "@ant-design/icons";
 import { formatCurrency, formatDate } from "@/utils/formatters";
 import { useBudget } from "../../contexts/BudgetContext";
-import { PAYMENT_STATUS } from "../../constants/budget.constants";
+import { getPaymentStatus } from "../../constants/budget.constants";
 import type { Expense, PaymentStatus } from "../../types/budget.types";
 import CategoryTag from "../shared/CategoryTag";
 import styles from "./ExpenseDetails.module.css";
+import { useTranslation } from "react-i18next";
 
 const { Title, Text } = Typography;
 
@@ -42,6 +43,8 @@ export default function ExpenseDetails({
   onDelete,
 }: ExpenseDetailsProps) {
   const { state } = useBudget();
+  const { t } = useTranslation();
+  const PAYMENT_STATUS = getPaymentStatus();
 
   if (!expense) return null;
 
@@ -60,7 +63,7 @@ export default function ExpenseDetails({
     <Drawer
       title={
         <Space>
-          <span>Expense Details</span>
+          <span>{t("expenseDetails.title")}</span>
           {getStatusTag(expense.payment_status)}
         </Space>
       }
@@ -71,7 +74,7 @@ export default function ExpenseDetails({
       extra={
         <Space>
           <Button icon={<EditOutlined />} onClick={() => onEdit?.(expense)}>
-            Edit
+            {t("common.edit")}
           </Button>
           <Button
             danger
@@ -81,7 +84,7 @@ export default function ExpenseDetails({
               onClose();
             }}
           >
-            Delete
+            {t("common.delete")}
           </Button>
         </Space>
       }
@@ -97,23 +100,23 @@ export default function ExpenseDetails({
         </div>
 
         <Descriptions column={1} bordered size="small">
-          <Descriptions.Item label="Category">
+          <Descriptions.Item label={t("common.category")}>
             <CategoryTag color={category?.color}>
               {category?.name || expense.category_id}
             </CategoryTag>
           </Descriptions.Item>
-          <Descriptions.Item label="Vendor">
-            {expense.vendor_name || "Not specified"}
+          <Descriptions.Item label={t("common.vendor")}>
+            {expense.vendor_name || t("common.notSpecified")}
           </Descriptions.Item>
-          <Descriptions.Item label="Date">
+          <Descriptions.Item label={t("common.date")}>
             {formatDate(expense.expense_date)}
           </Descriptions.Item>
-          <Descriptions.Item label="Payment Status">
+          <Descriptions.Item label={t("expenseModal.paymentStatus")}>
             {getStatusTag(expense.payment_status)}
           </Descriptions.Item>
         </Descriptions>
 
-        <Divider orientation="horizontal">Receipts</Divider>
+        <Divider orientation="horizontal">{t("expenseDetails.receipts")}</Divider>
 
         {expense.receipt_urls && expense.receipt_urls.length > 0 ? (
           <Image.PreviewGroup>
@@ -135,24 +138,24 @@ export default function ExpenseDetails({
             image={
               <FileImageOutlined className={styles.emptyIcon} />
             }
-            description="No receipts attached"
+            description={t("expenseDetails.noReceipts")}
           />
         )}
 
-        <Divider orientation="horizontal">Activity</Divider>
+        <Divider orientation="horizontal">{t("expenseDetails.activity")}</Divider>
 
         <Timeline
           items={[
             {
               color: "green",
-              children: `Expense created on ${formatDate(expense.expense_date)}`,
+              children: t("expenseDetails.expenseCreatedOn", { date: formatDate(expense.expense_date) }),
             },
             {
               color: expense.payment_status === "paid" ? "green" : "gray",
               children:
                 expense.payment_status === "paid"
-                  ? "Payment completed"
-                  : "Awaiting payment",
+                  ? t("expenseDetails.paymentCompleted")
+                  : t("expenseDetails.awaitingPayment"),
             },
           ]}
         />

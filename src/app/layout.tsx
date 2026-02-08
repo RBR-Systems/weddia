@@ -4,6 +4,7 @@ import "./globals.css";
 import "antd/dist/reset.css";
 import { EventProvider } from "./contexts/EventContext";
 import ThemeProvider from "@/theme/ThemeProvider";
+import I18nProvider from "./common/I18nProvider/I18nProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,9 +29,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        <ThemeProvider>
-          <EventProvider>{children}</EventProvider>
-        </ThemeProvider>
+        <I18nProvider>
+          <ThemeProvider>
+            <EventProvider>{children}</EventProvider>
+          </ThemeProvider>
+        </I18nProvider>
       </body>
     </html>
   );

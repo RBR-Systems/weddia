@@ -1,42 +1,43 @@
 import { TimelineItem } from "../models/types";
+import i18next from "i18next";
 
-export const STATUS_OPTIONS = {
+export const getStatusOptions = () => ({
   pending: {
     value: "pending",
-    label: "Pending",
+    label: i18next.t("schedule.status.pending"),
     icon: "",
     color: "#95A5A6",
-    description: "Not yet started",
+    description: i18next.t("schedule.statusDesc.pending"),
   },
   in_progress: {
     value: "in_progress",
-    label: "In Progress",
+    label: i18next.t("schedule.status.inProgress"),
     icon: "",
     color: "#3498DB",
-    description: "Currently happening",
+    description: i18next.t("schedule.statusDesc.inProgress"),
   },
   completed: {
     value: "completed",
-    label: "Completed",
+    label: i18next.t("schedule.status.completed"),
     icon: "",
     color: "#27AE60",
-    description: "Finished successfully",
+    description: i18next.t("schedule.statusDesc.completed"),
   },
   delayed: {
     value: "delayed",
-    label: "Delayed",
+    label: i18next.t("schedule.status.delayed"),
     icon: "",
     color: "#E67E22",
-    description: "Running behind schedule",
+    description: i18next.t("schedule.statusDesc.delayed"),
   },
   cancelled: {
     value: "cancelled",
-    label: "Cancelled",
+    label: i18next.t("schedule.status.cancelled"),
     icon: "",
     color: "#E74C3C",
-    description: "Will not happen",
+    description: i18next.t("schedule.statusDesc.cancelled"),
   },
-} as const;
+});
 
 export function calculateProgress(items: TimelineItem[]) {
   const total = items.length;
@@ -61,9 +62,9 @@ export function calculateProgress(items: TimelineItem[]) {
 }
 
 export function formatTime(timestamp: string, use24Hour = false) {
-  if (!timestamp) return "Invalid time";
+  if (!timestamp) return i18next.t("schedule.duration.invalidTime");
   const date = new Date(timestamp);
-  if (Number.isNaN(date.getTime())) return "Invalid time";
+  if (Number.isNaN(date.getTime())) return i18next.t("schedule.duration.invalidTime");
 
   return date.toLocaleTimeString("en-US", {
     hour: "numeric",
@@ -79,11 +80,11 @@ export function calculateDuration(item: TimelineItem) {
   const diffMs = end.getTime() - start.getTime();
   const diffMins = Math.floor(diffMs / 60000);
 
-  if (diffMins < 60) return `${diffMins} min`;
+  if (diffMins < 60) return i18next.t(diffMins === 1 ? "schedule.duration.minute" : "schedule.duration.minutes", { count: diffMins });
   const hours = Math.floor(diffMins / 60);
   const mins = diffMins % 60;
-  if (mins === 0) return `${hours} hour${hours > 1 ? "s" : ""}`;
-  return `${hours}h ${mins}m`;
+  if (mins === 0) return i18next.t(hours === 1 ? "schedule.duration.hour" : "schedule.duration.hours", { count: hours });
+  return `${i18next.t(hours === 1 ? "schedule.duration.hour" : "schedule.duration.hours", { count: hours })} ${i18next.t(mins === 1 ? "schedule.duration.minute" : "schedule.duration.minutes", { count: mins })}`;
 }
 
 export function sortTimelineItems(items: TimelineItem[]) {
@@ -123,11 +124,11 @@ export function calculateSetupDuration(item: TimelineItem) {
   const diffMs = start.getTime() - setup.getTime();
   if (diffMs <= 0) return null;
   const diffMins = Math.floor(diffMs / 60000);
-  if (diffMins < 60) return `${diffMins} min`;
+  if (diffMins < 60) return i18next.t(diffMins === 1 ? "schedule.duration.minute" : "schedule.duration.minutes", { count: diffMins });
   const hours = Math.floor(diffMins / 60);
   const mins = diffMins % 60;
-  if (mins === 0) return `${hours} hour${hours > 1 ? "s" : ""}`;
-  return `${hours}h ${mins}m`;
+  if (mins === 0) return i18next.t(hours === 1 ? "schedule.duration.hour" : "schedule.duration.hours", { count: hours });
+  return `${i18next.t(hours === 1 ? "schedule.duration.hour" : "schedule.duration.hours", { count: hours })} ${i18next.t(mins === 1 ? "schedule.duration.minute" : "schedule.duration.minutes", { count: mins })}`;
 }
 
 export function suggestSetupTime(activityType: string) {

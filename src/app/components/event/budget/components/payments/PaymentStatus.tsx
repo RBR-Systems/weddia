@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import {
   App,
   Table,
@@ -24,7 +25,7 @@ import type { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
 import { useBudget } from "../../contexts/BudgetContext";
 import { formatCurrency, formatDate } from "@/utils/formatters";
-import { PAYMENT_STATUS } from "../../constants/budget.constants";
+import { getPaymentStatus } from "../../constants/budget.constants";
 import type { Expense, PaymentStatus } from "../../types/budget.types";
 import payStyles from "./PaymentStatus.module.css";
 
@@ -32,6 +33,8 @@ const { Text } = Typography;
 import Statistic from "@/app/common/AnimatedStatistic/AnimatedStatistic";
 
 export default function PaymentStatusManager() {
+  const { t } = useTranslation();
+  const PAYMENT_STATUS = getPaymentStatus();
   const { message } = App.useApp();
   const { state, updateExpense } = useBudget();
   const [statusFilter, setStatusFilter] = useState<PaymentStatus | "all">(
@@ -67,7 +70,7 @@ export default function PaymentStatusManager() {
         payment_status: "paid",
         payment_date: values.payment_date?.format("YYYY-MM-DD"),
       });
-      message.success("Payment marked as paid");
+      message.success(t("paymentStatus.paymentMarkedPaid"));
       setMarkPaidModal(null);
       form.resetFields();
     } catch {
@@ -80,13 +83,13 @@ export default function PaymentStatusManager() {
       setMarkPaidModal(expense);
     } else {
       updateExpense?.(expense.expense_id, { payment_status: newStatus });
-      message.success("Payment status updated");
+      message.success(t("paymentStatus.paymentStatusUpdated"));
     }
   };
 
   const columns: ColumnsType<Expense> = [
     {
-      title: "Description",
+      title: t("common.description"),
       dataIndex: "description",
       key: "description",
       render: (text: string, record) => (
@@ -94,13 +97,13 @@ export default function PaymentStatusManager() {
           <Text strong>{text}</Text>
           <br />
           <Text type="secondary" className={payStyles.smallText}>
-            {record.vendor_name || "No vendor"}
+            {record.vendor_name || t("common.noVendor")}
           </Text>
         </div>
       ),
     },
     {
-      title: "Amount",
+      title: t("common.amount"),
       dataIndex: "amount",
       key: "amount",
       render: (amount: number) => (
@@ -110,7 +113,7 @@ export default function PaymentStatusManager() {
       align: "right",
     },
     {
-      title: "Due Date",
+      title: t("paymentStatus.dueDate"),
       dataIndex: "expense_date",
       key: "expense_date",
       render: (date: string) => formatDate(date),
@@ -118,7 +121,7 @@ export default function PaymentStatusManager() {
         new Date(a.expense_date).getTime() - new Date(b.expense_date).getTime(),
     },
     {
-      title: "Status",
+      title: t("common.status"),
       dataIndex: "payment_status",
       key: "payment_status",
       render: (status: PaymentStatus, record) => {
@@ -143,7 +146,7 @@ export default function PaymentStatusManager() {
       },
     },
     {
-      title: "Actions",
+      title: t("common.actions"),
       key: "actions",
       render: (_, record) =>
         record.payment_status !== "paid" && (
@@ -153,7 +156,7 @@ export default function PaymentStatusManager() {
             icon={<CheckCircleOutlined />}
             onClick={() => setMarkPaidModal(record)}
           >
-            Mark Paid
+            {t("paymentStatus.markPaid")}
           </Button>
         ),
     },
@@ -165,7 +168,7 @@ export default function PaymentStatusManager() {
         <Col xs={24} sm={8}>
           <Card size="small">
             <Statistic
-              title="Paid"
+              title={t("common.paid")}
               value={paidTotal}
               className={payStyles.paidValue}
               prefix={<CheckCircleOutlined />}
@@ -178,7 +181,7 @@ export default function PaymentStatusManager() {
         <Col xs={24} sm={8}>
           <Card size="small">
             <Statistic
-              title="Pending"
+              title={t("common.pending")}
               value={pendingTotal}
               className={payStyles.pendingValue}
               prefix={<ClockCircleOutlined />}
@@ -191,7 +194,7 @@ export default function PaymentStatusManager() {
         <Col xs={24} sm={8}>
           <Card size="small">
             <Statistic
-              title="Overdue"
+              title={t("common.overdue")}
               value={overdueTotal}
               className={payStyles.overdueValue}
               prefix={<ExclamationCircleOutlined />}
@@ -204,14 +207,14 @@ export default function PaymentStatusManager() {
       </Row>
 
       <Card
-        title="Payment Tracking"
+        title={t("paymentStatus.paymentTracking")}
         extra={
           <Select
             value={statusFilter}
             className="u-full-width"
             onChange={setStatusFilter}
             options={[
-              { value: "all", label: "All Statuses" },
+              { value: "all", label: t("paymentStatus.allStatuses") },
               ...Object.values(PAYMENT_STATUS).map((s) => ({
                 value: s.value,
                 label: s.label,
@@ -225,30 +228,30 @@ export default function PaymentStatusManager() {
           dataSource={filteredExpenses}
           rowKey="expense_id"
           pagination={{ pageSize: 10 }}
-          locale={{ emptyText: "No payments to track" }}
+          locale={{ emptyText: t("paymentStatus.noPayments") }}
         />
       </Card>
 
       <Modal
-        title="Mark Payment as Paid"
+        title={t("paymentStatus.markPaymentPaid")}
         open={!!markPaidModal}
         onOk={handleMarkPaid}
         onCancel={() => {
           setMarkPaidModal(null);
           form.resetFields();
         }}
-        okText="Confirm Payment"
+        okText={t("paymentStatus.confirmPayment")}
       >
         {markPaidModal && (
           <Space direction="vertical" className={payStyles.fullWidth}>
             <div>
-              <Text type="secondary">Expense:</Text>
+              <Text type="secondary">{t("paymentStatus.expense")}</Text>
               <div>
                 <Text strong>{markPaidModal.description}</Text>
               </div>
             </div>
             <div>
-              <Text type="secondary">Amount:</Text>
+              <Text type="secondary">{t("paymentStatus.amount")}</Text>
               <div>
                 <Text strong className={payStyles.confirmAmount}>
                   {formatCurrency(markPaidModal.amount, state.currency)}
@@ -258,7 +261,7 @@ export default function PaymentStatusManager() {
             <Form form={form} layout="vertical">
               <Form.Item
                 name="payment_date"
-                label="Payment Date"
+                label={t("paymentStatus.paymentDate")}
                 initialValue={dayjs()}
                 rules={[{ required: true }]}
               >

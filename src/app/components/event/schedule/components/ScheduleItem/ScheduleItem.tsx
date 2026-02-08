@@ -15,11 +15,12 @@ import {
   ToolOutlined,
 } from "@ant-design/icons";
 import { TimelineItem, Status } from "../../models/types";
+import { useTranslation } from "react-i18next";
 import {
   calculateDuration,
   calculateSetupDuration,
   formatTime,
-  STATUS_OPTIONS,
+  getStatusOptions,
 } from "../../utils/helpers";
 import styles from "./schedule-item.module.css";
 
@@ -75,10 +76,11 @@ export const ScheduleItem: React.FC<Props> = ({
   onStatusChange,
   timeLabel,
 }) => {
+  const { t } = useTranslation();
   const actualStatus: Status = (item.status ?? "pending") as Status;
   const displayStatus: Status =
     isNow && actualStatus === "pending" ? "in_progress" : actualStatus;
-  const statusInfo = STATUS_OPTIONS[displayStatus];
+  const statusInfo = getStatusOptions()[displayStatus];
 
   const now = Date.now();
   const isPast = new Date(item.end_time).getTime() < now;
@@ -161,7 +163,7 @@ export const ScheduleItem: React.FC<Props> = ({
             </span>
             <ToolOutlined className={styles.setupIcon} />
             <span className={styles.setupLabel}>
-              Setup: {calculateSetupDuration(item)}
+              {t("schedule.item.setup")}: {calculateSetupDuration(item)}
             </span>
           </div>
         )}
@@ -271,7 +273,7 @@ export const ScheduleItem: React.FC<Props> = ({
                 onEdit?.(item);
               }}
             >
-              Edit
+              {t("schedule.item.editItem")}
             </Button>
             <Button
               type="default"
@@ -288,7 +290,7 @@ export const ScheduleItem: React.FC<Props> = ({
                 }
               }}
             >
-              Delete
+              {t("schedule.item.deleteItem")}
             </Button>
           </div>
         </div>
@@ -296,18 +298,18 @@ export const ScheduleItem: React.FC<Props> = ({
         {expanded && (
           <div className={styles.expandedArea}>
             <Collapse activeKey={["1"]}>
-              <Collapse.Panel key="1" header="Details">
+              <Collapse.Panel key="1" header={t("schedule.item.details")}>
                 {item.description && (
                   <div className={styles.detailLine}>{item.description}</div>
                 )}
                 {item.notes && (
-                  <div className={styles.detailNotes}>Notes: {item.notes}</div>
+                  <div className={styles.detailNotes}>{t("schedule.item.notes")}: {item.notes}</div>
                 )}
               </Collapse.Panel>
             </Collapse>
             <div className={styles.detailsFooter}>
               {isPast && !isCancelled && !isCompleted && (
-                <Tag className={styles.passedTag}>Passed</Tag>
+                <Tag className={styles.passedTag}>{t("schedule.item.passed")}</Tag>
               )}
             </div>
           </div>

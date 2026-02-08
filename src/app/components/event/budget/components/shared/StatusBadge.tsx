@@ -1,27 +1,28 @@
 "use client";
 import React from "react";
 import { Tag } from "antd";
+import { useTranslation } from "react-i18next";
 import type { BudgetStatus, PaymentStatus } from "../../types/budget.types";
 
 const BUDGET_STATUS_CONFIG: Record<
   BudgetStatus,
   { label: string; color: string }
 > = {
-  on_track: { label: "On Track", color: "success" },
-  at_risk: { label: "At Risk", color: "warning" },
-  over_budget: { label: "Over Budget", color: "error" },
-  not_started: { label: "Not Started", color: "default" },
+  on_track: { label: "statusBadge.onTrack", color: "success" },
+  at_risk: { label: "statusBadge.atRisk", color: "warning" },
+  over_budget: { label: "statusBadge.overBudget", color: "error" },
+  not_started: { label: "statusBadge.notStarted", color: "default" },
 };
 
 const PAYMENT_STATUS_CONFIG: Record<
   PaymentStatus,
   { label: string; color: string }
 > = {
-  paid: { label: "Paid", color: "success" },
-  pending: { label: "Pending", color: "warning" },
-  overdue: { label: "Overdue", color: "error" },
-  partial: { label: "Partial", color: "processing" },
-  cancelled: { label: "Cancelled", color: "default" },
+  paid: { label: "statusBadge.paid", color: "success" },
+  pending: { label: "statusBadge.pending", color: "warning" },
+  overdue: { label: "statusBadge.overdue", color: "error" },
+  partial: { label: "statusBadge.partial", color: "processing" },
+  cancelled: { label: "statusBadge.cancelled", color: "default" },
 };
 
 interface StatusBadgeProps {
@@ -33,6 +34,7 @@ export default function StatusBadge({
   status,
   type = "budget",
 }: StatusBadgeProps) {
+  const { t } = useTranslation();
   const config =
     type === "budget"
       ? BUDGET_STATUS_CONFIG[status as BudgetStatus]
@@ -40,5 +42,5 @@ export default function StatusBadge({
 
   if (!config) return null;
 
-  return <Tag color={config.color}>{config.label}</Tag>;
+  return <Tag color={config.color}>{t(config.label)}</Tag>;
 }

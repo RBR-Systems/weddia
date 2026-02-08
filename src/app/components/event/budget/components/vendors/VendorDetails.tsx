@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import {
   Drawer,
   Descriptions,
@@ -18,7 +19,7 @@ import Card from "@/app/common/Card/card";
 import Statistic from "@/app/common/AnimatedStatistic/AnimatedStatistic";
 import { useBudget } from "../../contexts/BudgetContext";
 import { formatCurrency, formatDate } from "@/utils/formatters";
-import { PAYMENT_STATUS } from "../../constants/budget.constants";
+import { getPaymentStatus } from "../../constants/budget.constants";
 import type { Expense, PaymentStatus } from "../../types/budget.types";
 import type { Vendor } from "./VendorList";
 import vendorStyles from "./VendorDetails.module.css";
@@ -36,7 +37,9 @@ export default function VendorDetails({
   open,
   onClose,
 }: VendorDetailsProps) {
+  const { t } = useTranslation();
   const { state } = useBudget();
+  const PAYMENT_STATUS = getPaymentStatus();
 
   if (!vendor) return null;
 
@@ -54,24 +57,24 @@ export default function VendorDetails({
 
   const expenseColumns = [
     {
-      title: "Description",
+      title: t("vendorDetails.columns.description"),
       dataIndex: "description",
       key: "description",
     },
     {
-      title: "Amount",
+      title: t("vendorDetails.columns.amount"),
       dataIndex: "amount",
       key: "amount",
       render: (amount: number) => formatCurrency(amount, state.currency),
     },
     {
-      title: "Date",
+      title: t("vendorDetails.columns.date"),
       dataIndex: "expense_date",
       key: "expense_date",
       render: (date: string) => formatDate(date),
     },
     {
-      title: "Status",
+      title: t("vendorDetails.columns.status"),
       dataIndex: "payment_status",
       key: "payment_status",
       render: (status: PaymentStatus) => {
@@ -85,7 +88,7 @@ export default function VendorDetails({
 
   return (
     <Drawer
-      title="Vendor Details"
+      title={t("vendorDetails.title")}
       placement="right"
       width={600}
       open={open}
@@ -110,21 +113,21 @@ export default function VendorDetails({
 
         <Descriptions column={1} size="small">
           {vendor.contact_name && (
-            <Descriptions.Item label="Contact">
+            <Descriptions.Item label={t("vendorDetails.contact")}>
               {vendor.contact_name}
             </Descriptions.Item>
           )}
           {vendor.email && (
-            <Descriptions.Item label="Email">
+            <Descriptions.Item label={t("vendorDetails.email")}>
               <MailOutlined /> {vendor.email}
             </Descriptions.Item>
           )}
           {vendor.phone && (
-            <Descriptions.Item label="Phone">
+            <Descriptions.Item label={t("vendorDetails.phone")}>
               <PhoneOutlined /> {vendor.phone}
             </Descriptions.Item>
           )}
-          <Descriptions.Item label="Category">
+          <Descriptions.Item label={t("vendorDetails.category")}>
             {vendor.category}
           </Descriptions.Item>
         </Descriptions>
@@ -133,7 +136,7 @@ export default function VendorDetails({
           <Col span={8}>
             <Card size="small">
               <Statistic
-                title="Total Spent"
+                title={t("vendorDetails.totalSpent")}
                 value={vendor.total_spent}
                 formatter={(value) =>
                   formatCurrency(Number(value), state.currency)
@@ -144,7 +147,7 @@ export default function VendorDetails({
           <Col span={8}>
             <Card size="small">
               <Statistic
-                title="Paid"
+                title={t("vendorDetails.paid")}
                 value={paidAmount}
                 className={vendorStyles.paidValue}
                 formatter={(value) =>
@@ -156,7 +159,7 @@ export default function VendorDetails({
           <Col span={8}>
             <Card size="small">
               <Statistic
-                title="Pending"
+                title={t("vendorDetails.pending")}
                 value={pendingAmount}
                 className={vendorStyles.pendingValue}
                 formatter={(value) =>
@@ -168,7 +171,7 @@ export default function VendorDetails({
         </Row>
 
         <Divider orientation="horizontal">
-          Expenses ({vendorExpenses.length})
+          {t("vendorDetails.expenses", { count: vendorExpenses.length })}
         </Divider>
 
         {vendorExpenses.length > 0 ? (
@@ -180,7 +183,7 @@ export default function VendorDetails({
             pagination={{ pageSize: 5 }}
           />
         ) : (
-          <Empty description="No expenses from this vendor" />
+          <Empty description={t("vendorDetails.noExpenses")} />
         )}
       </Space>
     </Drawer>

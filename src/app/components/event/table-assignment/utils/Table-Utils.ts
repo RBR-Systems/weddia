@@ -1,3 +1,4 @@
+import i18next from "i18next";
 import { Guest, Table } from "../models/types";
 import styles from "../components/Tables/TableTileContent/TableTile.module.css";
 
@@ -25,7 +26,7 @@ export function getNextAvailableSeatNumber(
 
 export function getTableLabel(table: Table) {
   const m = table.table_id.match(/(?:table[-_]?)(\d+)/i);
-  if (m) return `Table ${Number(m[1])}`;
+  if (m) return i18next.t("tableAssignment.table", { number: Number(m[1]) });
   return table.table_id
     .replace(/[-_]/g, " ")
     .replace(/\b\w/g, (c) => c.toUpperCase());

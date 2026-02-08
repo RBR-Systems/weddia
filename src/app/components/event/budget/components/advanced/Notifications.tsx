@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Card,
   List,
@@ -62,6 +63,7 @@ const NOTIFICATION_CONFIG: Record<
 
 export default function NotificationsPanel() {
   const { state } = useBudget();
+  const { t } = useTranslation();
 
   // Generate notifications based on budget state
   const [notifications, setNotifications] = useState<Notification[]>(() => {
@@ -73,8 +75,8 @@ export default function NotificationsPanel() {
         notifs.push({
           id: `over_${cat.id}`,
           type: "alert",
-          title: "Category Over Budget",
-          message: `${cat.name} has exceeded its budget by ${formatCurrency(cat.spent - cat.allocated, state.currency)}`,
+          title: t("notifications.categoryOverBudget"),
+          message: t("notifications.categoryOverMsg", { name: cat.name, amount: formatCurrency(cat.spent - cat.allocated, state.currency) }),
           timestamp: dayjs().toISOString(),
           read: false,
         });
@@ -82,8 +84,8 @@ export default function NotificationsPanel() {
         notifs.push({
           id: `warn_${cat.id}`,
           type: "warning",
-          title: "Category Approaching Limit",
-          message: `${cat.name} is at ${Math.round((cat.spent / cat.allocated) * 100)}% of allocated budget`,
+          title: t("notifications.categoryApproaching"),
+          message: t("notifications.categoryApproachingMsg", { name: cat.name, percent: Math.round((cat.spent / cat.allocated) * 100) }),
           timestamp: dayjs().toISOString(),
           read: false,
         });
@@ -98,11 +100,11 @@ export default function NotificationsPanel() {
       notifs.push({
         id: "pending_payments",
         type: "reminder",
-        title: "Pending Payments",
-        message: `You have ${pendingExpenses.length} payment(s) pending totaling ${formatCurrency(
+        title: t("notifications.pendingPayments"),
+        message: t("notifications.pendingPaymentsMsg", { count: pendingExpenses.length, amount: formatCurrency(
           pendingExpenses.reduce((sum: number, e: any) => sum + e.amount, 0),
           state.currency,
-        )}`,
+        ) }),
         timestamp: dayjs().toISOString(),
         read: false,
       });
@@ -114,11 +116,11 @@ export default function NotificationsPanel() {
       notifs.push({
         id: "budget_critical",
         type: "alert",
-        title: "Budget Critical",
-        message: `You've spent ${percentSpent}% of your total budget. Only ${formatCurrency(
+        title: t("notifications.budgetCritical"),
+        message: t("notifications.budgetCriticalMsg", { percent: percentSpent, remaining: formatCurrency(
           state.summary?.total_remaining || 0,
           state.currency,
-        )} remaining.`,
+        ) }),
         timestamp: dayjs().toISOString(),
         read: false,
       });
@@ -126,8 +128,8 @@ export default function NotificationsPanel() {
       notifs.push({
         id: "budget_warning",
         type: "warning",
-        title: "Budget Alert",
-        message: `You've spent ${percentSpent}% of your total budget.`,
+        title: t("notifications.budgetAlert"),
+        message: t("notifications.budgetAlertMsg", { percent: percentSpent }),
         timestamp: dayjs().toISOString(),
         read: false,
       });
@@ -137,9 +139,8 @@ export default function NotificationsPanel() {
     notifs.push({
       id: "welcome",
       type: "info",
-      title: "Budget Tracking Active",
-      message:
-        "Your wedding budget is being tracked. Keep adding expenses to stay on top of your spending.",
+      title: t("notifications.budgetTrackingActive"),
+      message: t("notifications.budgetTrackingMsg"),
       timestamp: dayjs().subtract(1, "day").toISOString(),
       read: true,
     });
@@ -182,20 +183,20 @@ export default function NotificationsPanel() {
           title={
             <Space>
               <BellOutlined />
-              Notifications
+              {t("notifications.title")}
               {unreadCount > 0 && <Badge count={unreadCount} />}
             </Space>
           }
           extra={
             unreadCount > 0 && (
               <Button type="link" onClick={markAllAsRead}>
-                Mark all as read
+                {t("notifications.markAllRead")}
               </Button>
             )
           }
         >
           {notifications.length === 0 ? (
-            <Empty description="No notifications" />
+            <Empty description={t("notifications.noNotifications")} />
           ) : (
             <List
               dataSource={notifications}
@@ -212,7 +213,7 @@ export default function NotificationsPanel() {
                           size="small"
                           onClick={() => markAsRead(notification.id)}
                         >
-                          Mark read
+                          {t("notifications.markRead")}
                         </Button>
                       ),
                       <Button
@@ -259,14 +260,14 @@ export default function NotificationsPanel() {
       </Col>
 
       <Col xs={24} lg={8}>
-        <Card title="Notification Settings">
+        <Card title={t("notifications.settingsTitle")}>
             <Space direction="vertical" className={notifStyles.fullWidth} size="middle">
             <div className={notifStyles.settingRow}>
               <div>
-                <Text strong>Budget Alerts</Text>
+                <Text strong>{t("notifications.settings.budgetAlerts")}</Text>
                 <br />
                 <Text type="secondary" className={notifStyles.settingDescription}>
-                  When overall budget exceeds limits
+                  {t("notifications.settings.budgetAlertsDesc")}
                 </Text>
               </div>
               <Switch
@@ -279,10 +280,10 @@ export default function NotificationsPanel() {
 
             <div className={notifStyles.settingRow}>
               <div>
-                <Text strong>Payment Reminders</Text>
+                <Text strong>{t("notifications.settings.paymentReminders")}</Text>
                 <br />
                 <Text type="secondary" className={notifStyles.settingDescription}>
-                  Upcoming and overdue payments
+                  {t("notifications.settings.paymentRemindersDesc")}
                 </Text>
               </div>
               <Switch
@@ -295,10 +296,10 @@ export default function NotificationsPanel() {
 
             <div className={notifStyles.settingRow}>
               <div>
-                <Text strong>Category Warnings</Text>
+                <Text strong>{t("notifications.settings.categoryWarnings")}</Text>
                 <br />
                 <Text type="secondary" className={notifStyles.settingDescription}>
-                  When categories approach/exceed limits
+                  {t("notifications.settings.categoryWarningsDesc")}
                 </Text>
               </div>
               <Switch
@@ -311,10 +312,10 @@ export default function NotificationsPanel() {
 
             <div className={notifStyles.settingRow}>
               <div>
-                <Text strong>Weekly Digest</Text>
+                <Text strong>{t("notifications.settings.weeklyDigest")}</Text>
                 <br />
                 <Text type="secondary" className={notifStyles.settingDescription}>
-                  Summary of weekly spending
+                  {t("notifications.settings.weeklyDigestDesc")}
                 </Text>
               </div>
               <Switch
@@ -327,10 +328,10 @@ export default function NotificationsPanel() {
 
             <div className={notifStyles.settingRow}>
               <div>
-                <Text strong>Email Notifications</Text>
+                <Text strong>{t("notifications.settings.emailNotifications")}</Text>
                 <br />
                 <Text type="secondary" className={notifStyles.settingDescription}>
-                  Receive alerts via email
+                  {t("notifications.settings.emailNotificationsDesc")}
                 </Text>
               </div>
               <Switch

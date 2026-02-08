@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Card,
   Row,
@@ -98,6 +99,7 @@ const DEFAULT_TEMPLATES: BudgetTemplate[] = [
 export default function BudgetTemplates() {
   const { state, loadTemplate } = useBudget();
   const { mode } = useTheme();
+  const { t } = useTranslation();
   const [templates, setTemplates] =
     useState<BudgetTemplate[]>(DEFAULT_TEMPLATES);
   const [saveModalOpen, setSaveModalOpen] = useState(false);
@@ -126,7 +128,7 @@ export default function BudgetTemplates() {
       };
 
       setTemplates([...templates, newTemplate]);
-      message.success("Template saved successfully");
+      message.success(t("budgetTemplates.templateSaved"));
       setSaveModalOpen(false);
       form.resetFields();
     } catch {
@@ -136,37 +138,35 @@ export default function BudgetTemplates() {
 
   const handleApplyTemplate = (template: BudgetTemplate) => {
     loadTemplate?.(template);
-    message.success(`Template "${template.name}" applied`);
+    message.success(t("budgetTemplates.templateApplied", { name: template.name }));
     setPreviewTemplate(null);
   };
 
   const handleDeleteTemplate = (templateId: string) => {
     if (DEFAULT_TEMPLATES.find((t) => t.id === templateId)) {
-      message.error("Cannot delete default templates");
+      message.error(t("budgetTemplates.cannotDeleteDefault"));
       return;
     }
     setTemplates(templates.filter((t) => t.id !== templateId));
-    message.success("Template deleted");
+    message.success(t("budgetTemplates.templateDeleted"));
   };
 
   return (
     <>
       <Card
-        title="Budget Templates"
+        title={t("budgetTemplates.title")}
         extra={
           <Button
             type="primary"
             icon={<SaveOutlined />}
             onClick={() => setSaveModalOpen(true)}
           >
-            Save Current as Template
+            {t("budgetTemplates.saveAsCurrent")}
           </Button>
         }
       >
         <Paragraph type="secondary">
-          Use templates to quickly set up your budget with recommended
-          allocations, or save your current budget configuration as a reusable
-          template.
+          {t("budgetTemplates.description")}
         </Paragraph>
 
         <Row gutter={[16, 16]}>
@@ -186,12 +186,12 @@ export default function BudgetTemplates() {
                       handleApplyTemplate(template);
                     }}
                   >
-                    Apply
+                    {t("common.apply")}
                   </Button>,
                   !DEFAULT_TEMPLATES.find((t) => t.id === template.id) && (
                     <Popconfirm
                       key="delete"
-                      title="Delete this template?"
+                      title={t("budgetTemplates.deleteConfirm")}
                       onConfirm={() => handleDeleteTemplate(template.id)}
                     >
                       <Button
@@ -200,7 +200,7 @@ export default function BudgetTemplates() {
                         icon={<DeleteOutlined />}
                         onClick={(e) => e.stopPropagation()}
                       >
-                        Delete
+                        {t("common.delete")}
                       </Button>
                     </Popconfirm>
                   ),
@@ -217,7 +217,7 @@ export default function BudgetTemplates() {
                     {formatCurrency(template.total_budget, state.currency)}
                   </Text>
                   <Text type="secondary" style={{ marginLeft: 8 }}>
-                    • {template.categories.length} categories
+                    • {t("budgetTemplates.categories", { count: template.categories.length })}
                   </Text>
                 </div>
                 <div
@@ -238,7 +238,7 @@ export default function BudgetTemplates() {
                     </CategoryTag>
                   ))}
                   {template.categories.length > 3 && (
-                    <Tag>+{template.categories.length - 3} more</Tag>
+                    <Tag>{t("common.nMore", { count: template.categories.length - 3 })}</Tag>
                   )}
                 </div>
               </Card>
@@ -249,30 +249,30 @@ export default function BudgetTemplates() {
 
       {/* Save Template Modal */}
       <Modal
-        title="Save as Template"
+        title={t("budgetTemplates.saveAsTemplate")}
         open={saveModalOpen}
         onOk={handleSaveAsTemplate}
         onCancel={() => setSaveModalOpen(false)}
-        okText="Save Template"
+        okText={t("budgetTemplates.saveTemplate")}
       >
         <Form form={form} layout="vertical">
           <Form.Item
             name="name"
-            label="Template Name"
-            rules={[{ required: true, message: "Please enter a name" }]}
+            label={t("budgetTemplates.templateName")}
+            rules={[{ required: true, message: t("budgetTemplates.templateNameRequired") }]}
           >
-            <Input placeholder="e.g., My Wedding Budget" />
+            <Input placeholder={t("budgetTemplates.templateNamePlaceholder")} />
           </Form.Item>
-          <Form.Item name="description" label="Description">
+          <Form.Item name="description" label={t("common.description")}>
             <Input.TextArea
-              placeholder="Brief description of this budget template"
+              placeholder={t("budgetTemplates.templateDescription")}
               rows={2}
             />
           </Form.Item>
         </Form>
 
         <div style={{ marginTop: 16 }}>
-          <Text type="secondary">This template will include:</Text>
+          <Text type="secondary">{t("budgetTemplates.willInclude")}</Text>
           <List
             size="small"
             dataSource={state.categories}
@@ -299,19 +299,19 @@ export default function BudgetTemplates() {
         open={!!previewTemplate}
         onOk={() => previewTemplate && handleApplyTemplate(previewTemplate)}
         onCancel={() => setPreviewTemplate(null)}
-        okText="Apply Template"
+        okText={t("budgetTemplates.applyTemplate")}
         width={500}
       >
         {previewTemplate && (
           <Space direction="vertical" style={{ width: "100%" }}>
             <Paragraph>{previewTemplate.description}</Paragraph>
             <div>
-              <Text strong>Suggested Budget: </Text>
+              <Text strong>{t("budgetTemplates.suggestedBudget")}</Text>
               <Text>
                 {formatCurrency(previewTemplate.total_budget, state.currency)}
               </Text>
             </div>
-            <Title level={5}>Category Breakdown</Title>
+            <Title level={5}>{t("budgetTemplates.categoryBreakdown")}</Title>
             <List
               dataSource={previewTemplate.categories}
               renderItem={(cat) => (

@@ -3,8 +3,9 @@ import React from "react";
 import { Modal, Form, Input, InputNumber, Select, DatePicker } from "antd";
 import type { Expense } from "../types/budget.types";
 import { useBudget } from "../contexts/BudgetContext";
-import { DEFAULT_CATEGORIES } from "../constants/budget.constants";
+import { getDefaultCategories } from "../constants/budget.constants";
 import dayjs from "dayjs";
+import { useTranslation } from "react-i18next";
 
 type Props = {
   visible: boolean;
@@ -13,6 +14,7 @@ type Props = {
 
 export default function ExpenseModal({ visible, onClose }: Props) {
   const { addExpense } = useBudget();
+  const { t } = useTranslation();
   const [form] = Form.useForm();
 
   const onOk = async () => {
@@ -32,7 +34,7 @@ export default function ExpenseModal({ visible, onClose }: Props) {
 
   return (
     <Modal
-      title="Add Expense"
+      title={t("expenseModal.title")}
       open={visible}
       onOk={onOk}
       onCancel={onClose}
@@ -41,35 +43,35 @@ export default function ExpenseModal({ visible, onClose }: Props) {
       <Form form={form} layout="vertical">
         <Form.Item
           name="description"
-          label="Description"
+          label={t("expenseModal.description")}
           rules={[{ required: true }]}
         >
           <Input />
         </Form.Item>
-        <Form.Item name="amount" label="Amount" rules={[{ required: true }]}>
+        <Form.Item name="amount" label={t("expenseModal.amount")} rules={[{ required: true }]}>
           <InputNumber className="u-full-width" min={0} />
         </Form.Item>
         <Form.Item
           name="category_id"
-          label="Category"
+          label={t("expenseModal.category")}
           rules={[{ required: true }]}
         >
           <Select
-            options={DEFAULT_CATEGORIES.map((c) => ({
+            options={getDefaultCategories().map((c) => ({
               value: c.id,
               label: c.name,
             }))}
           />
         </Form.Item>
-        <Form.Item name="vendor_name" label="Vendor">
+        <Form.Item name="vendor_name" label={t("expenseModal.vendor")}>
           <Input />
         </Form.Item>
-        <Form.Item name="expense_date" label="Date" initialValue={dayjs()}>
+        <Form.Item name="expense_date" label={t("expenseModal.date")} initialValue={dayjs()}>
           <DatePicker className="u-full-width" />
         </Form.Item>
         <Form.Item
           name="payment_status"
-          label="Payment Status"
+          label={t("expenseModal.paymentStatus")}
           initialValue="pending"
         >
           <Select

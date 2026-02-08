@@ -21,6 +21,7 @@ import {
 } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
+import { useTranslation } from "react-i18next";
 import { useBudget } from "../../contexts/BudgetContext";
 import { formatCurrency, formatDate } from "@/utils/formatters";
 import type { Category, Expense } from "../../types/budget.types";
@@ -35,6 +36,7 @@ type ReportType = "summary" | "category" | "expense" | "vendor";
 export default function ReportsPage() {
   const { message } = App.useApp();
   const { state } = useBudget();
+  const { t } = useTranslation();
   const [reportType, setReportType] = useState<ReportType>("summary");
   const [dateRange, setDateRange] = useState<[dayjs.Dayjs, dayjs.Dayjs] | null>(
     null,
@@ -73,50 +75,50 @@ export default function ReportsPage() {
     a.download = `budget-report-${reportType}-${dayjs().format("YYYY-MM-DD")}.csv`;
     a.click();
     URL.revokeObjectURL(url);
-    message.success("Report exported as CSV");
+    message.success(t("reports.exportedCSV"));
   };
 
   const handlePrint = () => {
     window.print();
-    message.success("Print dialog opened");
+    message.success(t("reports.printDialogOpened"));
   };
 
   const summaryData = [
-    { label: "Total Budget", value: state.summary?.total_budget || 0 },
-    { label: "Total Spent", value: state.summary?.total_spent || 0 },
-    { label: "Remaining", value: state.summary?.total_remaining || 0 },
+    { label: t("budgetStats.totalBudget"), value: state.summary?.total_budget || 0 },
+    { label: t("budgetStats.totalSpent"), value: state.summary?.total_spent || 0 },
+    { label: t("budgetStats.remaining"), value: state.summary?.total_remaining || 0 },
     {
-      label: "Spent %",
+      label: t("budgetStats.spentPercent"),
       value: `${state.summary?.percentage_spent || 0}%`,
       isPercent: true,
     },
   ];
 
   const categoryColumns: ColumnsType<Category> = [
-    { title: "Category", dataIndex: "name", key: "name" },
+    { title: t("common.category"), dataIndex: "name", key: "name" },
     {
-      title: "Allocated",
+      title: t("budgetCharts.allocated"),
       dataIndex: "allocated",
       key: "allocated",
       render: (v: number) => formatCurrency(v, state.currency),
       align: "right",
     },
     {
-      title: "Spent",
+      title: t("budgetCharts.spent"),
       dataIndex: "spent",
       key: "spent",
       render: (v: number) => formatCurrency(v, state.currency),
       align: "right",
     },
     {
-      title: "Remaining",
+      title: t("budgetStats.remaining"),
       key: "remaining",
       render: (_, record) =>
         formatCurrency(record.allocated - record.spent, state.currency),
       align: "right",
     },
     {
-      title: "Usage %",
+      title: t("reports.usagePercent"),
       key: "usage",
       render: (_, record) =>
         record.allocated > 0
@@ -127,40 +129,40 @@ export default function ReportsPage() {
   ];
 
   const expenseColumns: ColumnsType<Expense> = [
-    { title: "Description", dataIndex: "description", key: "description" },
+    { title: t("common.description"), dataIndex: "description", key: "description" },
     {
-      title: "Amount",
+      title: t("common.amount"),
       dataIndex: "amount",
       key: "amount",
       render: (v: number) => formatCurrency(v, state.currency),
       align: "right",
     },
     {
-      title: "Category",
+      title: t("common.category"),
       dataIndex: "category_id",
       key: "category_id",
       render: (id: string) =>
         state.categories.find((c: Category) => c.id === id)?.name || id,
     },
     {
-      title: "Vendor",
+      title: t("common.vendor"),
       dataIndex: "vendor_name",
       key: "vendor_name",
       render: (v: string) => v || "—",
     },
     {
-      title: "Date",
+      title: t("common.date"),
       dataIndex: "expense_date",
       key: "expense_date",
       render: (v: string) => formatDate(v),
     },
-    { title: "Status", dataIndex: "payment_status", key: "payment_status" },
+    { title: t("common.status"), dataIndex: "payment_status", key: "payment_status" },
   ];
 
   return (
     <div className="reports-page">
       <Card
-        title="Budget Reports"
+        title={t("reports.title")}
         extra={
           <Space>
             <Select
@@ -168,9 +170,9 @@ export default function ReportsPage() {
               onChange={setReportType}
               className={reportStyles.reportSelect}
               options={[
-                { value: "summary", label: "Summary Report" },
-                { value: "category", label: "Category Report" },
-                { value: "expense", label: "Expense Report" },
+                { value: "summary", label: t("reports.summaryReport") },
+                { value: "category", label: t("reports.categoryReport") },
+                { value: "expense", label: t("reports.expenseReport") },
               ]}
             />
             <RangePicker
@@ -179,10 +181,10 @@ export default function ReportsPage() {
               }
             />
             <Button icon={<FileExcelOutlined />} onClick={handleExportCSV}>
-              Export CSV
+              {t("reports.exportCSV")}
             </Button>
             <Button icon={<PrinterOutlined />} onClick={handlePrint}>
-              Print
+              {t("common.print")}
             </Button>
           </Space>
         }
@@ -190,7 +192,7 @@ export default function ReportsPage() {
         {/* Summary Report */}
         {reportType === "summary" && (
           <>
-            <Title level={4}>Budget Summary</Title>
+            <Title level={4}>{t("reports.budgetSummary")}</Title>
             <Row gutter={16}>
               {summaryData.map((item, index) => (
                 <Col xs={24} sm={12} md={6} key={index}>
@@ -211,7 +213,7 @@ export default function ReportsPage() {
 
             <Divider />
 
-            <Title level={5}>Category Breakdown</Title>
+            <Title level={5}>{t("reports.categoryBreakdown")}</Title>
             <Table
               columns={categoryColumns}
               dataSource={state.categories}
@@ -222,7 +224,7 @@ export default function ReportsPage() {
                 <Table.Summary>
                   <Table.Summary.Row>
                     <Table.Summary.Cell index={0}>
-                      <Text strong>Total</Text>
+                      <Text strong>{t("common.total")}</Text>
                     </Table.Summary.Cell>
                     <Table.Summary.Cell index={1} align="right">
                       <Text strong>
@@ -265,7 +267,7 @@ export default function ReportsPage() {
         {/* Category Report */}
         {reportType === "category" && (
           <>
-            <Title level={4}>Category Report</Title>
+            <Title level={4}>{t("reports.categoryReport")}</Title>
             <Table
               columns={categoryColumns}
               dataSource={state.categories}
@@ -279,7 +281,7 @@ export default function ReportsPage() {
         {reportType === "expense" && (
           <>
             <Title level={4}>
-              Expense Report
+              {t("reports.expenseReport")}
               {dateRange && (
                 <Text type="secondary" className={reportStyles.dateRangeLabel}>
                   ({dateRange[0].format("MMM D")} -{" "}
@@ -290,13 +292,13 @@ export default function ReportsPage() {
             <Row gutter={16} className={reportStyles.expenseStatsRow}>
               <Col span={8}>
                 <Statistic
-                  title="Total Expenses"
+                  title={t("reports.totalExpenses")}
                   value={filteredExpenses.length}
                 />
               </Col>
               <Col span={8}>
                 <Statistic
-                  title="Total Amount"
+                  title={t("reports.totalAmount")}
                   value={filteredExpenses.reduce(
                     (sum: number, e: Expense) => sum + e.amount,
                     0,
@@ -308,7 +310,7 @@ export default function ReportsPage() {
               </Col>
               <Col span={8}>
                 <Statistic
-                  title="Avg Expense"
+                  title={t("reports.avgExpense")}
                   value={
                     filteredExpenses.length > 0
                       ? filteredExpenses.reduce(

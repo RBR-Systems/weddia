@@ -11,6 +11,7 @@ import {
   getBadgeColor,
   getTableShapeClass,
 } from "../../../utils/Table-Utils";
+import { useTranslation } from "react-i18next";
 
 function SeatTile({
   tableId,
@@ -24,6 +25,7 @@ function SeatTile({
   guest?: Guest | null | undefined;
   indexInParty?: number;
 }) {
+  const { t } = useTranslation();
   const { setNodeRef: setSeatRef, isOver: seatOver } = useDroppable({
     id: `table:${tableId}:seat:${num}`,
     data: { tableId, seatNumber: num },
@@ -38,7 +40,7 @@ function SeatTile({
     : "—";
   const titleLabel = guest
     ? `${guest.first_name} ${guest.last_name}`
-    : `Seat ${num}`;
+    : t("tableAssignment.seatNumber", { number: num });
   return (
     <div
       ref={setSeatRef}
@@ -72,6 +74,7 @@ export default memo(function DroppableTableTile({
   guestsById?: Map<string, Guest>;
 }) {
   const ctx = useTableAssignmentContext();
+  const { t } = useTranslation();
   const dropId = `table:${table.table_id}`;
   const { setNodeRef: setDropRef, isOver } = useDroppable({
     id: dropId,
@@ -198,7 +201,7 @@ export default memo(function DroppableTableTile({
       ) : (
         <div
           className={styles.seatCompact}
-          title={`${occupancy}/${table.total_number} seated`}
+          title={t("tableAssignment.seatedCount", { occupancy, capacity: table.total_number })}
         >
           {occupancy}/{table.total_number}
         </div>

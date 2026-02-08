@@ -25,6 +25,7 @@ import {
 import type { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
 import { formatCurrency } from "@/utils/formatters";
+import { useTranslation } from "react-i18next";
 import { CHART_COLORS, SEMANTIC_CHART_COLORS } from "@/theme/chartColors";
 import { useTheme } from "@/theme/ThemeProvider";
 
@@ -99,10 +100,10 @@ const MOCK_CLIENTS: ClientBudget[] = [
 ];
 
 const STATUS_CONFIG = {
-  on_track: { label: "On Track", color: "success" },
-  at_risk: { label: "At Risk", color: "warning" },
-  over_budget: { label: "Over Budget", color: "error" },
-  completed: { label: "Completed", color: "default" },
+  on_track: { label: "multiClientView.status.onTrack", color: "success" },
+  at_risk: { label: "multiClientView.status.atRisk", color: "warning" },
+  over_budget: { label: "multiClientView.status.overBudget", color: "error" },
+  completed: { label: "multiClientView.status.completed", color: "default" },
 };
 
 interface MultiClientViewProps {
@@ -112,6 +113,7 @@ interface MultiClientViewProps {
 export default function MultiClientView({
   onSelectClient,
 }: MultiClientViewProps) {
+  const { t } = useTranslation();
   const [clients] = useState<ClientBudget[]>(MOCK_CLIENTS);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
@@ -137,7 +139,7 @@ export default function MultiClientView({
 
   const columns: ColumnsType<ClientBudget> = [
     {
-      title: "Client",
+      title: t("multiClientView.columns.client"),
       key: "client",
       render: (_, record) => (
         <Space>
@@ -156,7 +158,7 @@ export default function MultiClientView({
       ),
     },
     {
-      title: "Budget",
+      title: t("common.budget"),
       key: "budget",
       render: (_, record) => (
         <div style={{ minWidth: 200 }}>
@@ -197,31 +199,31 @@ export default function MultiClientView({
       ),
     },
     {
-      title: "Status",
+      title: t("common.status"),
       dataIndex: "status",
       key: "status",
       render: (status: keyof typeof STATUS_CONFIG) => {
         const config = STATUS_CONFIG[status];
-        return <Tag color={config.color}>{config.label}</Tag>;
+        return <Tag color={config.color}>{t(config.label)}</Tag>;
       },
       filters: Object.entries(STATUS_CONFIG).map(([key, value]) => ({
-        text: value.label,
+        text: t(value.label),
         value: key,
       })),
       onFilter: (value, record) => record.status === value,
     },
     {
-      title: "Expenses",
+      title: t("multiClientView.columns.expenses"),
       dataIndex: "expenseCount",
       key: "expenseCount",
       sorter: (a, b) => a.expenseCount - b.expenseCount,
     },
     {
-      title: "Days Until",
+      title: t("multiClientView.columns.daysUntil"),
       key: "daysUntil",
       render: (_, record) => {
         const days = dayjs(record.weddingDate).diff(dayjs(), "day");
-        if (days < 0) return <Tag>Past</Tag>;
+        if (days < 0) return <Tag>{t("common.past")}</Tag>;
         if (days <= 30) return <Tag color="red">{days} days</Tag>;
         if (days <= 90) return <Tag color="orange">{days} days</Tag>;
         return <Text type="secondary">{days} days</Text>;
@@ -230,7 +232,7 @@ export default function MultiClientView({
         dayjs(a.weddingDate).diff(dayjs()) - dayjs(b.weddingDate).diff(dayjs()),
     },
     {
-      title: "Actions",
+      title: t("common.actions"),
       key: "actions",
       render: (_, record) => (
         <Button
@@ -239,7 +241,7 @@ export default function MultiClientView({
           icon={<EyeOutlined />}
           onClick={() => onSelectClient?.(record.id)}
         >
-          View
+          {t("common.view")}
         </Button>
       ),
     },
@@ -251,7 +253,7 @@ export default function MultiClientView({
         <Col xs={24} sm={12} md={6}>
           <Card size="small">
             <Statistic
-              title="Total Clients"
+              title={t("multiClientView.totalClients")}
               value={clients.length}
               prefix={<TeamOutlined />}
             />
@@ -260,7 +262,7 @@ export default function MultiClientView({
         <Col xs={24} sm={12} md={6}>
           <Card size="small">
             <Statistic
-              title="Active Weddings"
+              title={t("multiClientView.activeWeddings")}
               value={activeClients}
               valueStyle={{ color: semantic.info }}
             />
@@ -269,7 +271,7 @@ export default function MultiClientView({
         <Col xs={24} sm={12} md={6}>
           <Card size="small">
             <Statistic
-              title="Total Managed"
+              title={t("multiClientView.totalManaged")}
               value={totalManagedBudget}
               formatter={(value) => formatCurrency(Number(value), "USD")}
             />
@@ -278,7 +280,7 @@ export default function MultiClientView({
         <Col xs={24} sm={12} md={6}>
           <Card size="small">
             <Statistic
-              title="Needs Attention"
+              title={t("multiClientView.needsAttention")}
               value={atRiskClients}
               valueStyle={{ color: atRiskClients > 0 ? semantic.error : semantic.success }}
             />
@@ -287,28 +289,28 @@ export default function MultiClientView({
       </Row>
 
       <Card
-        title="Client Budgets"
+        title={t("multiClientView.clientBudgets")}
         extra={
           <Space>
             <Search
-              placeholder="Search clients..."
+              placeholder={t("multiClientView.searchClients")}
               allowClear
               onSearch={setSearchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               style={{ width: 200 }}
             />
             <Select
-              placeholder="Filter by status"
+              placeholder={t("multiClientView.filterByStatus")}
               allowClear
               style={{ width: 150 }}
               onChange={setStatusFilter}
               options={Object.entries(STATUS_CONFIG).map(([key, value]) => ({
                 value: key,
-                label: value.label,
+                label: t(value.label),
               }))}
             />
             <Button type="primary" icon={<PlusOutlined />}>
-              Add Client
+              {t("multiClientView.addClient")}
             </Button>
           </Space>
         }

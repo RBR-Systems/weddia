@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Modal, Form, Input, Select, DatePicker } from "antd";
 import type { Status, TimelineItem } from "../../models/types";
 import dayjs from "dayjs";
@@ -38,6 +39,7 @@ export default function AddTimelineItemModal({
   initialData = null,
   onSave,
 }: Props) {
+  const { t } = useTranslation();
   const [form] = Form.useForm();
 
   function createId() {
@@ -159,7 +161,7 @@ export default function AddTimelineItemModal({
 
   return (
     <Modal
-      title={initialData ? "Edit Timeline Item" : "Add Timeline Item"}
+      title={initialData ? t("schedule.addModal.editItem") : t("schedule.addModal.addItem")}
       open={visible}
       onCancel={() => {
         form.resetFields();
@@ -175,7 +177,7 @@ export default function AddTimelineItemModal({
         onFinish={handleFinish}
         onValuesChange={handleValuesChange}
       >
-        <Form.Item name="title" label="Title" rules={[{ required: true }]}>
+        <Form.Item name="title" label={t("schedule.addModal.title")} rules={[{ required: true }]}>
           <Input />
         </Form.Item>
 
@@ -185,7 +187,7 @@ export default function AddTimelineItemModal({
 
         <Form.Item
           name="timeRange"
-          label="Start & End Time"
+          label={`${t("schedule.addModal.startTime")} & ${t("schedule.addModal.endTime")}`}
           rules={[{ required: true }]}
         >
           <RangePicker showTime format="YYYY-MM-DD HH:mm" />
@@ -219,7 +221,7 @@ export default function AddTimelineItemModal({
           <DatePicker showTime format="YYYY-MM-DD HH:mm" />
         </Form.Item>
 
-        <Form.Item name="location_name" label="Location name">
+        <Form.Item name="location_name" label={t("schedule.addModal.location")}>
           <Input />
         </Form.Item>
 
@@ -227,11 +229,11 @@ export default function AddTimelineItemModal({
           <Input />
         </Form.Item>
 
-        <Form.Item name="description" label="Description">
+        <Form.Item name="description" label={t("schedule.addModal.description")}>
           <Input.TextArea rows={3} />
         </Form.Item>
 
-        <Form.Item name="notes" label="Notes">
+        <Form.Item name="notes" label={t("schedule.addModal.notes")}>
           <Input.TextArea rows={2} />
         </Form.Item>
 

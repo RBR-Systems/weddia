@@ -18,11 +18,13 @@ import CreateEventModal from "./components/event/create-event-modal/create-event
 import { Schedule } from "./components/event/schedule";
 import BudgetDashboard from "./components/event/budget/BudgetDashboard";
 import MultiClientPage from "./components/multi-client/MultiClientPage";
+import { useTranslation } from "react-i18next";
 
 export default function Home() {
   type MenuItem = Required<MenuProps>["items"][number];
 
   const [currentView, setCurrentView] = useState("events-hub");
+  const { t } = useTranslation();
 
   const renderContent = () => {
     switch (currentView) {
@@ -46,30 +48,30 @@ export default function Home() {
   const items: MenuItem[] = [
     {
       key: "events",
-      label: "Event Pages",
+      label: t("nav.eventPages"),
       icon: <ScheduleOutlined />,
       children: [
         {
           key: "events-hub",
-          label: "Events Hub",
+          label: t("nav.eventsHub"),
           icon: <HomeOutlined />,
           onClick: () => setCurrentView("events-hub"),
         },
         {
           key: "budget",
-          label: "Budget",
+          label: t("nav.budget"),
           icon: <SettingOutlined />,
           onClick: () => setCurrentView("budget"),
         },
         {
           key: "table-assignment",
-          label: "Table Assignment",
+          label: t("nav.tableAssignment"),
           icon: <TeamOutlined />,
           onClick: () => setCurrentView("table-assignment"),
         },
         {
           key: "schedule",
-          label: "Schedule",
+          label: t("nav.schedule"),
           icon: <ScheduleOutlined />,
           onClick: () => setCurrentView("schedule"),
         },
@@ -80,22 +82,22 @@ export default function Home() {
     },
     {
       key: "planner",
-      label: "Planner",
+      label: t("nav.planner"),
       icon: <SettingOutlined />,
       children: [
-        { key: "9", label: "Option 9" },
-        { key: "10", label: "Option 10" },
+        { key: "9", label: t("nav.option", { number: 9 }) },
+        { key: "10", label: t("nav.option", { number: 10 }) },
       ],
     },
     {
       key: "events-list",
-      label: "Events List",
+      label: t("nav.eventsList"),
       icon: <UnorderedListOutlined />,
       onClick: () => setCurrentView("events-list"),
     },
     {
       key: "multi-client",
-      label: "Multi-Client Budgets",
+      label: t("nav.multiClient"),
       icon: <TeamOutlined />,
       onClick: () => setCurrentView("multi-client"),
     },

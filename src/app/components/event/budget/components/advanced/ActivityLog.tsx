@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Card,
   Timeline,
@@ -137,6 +138,17 @@ const generateMockActivities = (): ActivityItem[] => {
 
 export default function ActivityLog() {
   const { state } = useBudget();
+  const { t } = useTranslation();
+
+  const activityTypeLabels: Record<ActivityType, string> = {
+    expense_added: t("activityLog.types.expenseAdded"),
+    expense_edited: t("activityLog.types.expenseEdited"),
+    expense_deleted: t("activityLog.types.expenseDeleted"),
+    payment_made: t("activityLog.types.paymentMade"),
+    category_updated: t("activityLog.types.categoryUpdated"),
+    budget_updated: t("activityLog.types.budgetUpdated"),
+  };
+
   const [activities] = useState<ActivityItem[]>(generateMockActivities);
   const [filterType, setFilterType] = useState<ActivityType | "all">("all");
   const [searchTerm, setSearchTerm] = useState("");
@@ -167,9 +179,9 @@ export default function ActivityLog() {
     const now = dayjs();
 
     if (date.isSame(now, "day")) {
-      return `Today at ${date.format("h:mm A")}`;
+      return t("activityLog.todayAt", { time: date.format("h:mm A") });
     } else if (date.isSame(now.subtract(1, "day"), "day")) {
-      return `Yesterday at ${date.format("h:mm A")}`;
+      return t("activityLog.yesterdayAt", { time: date.format("h:mm A") });
     } else if (date.isAfter(now.subtract(7, "day"))) {
       return date.format("dddd [at] h:mm A");
     } else {
@@ -179,11 +191,11 @@ export default function ActivityLog() {
 
   return (
     <Card
-      title="Activity Log"
+      title={t("activityLog.title")}
       extra={
         <Space wrap>
           <Search
-            placeholder="Search activities"
+            placeholder={t("activityLog.searchPlaceholder")}
             allowClear
             onSearch={setSearchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -194,10 +206,10 @@ export default function ActivityLog() {
             onChange={setFilterType}
             style={{ width: 150 }}
             options={[
-              { value: "all", label: "All Activities" },
+              { value: "all", label: t("activityLog.allActivities") },
               ...Object.entries(ACTIVITY_CONFIG).map(([key, config]) => ({
                 value: key,
-                label: config.label,
+                label: activityTypeLabels[key as ActivityType],
               })),
             ]}
           />
@@ -210,7 +222,7 @@ export default function ActivityLog() {
       }
     >
       {filteredActivities.length === 0 ? (
-        <Empty description="No activity found" />
+        <Empty description={t("activityLog.noActivity")} />
       ) : (
         <Timeline
           items={filteredActivities.map((activity) => {
@@ -222,7 +234,7 @@ export default function ActivityLog() {
                 <div>
                   <Space direction="vertical" size={0}>
                     <Space>
-                      <Tag color={config.color}>{config.label}</Tag>
+                      <Tag color={config.color}>{activityTypeLabels[activity.type]}</Tag>
                       <Text>{activity.description}</Text>
                     </Space>
                     <Space className={activityStyles.activityMeta}>

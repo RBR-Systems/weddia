@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useMemo, useRef, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Timeline, Divider, Typography } from "antd";
 import { ClockCircleOutlined } from "@ant-design/icons";
 import { TimelineItem, Status } from "../../models/types";
@@ -39,6 +40,7 @@ const ScheduleList: React.FC<Props> = ({
   onDelete,
   onStatusChange,
 }) => {
+  const { t } = useTranslation();
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [now, setNow] = useState(Date.now());
   const itemRefs = useRef<Record<string, HTMLDivElement | null>>({});
@@ -167,7 +169,7 @@ const ScheduleList: React.FC<Props> = ({
       children: (
         <div ref={nowItemRef} className={styles.nowIndicator}>
           <div className={styles.nowLabel}>
-            <strong>NOW</strong>
+            <strong>{t("common.now")}</strong>
             <span className={styles.nowTime}>{currentTimeFormatted}</span>
           </div>
         </div>

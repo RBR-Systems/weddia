@@ -1,5 +1,6 @@
 import React, { memo } from "react";
 import { Badge, Space, Typography } from "antd";
+import { useTranslation } from "react-i18next";
 import styles from "./TableTile.module.css";
 import type { Table } from "../../../models/types";
 

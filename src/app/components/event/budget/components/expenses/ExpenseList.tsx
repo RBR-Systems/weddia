@@ -23,10 +23,11 @@ import {
 import type { ColumnsType, TablePaginationConfig } from "antd/es/table";
 import { useBudget } from "../../contexts/BudgetContext";
 import { formatCurrency, formatDate } from "@/utils/formatters";
-import { PAYMENT_STATUS } from "../../constants/budget.constants";
+import { getPaymentStatus } from "../../constants/budget.constants";
 import type { Expense, PaymentStatus } from "../../types/budget.types";
 import CategoryTag from "../shared/CategoryTag";
 import expenseStyles from "./ExpenseList.module.css";
+import { useTranslation } from "react-i18next";
 
 const { Search } = Input;
 const { RangePicker } = DatePicker;
@@ -41,6 +42,8 @@ export default function ExpenseList({
   onViewExpense,
 }: ExpenseListProps) {
   const { message } = App.useApp();
+  const { t } = useTranslation();
+  const PAYMENT_STATUS = getPaymentStatus();
   const { state, deleteExpense } = useBudget();
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
@@ -62,7 +65,7 @@ export default function ExpenseList({
 
   const handleDelete = (expenseId: string) => {
     deleteExpense(expenseId);
-    message.success("Expense deleted");
+    message.success(t("expenseList.expenseDeleted"));
   };
 
   const getPaymentStatusTag = (status: PaymentStatus) => {
@@ -83,13 +86,13 @@ export default function ExpenseList({
 
   const columns: ColumnsType<Expense> = [
     {
-      title: "Description",
+      title: t("common.description"),
       dataIndex: "description",
       key: "description",
       sorter: (a, b) => a.description.localeCompare(b.description),
     },
     {
-      title: "Amount",
+      title: t("common.amount"),
       dataIndex: "amount",
       key: "amount",
       render: (amount: number) => formatCurrency(amount, state.currency),
@@ -97,7 +100,7 @@ export default function ExpenseList({
       align: "right",
     },
     {
-      title: "Category",
+      title: t("common.category"),
       dataIndex: "category_id",
       key: "category_id",
       render: (categoryId: string) => {
@@ -108,13 +111,13 @@ export default function ExpenseList({
       },
     },
     {
-      title: "Vendor",
+      title: t("common.vendor"),
       dataIndex: "vendor_name",
       key: "vendor_name",
       render: (vendor: string) => vendor || "—",
     },
     {
-      title: "Date",
+      title: t("common.date"),
       dataIndex: "expense_date",
       key: "expense_date",
       render: (date: string) => formatDate(date),
@@ -122,13 +125,13 @@ export default function ExpenseList({
         new Date(a.expense_date).getTime() - new Date(b.expense_date).getTime(),
     },
     {
-      title: "Status",
+      title: t("common.status"),
       dataIndex: "payment_status",
       key: "payment_status",
       render: (status: PaymentStatus) => getPaymentStatusTag(status),
     },
     {
-      title: "Actions",
+      title: t("common.actions"),
       key: "actions",
       render: (_, record) => (
         <Space>
@@ -138,10 +141,10 @@ export default function ExpenseList({
             onClick={() => onViewExpense?.(record)}
           />
           <Popconfirm
-            title="Delete this expense?"
+            title={t("expenseList.deleteConfirm")}
             onConfirm={() => handleDelete(record.expense_id)}
-            okText="Yes"
-            cancelText="No"
+            okText={t("common.yes")}
+            cancelText={t("common.no")}
           >
             <Button type="text" danger icon={<DeleteOutlined />} />
           </Popconfirm>
@@ -153,22 +156,22 @@ export default function ExpenseList({
   const paginationConfig: TablePaginationConfig = {
     pageSize: 10,
     showSizeChanger: true,
-    showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} expenses`,
+    showTotal: (total, range) => t("expenseList.paginationTotal", { start: range[0], end: range[1], total }),
   };
 
   return (
     <Card
-      title={`Expenses (${filteredExpenses.length})`}
+      title={t("expenseList.title", { count: filteredExpenses.length })}
       extra={
         <Space>
           <Button
             icon={<FilterOutlined />}
             onClick={() => setShowFilters(!showFilters)}
           >
-            Filters
+            {t("common.filters")}
           </Button>
           <Button type="primary" icon={<PlusOutlined />} onClick={onAddExpense}>
-            Add Expense
+            {t("expenseList.addExpense")}
           </Button>
         </Space>
       }
@@ -177,7 +180,7 @@ export default function ExpenseList({
         <Row gutter={16} className={expenseStyles.filterRow}>
           <Col xs={24} sm={8}>
             <Search
-              placeholder="Search expenses..."
+              placeholder={t("expenseList.searchPlaceholder")}
               allowClear
               onSearch={setSearchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -185,7 +188,7 @@ export default function ExpenseList({
           </Col>
           <Col xs={24} sm={8}>
             <Select
-              placeholder="Filter by category"
+              placeholder={t("expenseList.filterByCategory")}
               allowClear
               className="u-full-width"
               onChange={(value) => setCategoryFilter(value)}
@@ -199,7 +202,7 @@ export default function ExpenseList({
           </Col>
           <Col xs={24} sm={8}>
             <Select
-              placeholder="Filter by status"
+              placeholder={t("expenseList.filterByStatus")}
               allowClear
               className="u-full-width"
               onChange={(value) => setStatusFilter(value)}
@@ -219,7 +222,7 @@ export default function ExpenseList({
         pagination={paginationConfig}
         loading={state.isLoading}
         scroll={{ x: 800 }}
-        locale={{ emptyText: "No expenses recorded yet" }}
+        locale={{ emptyText: t("expenseList.noExpenses") }}
       />
     </Card>
   );

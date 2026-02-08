@@ -5,8 +5,10 @@ import Statistic from "@/app/common/AnimatedStatistic/AnimatedStatistic";
 import Card from "@/app/common/Card/card";
 import { useBudget } from "../contexts/BudgetContext";
 import { formatCurrency } from "@/utils/formatters";
+import { useTranslation } from "react-i18next";
 
 export default function BudgetStats() {
+  const { t } = useTranslation();
   const { state } = useBudget();
   if (state.isLoading || !state.summary) return null;
 
@@ -27,7 +29,7 @@ export default function BudgetStats() {
       <Col xs={24} sm={12} md={6}>
         <Card>
           <Statistic
-            title="Total Budget"
+            title={t("budgetStats.totalBudget")}
             value={formatCurrency(summary.total_budget, currency)}
           />
         </Card>
@@ -36,7 +38,7 @@ export default function BudgetStats() {
       <Col xs={24} sm={12} md={6}>
         <Card>
           <Statistic
-            title="Total Spent"
+            title={t("budgetStats.totalSpent")}
             value={formatCurrency(summary.total_spent, currency)}
           />
         </Card>
@@ -45,7 +47,7 @@ export default function BudgetStats() {
       <Col xs={24} sm={12} md={6}>
         <Card>
           <Statistic
-            title="Remaining"
+            title={t("budgetStats.remaining")}
             value={formatCurrency(summary.total_remaining, currency)}
           />
         </Card>
@@ -53,20 +55,20 @@ export default function BudgetStats() {
 
       <Col xs={24} sm={12} md={6}>
         <Card>
-          <Statistic title="Spent %" value={summary.percentage_spent} suffix="%" />
+          <Statistic title={t("budgetStats.spentPercent")} value={summary.percentage_spent} suffix="%" />
         </Card>
       </Col>
 
       <Col xs={24} sm={12} md={6} style={{ marginTop: 16 }}>
         <Card>
-          <Statistic title="Expenses Count" value={expenseCount} />
+          <Statistic title={t("budgetStats.expensesCount")} value={expenseCount} />
         </Card>
       </Col>
 
       <Col xs={24} sm={12} md={6} style={{ marginTop: 16 }}>
         <Card>
           <Statistic
-            title="Average Expense"
+            title={t("budgetStats.averageExpense")}
             value={formatCurrency(avgExpense, currency)}
           />
         </Card>
@@ -75,7 +77,7 @@ export default function BudgetStats() {
       <Col xs={24} sm={12} md={6} style={{ marginTop: 16 }}>
         <Card>
           <Statistic
-            title="Largest Expense"
+            title={t("budgetStats.largestExpense")}
             value={formatCurrency(largestExpense, currency)}
           />
         </Card>
@@ -85,7 +87,7 @@ export default function BudgetStats() {
         <Card>
           <Tooltip title={topCategory ? topCategory.name : "—"}>
             <Statistic
-              title="Top Category"
+              title={t("budgetStats.topCategory")}
               value={topCategory ? `${topCategory.name}` : "—"}
             />
           </Tooltip>
