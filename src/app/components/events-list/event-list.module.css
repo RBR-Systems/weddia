@@ -1,5 +1,5 @@
 .page-container {
-  gap: 2rem;
+  gap: var(--spacing-xl);
   display: flex;
   flex-direction: column;
   flex-grow: 1;
@@ -7,7 +7,7 @@
 
 .cards-container {
   width: 100%;
-  gap: 1rem;
+  gap: var(--spacing-md);
   display: flex;
   flex-direction: column;
 }
@@ -20,22 +20,57 @@
 .event-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.95rem;
+  font-size: var(--fs-base);
 }
 
 .event-table th,
 .event-table td {
   text-align: left;
-  padding: 0.6rem 0.8rem;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  padding: var(--spacing-sm);
+  border-bottom: 1px solid var(--divider-light);
 }
 
 .event-name {
-  font-weight: 600;
+  font-weight: var(--bold-font);
 }
 
 .description {
-  font-size: 0.85rem;
-  color: rgba(0, 0, 0, 0.6);
-  margin-top: 0.25rem;
+  font-size: var(--fs-sm);
+  color: var(--text-color-secondary);
+  margin-top: var(--spacing-xs);
+}
+
+.mutedText {
+  color: var(--text-color-muted);
+}
+
+.budgetContainer {
+  min-width: 180px;
+}
+
+.budgetRow {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-xs);
+  font-size: var(--fs-xs);
+}
+
+.tagNoMargin {
+  margin: 0 !important;
+}
+
+.spentText {
+  font-size: var(--fs-2xs);
+  color: var(--text-color-secondary);
+  margin-top: 2px;
+}
+
+.formFullWidth {
+  width: 100%;
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-sm);
 }

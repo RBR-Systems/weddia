@@ -1,7 +1,8 @@
 "use client";
 
 import React from "react";
-import { Progress, Space, Tag, Row, Col, Card } from "antd";
+import { Progress, Space, Tag, Row, Col } from "antd";
+import Card from "@/app/common/Card/card";
 import {
   CheckCircleOutlined,
   ClockCircleOutlined,
@@ -47,7 +48,7 @@ const StatusProgressBar: React.FC<Props> = ({ items }) => {
               color:
                 progress.completion_percentage === 100
                   ? STATUS_OPTIONS.completed.color
-                  : "#1890ff",
+                    : "var(--status-in-progress)",
             }}
           >
             {progress.completion_percentage}%
@@ -56,7 +57,7 @@ const StatusProgressBar: React.FC<Props> = ({ items }) => {
 
         <Progress
           percent={progress.completion_percentage}
-          strokeColor={{ from: "#1890ff", to: STATUS_OPTIONS.completed.color }}
+            strokeColor={{ from: "var(--status-in-progress)", to: STATUS_OPTIONS.completed.color }}
           status={progress.completion_percentage === 100 ? "success" : "active"}
           showInfo={false}
         />

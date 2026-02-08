@@ -1,6 +1,8 @@
 "use client";
 import React from "react";
-import { Row, Col, Card, Statistic, Tooltip } from "antd";
+import { Row, Col, Tooltip } from "antd";
+import Statistic from "@/app/common/AnimatedStatistic/AnimatedStatistic";
+import Card from "@/app/common/Card/card";
 import { useBudget } from "../contexts/BudgetContext";
 import { formatCurrency } from "@/utils/formatters";
 
@@ -51,7 +53,7 @@ export default function BudgetStats() {
 
       <Col xs={24} sm={12} md={6}>
         <Card>
-          <Statistic title="Spent %" value={`${summary.percentage_spent}%`} />
+          <Statistic title="Spent %" value={summary.percentage_spent} suffix="%" />
         </Card>
       </Col>
 

@@ -2,6 +2,8 @@
 import React from "react";
 import { Progress, Tooltip } from "antd";
 import { formatCurrency } from "@/utils/formatters";
+import { SEMANTIC_CHART_COLORS } from "@/theme/chartColors";
+import { useTheme } from "@/theme/ThemeProvider";
 
 interface BudgetProgressProps {
   spent: number;
@@ -18,6 +20,8 @@ export default function BudgetProgress({
   showInfo = true,
   size = "default",
 }: BudgetProgressProps) {
+  const { mode } = useTheme();
+  const semantic = SEMANTIC_CHART_COLORS[mode];
   const percentage = allocated > 0 ? Math.round((spent / allocated) * 100) : 0;
 
   const getStatus = (): "success" | "normal" | "exception" | "active" => {
@@ -27,9 +31,9 @@ export default function BudgetProgress({
   };
 
   const getStrokeColor = () => {
-    if (percentage >= 100) return "#ff4d4f";
-    if (percentage >= 80) return "#fa8c16";
-    return "#52c41a";
+    if (percentage >= 100) return semantic.error;
+    if (percentage >= 80) return semantic.warning;
+    return semantic.success;
   };
 
   return (

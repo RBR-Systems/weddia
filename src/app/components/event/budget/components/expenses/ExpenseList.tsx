@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useMemo } from "react";
 import {
+  App,
   Card,
   Table,
   Button,
@@ -9,7 +10,6 @@ import {
   Space,
   Tag,
   Popconfirm,
-  message,
   DatePicker,
   Row,
   Col,
@@ -25,6 +25,8 @@ import { useBudget } from "../../contexts/BudgetContext";
 import { formatCurrency, formatDate } from "@/utils/formatters";
 import { PAYMENT_STATUS } from "../../constants/budget.constants";
 import type { Expense, PaymentStatus } from "../../types/budget.types";
+import CategoryTag from "../shared/CategoryTag";
+import expenseStyles from "./ExpenseList.module.css";
 
 const { Search } = Input;
 const { RangePicker } = DatePicker;
@@ -38,6 +40,7 @@ export default function ExpenseList({
   onAddExpense,
   onViewExpense,
 }: ExpenseListProps) {
+  const { message } = App.useApp();
   const { state, deleteExpense } = useBudget();
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
@@ -101,7 +104,7 @@ export default function ExpenseList({
         const cat = state.categories.find(
           (c: { id: string; color?: string }) => c.id === categoryId,
         );
-        return <Tag color={cat?.color}>{getCategoryName(categoryId)}</Tag>;
+        return <CategoryTag color={cat?.color}>{getCategoryName(categoryId)}</CategoryTag>;
       },
     },
     {
@@ -171,7 +174,7 @@ export default function ExpenseList({
       }
     >
       {showFilters && (
-        <Row gutter={16} style={{ marginBottom: 16 }}>
+        <Row gutter={16} className={expenseStyles.filterRow}>
           <Col xs={24} sm={8}>
             <Search
               placeholder="Search expenses..."
@@ -184,7 +187,7 @@ export default function ExpenseList({
             <Select
               placeholder="Filter by category"
               allowClear
-              style={{ width: "100%" }}
+              className="u-full-width"
               onChange={(value) => setCategoryFilter(value)}
               options={state.categories.map(
                 (c: { id: string; name: string }) => ({
@@ -198,7 +201,7 @@ export default function ExpenseList({
             <Select
               placeholder="Filter by status"
               allowClear
-              style={{ width: "100%" }}
+              className="u-full-width"
               onChange={(value) => setStatusFilter(value)}
               options={Object.values(PAYMENT_STATUS).map((s) => ({
                 value: s.value,

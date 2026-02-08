@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
-import { Card, Row, Col, Typography, Empty } from "antd";
+import { Row, Col, Typography, Empty } from "antd";
+import Card from "@/app/common/Card/card";
 import {
   PieChart,
   Pie,
@@ -21,22 +22,19 @@ import {
 import { useBudget } from "../../contexts/BudgetContext";
 import { formatCurrency } from "@/utils/formatters";
 import type { Category, Expense } from "../../types/budget.types";
+import { CHART_COLORS, COMPARISON_COLORS, SEMANTIC_CHART_COLORS, resolveChartColor } from "@/theme/chartColors";
+import { useTheme } from "@/theme/ThemeProvider";
 
 const { Title } = Typography;
 
-const COLORS = [
-  "#1890ff",
-  "#52c41a",
-  "#722ed1",
-  "#fa8c16",
-  "#eb2f96",
-  "#13c2c2",
-  "#faad14",
-  "#2f54eb",
-];
-
 export default function BudgetCharts() {
   const { state } = useBudget();
+  const { mode } = useTheme();
+
+  // Resolve palettes for current theme
+  const colors = CHART_COLORS[mode];
+  const comparison = COMPARISON_COLORS[mode];
+  const semantic = SEMANTIC_CHART_COLORS[mode];
 
   // Pie chart data - Category spending breakdown
   const categoryPieData = state.categories
@@ -44,7 +42,7 @@ export default function BudgetCharts() {
     .map((c: Category, index: number) => ({
       name: c.name,
       value: c.spent,
-      color: c.color || COLORS[index % COLORS.length],
+      color: resolveChartColor(c.color || colors[index % colors.length], mode),
     }));
 
   // Bar chart data - Budget vs Actual per category
@@ -101,9 +99,10 @@ export default function BudgetCharts() {
       return (
         <div
           style={{
-            backgroundColor: "#fff",
+            backgroundColor: "var(--card-background)",
+            color: "var(--text-color)",
             padding: "10px",
-            border: "1px solid #ccc",
+            border: "1px solid var(--card-border)",
             borderRadius: "4px",
           }}
         >
@@ -185,8 +184,8 @@ export default function BudgetCharts() {
                 <YAxis />
                 <Tooltip content={<CustomTooltip />} />
                 <Legend />
-                <Bar dataKey="allocated" fill="#1890ff" name="Allocated" />
-                <Bar dataKey="spent" fill="#52c41a" name="Spent" />
+                <Bar dataKey="allocated" fill={comparison.primary} name="Allocated" />
+                <Bar dataKey="spent" fill={comparison.secondary} name="Spent" />
               </BarChart>
             </ResponsiveContainer>
           ) : (
@@ -213,7 +212,7 @@ export default function BudgetCharts() {
                 <Line
                   type="monotone"
                   dataKey="amount"
-                  stroke="#1890ff"
+                  stroke={comparison.primary}
                   strokeWidth={2}
                   name="Spending"
                 />
@@ -243,15 +242,15 @@ export default function BudgetCharts() {
                 <Area
                   type="monotone"
                   dataKey="cumulative"
-                  stroke="#52c41a"
-                  fill="#52c41a"
+                  stroke={semantic.success}
+                  fill={semantic.success}
                   fillOpacity={0.3}
                   name="Cumulative Spent"
                 />
                 <Line
                   type="monotone"
                   dataKey="budget"
-                  stroke="#ff4d4f"
+                  stroke={semantic.error}
                   strokeDasharray="5 5"
                   name="Total Budget"
                 />

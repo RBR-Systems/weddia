@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
-import { Card, Input, Button, List, Avatar, Spin, Tag } from "antd";
+import { Input, Button, List, Avatar, Spin, Tag } from "antd";
+import Card from "@/app/common/Card/card";
 import { useTableAssignmentContext } from "../../context/TableAssignmentContext";
 import { SendOutlined, RobotOutlined, UserOutlined } from "@ant-design/icons";
 import styles from "./SeatingAIChat.module.css";

@@ -16,6 +16,7 @@ import { useBudget } from "../../contexts/BudgetContext";
 import { formatCurrency } from "@/utils/formatters";
 import { PAYMENT_STATUS } from "../../constants/budget.constants";
 import type { Expense, PaymentStatus } from "../../types/budget.types";
+import calStyles from "./PaymentCalendar.module.css";
 
 const { Text } = Typography;
 
@@ -63,9 +64,9 @@ export default function PaymentCalendar() {
             size="small"
             dataSource={expenses}
             renderItem={(item) => (
-              <List.Item style={{ padding: "4px 0", border: "none" }}>
-                <Text style={{ color: "#fff" }}>{item.description}</Text>
-                <Text style={{ color: "#fff", marginLeft: 8 }}>
+              <List.Item className={calStyles.tooltipItem}>
+                <Text className={calStyles.tooltipText}>{item.description}</Text>
+                <Text className={calStyles.tooltipAmount}>
                   {formatCurrency(item.amount, state.currency)}
                 </Text>
               </List.Item>
@@ -73,13 +74,13 @@ export default function PaymentCalendar() {
           />
         }
       >
-        <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+        <ul className={calStyles.calendarList}>
           {expenses.slice(0, 3).map((expense) => (
-            <li key={expense.expense_id} style={{ marginBottom: 2 }}>
+            <li key={expense.expense_id} className={calStyles.calendarListItem}>
               <Badge
                 status={getStatusBadge(expense.payment_status)}
                 text={
-                  <Text style={{ fontSize: 10 }} ellipsis>
+                  <Text className={calStyles.calendarBadgeText} ellipsis>
                     {expense.description}
                   </Text>
                 }
@@ -88,7 +89,7 @@ export default function PaymentCalendar() {
           ))}
           {expenses.length > 3 && (
             <li>
-              <Text type="secondary" style={{ fontSize: 10 }}>
+              <Text type="secondary" className={calStyles.calendarMoreText}>
                 +{expenses.length - 3} more
               </Text>
             </li>
@@ -118,10 +119,10 @@ export default function PaymentCalendar() {
     ).length;
 
     return (
-      <div style={{ textAlign: "center" }}>
+      <div className={calStyles.monthSummary}>
         <Text strong>{formatCurrency(total, state.currency)}</Text>
         <br />
-        <Text type="secondary" style={{ fontSize: 12 }}>
+        <Text type="secondary" className={calStyles.monthDetail}>
           {paidCount}/{monthExpenses.length} paid
         </Text>
       </div>
@@ -153,7 +154,7 @@ export default function PaymentCalendar() {
     <div>
       <Card
         title="Upcoming Payments (Next 7 Days)"
-        style={{ marginBottom: 16 }}
+        className={calStyles.upcomingCard}
       >
         {upcomingPayments.length > 0 ? (
           <List
@@ -168,7 +169,7 @@ export default function PaymentCalendar() {
                     title={item.description}
                     description={`Due: ${dayjs(item.expense_date).format("MMM D, YYYY")}`}
                   />
-                  <div style={{ textAlign: "right" }}>
+                  <div className={calStyles.paymentAmount}>
                     <Text strong>
                       {formatCurrency(item.amount, state.currency)}
                     </Text>

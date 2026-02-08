@@ -1,23 +1,25 @@
+import { CHART_COLORS } from "@/theme/chartColors";
+
 export const DEFAULT_CATEGORIES = [
   {
     id: "venue",
     name: "Venue",
     icon: "HomeOutlined",
-    color: "#1890ff",
+    color: CHART_COLORS.light[0], // Blue
     typical_percentage: 15,
   },
   {
     id: "catering",
     name: "Catering & Bar",
     icon: "CoffeeOutlined",
-    color: "#52c41a",
+    color: CHART_COLORS.light[1], // Green
     typical_percentage: 30,
   },
   {
     id: "photography",
     name: "Photography & Videography",
     icon: "CameraOutlined",
-    color: "#722ed1",
+    color: CHART_COLORS.light[4], // Purple
     typical_percentage: 10,
   },
 ];

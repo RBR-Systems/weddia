@@ -26,6 +26,7 @@ import {
 import dayjs from "dayjs";
 import { useBudget } from "../../contexts/BudgetContext";
 import { formatCurrency } from "@/utils/formatters";
+import notifStyles from "./Notifications.module.css";
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -202,14 +203,7 @@ export default function NotificationsPanel() {
                 const config = NOTIFICATION_CONFIG[notification.type];
                 return (
                   <List.Item
-                    style={{
-                      backgroundColor: notification.read
-                        ? "transparent"
-                        : "#f6ffed",
-                      padding: "12px 16px",
-                      borderRadius: 4,
-                      marginBottom: 8,
-                    }}
+                    className={notification.read ? notifStyles.notificationItemRead : notifStyles.notificationItemUnread}
                     actions={[
                       !notification.read && (
                         <Button
@@ -233,7 +227,7 @@ export default function NotificationsPanel() {
                   >
                     <List.Item.Meta
                       avatar={
-                        <span style={{ color: config.color, fontSize: 20 }}>
+                        <span className={notifStyles.notificationIcon} style={{ color: config.color }}>
                           {config.icon}
                         </span>
                       }
@@ -248,7 +242,7 @@ export default function NotificationsPanel() {
                       description={
                         <Space direction="vertical" size={0}>
                           <Text>{notification.message}</Text>
-                          <Text type="secondary" style={{ fontSize: 12 }}>
+                            <Text type="secondary" className={notifStyles.notificationTimestamp}>
                             {dayjs(notification.timestamp).format(
                               "MMM D, h:mm A",
                             )}
@@ -266,18 +260,12 @@ export default function NotificationsPanel() {
 
       <Col xs={24} lg={8}>
         <Card title="Notification Settings">
-          <Space direction="vertical" style={{ width: "100%" }} size="middle">
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
+            <Space direction="vertical" className={notifStyles.fullWidth} size="middle">
+            <div className={notifStyles.settingRow}>
               <div>
                 <Text strong>Budget Alerts</Text>
                 <br />
-                <Text type="secondary" style={{ fontSize: 12 }}>
+                <Text type="secondary" className={notifStyles.settingDescription}>
                   When overall budget exceeds limits
                 </Text>
               </div>
@@ -287,19 +275,13 @@ export default function NotificationsPanel() {
               />
             </div>
 
-            <Divider style={{ margin: "8px 0" }} />
+            <Divider className={notifStyles.settingDivider} />
 
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
+            <div className={notifStyles.settingRow}>
               <div>
                 <Text strong>Payment Reminders</Text>
                 <br />
-                <Text type="secondary" style={{ fontSize: 12 }}>
+                <Text type="secondary" className={notifStyles.settingDescription}>
                   Upcoming and overdue payments
                 </Text>
               </div>
@@ -309,19 +291,13 @@ export default function NotificationsPanel() {
               />
             </div>
 
-            <Divider style={{ margin: "8px 0" }} />
+            <Divider className={notifStyles.settingDivider} />
 
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
+            <div className={notifStyles.settingRow}>
               <div>
                 <Text strong>Category Warnings</Text>
                 <br />
-                <Text type="secondary" style={{ fontSize: 12 }}>
+                <Text type="secondary" className={notifStyles.settingDescription}>
                   When categories approach/exceed limits
                 </Text>
               </div>
@@ -331,19 +307,13 @@ export default function NotificationsPanel() {
               />
             </div>
 
-            <Divider style={{ margin: "8px 0" }} />
+            <Divider className={notifStyles.settingDivider} />
 
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
+            <div className={notifStyles.settingRow}>
               <div>
                 <Text strong>Weekly Digest</Text>
                 <br />
-                <Text type="secondary" style={{ fontSize: 12 }}>
+                <Text type="secondary" className={notifStyles.settingDescription}>
                   Summary of weekly spending
                 </Text>
               </div>
@@ -353,19 +323,13 @@ export default function NotificationsPanel() {
               />
             </div>
 
-            <Divider style={{ margin: "8px 0" }} />
+            <Divider className={notifStyles.settingDivider} />
 
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
+            <div className={notifStyles.settingRow}>
               <div>
                 <Text strong>Email Notifications</Text>
                 <br />
-                <Text type="secondary" style={{ fontSize: 12 }}>
+                <Text type="secondary" className={notifStyles.settingDescription}>
                   Receive alerts via email
                 </Text>
               </div>

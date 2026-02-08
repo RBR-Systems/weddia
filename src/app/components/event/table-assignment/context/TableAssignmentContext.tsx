@@ -3,7 +3,7 @@ import React, { useCallback, useMemo, useReducer } from "react";
 import data from "@/data/tables-data.json";
 import { useSensor, useSensors, PointerSensor } from "@dnd-kit/core";
 import type { DragStartEvent, DragEndEvent } from "@dnd-kit/core";
-import { message } from "antd";
+import { App } from "antd";
 import {
   INITIAL_METERS_TO_PIXELS,
   DEFAULT_VENUE_WIDTH_METERS,
@@ -28,6 +28,7 @@ export function TableAssignmentProvider({
   children: React.ReactNode;
   messageApi?: any;
 }) {
+  const { message } = App.useApp();
   const relations = data.relations as Relation[];
   const guests = data.guests as Guest[];
   const layouts = data.table_layouts as TableLayout[];

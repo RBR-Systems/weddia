@@ -6,6 +6,7 @@ import { eventList } from "@/app/data/EventList";
 import { EventStatus } from "@/app/components/events-list/models/enums/event-list-enums";
 import { useEvent } from "@/app/contexts/EventContext";
 import { EventActions } from "@/app/contexts/EventActions";
+import { ThemeToggle } from "@/theme/ThemeToggle";
 
 type NavBarProps = {
   state: boolean;
@@ -55,19 +56,19 @@ export const NavBar: React.FC<NavBarProps> = ({
     });
   };
 
-  const eventViews = new Set(["events-hub", "table-assignment"]);
+  const eventViews = new Set(["events-hub", "table-assignment", "budget"]);
 
   return (
     <div className={styles["navbar"]}>
       <div className={`${styles["navbar-item"]} ${styles["start"]}`}>
-        <p
-          className={styles["header"]}
+        <img
+          src="/weddia-logo.svg"
+          alt="Wedd.IA"
+          className={styles["logo"]}
           onClick={() => {
             setCollapsed(!state);
           }}
-        >
-          RBR Weddings
-        </p>
+        />
       </div>
       <div className={`${styles["navbar-item"]} ${styles["end"]}`}>
         {eventViews.has(currentView || "") ? (
@@ -87,13 +88,10 @@ export const NavBar: React.FC<NavBarProps> = ({
         >
           New Event
         </Button>
-        <Badge
-          count={3}
-          size="small"
-          style={{ backgroundColor: "var(--badge-color)" }}
-        >
+        <Badge count={3} size="small" className={styles["badge-background"]}>
           <BellOutlined className={styles["icon"]} />
         </Badge>
+        <ThemeToggle />
       </div>
     </div>
   );

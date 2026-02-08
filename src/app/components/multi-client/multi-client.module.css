@@ -1,0 +1,7 @@
+.pageContainer {
+  padding: var(--spacing-md);
+}
+
+.pageTitle {
+  margin-bottom: var(--spacing-md);
+}

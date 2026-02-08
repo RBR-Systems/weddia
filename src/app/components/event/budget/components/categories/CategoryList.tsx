@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import {
+  App,
   Row,
   Col,
   Card,
@@ -13,17 +14,20 @@ import {
   InputNumber,
   Select,
   ColorPicker,
-  message,
 } from "antd";
 import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import { useBudget } from "../../contexts/BudgetContext";
 import CategoryCard from "./CategoryCard";
 import type { Category } from "../../types/budget.types";
+import { CHART_COLORS } from "@/theme/chartColors";
+import { useTheme } from "@/theme/ThemeProvider";
 
 const { Search } = Input;
 
 export default function CategoryList() {
+  const { message } = App.useApp();
   const { state, addCategory, updateCategory, deleteCategory } = useBudget();
+  const { mode } = useTheme();
   const [searchTerm, setSearchTerm] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
@@ -55,7 +59,7 @@ export default function CategoryList() {
       const colorValue =
         typeof values.color === "string"
           ? values.color
-          : values.color?.toHexString?.() || "#1890ff";
+          : values.color?.toHexString?.() || CHART_COLORS[mode][0];
 
       if (editingCategory) {
         updateCategory?.(editingCategory.id, { ...values, color: colorValue });
@@ -164,7 +168,7 @@ export default function CategoryList() {
             rules={[{ required: true, message: "Please enter an amount" }]}
           >
             <InputNumber
-              style={{ width: "100%" }}
+              className="u-full-width"
               min={0}
               prefix="$"
               formatter={(value) =>

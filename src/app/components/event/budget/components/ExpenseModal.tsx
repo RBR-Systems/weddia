@@ -47,7 +47,7 @@ export default function ExpenseModal({ visible, onClose }: Props) {
           <Input />
         </Form.Item>
         <Form.Item name="amount" label="Amount" rules={[{ required: true }]}>
-          <InputNumber style={{ width: "100%" }} min={0} />
+          <InputNumber className="u-full-width" min={0} />
         </Form.Item>
         <Form.Item
           name="category_id"
@@ -65,7 +65,7 @@ export default function ExpenseModal({ visible, onClose }: Props) {
           <Input />
         </Form.Item>
         <Form.Item name="expense_date" label="Date" initialValue={dayjs()}>
-          <DatePicker style={{ width: "100%" }} />
+          <DatePicker className="u-full-width" />
         </Form.Item>
         <Form.Item
           name="payment_status"

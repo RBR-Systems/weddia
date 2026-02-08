@@ -21,6 +21,8 @@ import { formatCurrency, formatDate } from "@/utils/formatters";
 import { useBudget } from "../../contexts/BudgetContext";
 import { PAYMENT_STATUS } from "../../constants/budget.constants";
 import type { Expense, PaymentStatus } from "../../types/budget.types";
+import CategoryTag from "../shared/CategoryTag";
+import styles from "./ExpenseDetails.module.css";
 
 const { Title, Text } = Typography;
 
@@ -84,21 +86,21 @@ export default function ExpenseDetails({
         </Space>
       }
     >
-      <Space direction="vertical" style={{ width: "100%" }} size="large">
+      <Space direction="vertical" className={styles.fullWidth} size="large">
         <div>
-          <Title level={4} style={{ marginBottom: 4 }}>
+          <Title level={4} className={styles.expenseDescription}>
             {expense.description}
           </Title>
-          <Title level={2} style={{ margin: 0, color: "#1890ff" }}>
+          <Title level={2} className={styles.expenseAmount}>
             {formatCurrency(expense.amount, state.currency)}
           </Title>
         </div>
 
         <Descriptions column={1} bordered size="small">
           <Descriptions.Item label="Category">
-            <Tag color={category?.color}>
+            <CategoryTag color={category?.color}>
               {category?.name || expense.category_id}
-            </Tag>
+            </CategoryTag>
           </Descriptions.Item>
           <Descriptions.Item label="Vendor">
             {expense.vendor_name || "Not specified"}
@@ -123,7 +125,7 @@ export default function ExpenseDetails({
                   height={100}
                   src={url}
                   fallback="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMIAAADDCAYAAADQvc6UAAABRWlDQ1BJQ0MgUHJvZmlsZQAAKJFjYGASSSwoyGFhYGDIzSspCnJ3UoiIjFJgf8LAwSDCIMogwMCcmFxc4BgQ4ANUwgCjUcG3awyMIPqyLsis7PPOq3QdDFcvjV3jOD1boQVTPQrgSkktTgbSf4A4LbmgqISBgTEFyFYuLykAsTuAbJEioKOA7DkgdjqEvQHEToKwj4DVhAQ5A9k3gGyB5IxEoBmML4BsnSQk8XQkNtReEOBxcfXxUQg1Mjc0dyHgXNJBSWpFCYh2zi+oLMpMzyhRcASGUqqCZ16yno6CkYGRAQMDKMwhqj/fAIcloxgHQqxAjIHBEugw5sUIsSQpBobtQPdLciLEVJYzMPBHMDBsayhILEqEO4DxG0txmrERhM29nYGBddr//5/DGRjYNRkY/l7////39v///y4Dmn+LgeHANwDrkl1AuO+pmgAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAwqADAAQAAAABAAAAwwAAAAD9b/HnAAAHlklEQVR4Ae3dP3PTWBSGcbGzM6GCKqlIBRV0dHRJFarQ0eUT8LH4BnRU0NHR0UEFVdIlFRV7TzRksomPY8uykTk/zewQfKw/9444"
-                  style={{ objectFit: "cover", borderRadius: 4 }}
+                  style={{ objectFit: "cover", borderRadius: "var(--radius-sm)" }}
                 />
               ))}
             </Space>
@@ -131,7 +133,7 @@ export default function ExpenseDetails({
         ) : (
           <Empty
             image={
-              <FileImageOutlined style={{ fontSize: 48, color: "#d9d9d9" }} />
+              <FileImageOutlined className={styles.emptyIcon} />
             }
             description="No receipts attached"
           />

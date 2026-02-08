@@ -9,3 +9,28 @@
   display: flex;
   width: 25rem;
 }
+
+.items-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  text-align: center;
+}
+
+.item-wrapper {
+  display: flex;
+  width: fit-content;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.item-text {
+  max-width: 200px;
+  font-size: var(--fs-xs);
+  color: var(--text-color-secondary);
+  font-weight: var(--bold-font);
+}
+
+.item-divider {
+  width: 30px;
+}

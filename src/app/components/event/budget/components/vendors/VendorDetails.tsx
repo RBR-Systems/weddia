@@ -8,19 +8,20 @@ import {
   Divider,
   Table,
   Tag,
-  Statistic,
   Row,
   Col,
-  Card,
   Avatar,
   Empty,
 } from "antd";
 import { ShopOutlined, MailOutlined, PhoneOutlined } from "@ant-design/icons";
+import Card from "@/app/common/Card/card";
+import Statistic from "@/app/common/AnimatedStatistic/AnimatedStatistic";
 import { useBudget } from "../../contexts/BudgetContext";
 import { formatCurrency, formatDate } from "@/utils/formatters";
 import { PAYMENT_STATUS } from "../../constants/budget.constants";
 import type { Expense, PaymentStatus } from "../../types/budget.types";
 import type { Vendor } from "./VendorList";
+import vendorStyles from "./VendorDetails.module.css";
 
 const { Title, Text } = Typography;
 
@@ -90,15 +91,15 @@ export default function VendorDetails({
       open={open}
       onClose={onClose}
     >
-      <Space direction="vertical" style={{ width: "100%" }} size="large">
+      <Space direction="vertical" className={vendorStyles.fullWidth} size="large">
         <Space>
           <Avatar
             size={64}
-            style={{ backgroundColor: "#1890ff" }}
+            className={vendorStyles.vendorAvatar}
             icon={<ShopOutlined />}
           />
           <div>
-            <Title level={4} style={{ margin: 0 }}>
+            <Title level={4} className={vendorStyles.vendorName}>
               {vendor.name}
             </Title>
             <Tag color={vendor.status === "active" ? "green" : "default"}>
@@ -145,7 +146,7 @@ export default function VendorDetails({
               <Statistic
                 title="Paid"
                 value={paidAmount}
-                valueStyle={{ color: "#52c41a" }}
+                className={vendorStyles.paidValue}
                 formatter={(value) =>
                   formatCurrency(Number(value), state.currency)
                 }
@@ -157,7 +158,7 @@ export default function VendorDetails({
               <Statistic
                 title="Pending"
                 value={pendingAmount}
-                valueStyle={{ color: "#faad14" }}
+                className={vendorStyles.pendingValue}
                 formatter={(value) =>
                   formatCurrency(Number(value), state.currency)
                 }

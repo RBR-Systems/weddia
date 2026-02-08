@@ -11,11 +11,11 @@
 .page-container {
   display: flex;
   width: 100%;
-  gap: 1rem;
+  gap: var(--spacing-md);
 }
 
 .page-content {
-  padding: 2.5rem 1rem;
+  padding: var(--spacing-xl) var(--spacing-md);
   flex-grow: 1;
 }
 
@@ -26,9 +26,9 @@
   overflow-x: hidden;
   overflow-y: auto;
   height: fit-content;
-  box-shadow: 0 0px 15px rgba(0, 0, 0, 0.2) !important;
-  border-top-right-radius: 12px;
-  border-bottom-right-radius: 12px;
+  box-shadow: var(--shadow-lg) !important;
+  border-top-right-radius: var(--radius-lg);
+  border-bottom-right-radius: var(--radius-lg);
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
@@ -37,21 +37,21 @@
 /* Custom scrollbar styles for .sidebar */
 .sidebar::-webkit-scrollbar {
   width: 8px;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   background: transparent;
 }
 .sidebar::-webkit-scrollbar-thumb {
-  background: #bdbdbd;
-  border-radius: 8px;
+  background: var(--text-color-muted);
+  border-radius: var(--radius-md);
 }
 .sidebar::-webkit-scrollbar-thumb:hover {
-  background: #888;
+  background: var(--text-color-tertiary);
 }
 
 /* For Firefox */
 .sidebar {
   scrollbar-width: thin;
-  scrollbar-color: #bdbdbd transparent;
+  scrollbar-color: var(--text-color-muted) transparent;
 }
 
 .menu-container {

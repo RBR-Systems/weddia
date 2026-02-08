@@ -110,22 +110,16 @@ const EventList = () => {
       key: "budget",
       width: 220,
       render: (_: unknown, record: EventCardProps) => {
-        if (!record.budget) return <span style={{ color: "#999" }}>—</span>;
+        if (!record.budget)
+          return <span className={styles["mutedText"]}>—</span>;
         const spent = record.spent ?? 0;
         const remaining = record.budget - spent;
         const percentage = Math.round((spent / record.budget) * 100);
         const isOverBudget = spent > record.budget;
 
         return (
-          <div style={{ minWidth: 180 }}>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                marginBottom: 4,
-                fontSize: 12,
-              }}
-            >
+          <div className={styles["budgetContainer"]}>
+            <div className={styles["budgetRow"]}>
               <Tooltip title="Total Budget">
                 <span>
                   <DollarOutlined /> {formatCurrency(record.budget)}
@@ -140,7 +134,7 @@ const EventList = () => {
                         ? "orange"
                         : "green"
                   }
-                  style={{ margin: 0 }}
+                  className={styles["tagNoMargin"]}
                 >
                   {isOverBudget
                     ? `-${formatCurrency(Math.abs(remaining))}`
@@ -160,14 +154,14 @@ const EventList = () => {
               }
               strokeColor={
                 isOverBudget
-                  ? "#ff4d4f"
+                  ? "var(--status-canceled)"
                   : percentage >= 90
-                    ? "#faad14"
-                    : "#52c41a"
+                    ? "var(--status-delayed)"
+                    : "var(--status-completed)"
               }
               format={() => `${percentage}%`}
             />
-            <div style={{ fontSize: 11, color: "#666", marginTop: 2 }}>
+            <div className={styles["spentText"]}>
               Spent: {formatCurrency(spent)}
             </div>
           </div>
@@ -230,20 +224,20 @@ const EventList = () => {
             <Input />
           </Form.Item>
           <Form.Item name="invites" label="Invites">
-            <InputNumber style={{ width: "100%" }} />
+            <InputNumber className={styles["formFullWidth"]} />
           </Form.Item>
           <Form.Item name="rsvp" label="RSVP">
-            <InputNumber style={{ width: "100%" }} />
+            <InputNumber className={styles["formFullWidth"]} />
           </Form.Item>
           <Form.Item name="tasks" label="Tasks">
-            <InputNumber style={{ width: "100%" }} />
+            <InputNumber className={styles["formFullWidth"]} />
           </Form.Item>
           <Form.Item name="sits" label="Sits">
-            <InputNumber style={{ width: "100%" }} />
+            <InputNumber className={styles["formFullWidth"]} />
           </Form.Item>
           <Form.Item name="budget" label="Budget ($)">
             <InputNumber
-              style={{ width: "100%" }}
+              className="u-full-width"
               min={0}
               formatter={(value) =>
                 `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
@@ -255,7 +249,7 @@ const EventList = () => {
           </Form.Item>
           <Form.Item name="spent" label="Spent ($)">
             <InputNumber
-              style={{ width: "100%" }}
+              className="u-full-width"
               min={0}
               formatter={(value) =>
                 `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
@@ -283,9 +277,7 @@ const EventList = () => {
           </Form.Item>
 
           <Form.Item>
-            <div
-              style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}
-            >
+            <div className={styles["formActions"]}>
               <Button onClick={handleCancel}>Cancel</Button>
               <Button type="primary" htmlType="submit">
                 Save

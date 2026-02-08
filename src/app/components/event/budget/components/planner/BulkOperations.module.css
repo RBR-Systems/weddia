@@ -1,0 +1,7 @@
+.fullWidth {
+  width: 100%;
+}
+
+.bulkTable {
+  margin-top: var(--spacing-md);
+}

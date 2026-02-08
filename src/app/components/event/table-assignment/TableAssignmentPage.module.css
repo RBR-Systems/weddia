@@ -1,7 +1,7 @@
 .page {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--spacing-ms);
   width: 100%;
 }
 
@@ -9,13 +9,13 @@
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  gap: 12px;
+  gap: var(--spacing-ms);
 }
 
 .headerLeft {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--spacing-xs);
 }
 
 .title {
@@ -24,7 +24,7 @@
 
 .contentGrid {
   display: flex;
-  gap: 12px;
+  gap: var(--spacing-ms);
   min-height: 560px;
   align-items: stretch;
 }
@@ -57,8 +57,8 @@
   min-height: 0;
 
   background-image:
-    linear-gradient(0deg, rgba(0, 0, 0, 0.1) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 0, 0, 0.1) 1px, transparent 1px);
+    linear-gradient(0deg, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
   background-size: var(--grid-size) var(--grid-size);
   --grid-size: 20px;
 
@@ -68,16 +68,16 @@
     center center;
   background-repeat: repeat, repeat, no-repeat;
 
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   overflow: auto;
 }
 
 .tableTile {
   position: absolute;
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--tile-border);
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.9),
+    var(--tile-bg-from),
     var(--primary-background)
   );
   cursor: grab;
@@ -87,7 +87,7 @@
     box-shadow 120ms ease;
   pointer-events: auto;
   z-index: 1;
-  padding: 10px;
+  padding: var(--spacing-sm);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -99,18 +99,18 @@
 
 .tableTile:hover {
   transform: translateY(-1px);
-  border-color: rgba(0, 0, 0, 0.18);
-  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.12);
+  border-color: var(--tile-hover-border);
+  box-shadow: var(--tile-hover-shadow);
 }
 
 .tableTileSelected {
-  border-color: rgba(92, 107, 192, 0.9);
-  box-shadow: 0 12px 36px rgba(92, 107, 192, 0.18);
+  border-color: var(--tile-selected-border);
+  box-shadow: var(--tile-selected-shadow);
 }
 
 .tableTileOver {
-  border-color: rgba(60, 150, 90, 0.9);
-  box-shadow: 0 12px 28px rgba(60, 150, 90, 0.18);
+  border-color: var(--tile-over-border);
+  box-shadow: var(--tile-over-shadow);
 }
 
 /* === SHAPES === */
@@ -124,19 +124,19 @@
 .tableSquare {
   width: 120px;
   height: 120px;
-  border-radius: 10px;
+  border-radius: var(--radius-lg);
 }
 
 .tableRectangular {
   width: 180px;
   height: 100px;
-  border-radius: 10px;
+  border-radius: var(--radius-lg);
 }
 
 .tableRound .tableTileHeader {
   justify-content: center;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--spacing-xs);
 }
 
 .tableRound .tableMeta {
@@ -147,7 +147,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  gap: var(--spacing-sm);
   align-items: center;
 }
 
@@ -158,18 +158,18 @@
 }
 
 .occupancyBadge :global(.ant-badge-count) {
-  font-size: 12px;
-  font-weight: 700;
+  font-size: var(--fs-xs);
+  font-weight: var(--bold-font);
   min-width: 44px;
   height: 28px;
-  padding: 0 8px;
+  padding: 0 var(--spacing-sm);
   border-radius: 14px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow-sm);
 }
 
 .tableMeta {
   display: inline-block;
-  margin-top: 6px;
+  margin-top: var(--spacing-xs);
 }
 
 .shapeIcon {
@@ -178,8 +178,8 @@
   height: 22px;
   align-items: center;
   justify-content: center;
-  border-radius: 6px;
-  background: rgba(0, 0, 0, 0.04);
+  border-radius: var(--radius-sm);
+  background: var(--subtle-bg);
 }
 
 .shapeIconLarge {
@@ -188,8 +188,8 @@
   height: 34px;
   align-items: center;
   justify-content: center;
-  border-radius: 10px;
-  background: rgba(0, 0, 0, 0.04);
+  border-radius: var(--radius-lg);
+  background: var(--subtle-bg);
 }
 
 /* (rest unchanged) */
@@ -198,20 +198,20 @@
 }
 
 .sideTop {
-  margin-bottom: 10px;
+  margin-bottom: var(--spacing-sm);
 }
 
 .sideBody {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--spacing-ms);
   height: calc(100% - 44px);
 }
 
 .sideList {
   flex: 1;
   overflow: auto;
-  padding-right: 4px;
+  padding-right: var(--spacing-xs);
 }
 
 .guestRow :global(.ant-list-item-meta-title) {
@@ -219,21 +219,20 @@
 }
 
 .unassignedDropZone {
-  border: 1px dashed rgba(0, 0, 0, 0.18);
-  border-radius: 10px;
-  padding: 12px;
-  background: rgba(0, 0, 0, 0.02);
-  padding: 10px;
+  border: 1px dashed var(--tile-hover-border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-sm);
+  background: var(--subtle-bg-hover);
 }
 
 .dropZoneOver {
-  border-color: rgba(92, 107, 192, 0.9);
-  background: rgba(92, 107, 192, 0.08);
+  border-color: var(--tile-selected-border);
+  background: var(--status-in-progress-bg);
 }
 
 .dropZoneHint {
   display: inline-block;
-  margin-top: 6px;
+  margin-top: var(--spacing-xs);
 }
 
 .draggableGuest {
@@ -249,17 +248,17 @@
 }
 
 .dragOverlay {
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 10px;
-  padding: 10px 12px;
+  border: 1px solid var(--tile-border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-sm) var(--spacing-ms);
   background: var(--primary-background);
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+  box-shadow: var(--shadow-lg);
   z-index: 2000;
   pointer-events: none;
 }
 
 .tableDetailsHeader {
-  padding: 8px 8px 0 8px;
+  padding: var(--spacing-sm) var(--spacing-sm) 0 var(--spacing-sm);
 }
 
 .tableTitle {
@@ -281,7 +280,7 @@
   min-height: 560px;
   display: flex;
   flex-direction: row;
-  gap: 24px;
+  gap: var(--spacing-lg);
 }
 
 .canvasWrapper {
@@ -298,27 +297,27 @@
 .zoomControls {
   display: flex;
   justify-content: flex-end;
-  gap: 8px;
-  margin-bottom: 8px;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
 }
 
 .floatButtonFixed {
-  right: 32px;
-  bottom: 32px;
+  right: var(--spacing-xl);
+  bottom: var(--spacing-xl);
   z-index: 1000;
 }
 
 .aiChatContainer {
   position: fixed;
-  right: 32px;
+  right: var(--spacing-xl);
   bottom: 96px;
   z-index: 1100;
   width: 400px;
   max-width: 90vw;
   height: 520px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.18);
-  border-radius: 12px;
-  background: #fff;
+  box-shadow: var(--shadow-xl);
+  border-radius: var(--radius-lg);
+  background: var(--card-background);
   display: flex;
   flex-direction: column;
 }
@@ -327,17 +326,17 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px;
-  border-bottom: 1px solid #f0f0f0;
+  padding: var(--spacing-ms);
+  border-bottom: 1px solid var(--divider-light);
 }
 
 .aiChatTitle {
-  font-weight: 600;
-  font-size: 16px;
+  font-weight: var(--bold-font);
+  font-size: var(--fs-lg);
 }
 
 .aiChatIcon {
-  margin-right: 8px;
+  margin-right: var(--spacing-sm);
 }
 
 .aiChatContent {
@@ -345,4 +344,8 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
+}
+
+.tagSpacing {
+  margin-left: var(--spacing-xs);
 }

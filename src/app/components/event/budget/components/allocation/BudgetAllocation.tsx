@@ -13,9 +13,11 @@ import {
   Divider,
   Alert,
 } from "antd";
+import Statistic from "@/app/common/AnimatedStatistic/AnimatedStatistic";
 import { useBudget } from "../../contexts/BudgetContext";
 import { formatCurrency } from "@/utils/formatters";
 import type { Category } from "../../types/budget.types";
+import styles from "./BudgetAllocation.module.css";
 
 const { Title, Text } = Typography;
 
@@ -61,31 +63,29 @@ export default function BudgetAllocation() {
         <Col xs={24} md={8}>
           <Card size="small">
             <Title level={5}>Total Budget</Title>
-            <Title level={3} style={{ margin: 0 }}>
-              {formatCurrency(totalBudget, state.currency)}
-            </Title>
+              <Statistic
+                value={totalBudget}
+                formatter={(v) => formatCurrency(Number(v), state.currency)}
+              />
           </Card>
         </Col>
         <Col xs={24} md={8}>
           <Card size="small">
             <Title level={5}>Allocated</Title>
-            <Title level={3} style={{ margin: 0, color: "#1890ff" }}>
-              {formatCurrency(totalAllocated, state.currency)}
-            </Title>
+              <Statistic
+                value={totalAllocated}
+                formatter={(v) => formatCurrency(Number(v), state.currency)}
+              />
           </Card>
         </Col>
         <Col xs={24} md={8}>
           <Card size="small">
             <Title level={5}>Unallocated</Title>
-            <Title
-              level={3}
-              style={{
-                margin: 0,
-                color: unallocated < 0 ? "#ff4d4f" : "#52c41a",
-              }}
-            >
-              {formatCurrency(unallocated, state.currency)}
-            </Title>
+              <Statistic
+                value={unallocated}
+                formatter={(v) => formatCurrency(Number(v), state.currency)}
+                valueStyle={unallocated < 0 ? { color: 'var(--danger)' } : undefined}
+              />
           </Card>
         </Col>
       </Row>
@@ -96,13 +96,13 @@ export default function BudgetAllocation() {
           description={`You've allocated ${formatCurrency(Math.abs(unallocated), state.currency)} more than your total budget.`}
           type="warning"
           showIcon
-          style={{ marginTop: 16 }}
+          className={styles.overAllocatedAlert}
         />
       )}
 
       <Divider />
 
-      <Space direction="vertical" style={{ width: "100%" }} size="large">
+      <Space direction="vertical" className={styles.fullWidth} size="large">
         {state.categories.map((category: Category) => {
           const allocated = category.allocated ?? 0;
           const percentage =
@@ -110,26 +110,17 @@ export default function BudgetAllocation() {
 
           return (
             <div key={category.id}>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  marginBottom: 8,
-                }}
-              >
+              <div className={styles.categoryRow}>
                 <Space>
                   <span
-                    style={{
-                      width: 12,
-                      height: 12,
-                      borderRadius: "50%",
-                      backgroundColor: category.color || "#1890ff",
-                      display: "inline-block",
-                    }}
+                    className={styles.categoryDot}
+                    style={{ backgroundColor: category.color || "var(--status-in-progress)" }}
                   />
                   <Text strong>{category.name}</Text>
                 </Space>
-                <Text type="secondary">{percentage}% of budget</Text>
+                <Text type="secondary">
+                  <Statistic value={percentage} suffix="%" /> of budget
+                </Text>
               </div>
               <Row gutter={16} align="middle">
                 <Col flex="auto">
@@ -140,9 +131,9 @@ export default function BudgetAllocation() {
                     value={allocated}
                     onChange={(value) => handleSliderChange(category.id, value)}
                     trackStyle={{
-                      backgroundColor: category.color || "#1890ff",
+                      backgroundColor: category.color || "var(--status-in-progress)",
                     }}
-                    handleStyle={{ borderColor: category.color || "#1890ff" }}
+                    handleStyle={{ borderColor: category.color || "var(--status-in-progress)" }}
                   />
                 </Col>
                 <Col flex="150px">
@@ -158,23 +149,17 @@ export default function BudgetAllocation() {
                     parser={(value) =>
                       Number(value?.replace(/\$\s?|(,*)/g, "") || 0)
                     }
-                    style={{ width: "100%" }}
+                    className="u-full-width"
                   />
                 </Col>
               </Row>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  marginTop: 4,
-                }}
-              >
-                <Text type="secondary" style={{ fontSize: 12 }}>
+              <div className={styles.categoryFooter}>
+                <Text type="secondary" className={styles.smallText}>
                   Spent: {formatCurrency(category.spent, state.currency)}
                 </Text>
                 <Text
                   type={allocated - category.spent < 0 ? "danger" : "secondary"}
-                  style={{ fontSize: 12 }}
+                  className={styles.smallText}
                 >
                   Remaining:{" "}
                   {formatCurrency(allocated - category.spent, state.currency)}

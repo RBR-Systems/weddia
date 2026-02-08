@@ -1,11 +1,18 @@
 import React from "react";
-import styles from "./card.module.css";
-const Card = ({ children }: { children: React.ReactNode }) => {
+import { Card as AntdCard } from "antd";
+import type { CardProps as AntdCardProps } from "antd";
+
+type Props = AntdCardProps & {
+  children: React.ReactNode;
+};
+
+const Card = ({ children, title, className, ...rest }: Props) => {
+  const renderedTitle = title !== undefined ? title : undefined;
+
   return (
-    <div className={styles["card"]}>
-      <p className={styles["header"]}>Header</p>
+    <AntdCard className={className} title={renderedTitle} {...(rest as AntdCardProps)}>
       <div>{children}</div>
-    </div>
+    </AntdCard>
   );
 };
 

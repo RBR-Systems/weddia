@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useMemo } from "react";
 import {
-  Card,
+  App,
   Table,
   Button,
   Input,
@@ -11,10 +11,8 @@ import {
   Typography,
   Row,
   Col,
-  Statistic,
   Modal,
   Form,
-  message,
 } from "antd";
 import {
   PlusOutlined,
@@ -23,6 +21,9 @@ import {
   MailOutlined,
   EyeOutlined,
 } from "@ant-design/icons";
+import Card from "@/app/common/Card/card";
+import Statistic from "@/app/common/AnimatedStatistic/AnimatedStatistic";
+import styles from "./vendor-list.module.css";
 import type { ColumnsType } from "antd/es/table";
 import { useBudget } from "../../contexts/BudgetContext";
 import { formatCurrency } from "@/utils/formatters";
@@ -47,6 +48,7 @@ interface VendorListProps {
 }
 
 export default function VendorList({ onViewVendor }: VendorListProps) {
+  const { message } = App.useApp();
   const { state } = useBudget();
   const [searchTerm, setSearchTerm] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
@@ -99,14 +101,11 @@ export default function VendorList({ onViewVendor }: VendorListProps) {
       key: "vendor",
       render: (_, record) => (
         <Space>
-          <Avatar
-            style={{ backgroundColor: "#1890ff" }}
-            icon={<ShopOutlined />}
-          />
+          <Avatar className={styles["avatarBlue"]} icon={<ShopOutlined />} />
           <div>
             <Text strong>{record.name}</Text>
             <br />
-            <Text type="secondary" style={{ fontSize: 12 }}>
+            <Text type="secondary" className={styles["smallText"]}>
               {record.category}
             </Text>
           </div>
@@ -119,12 +118,12 @@ export default function VendorList({ onViewVendor }: VendorListProps) {
       render: (_, record) => (
         <Space direction="vertical" size={0}>
           {record.email && (
-            <Text style={{ fontSize: 12 }}>
+            <Text className={styles["smallText"]}>
               <MailOutlined /> {record.email}
             </Text>
           )}
           {record.phone && (
-            <Text style={{ fontSize: 12 }}>
+            <Text className={styles["smallText"]}>
               <PhoneOutlined /> {record.phone}
             </Text>
           )}
@@ -183,7 +182,7 @@ export default function VendorList({ onViewVendor }: VendorListProps) {
 
   return (
     <>
-      <Row gutter={16} style={{ marginBottom: 16 }}>
+      <Row gutter={16} className={styles["rowSpacing"]}>
         <Col xs={24} sm={8}>
           <Card size="small">
             <Statistic title="Total Vendors" value={vendors.length} />
@@ -219,7 +218,7 @@ export default function VendorList({ onViewVendor }: VendorListProps) {
               allowClear
               onSearch={setSearchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              style={{ width: 200 }}
+              className={styles["searchWidth"]}
             />
             <Button
               type="primary"

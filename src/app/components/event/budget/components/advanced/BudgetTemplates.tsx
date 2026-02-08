@@ -25,6 +25,9 @@ import {
 import { useBudget } from "../../contexts/BudgetContext";
 import { formatCurrency } from "@/utils/formatters";
 import type { Category } from "../../types/budget.types";
+import CategoryTag from "../shared/CategoryTag";
+import { CHART_COLORS, resolveChartColor } from "@/theme/chartColors";
+import { useTheme } from "@/theme/ThemeProvider";
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -48,13 +51,13 @@ const DEFAULT_TEMPLATES: BudgetTemplate[] = [
     description: "Traditional wedding budget allocation",
     total_budget: 30000,
     categories: [
-      { name: "Venue", percentage: 40, color: "#1890ff" },
-      { name: "Catering", percentage: 25, color: "#52c41a" },
-      { name: "Photography", percentage: 10, color: "#722ed1" },
-      { name: "Flowers", percentage: 8, color: "#eb2f96" },
-      { name: "Music", percentage: 7, color: "#fa8c16" },
-      { name: "Attire", percentage: 5, color: "#13c2c2" },
-      { name: "Other", percentage: 5, color: "#d9d9d9" },
+      { name: "Venue", percentage: 40, color: CHART_COLORS.light[0] },
+      { name: "Catering", percentage: 25, color: CHART_COLORS.light[1] },
+      { name: "Photography", percentage: 10, color: CHART_COLORS.light[4] },
+      { name: "Flowers", percentage: 8, color: CHART_COLORS.light[7] },
+      { name: "Music", percentage: 7, color: CHART_COLORS.light[6] },
+      { name: "Attire", percentage: 5, color: CHART_COLORS.light[5] },
+      { name: "Other", percentage: 5, color: CHART_COLORS.light[11] },
     ],
     created_at: "2026-01-01",
   },
@@ -64,11 +67,11 @@ const DEFAULT_TEMPLATES: BudgetTemplate[] = [
     description: "Smaller guest list, higher quality focus",
     total_budget: 15000,
     categories: [
-      { name: "Venue & Catering", percentage: 50, color: "#1890ff" },
-      { name: "Photography", percentage: 15, color: "#722ed1" },
-      { name: "Flowers & Decor", percentage: 15, color: "#eb2f96" },
-      { name: "Attire", percentage: 10, color: "#13c2c2" },
-      { name: "Music", percentage: 10, color: "#fa8c16" },
+      { name: "Venue & Catering", percentage: 50, color: CHART_COLORS.light[0] },
+      { name: "Photography", percentage: 15, color: CHART_COLORS.light[4] },
+      { name: "Flowers & Decor", percentage: 15, color: CHART_COLORS.light[7] },
+      { name: "Attire", percentage: 10, color: CHART_COLORS.light[5] },
+      { name: "Music", percentage: 10, color: CHART_COLORS.light[6] },
     ],
     created_at: "2026-01-01",
   },
@@ -78,15 +81,15 @@ const DEFAULT_TEMPLATES: BudgetTemplate[] = [
     description: "Premium vendors and full-service planning",
     total_budget: 100000,
     categories: [
-      { name: "Venue", percentage: 30, color: "#1890ff" },
-      { name: "Catering & Bar", percentage: 20, color: "#52c41a" },
-      { name: "Photography & Video", percentage: 12, color: "#722ed1" },
-      { name: "Flowers & Decor", percentage: 12, color: "#eb2f96" },
-      { name: "Entertainment", percentage: 10, color: "#fa8c16" },
-      { name: "Attire & Beauty", percentage: 8, color: "#13c2c2" },
-      { name: "Stationery", percentage: 3, color: "#faad14" },
-      { name: "Transportation", percentage: 3, color: "#2f54eb" },
-      { name: "Miscellaneous", percentage: 2, color: "#d9d9d9" },
+      { name: "Venue", percentage: 30, color: CHART_COLORS.light[0] },
+      { name: "Catering & Bar", percentage: 20, color: CHART_COLORS.light[1] },
+      { name: "Photography & Video", percentage: 12, color: CHART_COLORS.light[4] },
+      { name: "Flowers & Decor", percentage: 12, color: CHART_COLORS.light[7] },
+      { name: "Entertainment", percentage: 10, color: CHART_COLORS.light[6] },
+      { name: "Attire & Beauty", percentage: 8, color: CHART_COLORS.light[5] },
+      { name: "Stationery", percentage: 3, color: CHART_COLORS.light[2] },
+      { name: "Transportation", percentage: 3, color: CHART_COLORS.light[9] },
+      { name: "Miscellaneous", percentage: 2, color: CHART_COLORS.light[11] },
     ],
     created_at: "2026-01-01",
   },
@@ -94,6 +97,7 @@ const DEFAULT_TEMPLATES: BudgetTemplate[] = [
 
 export default function BudgetTemplates() {
   const { state, loadTemplate } = useBudget();
+  const { mode } = useTheme();
   const [templates, setTemplates] =
     useState<BudgetTemplate[]>(DEFAULT_TEMPLATES);
   const [saveModalOpen, setSaveModalOpen] = useState(false);
@@ -116,7 +120,7 @@ export default function BudgetTemplates() {
             state.summary?.total_budget && state.summary.total_budget > 0
               ? Math.round((c.allocated / state.summary.total_budget) * 100)
               : 0,
-          color: c.color || "#1890ff",
+          color: c.color || CHART_COLORS[mode][0],
         })),
         created_at: new Date().toISOString(),
       };
@@ -216,15 +220,22 @@ export default function BudgetTemplates() {
                     • {template.categories.length} categories
                   </Text>
                 </div>
-                <div style={{ marginTop: 8 }}>
+                <div
+                  style={{
+                    marginTop: 8,
+                    gap: 6,
+                    display: "flex",
+                    flexWrap: "wrap",
+                  }}
+                >
                   {template.categories.slice(0, 3).map((cat, idx) => (
-                    <Tag
+                    <CategoryTag
                       key={idx}
-                      color={cat.color}
+                      color={resolveChartColor(cat.color, mode)}
                       style={{ marginBottom: 4 }}
                     >
                       {cat.name} ({cat.percentage}%)
-                    </Tag>
+                    </CategoryTag>
                   ))}
                   {template.categories.length > 3 && (
                     <Tag>+{template.categories.length - 3} more</Tag>
@@ -267,7 +278,7 @@ export default function BudgetTemplates() {
             dataSource={state.categories}
             renderItem={(cat: Category) => (
               <List.Item>
-                <Tag color={cat.color}>{cat.name}</Tag>
+                <CategoryTag color={cat.color}>{cat.name}</CategoryTag>
                 <Text>
                   {state.summary?.total_budget && state.summary.total_budget > 0
                     ? Math.round(
@@ -305,7 +316,7 @@ export default function BudgetTemplates() {
               dataSource={previewTemplate.categories}
               renderItem={(cat) => (
                 <List.Item>
-                  <Tag color={cat.color}>{cat.name}</Tag>
+                  <CategoryTag color={resolveChartColor(cat.color, mode)}>{cat.name}</CategoryTag>
                   <Text>{cat.percentage}%</Text>
                   <Text type="secondary" style={{ marginLeft: 8 }}>
                     (

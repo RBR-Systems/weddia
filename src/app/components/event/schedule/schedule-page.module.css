@@ -1,0 +1,89 @@
+.scheduleHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-ms);
+}
+
+.scheduleTitle {
+  margin: 0;
+}
+
+.timelineContainer {
+  position: relative;
+}
+
+.emptyMarginTop {
+  margin-top: var(--spacing-lg);
+}
+
+/* Adjust Modal styles */
+.modalSection {
+  margin-bottom: var(--spacing-ms);
+}
+
+.modalSectionLabel {
+  margin-bottom: var(--spacing-sm);
+}
+
+.radioIconMargin {
+  margin-right: var(--spacing-sm);
+}
+
+.radioSpacing {
+  margin-left: var(--spacing-sm);
+}
+
+.quickMinuteWrap {
+  margin-top: var(--spacing-sm);
+}
+
+.quickMinuteBtn {
+  margin-right: var(--spacing-sm);
+  margin-top: 6px;
+}
+
+.fullWidth {
+  width: 100%;
+}
+
+.previewHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.previewCount {
+  color: var(--text-color-secondary);
+}
+
+.previewListItem {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.previewTimeShift {
+  color: var(--text-color-secondary);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.modalFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-sm);
+}
+
+.deleteModalTime {
+  margin-bottom: var(--spacing-sm);
+}
+
+.deleteModalGap {
+  margin-bottom: var(--spacing-sm);
+}
+
+.deleteModalCascade {
+  margin-top: var(--spacing-sm);
+}

@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useMemo } from "react";
 import {
-  Card,
+  App,
   Table,
   Tag,
   Button,
@@ -10,8 +10,6 @@ import {
   Modal,
   Form,
   DatePicker,
-  message,
-  Statistic,
   Row,
   Col,
   Typography,
@@ -21,16 +19,20 @@ import {
   ClockCircleOutlined,
   ExclamationCircleOutlined,
 } from "@ant-design/icons";
+import Card from "@/app/common/Card/card";
 import type { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
 import { useBudget } from "../../contexts/BudgetContext";
 import { formatCurrency, formatDate } from "@/utils/formatters";
 import { PAYMENT_STATUS } from "../../constants/budget.constants";
 import type { Expense, PaymentStatus } from "../../types/budget.types";
+import payStyles from "./PaymentStatus.module.css";
 
 const { Text } = Typography;
+import Statistic from "@/app/common/AnimatedStatistic/AnimatedStatistic";
 
 export default function PaymentStatusManager() {
+  const { message } = App.useApp();
   const { state, updateExpense } = useBudget();
   const [statusFilter, setStatusFilter] = useState<PaymentStatus | "all">(
     "all",
@@ -91,7 +93,7 @@ export default function PaymentStatusManager() {
         <div>
           <Text strong>{text}</Text>
           <br />
-          <Text type="secondary" style={{ fontSize: 12 }}>
+          <Text type="secondary" className={payStyles.smallText}>
             {record.vendor_name || "No vendor"}
           </Text>
         </div>
@@ -126,12 +128,12 @@ export default function PaymentStatusManager() {
         return (
           <Select
             value={status}
-            style={{ width: 120 }}
+            className={payStyles.statusSelectWidth}
             onChange={(value) => handleStatusChange(record, value)}
             options={Object.values(PAYMENT_STATUS).map((s) => ({
               value: s.value,
               label: (
-                <Tag color={s.color} style={{ margin: 0 }}>
+                <Tag color={s.color} className={payStyles.tagNoMargin}>
                   {s.label}
                 </Tag>
               ),
@@ -159,13 +161,13 @@ export default function PaymentStatusManager() {
 
   return (
     <>
-      <Row gutter={16} style={{ marginBottom: 16 }}>
+      <Row gutter={16} className={payStyles.statsRow}>
         <Col xs={24} sm={8}>
           <Card size="small">
             <Statistic
               title="Paid"
               value={paidTotal}
-              valueStyle={{ color: "#52c41a" }}
+              className={payStyles.paidValue}
               prefix={<CheckCircleOutlined />}
               formatter={(value) =>
                 formatCurrency(Number(value), state.currency)
@@ -178,7 +180,7 @@ export default function PaymentStatusManager() {
             <Statistic
               title="Pending"
               value={pendingTotal}
-              valueStyle={{ color: "#faad14" }}
+              className={payStyles.pendingValue}
               prefix={<ClockCircleOutlined />}
               formatter={(value) =>
                 formatCurrency(Number(value), state.currency)
@@ -191,7 +193,7 @@ export default function PaymentStatusManager() {
             <Statistic
               title="Overdue"
               value={overdueTotal}
-              valueStyle={{ color: "#ff4d4f" }}
+              className={payStyles.overdueValue}
               prefix={<ExclamationCircleOutlined />}
               formatter={(value) =>
                 formatCurrency(Number(value), state.currency)
@@ -206,7 +208,7 @@ export default function PaymentStatusManager() {
         extra={
           <Select
             value={statusFilter}
-            style={{ width: 150 }}
+            className="u-full-width"
             onChange={setStatusFilter}
             options={[
               { value: "all", label: "All Statuses" },
@@ -238,7 +240,7 @@ export default function PaymentStatusManager() {
         okText="Confirm Payment"
       >
         {markPaidModal && (
-          <Space direction="vertical" style={{ width: "100%" }}>
+          <Space direction="vertical" className={payStyles.fullWidth}>
             <div>
               <Text type="secondary">Expense:</Text>
               <div>
@@ -248,7 +250,7 @@ export default function PaymentStatusManager() {
             <div>
               <Text type="secondary">Amount:</Text>
               <div>
-                <Text strong style={{ fontSize: 18, color: "#1890ff" }}>
+                <Text strong className={payStyles.confirmAmount}>
                   {formatCurrency(markPaidModal.amount, state.currency)}
                 </Text>
               </div>
@@ -260,7 +262,7 @@ export default function PaymentStatusManager() {
                 initialValue={dayjs()}
                 rules={[{ required: true }]}
               >
-                <DatePicker style={{ width: "100%" }} />
+                <DatePicker className="u-full-width" />
               </Form.Item>
             </Form>
           </Space>

@@ -1,33 +1,33 @@
 .container {
   max-width: 1000px;
   margin: 0 auto;
-  padding: 16px;
+  padding: var(--spacing-md);
 }
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 12px;
+  margin-bottom: var(--spacing-ms);
 }
 .list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--spacing-ms);
 }
 .item {
   display: flex;
-  gap: 12px;
-  padding: 12px;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  gap: var(--spacing-ms);
+  padding: var(--spacing-ms);
+  background: var(--card-background);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-xs);
   cursor: pointer;
 }
 .timeCol {
   width: 90px;
   flex-shrink: 0;
-  color: #333;
-  font-weight: 600;
+  color: var(--text-color);
+  font-weight: var(--bold-font);
 }
 .content {
   flex: 1;
@@ -35,23 +35,23 @@
 .titleRow {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 6px;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-xs);
 }
 .typeBadge {
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 12px;
-  background: #eee;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-xs);
+  background: var(--secondary-background);
 }
 .meta {
-  font-size: 13px;
-  color: #666;
+  font-size: var(--fs-sm);
+  color: var(--text-color-secondary);
 }
 .expanded {
-  margin-top: 8px;
-  padding-top: 8px;
-  border-top: 1px dashed #eee;
+  margin-top: var(--spacing-sm);
+  padding-top: var(--spacing-sm);
+  border-top: 1px dashed var(--divider-light);
 }
 
 @media (max-width: 480px) {

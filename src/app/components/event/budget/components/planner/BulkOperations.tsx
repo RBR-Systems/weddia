@@ -1,13 +1,13 @@
 "use client";
 import React, { useState } from "react";
 import {
+  App,
   Card,
   Row,
   Col,
   Upload,
   Button,
   Table,
-  message,
   Space,
   Modal,
   Select,
@@ -28,12 +28,15 @@ import {
 import type { UploadProps } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { useBudget } from "../../contexts/BudgetContext";
+import CategoryTag from "../shared/CategoryTag";
 import { formatCurrency, formatDate } from "@/utils/formatters";
 import type { Expense, PaymentStatus } from "../../types/budget.types";
+import bulkStyles from "./BulkOperations.module.css";
 
 const { Text, Paragraph, Title } = Typography;
 
 export default function BulkOperations() {
+  const { message } = App.useApp();
   const { state, deleteExpense, updateExpense } = useBudget();
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [bulkActionModal, setBulkActionModal] = useState<
@@ -202,7 +205,7 @@ export default function BulkOperations() {
       key: "category_id",
       render: (id: string) => {
         const cat = state.categories.find((c: { id: string }) => c.id === id);
-        return <Tag color={cat?.color}>{cat?.name || id}</Tag>;
+        return <CategoryTag color={cat?.color}>{cat?.name || id}</CategoryTag>;
       },
     },
     {
@@ -224,7 +227,7 @@ export default function BulkOperations() {
       <Row gutter={[16, 16]}>
         <Col xs={24} lg={12}>
           <Card title="Import Data">
-            <Space direction="vertical" style={{ width: "100%" }}>
+            <Space direction="vertical" className={bulkStyles.fullWidth}>
               <Alert
                 message="CSV Import"
                 description="Upload a CSV file with columns: Description, Amount, Category, Vendor, Date, Status"
@@ -267,7 +270,7 @@ export default function BulkOperations() {
 
         <Col xs={24} lg={12}>
           <Card title="Export Data">
-            <Space direction="vertical" style={{ width: "100%" }}>
+            <Space direction="vertical" className={bulkStyles.fullWidth}>
               <Button
                 icon={<DownloadOutlined />}
                 onClick={handleExportAll}
@@ -295,7 +298,7 @@ export default function BulkOperations() {
 
       <Card
         title="Bulk Operations"
-        style={{ marginTop: 16 }}
+        className={bulkStyles.bulkTable}
         extra={
           selectedRowKeys.length > 0 && (
             <Space>
@@ -339,12 +342,12 @@ export default function BulkOperations() {
         onOk={handleBulkStatusUpdate}
         onCancel={() => setBulkActionModal(null)}
       >
-        <Space direction="vertical" style={{ width: "100%" }}>
+        <Space direction="vertical" className={bulkStyles.fullWidth}>
           <Text>Update {selectedRowKeys.length} expenses to:</Text>
           <Select
             value={bulkStatus}
             onChange={setBulkStatus}
-            style={{ width: "100%" }}
+            className="u-full-width"
             options={[
               { value: "paid", label: "Paid" },
               { value: "pending", label: "Pending" },
@@ -362,12 +365,12 @@ export default function BulkOperations() {
         onOk={handleBulkCategoryUpdate}
         onCancel={() => setBulkActionModal(null)}
       >
-        <Space direction="vertical" style={{ width: "100%" }}>
+        <Space direction="vertical" className={bulkStyles.fullWidth}>
           <Text>Move {selectedRowKeys.length} expenses to:</Text>
           <Select
             value={bulkCategory}
             onChange={setBulkCategory}
-            style={{ width: "100%" }}
+            className="u-full-width"
             placeholder="Select category"
             options={state.categories.map(
               (c: { id: string; name: string }) => ({

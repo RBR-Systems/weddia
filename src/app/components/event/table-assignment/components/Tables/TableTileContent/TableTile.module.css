@@ -1,9 +1,9 @@
 .tableTile {
   position: absolute;
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--tile-border);
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.9),
+    var(--tile-bg-from),
     var(--primary-background)
   );
   cursor: grab;
@@ -13,7 +13,7 @@
     box-shadow 120ms ease;
   pointer-events: auto;
   z-index: 2;
-  padding: 10px;
+  padding: var(--spacing-sm);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -25,19 +25,19 @@
 
 .tableTile:hover {
   transform: translateY(-1px);
-  border-color: rgba(0, 0, 0, 0.18);
-  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.12);
+  border-color: var(--tile-hover-border);
+  box-shadow: var(--tile-hover-shadow);
 }
 
 .tableTileSelected {
-  border-color: rgba(92, 107, 192, 0.95);
-  box-shadow: 0 20px 48px rgba(92, 107, 192, 0.22);
+  border-color: var(--tile-selected-border);
+  box-shadow: var(--tile-selected-shadow);
   transform: translateY(-2px) scale(1.02);
 }
 
 .tableTileOver {
-  border-color: rgba(60, 150, 90, 0.9);
-  box-shadow: 0 12px 28px rgba(60, 150, 90, 0.18);
+  border-color: var(--tile-over-border);
+  box-shadow: var(--tile-over-shadow);
 }
 
 .tableRound {
@@ -50,19 +50,19 @@
 .tableSquare {
   width: 120px;
   height: 120px;
-  border-radius: 10px;
+  border-radius: var(--radius-lg);
 }
 
 .tableRectangular {
   width: 180px;
   height: 100px;
-  border-radius: 10px;
+  border-radius: var(--radius-lg);
 }
 
 .tableRound .tableTileHeader {
   justify-content: center;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--spacing-xs);
 }
 
 .tableRound .tableMeta {
@@ -73,7 +73,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  gap: var(--spacing-sm);
   align-items: center;
 }
 
@@ -84,18 +84,18 @@
 }
 
 .occupancyBadge :global(.ant-badge-count) {
-  font-size: 12px;
-  font-weight: 700;
+  font-size: var(--fs-xs);
+  font-weight: var(--bold-font);
   min-width: 44px;
   height: 28px;
-  padding: 0 8px;
+  padding: 0 var(--spacing-sm);
   border-radius: 14px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow-sm);
 }
 
 .tableMeta {
   display: inline-block;
-  margin-top: 6px;
+  margin-top: var(--spacing-xs);
 }
 
 .shapeIcon {
@@ -104,8 +104,8 @@
   height: 22px;
   align-items: center;
   justify-content: center;
-  border-radius: 6px;
-  background: rgba(0, 0, 0, 0.04);
+  border-radius: var(--radius-sm);
+  background: var(--subtle-bg);
 }
 
 .shapeIconLarge {
@@ -114,14 +114,14 @@
   height: 34px;
   align-items: center;
   justify-content: center;
-  border-radius: 10px;
-  background: rgba(0, 0, 0, 0.04);
+  border-radius: var(--radius-lg);
+  background: var(--subtle-bg);
 }
 
 .seatContainer {
   display: flex;
-  gap: 6px;
-  margin-top: 8px;
+  gap: var(--spacing-xs);
+  margin-top: var(--spacing-sm);
   justify-content: center;
   flex-wrap: wrap;
 }
@@ -133,42 +133,42 @@
   justify-content: center;
   min-width: 28px;
   height: 32px;
-  border-radius: 6px;
-  background: rgba(0, 0, 0, 0.03);
-  padding: 4px 6px;
-  font-size: 11px;
-  color: rgba(0, 0, 0, 0.7);
+  border-radius: var(--radius-sm);
+  background: var(--subtle-bg);
+  padding: var(--spacing-xs);
+  font-size: var(--fs-3xs);
+  color: var(--seat-text);
 }
 
 .seatOver {
-  background: rgba(60, 150, 90, 0.14);
-  box-shadow: 0 6px 18px rgba(60, 150, 90, 0.12);
+  background: var(--tile-over-border);
+  box-shadow: var(--tile-over-shadow);
 }
 
 .seatNumber {
-  font-weight: 700;
-  font-size: 11px;
+  font-weight: var(--bold-font);
+  font-size: var(--fs-3xs);
 }
 
 .seatName {
-  font-size: 10px;
-  color: rgba(0, 0, 0, 0.55);
+  font-size: var(--fs-3xs);
+  color: var(--seat-text-secondary);
 }
 
 .seatCompact {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: 8px;
-  font-size: 12px;
-  color: rgba(0, 0, 0, 0.65);
+  margin-top: var(--spacing-sm);
+  font-size: var(--fs-xs);
+  color: var(--seat-text);
   min-height: 28px;
 }
 
 .popoverSeats {
   display: flex;
-  gap: 6px;
-  padding: 8px;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm);
   flex-wrap: wrap;
   max-width: 260px;
 }

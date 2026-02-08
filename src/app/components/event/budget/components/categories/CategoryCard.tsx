@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
-import { Card, Progress, Typography, Space, Badge } from "antd";
+import { Progress, Typography, Space, Badge } from "antd";
+import Card from "@/app/common/Card/card";
 import {
   HomeOutlined,
   CoffeeOutlined,
@@ -13,6 +14,7 @@ import {
 } from "@ant-design/icons";
 import { formatCurrency } from "@/utils/formatters";
 import type { Category } from "../../types/budget.types";
+import styles from "./CategoryCard.module.css";
 
 const { Text, Title } = Typography;
 
@@ -50,37 +52,32 @@ export default function CategoryCard({
   };
 
   const getProgressColor = () => {
-    if (percentage >= 100) return "#ff4d4f";
-    if (percentage >= 80) return "#fa8c16";
-    return color || "#52c41a";
+    if (percentage >= 100) return "var(--status-canceled)";
+    if (percentage >= 80) return "var(--status-delayed)";
+    return color || "var(--status-completed)";
   };
 
   return (
     <Card
       hoverable
       onClick={() => onClick?.(category)}
-      style={{ borderLeft: `4px solid ${color || "#1890ff"}` }}
+      style={{
+        borderLeft: `4px solid ${color || "var(--status-in-progress)"}`,
+      }}
     >
-      <Space direction="vertical" style={{ width: "100%" }} size="small">
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
+      <Space direction="vertical" className={styles.fullWidth} size="small">
+        <div className={styles.cardHeader}>
           <Space>
-            <span style={{ color: color || "#1890ff", fontSize: 18 }}>
+            <span
+              className={styles.categoryIcon}
+              style={{ color: color || "var(--status-in-progress)" }}
+            >
               {ICON_MAP[category.id] || <ShopOutlined />}
             </span>
-            <Title level={5} style={{ margin: 0 }}>
+            <Title level={5} className={styles.categoryName}>
               {name}
             </Title>
           </Space>
-          <Badge
-            count={expense_count ?? 0}
-            style={{ backgroundColor: color || "#1890ff" }}
-          />
         </div>
 
         <Progress
@@ -90,29 +87,31 @@ export default function CategoryCard({
           size="small"
         />
 
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
+        <div className={styles.statsRow}>
           <div>
-            <Text type="secondary" style={{ fontSize: 12 }}>
+            <span className={styles.statLabel}>
               Spent
-            </Text>
+            </span>
             <div>
               <Text strong>{formatCurrency(spent, currency)}</Text>
             </div>
           </div>
-          <div style={{ textAlign: "center" }}>
-            <Text type="secondary" style={{ fontSize: 12 }}>
+          <div className={styles.statCenter}>
+            <span className={styles.statLabel}>
               Allocated
-            </Text>
+            </span>
             <div>
               <Text>{formatCurrency(allocated, currency)}</Text>
             </div>
           </div>
-          <div style={{ textAlign: "right" }}>
-            <Text type="secondary" style={{ fontSize: 12 }}>
+          <div className={styles.statRight}>
+            <span className={styles.statLabel}>
               Remaining
-            </Text>
+            </span>
             <div>
-              <Text type={remaining < 0 ? "danger" : "success"}>
+              <Text
+                style={{ color: remaining < 0 ? "var(--text-danger)" : "var(--text-success)" }}
+              >
                 {formatCurrency(remaining, currency)}
               </Text>
             </div>

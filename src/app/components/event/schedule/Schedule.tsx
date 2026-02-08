@@ -2,18 +2,17 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import {
+  App,
   Spin,
   Empty,
   Button,
   Space,
   Modal,
-  message,
   Radio,
   InputNumber,
   Select,
   List,
   Typography,
-  notification,
 } from "antd";
 import {
   ClockCircleOutlined,
@@ -33,8 +32,10 @@ import CurrentTimeIndicator from "./components/CurrentTimeIndicator/CurrentTimeI
 // import 'antd/dist/reset.css';
 
 import timelineData from "../../../../data/timeline-data.json";
+import pageStyles from "./schedule-page.module.css";
 
 const Schedule: React.FC = () => {
+  const { message, notification } = App.useApp();
   const [items, setItems] = useState<TimelineItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalVisible, setModalVisible] = useState(false);
@@ -559,7 +560,7 @@ const Schedule: React.FC = () => {
           style={{ marginTop: 24 }}
         />
       ) : (
-        <div ref={timelineContainerRef} style={{ position: "relative" }}>
+          <div ref={timelineContainerRef} className={pageStyles.timelineContainer}>
           <CurrentTimeIndicator
             ref={nowIndicatorRef}
             items={items}
@@ -584,29 +585,29 @@ const Schedule: React.FC = () => {
         onCancel={() => setAdjustModalOpen(false)}
         footer={null}
       >
-        <div style={{ marginBottom: 12 }}>
-          <div style={{ marginBottom: 8 }}>Timeline is running:</div>
+          <div className={pageStyles.modalSection}>
+            <div className={pageStyles.modalSectionLabel}>Timeline is running:</div>
           <Radio.Group
             value={direction}
             onChange={(e) => setDirection(e.target.value)}
           >
             <Radio value="behind">
-              <ClockCircleOutlined style={{ marginRight: 8 }} />
+              <ClockCircleOutlined className={pageStyles.radioIconMargin} />
               Behind Schedule
             </Radio>
-            <Radio value="ahead" style={{ marginLeft: 8 }}>
-              <ThunderboltOutlined style={{ marginRight: 8 }} />
+            <Radio value="ahead" className={pageStyles.radioSpacing}>
+              <ThunderboltOutlined className={pageStyles.radioIconMargin} />
               Ahead of Schedule
             </Radio>
-            <Radio value="on-time" style={{ marginLeft: 8 }}>
-              <CheckCircleOutlined style={{ marginRight: 8 }} />
+            <Radio value="on-time" className={pageStyles.radioSpacing}>
+              <CheckCircleOutlined className={pageStyles.radioIconMargin} />
               On Time (reset)
             </Radio>
           </Radio.Group>
         </div>
 
-        <div style={{ marginBottom: 12 }}>
-          <div style={{ marginBottom: 8 }}>Adjust by (minutes):</div>
+        <div className={pageStyles.modalSection}>
+          <div className={pageStyles.modalSectionLabel}>Adjust by (minutes):</div>
           <InputNumber
             min={0}
             max={180}
@@ -614,12 +615,12 @@ const Schedule: React.FC = () => {
             value={adjustmentMinutes ?? undefined}
             onChange={(v) => setAdjustmentMinutes(v as number)}
           />
-          <div style={{ marginTop: 8 }}>
+          <div className={pageStyles.quickMinuteWrap}>
             {[5, 10, 15, 20, 30, 45, 60].map((m) => (
               <Button
                 key={m}
                 size="small"
-                style={{ marginRight: 8, marginTop: 6 }}
+                className={pageStyles.quickMinuteBtn}
                 onClick={() => setAdjustmentMinutes(m)}
               >
                 {m} min
@@ -628,12 +629,12 @@ const Schedule: React.FC = () => {
           </div>
         </div>
 
-        <div style={{ marginBottom: 12 }}>
-          <div style={{ marginBottom: 8 }}>Apply to:</div>
+        <div className={pageStyles.modalSection}>
+          <div className={pageStyles.modalSectionLabel}>Apply to:</div>
           <Select
             value={applyFrom}
             onChange={(v) => setApplyFrom(v)}
-            style={{ width: "100%" }}
+            className={pageStyles.fullWidth}
           >
             <Select.Option value="all-remaining">
               All remaining activities
@@ -653,18 +654,12 @@ const Schedule: React.FC = () => {
           </Select>
         </div>
 
-        <div style={{ marginBottom: 12 }}>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
+        <div className={pageStyles.modalSection}>
+          <div className={pageStyles.previewHeader}>
             <div>
               <strong>Preview Changes</strong>
             </div>
-            <div style={{ color: "#666" }}>
+            <div className={pageStyles.previewCount}>
               {
                 getAffectedItems(
                   applyFrom === "specific" && selectedItemId
@@ -685,22 +680,9 @@ const Schedule: React.FC = () => {
             ).slice(0, 5)}
             renderItem={(item: any) => (
               <List.Item>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    width: "100%",
-                  }}
-                >
+                <div className={pageStyles.previewListItem}>
                   <div>{item.title}</div>
-                  <div
-                    style={{
-                      color: "#666",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 8,
-                    }}
-                  >
+                  <div className={pageStyles.previewTimeShift}>
                     {formatTime(item.start_time)} <RightOutlined />{" "}
                     {formatTime(
                       calculateNewTime(
@@ -716,7 +698,7 @@ const Schedule: React.FC = () => {
           />
         </div>
 
-        <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
+        <div className={pageStyles.modalFooter}>
           <Button onClick={() => setAdjustModalOpen(false)}>Cancel</Button>
           <Button
             type="primary"
@@ -739,13 +721,13 @@ const Schedule: React.FC = () => {
       >
         {deleteTarget && (
           <div>
-            <div style={{ marginBottom: 8 }}>
+            <div className={pageStyles.deleteModalTime}>
               {formatTime(deleteTarget.start_time)} -{" "}
               {formatTime(deleteTarget.end_time)}
             </div>
 
             {analyzeDeleteImpact(deleteTarget).hasGap && (
-              <div style={{ marginBottom: 8 }}>
+              <div className={pageStyles.deleteModalGap}>
                 This will create a gap of{" "}
                 {analyzeDeleteImpact(deleteTarget).gapDurationText} between "
                 {analyzeDeleteImpact(deleteTarget)?.previousItem?.title}" and "
@@ -754,7 +736,7 @@ const Schedule: React.FC = () => {
             )}
 
             {analyzeDeleteImpact(deleteTarget).canCascade && (
-              <div style={{ marginTop: 8 }}>
+              <div className={pageStyles.deleteModalCascade}>
                 <Checkbox
                   checked={shouldCascadeLocal}
                   onChange={(e) => setShouldCascadeLocal(e.target.checked)}

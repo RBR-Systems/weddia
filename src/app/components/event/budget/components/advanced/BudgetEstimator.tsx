@@ -13,12 +13,15 @@ import {
   List,
   Tag,
   Button,
-  Statistic,
   Alert,
 } from "antd";
 import { BulbOutlined, CalculatorOutlined } from "@ant-design/icons";
 import { useBudget } from "../../contexts/BudgetContext";
 import { formatCurrency } from "@/utils/formatters";
+import Statistic from "@/app/common/AnimatedStatistic/AnimatedStatistic";
+import CategoryTag from "../shared/CategoryTag";
+import { CHART_COLORS, SEMANTIC_CHART_COLORS, resolveChartColor } from "@/theme/chartColors";
+import { useTheme } from "@/theme/ThemeProvider";
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -33,61 +36,61 @@ const ESTIMATE_CATEGORIES: EstimateCategory[] = [
   {
     name: "Venue",
     percentage: 30,
-    color: "#1890ff",
+    color: CHART_COLORS.light[0], // Blue
     description: "Reception hall, ceremony site, rentals",
   },
   {
     name: "Catering & Bar",
     percentage: 25,
-    color: "#52c41a",
+    color: CHART_COLORS.light[1], // Green
     description: "Food, drinks, cake, service staff",
   },
   {
     name: "Photography & Video",
     percentage: 12,
-    color: "#722ed1",
+    color: CHART_COLORS.light[4], // Purple
     description: "Photographer, videographer, albums",
   },
   {
     name: "Flowers & Decor",
     percentage: 8,
-    color: "#eb2f96",
+    color: CHART_COLORS.light[7], // Pink
     description: "Bouquets, centerpieces, decorations",
   },
   {
     name: "Music & Entertainment",
     percentage: 7,
-    color: "#fa8c16",
+    color: CHART_COLORS.light[6], // Orange
     description: "DJ, band, lighting, games",
   },
   {
     name: "Attire & Beauty",
     percentage: 6,
-    color: "#13c2c2",
+    color: CHART_COLORS.light[5], // Cyan
     description: "Dress, suit, hair, makeup",
   },
   {
     name: "Stationery",
     percentage: 3,
-    color: "#faad14",
+    color: CHART_COLORS.light[2], // Amber
     description: "Invitations, programs, signage",
   },
   {
     name: "Transportation",
     percentage: 3,
-    color: "#2f54eb",
+    color: CHART_COLORS.light[9], // Indigo
     description: "Limo, shuttle, valet",
   },
   {
     name: "Favors & Gifts",
     percentage: 2,
-    color: "#a0d911",
+    color: CHART_COLORS.light[10], // Lime
     description: "Guest gifts, wedding party gifts",
   },
   {
     name: "Miscellaneous",
     percentage: 4,
-    color: "#d9d9d9",
+    color: CHART_COLORS.light[11], // Violet
     description: "Tips, insurance, unexpected costs",
   },
 ];
@@ -106,6 +109,8 @@ const STYLE_MULTIPLIERS: Record<
 
 export default function BudgetEstimator() {
   const { state, loadEstimate } = useBudget();
+  const { mode } = useTheme();
+  const semantic = SEMANTIC_CHART_COLORS[mode];
   const [guestCount, setGuestCount] = useState(100);
   const [weddingStyle, setWeddingStyle] = useState<WeddingStyle>("moderate");
   const [customBudget, setCustomBudget] = useState<number | null>(null);
@@ -119,9 +124,10 @@ export default function BudgetEstimator() {
   const categoryEstimates = useMemo(() => {
     return ESTIMATE_CATEGORIES.map((cat) => ({
       ...cat,
+      color: resolveChartColor(cat.color, mode),
       amount: Math.round((estimatedBudget * cat.percentage) / 100),
     }));
-  }, [estimatedBudget]);
+  }, [estimatedBudget, mode]);
 
   const handleApplyEstimate = () => {
     loadEstimate?.({
@@ -230,7 +236,10 @@ export default function BudgetEstimator() {
 
             <Card
               size="small"
-              style={{ backgroundColor: "#f6ffed", borderColor: "#b7eb8f" }}
+              style={{
+                backgroundColor: mode === "dark" ? "rgba(34, 197, 94, 0.08)" : "#F0FDF4",
+                borderColor: mode === "dark" ? "rgba(34, 197, 94, 0.25)" : "#BBF7D0",
+              }}
             >
               <Statistic
                 title="Estimated Total Budget"
@@ -238,7 +247,7 @@ export default function BudgetEstimator() {
                 formatter={(value) =>
                   formatCurrency(Number(value), state.currency)
                 }
-                valueStyle={{ color: "#52c41a", fontSize: 28 }}
+                valueStyle={{ color: semantic.success, fontSize: 28 }}
               />
               <Text type="secondary">
                 Based on {guestCount} guests ×{" "}
@@ -275,12 +284,12 @@ export default function BudgetEstimator() {
               <List.Item>
                 <List.Item.Meta
                   avatar={
-                    <Tag
+                    <CategoryTag
                       color={cat.color}
                       style={{ minWidth: 100, textAlign: "center" }}
                     >
                       {cat.percentage}%
-                    </Tag>
+                    </CategoryTag>
                   }
                   title={cat.name}
                   description={cat.description}

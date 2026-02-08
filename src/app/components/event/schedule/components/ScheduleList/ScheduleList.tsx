@@ -12,10 +12,6 @@ type Props = {
   onEdit?: (item: TimelineItem) => void;
   onDelete?: (id: string) => void;
   onStatusChange?: (itemId: string, newStatus: Status) => void;
-  // When false, disable the initial auto-scroll (used to prevent scrolling after remounts)
-  allowAutoScroll?: boolean;
-  // Callback to notify parent that auto-scroll happened
-  onAutoScrolled?: () => void;
 };
 
 const { Text } = Typography;
@@ -42,14 +38,12 @@ const ScheduleList: React.FC<Props> = ({
   onEdit,
   onDelete,
   onStatusChange,
-  allowAutoScroll = true,
-  onAutoScrolled,
 }) => {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [now, setNow] = useState(Date.now());
   const itemRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const nowItemRef = useRef<HTMLDivElement | null>(null);
   const lastScrolledId = useRef<string | null>(null);
-  const hasAutoScrolledRef = useRef(false);
   const toggle = (id: string) => setExpandedId((p) => (p === id ? null : id));
 
   React.useEffect(() => {
@@ -73,19 +67,11 @@ const ScheduleList: React.FC<Props> = ({
       return start <= now && now <= end;
     });
 
-    // Auto-scroll only once on initial mount (do not re-scroll after filters/updates)
-    if (
-      current &&
-      allowAutoScroll &&
-      !hasAutoScrolledRef.current &&
-      lastScrolledId.current !== current.timeline_item_id
-    ) {
+    if (current && lastScrolledId.current !== current.timeline_item_id) {
       const el = itemRefs.current[current.timeline_item_id];
       if (el && typeof el.scrollIntoView === "function") {
         el.scrollIntoView({ behavior: "smooth", block: "center" });
         lastScrolledId.current = current.timeline_item_id;
-        hasAutoScrolledRef.current = true;
-        onAutoScrolled?.();
       }
     }
     if (!current) lastScrolledId.current = null;
@@ -132,6 +118,69 @@ const ScheduleList: React.FC<Props> = ({
       icon,
     } as any;
   });
+
+  // Insert NOW indicator at the correct position
+  const nowTime = new Date();
+  const nowItemIndex = sortedItems.findIndex((item, index) => {
+    const itemStart = new Date(item.start_time).getTime();
+    const itemEnd = new Date(item.end_time).getTime();
+    const currentTime = nowTime.getTime();
+
+    // If current time is within this item
+    if (currentTime >= itemStart && currentTime <= itemEnd) {
+      return true;
+    }
+
+    // If current time is between this item and the next
+    if (index < sortedItems.length - 1) {
+      const nextItemStart = new Date(
+        sortedItems[index + 1].start_time,
+      ).getTime();
+      if (currentTime > itemEnd && currentTime < nextItemStart) {
+        return true;
+      }
+    }
+
+    return false;
+  });
+
+  // Only show NOW indicator if current time is within the timeline range
+  if (
+    nowItemIndex !== -1 ||
+    (sortedItems.length > 0 &&
+      nowTime.getTime() < new Date(sortedItems[0].start_time).getTime())
+  ) {
+    const insertIndex = nowItemIndex === -1 ? 0 : nowItemIndex + 1;
+    const currentTimeFormatted = nowTime.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+
+    timelineItems.splice(insertIndex, 0, {
+      key: "now-indicator",
+      dot: (
+        <div className={styles.nowDot}>
+          <ClockCircleOutlined style={{ fontSize: 16, color: "#ff4d4f" }} />
+        </div>
+      ),
+      color: "red",
+      children: (
+        <div ref={nowItemRef} className={styles.nowIndicator}>
+          <div className={styles.nowLabel}>
+            <strong>NOW</strong>
+            <span className={styles.nowTime}>{currentTimeFormatted}</span>
+          </div>
+        </div>
+      ),
+    });
+  }
+
+  // Expose the nowItemRef to parent via a data attribute for scrolling
+  useEffect(() => {
+    if (nowItemRef.current) {
+      (window as any).__timelineNowRef = nowItemRef;
+    }
+  }, [nowItemRef.current]);
 
   return (
     <Timeline

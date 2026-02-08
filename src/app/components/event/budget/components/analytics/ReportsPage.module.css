@@ -1,0 +1,12 @@
+.dateRangeLabel {
+  font-size: var(--fs-sm);
+  margin-left: var(--spacing-sm);
+}
+
+.expenseStatsRow {
+  margin-bottom: var(--spacing-md);
+}
+
+.reportSelect {
+  width: 150px;
+}

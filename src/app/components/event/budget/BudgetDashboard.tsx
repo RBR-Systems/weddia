@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
-import { Card, Tabs, Empty, Button, Space, Typography } from "antd";
+import { Tabs, Empty, Button, Space, Typography } from "antd";
+import Card from "@/app/common/Card/card";
 import {
   DashboardOutlined,
   UnorderedListOutlined,
@@ -37,6 +38,7 @@ import {
 import { BulkOperations } from "./components/planner";
 
 import type { Expense } from "./types/budget.types";
+import dashboardStyles from "./BudgetDashboard.module.css";
 
 const { Title } = Typography;
 
@@ -49,7 +51,7 @@ function DashboardContent() {
   const [vendorDrawerOpen, setVendorDrawerOpen] = useState(false);
 
   if (state.isLoading) {
-    return <Card loading style={{ minHeight: 400 }} />;
+    return <Card loading className={dashboardStyles.loadingCard} />;
   }
 
   if (state.error) {
@@ -84,7 +86,7 @@ function DashboardContent() {
         </span>
       ),
       children: (
-        <Space direction="vertical" style={{ width: "100%" }} size="large">
+        <Space direction="vertical" className={dashboardStyles.tabContent} size="large">
           <BudgetStats />
           <CategoryList />
         </Space>
@@ -215,8 +217,8 @@ function DashboardContent() {
   ];
 
   return (
-    <div style={{ padding: 16 }}>
-      <Title level={3} style={{ marginBottom: 16 }}>
+    <div className={dashboardStyles.dashboardContainer}>
+      <Title level={3} className={dashboardStyles.dashboardTitle}>
         Wedding Budget Manager
       </Title>
 

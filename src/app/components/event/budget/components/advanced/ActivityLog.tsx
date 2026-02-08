@@ -23,6 +23,7 @@ import {
 import dayjs from "dayjs";
 import { useBudget } from "../../contexts/BudgetContext";
 import { formatCurrency, formatDate } from "@/utils/formatters";
+import activityStyles from "./ActivityLog.module.css";
 
 const { Text, Title } = Typography;
 const { RangePicker } = DatePicker;
@@ -224,7 +225,7 @@ export default function ActivityLog() {
                       <Tag color={config.color}>{config.label}</Tag>
                       <Text>{activity.description}</Text>
                     </Space>
-                    <Space style={{ marginTop: 4 }}>
+                    <Space className={activityStyles.activityMeta}>
                       {activity.amount && (
                         <Text type="secondary">
                           {formatCurrency(activity.amount, state.currency)}
@@ -236,7 +237,7 @@ export default function ActivityLog() {
                           <Text type="secondary">{activity.user}</Text>
                         </Space>
                       )}
-                      <Text type="secondary" style={{ fontSize: 12 }}>
+                      <Text type="secondary" className={activityStyles.activityTimestamp}>
                         {formatTimestamp(activity.timestamp)}
                       </Text>
                     </Space>

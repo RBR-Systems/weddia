@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import {
+  App,
   Card,
   Row,
   Col,
@@ -9,10 +10,8 @@ import {
   DatePicker,
   Space,
   Table,
-  Statistic,
   Divider,
   Typography,
-  message,
 } from "antd";
 import {
   DownloadOutlined,
@@ -25,13 +24,16 @@ import dayjs from "dayjs";
 import { useBudget } from "../../contexts/BudgetContext";
 import { formatCurrency, formatDate } from "@/utils/formatters";
 import type { Category, Expense } from "../../types/budget.types";
+import reportStyles from "./ReportsPage.module.css";
 
 const { RangePicker } = DatePicker;
 const { Title, Text } = Typography;
+import Statistic from "@/app/common/AnimatedStatistic/AnimatedStatistic";
 
 type ReportType = "summary" | "category" | "expense" | "vendor";
 
 export default function ReportsPage() {
+  const { message } = App.useApp();
   const { state } = useBudget();
   const [reportType, setReportType] = useState<ReportType>("summary");
   const [dateRange, setDateRange] = useState<[dayjs.Dayjs, dayjs.Dayjs] | null>(
@@ -164,7 +166,7 @@ export default function ReportsPage() {
             <Select
               value={reportType}
               onChange={setReportType}
-              style={{ width: 150 }}
+              className={reportStyles.reportSelect}
               options={[
                 { value: "summary", label: "Summary Report" },
                 { value: "category", label: "Category Report" },
@@ -279,13 +281,13 @@ export default function ReportsPage() {
             <Title level={4}>
               Expense Report
               {dateRange && (
-                <Text type="secondary" style={{ fontSize: 14, marginLeft: 8 }}>
+                <Text type="secondary" className={reportStyles.dateRangeLabel}>
                   ({dateRange[0].format("MMM D")} -{" "}
                   {dateRange[1].format("MMM D, YYYY")})
                 </Text>
               )}
             </Title>
-            <Row gutter={16} style={{ marginBottom: 16 }}>
+            <Row gutter={16} className={reportStyles.expenseStatsRow}>
               <Col span={8}>
                 <Statistic
                   title="Total Expenses"

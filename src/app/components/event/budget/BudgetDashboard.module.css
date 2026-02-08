@@ -1,0 +1,15 @@
+.dashboardContainer {
+  padding: var(--spacing-md);
+}
+
+.dashboardTitle {
+  margin-bottom: var(--spacing-md);
+}
+
+.tabContent {
+  width: 100%;
+}
+
+.loadingCard {
+  min-height: 400px;
+}

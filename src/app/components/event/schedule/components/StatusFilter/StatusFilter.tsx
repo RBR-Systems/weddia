@@ -69,7 +69,7 @@ const StatusFilter: React.FC<Props> = ({
               allowClear
               value={searchQuery}
               onChange={(e) => onSearchChange?.(e.target.value)}
-              style={{ width: 280 }}
+              className={styles.searchInput}
               size="small"
             />
 
@@ -79,7 +79,7 @@ const StatusFilter: React.FC<Props> = ({
               value={selectedTypes}
               onChange={(vals) => onTypesChange?.(vals as string[])}
               options={types.map((t) => ({ label: t, value: t }))}
-              style={{ minWidth: 200, maxWidth: 360 }}
+              className={styles.typeSelect}
               size="small"
             />
 

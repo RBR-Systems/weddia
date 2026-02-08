@@ -1,0 +1,22 @@
+.fullWidth {
+  width: 100%;
+}
+
+.expenseDescription {
+  margin-bottom: var(--spacing-xs);
+}
+
+.expenseAmount {
+  margin: 0;
+  color: var(--status-in-progress);
+}
+
+.receiptImage {
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+}
+
+.emptyIcon {
+  font-size: var(--fs-3xl);
+  color: var(--text-color-muted);
+}

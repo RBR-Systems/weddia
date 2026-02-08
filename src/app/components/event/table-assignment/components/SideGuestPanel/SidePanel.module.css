@@ -1,12 +1,12 @@
 .sideCard {
   height: 100%;
-  padding: 10px;
+  padding: var(--spacing-sm);
   position: relative;
   min-width: 300px;
   max-width: 25vw;
   z-index: 20;
   overflow: hidden;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   display: flex;
   flex-direction: column;
   flex: 1 0 auto;
@@ -17,7 +17,7 @@
 }
 
 .sideTop {
-  margin-bottom: 10px;
+  margin-bottom: var(--spacing-sm);
 }
 
 .sideCard :global(.ant-card-body) {
@@ -31,7 +31,7 @@
 .sideBody {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--spacing-ms);
   flex: 1 1 0%;
   min-height: 0;
 }
@@ -39,7 +39,7 @@
 .sideList {
   flex: 1;
   overflow: auto;
-  padding-right: 4px;
+  padding-right: var(--spacing-xs);
 }
 
 .guestRow :global(.ant-list-item-meta-title) {
@@ -47,16 +47,16 @@
 }
 
 .tableDetailsHeader {
-  padding: 8px 8px 0 8px;
+  padding: var(--spacing-sm) var(--spacing-sm) 0 var(--spacing-sm);
 }
 
 .tableTitle {
-  font-weight: 600;
-  font-size: 18px;
+  font-weight: var(--semi-bold-font);
+  font-size: var(--fs-lg);
 }
 
 .tableSubtitle {
-  color: rgba(0, 0, 0, 0.45);
+  color: var(--text-color-muted);
 }
 
 .tableListItem {
@@ -66,12 +66,12 @@
     transform 120ms ease;
 }
 .tableListItem:hover {
-  background: rgba(0, 0, 0, 0.02);
+  background: var(--subtle-bg-hover);
   transform: translateY(-1px);
 }
 
 .spaceMargin {
-  margin: 12px;
+  margin: var(--spacing-ms);
 }
 
 .sideListHeight180 {

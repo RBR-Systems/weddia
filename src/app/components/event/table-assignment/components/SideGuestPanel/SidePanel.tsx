@@ -1,5 +1,6 @@
 import React from "react";
-import { Card, Space, Input, Select, List, Tag, Empty, Button } from "antd";
+import { Space, Input, Select, List, Tag, Empty, Button } from "antd";
+import Card from "@/app/common/Card/card";
 import { Segmented } from "antd";
 import DraggableGuestRow from "../DraggableguestRow/DraggableGuestRow";
 import UnassignedDropZone from "../UnassignedDropZone/UnassignedDropZone";

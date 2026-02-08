@@ -1,7 +1,8 @@
 "use client";
 
 import React from "react";
-import { Card, Tag, Badge, Collapse, Space, Button, Tooltip } from "antd";
+import { Tag, Badge, Collapse, Space, Button, Tooltip } from "antd";
+import Card from "@/app/common/Card/card";
 import {
   EditOutlined,
   DeleteOutlined,
@@ -34,20 +35,20 @@ type Props = {
 };
 
 const typeColors: Record<string, string> = {
-  ceremony: "#D4AF37",
-  reception: "#4A90E2",
-  photos: "#9B59B6",
-  vendor_arrival: "#95A5A6",
-  vendor_setup: "#BDC3C7",
-  vendor_breakdown: "#7F8C8D",
-  entertainment: "#E74C3C",
-  meal_service: "#27AE60",
-  speeches: "#F39C12",
-  special_moment: "#E91E63",
-  transition: "#34495E",
-  setup: "#95A5A6",
-  breakdown: "#7F8C8D",
-  guest_activity: "#3498DB",
+  ceremony: "var(--type-ceremony)",
+  reception: "var(--type-reception)",
+  photos: "var(--type-photos)",
+  vendor_arrival: "var(--type-vendor-arrival)",
+  vendor_setup: "var(--type-vendor-setup)",
+  vendor_breakdown: "var(--type-vendor-breakdown)",
+  entertainment: "var(--type-entertainment)",
+  meal_service: "var(--type-meal-service)",
+  speeches: "var(--type-speeches)",
+  special_moment: "var(--type-special-moment)",
+  transition: "var(--type-transition)",
+  setup: "var(--type-setup)",
+  breakdown: "var(--type-breakdown)",
+  guest_activity: "var(--type-guest-activity)",
 };
 
 const statusMap: Record<

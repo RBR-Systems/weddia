@@ -11,7 +11,7 @@ import {
   Select,
   Row,
   Col,
-  Statistic,
+  
   Typography,
   Avatar,
   Badge,
@@ -25,9 +25,12 @@ import {
 import type { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
 import { formatCurrency } from "@/utils/formatters";
+import { CHART_COLORS, SEMANTIC_CHART_COLORS } from "@/theme/chartColors";
+import { useTheme } from "@/theme/ThemeProvider";
 
 const { Search } = Input;
 const { Text, Title } = Typography;
+import Statistic from "@/app/common/AnimatedStatistic/AnimatedStatistic";
 
 interface ClientBudget {
   id: string;
@@ -121,6 +124,10 @@ export default function MultiClientView({
     return matchesSearch && matchesStatus;
   });
 
+  const { mode } = useTheme();
+  const chartColors = CHART_COLORS[mode];
+  const semantic = SEMANTIC_CHART_COLORS[mode];
+
   const totalManagedBudget = clients.reduce((sum, c) => sum + c.totalBudget, 0);
   const totalManagedSpent = clients.reduce((sum, c) => sum + c.totalSpent, 0);
   const activeClients = clients.filter((c) => c.status !== "completed").length;
@@ -134,7 +141,7 @@ export default function MultiClientView({
       key: "client",
       render: (_, record) => (
         <Space>
-          <Avatar style={{ backgroundColor: "#1890ff" }}>
+          <Avatar style={{ backgroundColor: chartColors[0] }}>
             {record.clientName.charAt(0)}
           </Avatar>
           <div>
@@ -180,10 +187,10 @@ export default function MultiClientView({
             size="small"
             strokeColor={
               record.status === "over_budget"
-                ? "#ff4d4f"
+                ? semantic.error
                 : record.status === "at_risk"
-                  ? "#fa8c16"
-                  : "#52c41a"
+                  ? semantic.warning
+                  : semantic.success
             }
           />
         </div>
@@ -255,7 +262,7 @@ export default function MultiClientView({
             <Statistic
               title="Active Weddings"
               value={activeClients}
-              valueStyle={{ color: "#1890ff" }}
+              valueStyle={{ color: semantic.info }}
             />
           </Card>
         </Col>
@@ -273,7 +280,7 @@ export default function MultiClientView({
             <Statistic
               title="Needs Attention"
               value={atRiskClients}
-              valueStyle={{ color: atRiskClients > 0 ? "#ff4d4f" : "#52c41a" }}
+              valueStyle={{ color: atRiskClients > 0 ? semantic.error : semantic.success }}
             />
           </Card>
         </Col>

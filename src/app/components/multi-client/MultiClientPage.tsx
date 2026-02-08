@@ -1,14 +1,16 @@
 "use client";
 import React from "react";
-import { Card, Typography } from "antd";
+import { Typography } from "antd";
+import Card from "@/app/common/Card/card";
+import styles from "./multi-client.module.css";
 import { MultiClientView } from "../event/budget/components/planner";
 
 const { Title } = Typography;
 
 export default function MultiClientPage() {
   return (
-    <div style={{ padding: 16 }}>
-      <Title level={3} style={{ marginBottom: 16 }}>
+    <div className={styles["pageContainer"]}>
+      <Title level={3} className={styles["pageTitle"]}>
         Multi-Client Budget Management
       </Title>
       <Card>

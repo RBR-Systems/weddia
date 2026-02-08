@@ -21,43 +21,17 @@ const Header = ({
           </Divider>
         </div>
       )}
-      <div
-        style={{
-          display: "flex",
-          maxWidth: "100vw",
-          flexWrap: "wrap",
-          justifyContent: "center",
-          textAlign: "center",
-        }}
-      >
+      <div className={styles["items-container"]}>
         {items?.map((element, index) => {
           return (
-            <div
-              key={index}
-              style={{
-                display: "flex",
-                width: "fit-content",
-                alignItems: "center",
-                gap: "10px",
-              }}
-            >
+            <div key={index} className={styles["item-wrapper"]}>
               <div>
-                <Divider></Divider>
+                <Divider />
               </div>
-              <p
-                style={{
-                  height: "fit-content",
-                  maxWidth: "200px",
-                  fontSize: "0.8rem",
-                  color: "var(--text-color-secondary)",
-                  fontWeight: "var(--bold-font)",
-                }}
-              >
-                {element}
-              </p>
+              <p className={styles["item-text"]}>{element}</p>
               {index !== items.length - 1 && (
-                <div style={{ color: "black" }}>
-                  <Divider style={{ width: "30px" }}></Divider>
+                <div>
+                  <Divider className={styles["item-divider"]} />
                 </div>
               )}
             </div>

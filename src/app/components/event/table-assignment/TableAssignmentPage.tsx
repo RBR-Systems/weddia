@@ -130,10 +130,10 @@ function TableAssignmentContent() {
               <Space size={8} align="center">
                 <TeamOutlined />
                 <span>Seating chart</span>
-                <Tag color="blue" style={{ marginLeft: 6 }}>
+                <Tag color="blue" className={styles["tagSpacing"]}>
                   {Array.from(guestsById.values()).length} guests
                 </Tag>
-                <Tag color="orange" style={{ marginLeft: 6 }}>
+                <Tag color="orange" className={styles["tagSpacing"]}>
                   {Array.from(guestsById.values()).length -
                     (assignedGuestIds?.size ?? 0)}{" "}
                   unassigned

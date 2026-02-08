@@ -1,0 +1,36 @@
+.fullWidth {
+  width: 100%;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.categoryIcon {
+  font-size: var(--fs-lg);
+}
+
+.categoryName {
+  margin: 0;
+}
+
+.statsRow {
+  display: flex;
+  justify-content: space-between;
+}
+
+.statCenter {
+  text-align: center;
+}
+
+.statRight {
+  text-align: right;
+}
+
+.statLabel {
+  display: block;
+  font-size: var(--fs-2xs);
+  color: var(--text-color-secondary);
+}

@@ -1,8 +1,8 @@
 .timelineWrap {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--spacing-md);
 }
 .iconClock {
-  font-size: 16px;
+  font-size: var(--fs-base);
 }
