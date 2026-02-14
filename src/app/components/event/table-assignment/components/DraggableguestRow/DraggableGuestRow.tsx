@@ -57,13 +57,18 @@ export default memo(function DraggableGuestRow({
         const assignments = assignmentsByTable.get(t.table_id) ?? [];
         const usedOccupancy = assignments.reduce((sum: number, a: any) => {
           const g = guestsById.get(a.guest_id);
-          return sum + (g?.party_size ?? 1);
+          return sum + (g?.party_size ?? (g?.plus_one ? 2 : 1));
         }, 0);
-        const available = Math.max(0, t.total_number - usedOccupancy);
         const isAssignedHere = assignments.some(
           (a: any) => a.guest_id === guest.guest_id,
         );
-        if (available >= (guest.party_size ?? 1) || isAssignedHere) {
+        // If already assigned here, subtract own party_size from used
+        const selfOccupancy = isAssignedHere ? partySize : 0;
+        const available = Math.max(
+          0,
+          t.total_number - usedOccupancy + selfOccupancy,
+        );
+        if (available >= partySize || isAssignedHere) {
           return {
             value: t.table_id,
             label: getTableLabel(t),
@@ -72,7 +77,14 @@ export default memo(function DraggableGuestRow({
         return null;
       })
       .filter(Boolean) as { value: string; label: string }[];
-  }, [tablesForActiveLayout, assignmentsByTable, guestsById, guest.party_size]);
+  }, [
+    tablesForActiveLayout,
+    assignmentsByTable,
+    guestsById,
+    guest.party_size,
+    guest.guest_id,
+    partySize,
+  ]);
 
   const dragId = `guest:${guest.guest_id}`;
   const { attributes, listeners, setNodeRef, /* transform, */ isDragging } =
@@ -122,7 +134,12 @@ export default memo(function DraggableGuestRow({
               {guest.plus_one ? <Tag color="purple">+1</Tag> : null}
               {assignedAssignment ? (
                 <Tag color="blue">
-                  {t("tableAssignment.seatLabel", { seats: Array.from({ length: partySize }, (_, i) => assignedAssignment.seat_number + i).join(", ") })}
+                  {t("tableAssignment.seatLabel", {
+                    seats: Array.from(
+                      { length: partySize },
+                      (_, i) => assignedAssignment.seat_number + i,
+                    ).join(", "),
+                  })}
                 </Tag>
               ) : null}
               {guest.dietary_restrictions ? (
@@ -152,12 +169,20 @@ export default memo(function DraggableGuestRow({
               );
               if (!targetTable) return;
               if (tableId === assignedTableId) return;
-              const usedSeatNumbers = (
-                assignmentsByTable.get(tableId) ?? []
-              ).map((a: any) => a.seat_number);
+              // Build used-seat set accounting for party_size of each occupant
+              const usedSeatNumbers: number[] = [];
+              for (const a of assignmentsByTable.get(tableId) ?? []) {
+                if (a.guest_id === guest.guest_id) continue; // exclude self when reassigning
+                const g = guestsById.get(a.guest_id);
+                const ps = g?.party_size ?? (g?.plus_one ? 2 : 1);
+                for (let s = a.seat_number; s < a.seat_number + ps; s += 1) {
+                  usedSeatNumbers.push(s);
+                }
+              }
               const seat = getNextAvailableSeatNumber(
                 targetTable.total_number,
                 usedSeatNumbers,
+                partySize,
               );
               if (!seat) {
                 messageApi?.warning(t("tableAssignment.tableFull"));
@@ -168,7 +193,10 @@ export default memo(function DraggableGuestRow({
                 payload: { tableId, guestId: guest.guest_id, seatNumber: seat },
               });
               messageApi?.success(
-                t("tableAssignment.reassigned", { name: fullName(guest), table: tableId }),
+                t("tableAssignment.reassigned", {
+                  name: fullName(guest),
+                  table: tableId,
+                }),
               );
             }}
           />

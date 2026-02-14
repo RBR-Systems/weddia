@@ -13,10 +13,20 @@
     box-shadow 120ms ease;
   pointer-events: auto;
   z-index: 2;
-  padding: var(--spacing-sm);
+  padding: var(--spacing-xs);
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.tileLabel {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  font-size: var(--fs-xs) !important;
 }
 
 .tableTile:active {
@@ -72,9 +82,11 @@
 .tableTileHeader {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--spacing-sm);
-  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  flex-wrap: wrap;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .occupancyBadge {
@@ -84,13 +96,14 @@
 }
 
 .occupancyBadge :global(.ant-badge-count) {
-  font-size: var(--fs-xs);
+  font-size: var(--fs-2xs);
   font-weight: var(--bold-font);
-  min-width: 44px;
-  height: 28px;
-  padding: 0 var(--spacing-sm);
-  border-radius: 14px;
+  min-width: 32px;
+  height: 20px;
+  padding: 0 var(--spacing-xs);
+  border-radius: 10px;
   box-shadow: var(--shadow-sm);
+  line-height: 20px;
 }
 
 .tableMeta {

@@ -100,20 +100,23 @@ export default function ExpenseDetails({
         </div>
 
         <Descriptions column={1} bordered size="small">
-          <Descriptions.Item label={t("common.category")}>
-            <CategoryTag color={category?.color}>
-              {category?.name || expense.category_id}
-            </CategoryTag>
+          <Descriptions.Item label={t("common.category")}> 
+            <CategoryTag color={category?.color}> 
+              {category?.name || expense.category_id} 
+            </CategoryTag> 
+          </Descriptions.Item> 
+          <Descriptions.Item label={t("common.vendor")}> 
+            {expense.vendor_name || t("common.notSpecified")} 
+          </Descriptions.Item> 
+          <Descriptions.Item label={t("expenseModal.methodOfPayment")}> 
+            {expense.methodOfPayment || t("common.notSpecified")}
           </Descriptions.Item>
-          <Descriptions.Item label={t("common.vendor")}>
-            {expense.vendor_name || t("common.notSpecified")}
-          </Descriptions.Item>
-          <Descriptions.Item label={t("common.date")}>
-            {formatDate(expense.expense_date)}
-          </Descriptions.Item>
-          <Descriptions.Item label={t("expenseModal.paymentStatus")}>
-            {getStatusTag(expense.payment_status)}
-          </Descriptions.Item>
+          <Descriptions.Item label={t("common.date")}> 
+            {formatDate(expense.expense_date)} 
+          </Descriptions.Item> 
+          <Descriptions.Item label={t("expenseModal.paymentStatus")}> 
+            {getStatusTag(expense.payment_status)} 
+          </Descriptions.Item> 
         </Descriptions>
 
         <Divider orientation="horizontal">{t("expenseDetails.receipts")}</Divider>

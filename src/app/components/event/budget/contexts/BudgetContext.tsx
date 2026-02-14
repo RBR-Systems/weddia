@@ -43,6 +43,7 @@ const initialState: BudgetState = {
   error: null,
   summary: {
     total_budget: 0,
+    total_allocated: 0,
     total_spent: 0,
     total_remaining: 0,
     percentage_spent: 0,
@@ -85,7 +86,7 @@ function reducer(state: BudgetState, action: Action): BudgetState {
       const total_budget = state.summary?.total_budget ?? 0;
       const percentage_spent =
         total_budget > 0 ? Math.round((total_spent / total_budget) * 100) : 0;
-      const total_remaining = Math.max(0, total_budget - total_spent);
+      const total_remaining = total_budget - total_spent;
       return {
         ...state,
         expenses: [...state.expenses, e],
@@ -118,7 +119,7 @@ function reducer(state: BudgetState, action: Action): BudgetState {
       const total_budget = state.summary?.total_budget ?? 0;
       const percentage_spent =
         total_budget > 0 ? Math.round((total_spent / total_budget) * 100) : 0;
-      const total_remaining = Math.max(0, total_budget - total_spent);
+      const total_remaining = total_budget - total_spent;
       return {
         ...state,
         expenses: state.expenses.filter((x) => x.expense_id !== expenseId),
@@ -142,24 +143,24 @@ function reducer(state: BudgetState, action: Action): BudgetState {
     }
     case "ADD_CATEGORY": {
       const updatedCategories = [...state.categories, action.payload];
-      const total_budget = updatedCategories.reduce(
+      const total_allocated = updatedCategories.reduce(
         (sum, c) => sum + (c.allocated ?? 0),
         0,
       );
+      const total_budget = state.summary?.total_budget ?? 0;
       const total_spent = state.summary?.total_spent ?? 0;
       const percentage_spent =
         total_budget > 0 ? Math.round((total_spent / total_budget) * 100) : 0;
-      const total_remaining = Math.max(0, total_budget - total_spent);
+      const total_remaining = total_budget - total_spent;
 
       return {
         ...state,
         categories: updatedCategories,
         summary: {
           ...(state.summary as BudgetSummary),
-          total_budget,
+          total_allocated,
           percentage_spent,
           total_remaining,
-          total_allocated: total_budget,
         },
       };
     }
@@ -169,23 +170,24 @@ function reducer(state: BudgetState, action: Action): BudgetState {
         c.id === id ? { ...c, ...data } : c,
       );
 
-      // Recalculate total budget if allocated amount changed
-      const total_budget = updatedCategories.reduce(
+      // Recalculate total allocated from categories
+      const total_allocated = updatedCategories.reduce(
         (sum, c) => sum + (c.allocated ?? 0),
         0,
       );
+      const total_budget = state.summary?.total_budget ?? 0;
       const total_spent = state.summary?.total_spent ?? 0;
       const percentage_spent =
         total_budget > 0 ? Math.round((total_spent / total_budget) * 100) : 0;
-      const total_remaining = Math.max(0, total_budget - total_spent);
+      const total_remaining = total_budget - total_spent;
 
       // Recalculate remaining for the updated category if it has spent amount
       const updatedCategoriesWithRemaining = updatedCategories.map((c) => ({
         ...c,
         remaining: (c.allocated ?? 0) - (c.spent ?? 0),
         percentage:
-          total_budget > 0
-            ? Math.round(((c.allocated ?? 0) / total_budget) * 100)
+          total_allocated > 0
+            ? Math.round(((c.allocated ?? 0) / total_allocated) * 100)
             : 0,
       }));
 
@@ -194,10 +196,9 @@ function reducer(state: BudgetState, action: Action): BudgetState {
         categories: updatedCategoriesWithRemaining,
         summary: {
           ...(state.summary as BudgetSummary),
-          total_budget,
+          total_allocated,
           percentage_spent,
           total_remaining,
-          total_allocated: total_budget,
         },
       };
     }
@@ -205,24 +206,24 @@ function reducer(state: BudgetState, action: Action): BudgetState {
       const updatedCategories = state.categories.filter(
         (c) => c.id !== action.payload,
       );
-      const total_budget = updatedCategories.reduce(
+      const total_allocated = updatedCategories.reduce(
         (sum, c) => sum + (c.allocated ?? 0),
         0,
       );
+      const total_budget = state.summary?.total_budget ?? 0;
       const total_spent = state.summary?.total_spent ?? 0;
       const percentage_spent =
         total_budget > 0 ? Math.round((total_spent / total_budget) * 100) : 0;
-      const total_remaining = Math.max(0, total_budget - total_spent);
+      const total_remaining = total_budget - total_spent;
 
       return {
         ...state,
         categories: updatedCategories,
         summary: {
           ...(state.summary as BudgetSummary),
-          total_budget,
+          total_allocated,
           percentage_spent,
           total_remaining,
-          total_allocated: total_budget,
         },
       };
     }
@@ -231,7 +232,7 @@ function reducer(state: BudgetState, action: Action): BudgetState {
       const total_spent = state.summary?.total_spent ?? 0;
       const percentage_spent =
         total_budget > 0 ? Math.round((total_spent / total_budget) * 100) : 0;
-      const total_remaining = Math.max(0, total_budget - total_spent);
+      const total_remaining = total_budget - total_spent;
       return {
         ...state,
         summary: {
@@ -259,7 +260,15 @@ export function BudgetProvider({ children }: { children: React.ReactNode }) {
       const data = await BudgetService.getBudgetData(eventId || "event_001");
 
       const budgetData: Partial<BudgetState> = {
-        summary: data.summary,
+        summary: {
+          total_budget: data.summary.total_budget,
+          total_allocated: data.summary.total_allocated ?? 0,
+          total_spent: data.summary.total_spent,
+          total_remaining: data.summary.total_remaining,
+          percentage_spent: data.summary.percentage_spent,
+          status: data.summary.status as any,
+          currency: data.budget.currency as Currency,
+        },
         categories: data.categories.map((c) => ({
           id: c.category_id,
           name: c.name,
@@ -332,25 +341,133 @@ export function BudgetProvider({ children }: { children: React.ReactNode }) {
   };
 
   const loadTemplate = (template: any) => {
+    const totalBudget =
+      template.total_budget ?? state.summary?.total_budget ?? 0;
+
     if (template.total_budget) {
       dispatch({ type: "UPDATE_BUDGET", payload: template.total_budget });
     }
+
     if (template.categories) {
+      const existingByName = new Map<string, Category>();
+      state.categories.forEach((c) => existingByName.set(c.name.trim().toLowerCase(), c));
+
+      const mapped = template.categories.map((c: any) => {
+        const key = (c.name || "").trim().toLowerCase();
+        const existing = existingByName.get(key);
+        const allocated = Math.round(((c.percentage ?? 0) * totalBudget) / 100);
+
+        return {
+          id: existing?.id ?? generateId(),
+          name: c.name,
+          allocated,
+          // Preserve existing spent/expense_count when matching by name
+          spent: existing?.spent ?? 0,
+          expense_count: existing?.expense_count ?? 0,
+          remaining: allocated - (existing?.spent ?? 0),
+          percentage: c.percentage ?? 0,
+          color: c.color ?? existing?.color,
+        } as Category;
+      });
+
+      // Keep any existing categories not present in the template
+      const templateNames = new Set(
+        template.categories.map((c: any) => (c.name || "").trim().toLowerCase()),
+      );
+      const others = state.categories.filter(
+        (c) => !templateNames.has(c.name.trim().toLowerCase()),
+      );
+
+      const combined = [...mapped, ...others];
+
+      const total_allocated = combined.reduce((s, x) => s + (x.allocated ?? 0), 0);
+      const total_spent = state.summary?.total_spent ?? 0;
+      const percentage_spent =
+        totalBudget > 0 ? Math.round((total_spent / totalBudget) * 100) : 0;
+      const total_remaining = totalBudget - total_spent;
+
       dispatch({
         type: "SET_DATA",
-        payload: { categories: template.categories },
+        payload: {
+          categories: combined,
+          summary: {
+            ...(state.summary as BudgetSummary),
+            total_allocated,
+            percentage_spent,
+            total_remaining,
+            total_budget: totalBudget,
+          },
+        },
       });
     }
   };
 
   const loadEstimate = (estimate: any) => {
+    const totalBudget =
+      estimate.total_budget ?? state.summary?.total_budget ?? 0;
+
     if (estimate.total_budget) {
       dispatch({ type: "UPDATE_BUDGET", payload: estimate.total_budget });
     }
+
     if (estimate.categories) {
+      const existingByName = new Map<string, Category>();
+      state.categories.forEach((c) => existingByName.set(c.name.trim().toLowerCase(), c));
+
+      const mapped = estimate.categories.map((c: any) => {
+        const key = (c.name || "").trim().toLowerCase();
+        const existing = existingByName.get(key);
+        const allocated =
+          typeof c.allocated === "number"
+            ? Math.round(c.allocated)
+            : Math.round(((c.percentage ?? 0) * totalBudget) / 100);
+
+        const percentage =
+          typeof c.percentage === "number"
+            ? Math.round(c.percentage)
+            : totalBudget > 0
+            ? Math.round((allocated / totalBudget) * 100)
+            : 0;
+
+        return {
+          id: existing?.id ?? generateId(),
+          name: c.name,
+          allocated,
+          spent: existing?.spent ?? (typeof c.spent === "number" ? c.spent : 0),
+          expense_count: existing?.expense_count ?? 0,
+          remaining: allocated - (existing?.spent ?? (c.spent ?? 0)),
+          percentage,
+          color: c.color ?? existing?.color,
+        } as Category;
+      });
+
+      const templateNames = new Set(
+        estimate.categories.map((c: any) => (c.name || "").trim().toLowerCase()),
+      );
+      const others = state.categories.filter(
+        (c) => !templateNames.has(c.name.trim().toLowerCase()),
+      );
+
+      const combined = [...mapped, ...others];
+
+      const total_allocated = combined.reduce((s, x) => s + (x.allocated ?? 0), 0);
+      const total_spent = state.summary?.total_spent ?? 0;
+      const percentage_spent =
+        totalBudget > 0 ? Math.round((total_spent / totalBudget) * 100) : 0;
+      const total_remaining = totalBudget - total_spent;
+
       dispatch({
         type: "SET_DATA",
-        payload: { categories: estimate.categories },
+        payload: {
+          categories: combined,
+          summary: {
+            ...(state.summary as BudgetSummary),
+            total_allocated,
+            percentage_spent,
+            total_remaining,
+            total_budget: totalBudget,
+          },
+        },
       });
     }
   };
@@ -368,6 +485,7 @@ export function BudgetProvider({ children }: { children: React.ReactNode }) {
     updateBudget,
     loadTemplate,
     loadEstimate,
+    
   };
 
   return (

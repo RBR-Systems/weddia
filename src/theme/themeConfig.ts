@@ -72,8 +72,13 @@ function buildTheme(t: typeof light | typeof dark): ThemeConfig {
         algorithm: true,
       },
       Modal: {
+        colorBgContainer: t.cardBg,
         contentBg: t.cardBg,
         headerBg: t.cardBg,
+        colorText: t.text,
+        colorTextHeading: t.text,
+        colorIcon: t.textSecondary,
+        colorIconHover: t.text,
         algorithm: true,
       },
       Table: {

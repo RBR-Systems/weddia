@@ -1,9 +1,8 @@
-import React, { memo, useState } from "react";
+import React, { memo, useEffect, useRef, useState } from "react";
 import { useDraggable, useDroppable } from "@dnd-kit/core";
 import type { CSSProperties } from "react";
 import styles from "../TableTileContent/TableTile.module.css";
 import { Popover } from "antd";
-import { useTableAssignmentContext } from "../../../context/TableAssignmentContext";
 import type { Table, TableAssignment, Guest } from "../../../models/types";
 import TableTileContent from "../TableTileContent/TableTileContent";
 import {
@@ -18,6 +17,7 @@ function SeatTile({
   num,
   assign,
   guest,
+  indexInParty = 0,
 }: {
   tableId: string;
   num: number;
@@ -30,13 +30,8 @@ function SeatTile({
     id: `table:${tableId}:seat:${num}`,
     data: { tableId, seatNumber: num },
   });
-  const partySize = guest ? (guest.party_size ?? (guest.plus_one ? 2 : 1)) : 1;
-  const idx =
-    typeof (arguments[0] as any)?.indexInParty === "number"
-      ? (arguments[0] as any).indexInParty
-      : 0;
   const nameLabel = guest
-    ? `${guest.first_name}${idx > 0 ? ` +${idx}` : ""}`
+    ? `${guest.first_name}${indexInParty > 0 ? ` +${indexInParty}` : ""}`
     : "—";
   const titleLabel = guest
     ? `${guest.first_name} ${guest.last_name}`
@@ -73,8 +68,6 @@ export default memo(function DroppableTableTile({
   assignments?: TableAssignment[];
   guestsById?: Map<string, Guest>;
 }) {
-  const ctx = useTableAssignmentContext();
-  const { t } = useTranslation();
   const dropId = `table:${table.table_id}`;
   const { setNodeRef: setDropRef, isOver } = useDroppable({
     id: dropId,
@@ -112,20 +105,28 @@ export default memo(function DroppableTableTile({
   const setRefs = (el: HTMLButtonElement | null) => {
     setDropRef(el);
     setDragRef(el);
+    tileRef.current = el;
   };
 
-  const [popoverOpen, setPopoverOpen] = useState(false);
+  const tileRef = useRef<HTMLButtonElement | null>(null);
 
+  // Scroll into view when this tile is selected from an external source
+  useEffect(() => {
+    if (isSelected && tileRef.current) {
+      tileRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+        inline: "center",
+      });
+    }
+  }, [isSelected]);
+
+  const [popoverOpen, setPopoverOpen] = useState(false);
   const seatCount = table.total_number ?? 0;
-  const PER_SEAT_SPACE = 34; // approximate px per seat including gap
-  const neededWidth = seatCount * PER_SEAT_SPACE;
-  const padding = 20; // allow some padding inside table
-  const showSeats = neededWidth <= Math.max(0, width - padding);
 
   const popContent = (
     <div className={styles.popoverSeats}>
       {Array.from({ length: seatCount }, (_, i) => i + 1).map((n) => {
-        // find an assignment that covers this seat (start seat + party_size)
         const assign = assignments.find((a) => {
           const g = guestsById?.get(a.guest_id);
           const ps = g ? (g.party_size ?? (g.plus_one ? 2 : 1)) : 1;
@@ -147,81 +148,38 @@ export default memo(function DroppableTableTile({
     </div>
   );
 
-  const buttonEl = (
-    <button
-      ref={setRefs}
-      type="button"
-      style={style}
-      className={[
-        styles.tableTile,
-        getTableShapeClass(table.shape),
-        isSelected ? styles.tableTileSelected : "",
-        isOver ? styles.tableTileOver : "",
-      ].join(" ")}
-      onClick={onSelect}
-      {...attributes}
-      {...listeners}
-      onMouseEnter={() =>
-        !showSeats &&
-        !ctx.state?.activeDragId?.toString?.().startsWith?.("guest:") &&
-        setPopoverOpen(true)
-      }
-      onMouseLeave={() => !showSeats && setPopoverOpen(false)}
+  return (
+    <Popover
+      content={popContent}
+      open={popoverOpen}
+      onOpenChange={(v) => setPopoverOpen(v)}
+      placement="right"
+      getPopupContainer={() => document.body}
     >
-      <TableTileContent
-        table={table}
-        occupancy={occupancy}
-        capacity={table.total_number}
-        label={getTableLabel(table)}
-        badgeColor={getBadgeColor(occupancy, table.total_number)}
-        metersToPixels={metersToPixels}
-      />
-      {showSeats ? (
-        <div className={styles.seatContainer}>
-          {Array.from({ length: seatCount }, (_, i) => i + 1).map((n) => {
-            const assign = assignments.find((a) => {
-              const g = guestsById?.get(a.guest_id);
-              const ps = g ? (g.party_size ?? (g.plus_one ? 2 : 1)) : 1;
-              return n >= a.seat_number && n < a.seat_number + ps;
-            });
-            const guest = assign ? guestsById?.get(assign.guest_id) : null;
-            const indexInParty = assign ? n - assign.seat_number : 0;
-            return (
-              <SeatTile
-                key={`seat-${n}`}
-                tableId={table.table_id}
-                num={n}
-                assign={assign}
-                guest={guest}
-                indexInParty={indexInParty}
-              />
-            );
-          })}
-        </div>
-      ) : (
-        <div
-          className={styles.seatCompact}
-          title={t("tableAssignment.seatedCount", { occupancy, capacity: table.total_number })}
-        >
-          {occupancy}/{table.total_number}
-        </div>
-      )}
-    </button>
-  );
-
-  if (!showSeats) {
-    return (
-      <Popover
-        content={popContent}
-        open={popoverOpen}
-        onOpenChange={(v) => setPopoverOpen(v)}
-        placement="right"
-        getPopupContainer={() => document.body}
+      <button
+        ref={setRefs}
+        type="button"
+        style={style}
+        className={[
+          styles.tableTile,
+          getTableShapeClass(table.shape),
+          isSelected ? styles.tableTileSelected : "",
+          isOver ? styles.tableTileOver : "",
+        ].join(" ")}
+        onClick={onSelect}
+        onMouseEnter={() => setPopoverOpen(true)}
+        onMouseLeave={() => setPopoverOpen(false)}
+        {...attributes}
+        {...listeners}
       >
-        {buttonEl}
-      </Popover>
-    );
-  }
-
-  return buttonEl;
+        <TableTileContent
+          table={table}
+          occupancy={occupancy}
+          capacity={table.total_number}
+          label={getTableLabel(table)}
+          badgeColor={getBadgeColor(occupancy, table.total_number)}
+        />
+      </button>
+    </Popover>
+  );
 });

@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { Tabs, Empty, Button, Space, Typography } from "antd";
+import { Tabs, Empty, Button, Space, Typography, Alert } from "antd";
 import Card from "@/app/common/Card/card";
 import {
   DashboardOutlined,
@@ -88,7 +88,11 @@ function DashboardContent() {
         </span>
       ),
       children: (
-        <Space direction="vertical" className={dashboardStyles.tabContent} size="large">
+        <Space
+          direction="vertical"
+          className={dashboardStyles.tabContent}
+          size="large"
+        >
           <BudgetStats />
           <CategoryList />
         </Space>
@@ -162,8 +166,16 @@ function DashboardContent() {
         <Tabs
           defaultActiveKey="charts"
           items={[
-            { key: "charts", label: t("budgetDashboard.subTabs.charts"), children: <BudgetCharts /> },
-            { key: "reports", label: t("budgetDashboard.subTabs.reports"), children: <ReportsPage /> },
+            {
+              key: "charts",
+              label: t("budgetDashboard.subTabs.charts"),
+              children: <BudgetCharts />,
+            },
+            {
+              key: "reports",
+              label: t("budgetDashboard.subTabs.reports"),
+              children: <ReportsPage />,
+            },
           ]}
         />
       ),

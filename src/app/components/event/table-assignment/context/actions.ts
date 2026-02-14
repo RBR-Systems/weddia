@@ -3,6 +3,7 @@ import { DragId, Table, TableAssignment } from "../models/types";
 
 export type Action =
   | { type: "SET_METERS_TO_PIXELS"; payload: number }
+  | { type: "SET_ZOOM_SCALE"; payload: number }
   | { type: "SET_PAN"; payload: { x: number; y: number } }
   | { type: "SET_TABLES"; payload: Table[] }
   | {

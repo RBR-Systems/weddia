@@ -1,0 +1,280 @@
+/* ===== Check-In Stats Cards ===== */
+.statsRow {
+  margin-bottom: var(--spacing-md);
+}
+
+.statCard {
+  text-align: center;
+  border-radius: var(--radius-md);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  cursor: pointer;
+}
+
+.statCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.statCardActive {
+  outline: 2px solid;
+  outline-offset: -2px;
+}
+
+.statCardTotal {
+  border-left: 4px solid var(--primary);
+}
+
+.statCardTotal.statCardActive {
+  outline-color: var(--primary);
+}
+
+.statCardCheckedIn {
+  border-left: 4px solid var(--status-completed);
+}
+
+.statCardCheckedIn.statCardActive {
+  outline-color: var(--status-completed);
+}
+
+.statCardNotArrived {
+  border-left: 4px solid #faad14;
+}
+
+.statCardNotArrived.statCardActive {
+  outline-color: #faad14;
+}
+
+.statCardRate {
+  border-left: 4px solid var(--status-in-progress);
+  cursor: default;
+}
+
+.statCardRate:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.statCardSpecial {
+  border-left: 4px solid #722ed1;
+}
+
+.statCardSpecial.statCardActive {
+  outline-color: #722ed1;
+}
+
+/* ===== Filter Tags Area ===== */
+.filterTagsRow {
+  margin-bottom: 12px;
+}
+
+.filterTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+/* ===== Search & Filter Bar ===== */
+.searchFilterBar {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.searchInput {
+  flex: 1;
+  min-width: 200px;
+}
+
+.filterPanel {
+  margin-bottom: var(--spacing-md);
+  display: flex;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+}
+
+.filterGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.filterLabel {
+  font-size: var(--fs-sm);
+  font-weight: var(--semi-bold-font);
+  color: var(--text-color-secondary);
+}
+
+/* ===== Guest Table ===== */
+.checkedInRow {
+  background-color: var(--status-completed-bg) !important;
+}
+
+.vipStar {
+  color: #faad14;
+  margin-left: var(--spacing-xs);
+}
+
+.guestNameCell {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.tableCell {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.tableCellClickable {
+  cursor: pointer;
+  color: var(--primary);
+  transition: all var(--transition-fast);
+}
+
+.tableCellClickable:hover {
+  color: var(--primary-hover, var(--primary));
+  text-decoration: underline;
+  opacity: 0.85;
+}
+
+.alertBadges {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.checkInTimeCell {
+  color: var(--text-color-secondary);
+  font-size: var(--fs-sm);
+}
+
+/* ===== Check-In Modal ===== */
+.modalSection {
+  margin-bottom: var(--spacing-md);
+}
+
+.modalSectionTitle {
+  font-weight: var(--semi-bold-font);
+  margin-bottom: var(--spacing-sm);
+  font-size: var(--fs-base);
+}
+
+.modalInfoGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-sm);
+}
+
+.modalInfoItem {
+  display: flex;
+  flex-direction: column;
+}
+
+.modalInfoLabel {
+  font-size: var(--fs-xs);
+  color: var(--text-color-secondary);
+  margin-bottom: 2px;
+}
+
+.modalInfoValue {
+  font-size: var(--fs-base);
+  font-weight: var(--medium-font);
+}
+
+.alertBox {
+  padding: var(--spacing-sm) var(--spacing-ms);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-sm);
+}
+
+.alertBoxDietary {
+  background-color: #e6f4ff;
+  border: 1px solid #91caff;
+}
+
+.alertBoxAccessibility {
+  background-color: #f9f0ff;
+  border: 1px solid #d3adf7;
+}
+
+.alertBoxNotes {
+  background-color: #fffbe6;
+  border: 1px solid #ffe58f;
+}
+
+/* Dark mode alert boxes */
+:global([data-theme="dark"]) .alertBoxDietary {
+  background-color: #111a2c;
+  border-color: #15325b;
+}
+
+:global([data-theme="dark"]) .alertBoxAccessibility {
+  background-color: #1a1325;
+  border-color: #301c4d;
+}
+
+:global([data-theme="dark"]) .alertBoxNotes {
+  background-color: #2b2111;
+  border-color: #443111;
+}
+
+.alertBoxTitle {
+  font-weight: var(--semi-bold-font);
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.alertBoxContent {
+  font-size: var(--fs-sm);
+}
+
+.partySizeInput {
+  margin-top: var(--spacing-sm);
+}
+
+.partySizeHelp {
+  font-size: var(--fs-xs);
+  color: var(--text-color-secondary);
+  margin-top: 4px;
+}
+
+/* ===== VIP Header ===== */
+.vipHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.vipBadge {
+  color: #faad14;
+}
+
+/* ===== Day-of-Event Page Tabs ===== */
+.dayOfEventTabs {
+  margin-bottom: var(--spacing-md);
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+  .searchFilterBar {
+    flex-direction: column;
+  }
+
+  .searchInput {
+    width: 100%;
+  }
+
+  .filterPanel {
+    flex-direction: column;
+  }
+
+  .modalInfoGrid {
+    grid-template-columns: 1fr;
+  }
+}

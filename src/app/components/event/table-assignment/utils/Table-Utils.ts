@@ -16,10 +16,18 @@ export function parseGuestIdFromDragId(id: unknown) {
 export function getNextAvailableSeatNumber(
   capacity: number,
   usedSeatNumbers: number[],
+  partySize = 1,
 ) {
   const used = new Set(usedSeatNumbers);
-  for (let seat = 1; seat <= capacity; seat += 1) {
-    if (!used.has(seat)) return seat;
+  for (let seat = 1; seat <= capacity - partySize + 1; seat += 1) {
+    let fits = true;
+    for (let s = seat; s < seat + partySize; s += 1) {
+      if (used.has(s)) {
+        fits = false;
+        break;
+      }
+    }
+    if (fits) return seat;
   }
   return null;
 }

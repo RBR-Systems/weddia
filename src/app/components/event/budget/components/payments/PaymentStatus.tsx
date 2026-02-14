@@ -69,6 +69,7 @@ export default function PaymentStatusManager() {
       updateExpense?.(markPaidModal.expense_id, {
         payment_status: "paid",
         payment_date: values.payment_date?.format("YYYY-MM-DD"),
+        methodOfPayment: values.methodOfPayment || markPaidModal.methodOfPayment || "",
       });
       message.success(t("paymentStatus.paymentMarkedPaid"));
       setMarkPaidModal(null);
@@ -266,6 +267,23 @@ export default function PaymentStatusManager() {
                 rules={[{ required: true }]}
               >
                 <DatePicker className="u-full-width" />
+              </Form.Item>
+              <Form.Item
+                name="methodOfPayment"
+                label={t("expenseModal.methodOfPayment")}
+                initialValue={markPaidModal.methodOfPayment || undefined}
+                rules={[{ required: true, message: t("expenseModal.methodOfPaymentRequired") }]}
+              >
+                <Select
+                  options={[
+                    { value: "Credit Card", label: t("expenseModal.paymentMethods.creditCard") },
+                    { value: "Bank Transfer", label: t("expenseModal.paymentMethods.bankTransfer") },
+                    { value: "Cash", label: t("expenseModal.paymentMethods.cash") },
+                    { value: "Check", label: t("expenseModal.paymentMethods.check") },
+                    { value: "Other", label: t("expenseModal.paymentMethods.other") },
+                  ]}
+                  placeholder={t("expenseModal.methodOfPaymentPlaceholder")}
+                />
               </Form.Item>
             </Form>
           </Space>

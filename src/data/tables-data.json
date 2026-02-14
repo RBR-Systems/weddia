@@ -773,7 +773,7 @@
     {
       "table_id": "table-003",
       "guest_id": "guest-012",
-      "seat_number": 2,
+      "seat_number": 3,
       "created_at": "2025-09-15T15:13:00Z",
       "created_by": "admin-001",
       "updated_at": "2025-09-15T15:13:00Z",

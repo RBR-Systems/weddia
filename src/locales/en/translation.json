@@ -1,4 +1,74 @@
 {
+  "guestList": {
+    "allGroups": "All groups",
+    "searchPlaceholder": "Search name or email",
+    "groupPlaceholder": "Group",
+    "all": "All",
+    "attending": "Attending",
+    "pending": "Pending",
+    "maybe": "Maybe",
+    "notAttending": "Not Attending",
+    "guest": "Guest",
+    "hasEmail": "Has email",
+    "hasPhone": "Has phone",
+    "noContact": "No contact",
+    "sendEmail": "Send Email",
+    "sendWhatsApp": "Send WhatsApp",
+    "relation": "Relation",
+    "plusOne": "+1",
+    "addGuest": "Add Guest",
+    "exportCsv": "Export CSV",
+    "importCsv": "Import CSV",
+    "searchTag": "Search",
+    "clearFilters": "Clear all Filters",
+    "importGuestsTitle": "Import Guests (CSV)",
+    "importDragText": "Click or drag CSV file to this area to upload",
+    "importHint": "Accepted columns: first_name,last_name,email,phone,party_size,relation_id,rsvp_status",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "email": "Email",
+    "validEmail": "Please enter a valid email address",
+    "country": "Country",
+    "phonePlaceholder": "Include country code or national number",
+    "selectCountryFirst": "Select country first",
+    "partySize": "Party size",
+    "relation": "Relation",
+    "rsvp": "RSVP",
+    "dietaryRestrictions": "Dietary restrictions",
+    "commaSeparated": "Comma separated",
+    "accessibilityNeeds": "Accessibility needs",
+    "notes": "Notes",
+    "cancel": "Cancel",
+    "add": "Add",
+    "rsvpStatus": "RSVP Status",
+    "group": "Group",
+    "specials": "Specials",
+    "contact": "Contact",
+    "sendRSVP": "Send RSVP",
+    "searchName": "Search name",
+    "reset": "Reset",
+    "searchContact": "Search contact",
+    "whatsapp": "WhatsApp",
+    "stats": {
+      "attending": "Attending",
+      "pending": "Pending",
+      "maybe": "Maybe",
+      "notAttending": "Not Attending",
+      "total": "Total Guests",
+      "confirmedSeats": "Confirmed Seats"
+    },
+    "contactInfo": "Contact Information",
+    "eventDetails": "Event Details",
+    "invitedAt": "Invited at",
+    "rsvpAt": "RSVP at",
+    "specialRequirements": "Special Requirements",
+    "dietary": "Dietary",
+    "accessibility": "Accessibility"
+    ,"removed": "Guest removed",
+    "removeFailed": "Failed to remove guest",
+    "confirmRemove": "Remove guest?",
+    "remove": "Remove"
+  },
   "common": {
     "save": "Save",
     "cancel": "Cancel",
@@ -54,6 +124,7 @@
   "nav": {
     "eventPages": "Event Pages",
     "eventsHub": "Events Hub",
+    "guestList": "Guest List",
     "budget": "Budget",
     "tableAssignment": "Table Assignment",
     "schedule": "Schedule",
@@ -134,13 +205,15 @@
   },
   "budgetStats": {
     "totalBudget": "Total Budget",
+    "totalAllocated": "Total Allocated",
     "totalSpent": "Total Spent",
     "remaining": "Remaining",
     "spentPercent": "Spent %",
     "expensesCount": "Expenses Count",
     "averageExpense": "Average Expense",
     "largestExpense": "Largest Expense",
-    "topCategory": "Top Category"
+    "topCategory": "Top Category",
+    "clickToEdit": "Click to edit budget"
   },
   "expenseModal": {
     "title": "Add Expense",
@@ -198,11 +271,15 @@
     "totalBudget": "Total Budget",
     "allocated": "Allocated",
     "unallocated": "Unallocated",
+    "allocationPercent": "Budget Usage %",
+    "allocation": "Allocation",
     "overAllocatedTitle": "Over-allocated",
     "overAllocatedDesc": "You've allocated {{amount}} more than your total budget.",
     "ofBudget": "of budget",
     "spent": "Spent: {{amount}}",
-    "remaining": "Remaining: {{amount}}"
+    "budgeted": "Budgeted: {{amount}}",
+    "allocated": "Allocated: {{amount}}",
+    "remaining": "Allocation - Actual Expenses: {{amount}}"
   },
   "budgetCharts": {
     "noData": "Add expenses and categories to see charts",
@@ -341,6 +418,11 @@
     "estimatedTotal": "Estimated Total Budget",
     "basedOn": "Based on {{guests}} guests × {{style}} style",
     "applyEstimate": "Apply This Estimate to My Budget",
+    "estimateApplied": "Budget estimate applied: {{amount}}",
+    "applyEstimateConfirmTitle": "Apply suggested allocations?",
+    "applyEstimateConfirmDesc": "You already have categories in your budget. Would you like to replace existing allocations with the suggested standard percentages and amounts, or keep your existing allocations?",
+    "applyEstimateConfirmOk": "Apply Standard Values",
+    "applyEstimateConfirmCancel": "Keep Existing",
     "suggestedBreakdown": "Suggested Category Breakdown",
     "industryStandard": "Industry Standard Allocations",
     "industryStandardDesc": "These percentages are based on average wedding spending patterns. Adjust based on your priorities.",
@@ -542,6 +624,7 @@
     "table": "Table {{number}}",
     "seatedCount": "{{occupancy}}/{{capacity}} seated",
     "seatNumber": "Seat {{number}}",
+    "seatRange": "Seats {{from}}–{{to}}",
     "seatLabel": "Seat(s) {{seats}}"
   },
   "schedule": {
@@ -662,6 +745,18 @@
       "invalidTime": "Invalid time"
     }
   },
+  "expenseModal": {
+    "methodOfPayment": "Method of Payment",
+    "methodOfPaymentRequired": "Please select a method of payment!",
+    "methodOfPaymentPlaceholder": "Select payment method",
+    "paymentMethods": {
+      "creditCard": "Credit Card",
+      "bankTransfer": "Bank Transfer",
+      "cash": "Cash",
+      "check": "Check",
+      "other": "Other"
+    }
+  },
   "multiClient": {
     "title": "Multi-Client Budget Management"
   },
@@ -734,6 +829,93 @@
     "intimate": "Intimate & Cozy",
     "grand": "Grand & Extravagant",
     "casual": "Casual & Relaxed"
+  },
+  "checkIn": {
+    "title": "Guest Check-In",
+    "tabs": {
+      "schedule": "Schedule",
+      "checkIn": "Check-In",
+      "tableView": "Table View"
+    },
+    "stats": {
+      "totalGuests": "Total Guests",
+      "checkedIn": "Checked In",
+      "notArrived": "Not Yet Arrived",
+      "attendanceRate": "Attendance Rate",
+      "specialNeeds": "Special Needs"
+    },
+    "table": {
+      "status": "Status",
+      "guestName": "Guest Name",
+      "contact": "Contact",
+      "relation": "Relation",
+      "tableAssignment": "Table",
+      "seat": "Seat",
+      "partySize": "Party Size",
+      "alerts": "Alerts",
+      "checkInTime": "Check-In Time",
+      "actions": "Actions",
+      "seatNumber": "Seat {{number}}"
+    },
+    "status": {
+      "checkedIn": "Checked In",
+      "expected": "Expected",
+      "maybe": "Maybe",
+      "pending": "Pending",
+      "notAttending": "Not Attending"
+    },
+    "search": {
+      "placeholder": "Search by name, phone, or table...",
+      "showFilters": "Show Filters",
+      "hideFilters": "Hide Filters"
+    },
+    "filters": {
+      "byStatus": "By Status",
+      "byRelation": "By Relation",
+      "allStatuses": "All Statuses",
+      "checkedIn": "Checked In",
+      "notArrived": "Not Yet Arrived",
+      "specialNeeds": "Special Needs",
+      "allRelations": "All Relations"
+    },
+    "modal": {
+      "title": "Guest Check-In",
+      "guestInfo": "Guest Information",
+      "relation": "Relation",
+      "tableAssignment": "Table Assignment",
+      "table": "Table",
+      "seat": "Seat",
+      "notAssigned": "Not assigned",
+      "expectedPartySize": "Expected Party Size",
+      "actualPartySize": "Actual Party Size",
+      "actualPartySizeHelp": "Adjust if the actual number of guests differs from expected",
+      "contactInfo": "Contact Information",
+      "phone": "Phone",
+      "email": "Email",
+      "noContact": "No contact information",
+      "dietaryRestrictions": "Dietary Restrictions",
+      "accessibilityNeeds": "Accessibility Needs",
+      "specialNotes": "Special Notes",
+      "confirmCheckIn": "Confirm Check-In",
+      "cancelCheckIn": "Cancel"
+    },
+    "actions": {
+      "checkIn": "Check In",
+      "undoCheckIn": "Undo",
+      "checkedInAt": "Checked in at {{time}}"
+    },
+    "badges": {
+      "dietary": "Dietary",
+      "accessibility": "Accessibility",
+      "notes": "Notes",
+      "vip": "VIP"
+    },
+    "messages": {
+      "checkedInSuccess": "{{name}} has been checked in",
+      "checkInUndone": "Check-in for {{name}} has been undone",
+      "guestsLoaded": "Guest data loaded"
+    },
+    "emptyState": "No guests match the current filters"
   },
   "language": {
     "en": "English",

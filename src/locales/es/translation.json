@@ -1,4 +1,74 @@
 {
+  "guestList": {
+    "allGroups": "Todos los grupos",
+    "searchPlaceholder": "Buscar nombre o correo",
+    "groupPlaceholder": "Grupo",
+    "all": "Todos",
+    "attending": "Asiste",
+    "pending": "Pendiente",
+    "maybe": "Quizás",
+    "notAttending": "No asiste",
+    "guest": "Invitado",
+    "hasEmail": "Tiene correo",
+    "hasPhone": "Tiene teléfono",
+    "noContact": "Sin contacto",
+    "sendEmail": "Enviar correo",
+    "sendWhatsApp": "Enviar WhatsApp",
+    "relation": "Relación",
+    "plusOne": "+1",
+    "addGuest": "Agregar invitado",
+    "exportCsv": "Exportar CSV",
+    "importCsv": "Importar CSV",
+    "searchTag": "Buscar",
+    "clearFilters": "Limpiar todos los filtros",
+    "importGuestsTitle": "Importar invitados (CSV)",
+    "importDragText": "Haz clic o arrastra un archivo CSV a esta área para subirlo",
+    "importHint": "Columnas aceptadas: first_name,last_name,email,phone,party_size,relation_id,rsvp_status",
+    "firstName": "Nombre",
+    "lastName": "Apellido",
+    "email": "Correo electrónico",
+    "validEmail": "Por favor ingresa un correo válido",
+    "country": "País",
+    "phonePlaceholder": "Incluye código de país o número nacional",
+    "selectCountryFirst": "Selecciona país primero",
+    "partySize": "Tamaño del grupo",
+    "relation": "Relación",
+    "rsvp": "RSVP",
+    "dietaryRestrictions": "Restricciones alimentarias",
+    "commaSeparated": "Separados por coma",
+    "accessibilityNeeds": "Necesidades de accesibilidad",
+    "notes": "Notas",
+    "cancel": "Cancelar",
+    "add": "Agregar",
+    "rsvpStatus": "Estado RSVP",
+    "group": "Grupo",
+    "specials": "Especiales",
+    "contact": "Contacto",
+    "sendRSVP": "Enviar RSVP",
+    "searchName": "Buscar nombre",
+    "reset": "Restablecer",
+    "searchContact": "Buscar contacto",
+    "whatsapp": "WhatsApp",
+    "stats": {
+      "attending": "Asisten",
+      "pending": "Pendientes",
+      "maybe": "Quizás",
+      "notAttending": "No asisten",
+      "total": "Total de invitados",
+      "confirmedSeats": "Lugares confirmados"
+    },
+    "contactInfo": "Información de contacto",
+    "eventDetails": "Detalles del evento",
+    "invitedAt": "Invitado el",
+    "rsvpAt": "RSVP el",
+    "specialRequirements": "Requerimientos especiales",
+    "dietary": "Alimentación",
+    "accessibility": "Accesibilidad"
+    ,"removed": "Invitado eliminado",
+    "removeFailed": "No se pudo eliminar el invitado",
+    "confirmRemove": "¿Eliminar invitado?",
+    "remove": "Eliminar"
+  },
   "common": {
     "save": "Guardar",
     "cancel": "Cancelar",
@@ -54,6 +124,7 @@
   "nav": {
     "eventPages": "Páginas de Eventos",
     "eventsHub": "Centro de Eventos",
+    "guestList": "Lista de invitados",
     "budget": "Presupuesto",
     "tableAssignment": "Asignación de Mesas",
     "schedule": "Cronograma",
@@ -134,13 +205,15 @@
   },
   "budgetStats": {
     "totalBudget": "Presupuesto Total",
+    "totalAllocated": "Total Asignado",
     "totalSpent": "Total Gastado",
     "remaining": "Restante",
     "spentPercent": "% Gastado",
     "expensesCount": "Cantidad de Gastos",
     "averageExpense": "Gasto Promedio",
     "largestExpense": "Mayor Gasto",
-    "topCategory": "Categoría Principal"
+    "topCategory": "Categoría Principal",
+    "clickToEdit": "Clic para editar presupuesto"
   },
   "expenseModal": {
     "title": "Agregar Gasto",
@@ -189,20 +262,23 @@
   },
   "categoryCard": {
     "spent": "Gastado",
-    "allocated": "Asignado",
+    "allocated": "Asignado: {{amount}}",
     "remaining": "Restante"
   },
   "budgetAllocation": {
     "title": "Asignación de Presupuesto",
     "distributeEvenly": "Distribuir Equitativamente",
     "totalBudget": "Presupuesto Total",
-    "allocated": "Asignado",
+    "allocated": "Asignado: {{amount}}",
     "unallocated": "Sin Asignar",
+    "allocationPercent": "Presupuesto usado %",
+    "allocation": "Asignación",
     "overAllocatedTitle": "Sobre-asignado",
     "overAllocatedDesc": "Has asignado {{amount}} más que tu presupuesto total.",
     "ofBudget": "del presupuesto",
     "spent": "Gastado: {{amount}}",
-    "remaining": "Restante: {{amount}}"
+    "budgeted": "Asignado: {{amount}}",
+    "remaining": "Asignado vs Gastos: {{amount}}"
   },
   "budgetCharts": {
     "noData": "Agrega gastos y categorías para ver gráficos",
@@ -341,6 +417,11 @@
     "estimatedTotal": "Presupuesto Total Estimado",
     "basedOn": "Basado en {{guests}} invitados × estilo {{style}}",
     "applyEstimate": "Aplicar Esta Estimación a Mi Presupuesto",
+    "estimateApplied": "Estimación de presupuesto aplicada: {{amount}}",
+    "applyEstimateConfirmTitle": "¿Aplicar asignaciones sugeridas?",
+    "applyEstimateConfirmDesc": "Ya tienes categorías en tu presupuesto. ¿Deseas reemplazar las asignaciones existentes con los porcentajes y montos sugeridos, o mantener tus asignaciones actuales?",
+    "applyEstimateConfirmOk": "Aplicar valores estándar",
+    "applyEstimateConfirmCancel": "Mantener existentes",
     "suggestedBreakdown": "Desglose Sugerido por Categoría",
     "industryStandard": "Asignaciones Estándar de la Industria",
     "industryStandardDesc": "Estos porcentajes se basan en patrones promedio de gasto en bodas. Ajuste según sus prioridades.",
@@ -542,6 +623,7 @@
     "table": "Mesa {{number}}",
     "seatedCount": "{{occupancy}}/{{capacity}} sentados",
     "seatNumber": "Asiento {{number}}",
+    "seatRange": "Asientos {{from}}–{{to}}",
     "seatLabel": "Asiento(s) {{seats}}"
   },
   "schedule": {
@@ -662,6 +744,18 @@
       "invalidTime": "Hora inválida"
     }
   },
+  "expenseModal": {
+    "methodOfPayment": "Método de pago",
+    "methodOfPaymentRequired": "¡Por favor selecciona un método de pago!",
+    "methodOfPaymentPlaceholder": "Selecciona método de pago",
+    "paymentMethods": {
+      "creditCard": "Tarjeta de crédito",
+      "bankTransfer": "Transferencia bancaria",
+      "cash": "Efectivo",
+      "check": "Cheque",
+      "other": "Otro"
+    }
+  },
   "multiClient": {
     "title": "Gestión de Presupuesto Multi-Cliente"
   },
@@ -734,6 +828,93 @@
     "intimate": "Íntima y Acogedora",
     "grand": "Gran y Extravagante",
     "casual": "Casual y Relajada"
+  },
+  "checkIn": {
+    "title": "Registro de Invitados",
+    "tabs": {
+      "schedule": "Cronograma",
+      "checkIn": "Registro",
+      "tableView": "Vista de Mesas"
+    },
+    "stats": {
+      "totalGuests": "Total de Invitados",
+      "checkedIn": "Registrados",
+      "notArrived": "Sin Llegar",
+      "attendanceRate": "Tasa de Asistencia",
+      "specialNeeds": "Necesidades Especiales"
+    },
+    "table": {
+      "status": "Estado",
+      "guestName": "Nombre del Invitado",
+      "contact": "Contacto",
+      "relation": "Relación",
+      "tableAssignment": "Mesa",
+      "seat": "Asiento",
+      "partySize": "Grupo",
+      "alerts": "Alertas",
+      "checkInTime": "Hora de Registro",
+      "actions": "Acciones",
+      "seatNumber": "Asiento {{number}}"
+    },
+    "status": {
+      "checkedIn": "Registrado",
+      "expected": "Esperado",
+      "maybe": "Quizás",
+      "pending": "Pendiente",
+      "notAttending": "No Asiste"
+    },
+    "search": {
+      "placeholder": "Buscar por nombre, teléfono o mesa...",
+      "showFilters": "Mostrar Filtros",
+      "hideFilters": "Ocultar Filtros"
+    },
+    "filters": {
+      "byStatus": "Por Estado",
+      "byRelation": "Por Relación",
+      "allStatuses": "Todos los Estados",
+      "checkedIn": "Registrados",
+      "notArrived": "Sin Llegar",
+      "specialNeeds": "Necesidades Especiales",
+      "allRelations": "Todas las Relaciones"
+    },
+    "modal": {
+      "title": "Registro de Invitado",
+      "guestInfo": "Información del Invitado",
+      "relation": "Relación",
+      "tableAssignment": "Asignación de Mesa",
+      "table": "Mesa",
+      "seat": "Asiento",
+      "notAssigned": "Sin asignar",
+      "expectedPartySize": "Tamaño de Grupo Esperado",
+      "actualPartySize": "Tamaño de Grupo Real",
+      "actualPartySizeHelp": "Ajustar si el número real de invitados difiere del esperado",
+      "contactInfo": "Información de Contacto",
+      "phone": "Teléfono",
+      "email": "Correo",
+      "noContact": "Sin información de contacto",
+      "dietaryRestrictions": "Restricciones Alimentarias",
+      "accessibilityNeeds": "Necesidades de Accesibilidad",
+      "specialNotes": "Notas Especiales",
+      "confirmCheckIn": "Confirmar Registro",
+      "cancelCheckIn": "Cancelar"
+    },
+    "actions": {
+      "checkIn": "Registrar",
+      "undoCheckIn": "Deshacer",
+      "checkedInAt": "Registrado a las {{time}}"
+    },
+    "badges": {
+      "dietary": "Alimentación",
+      "accessibility": "Accesibilidad",
+      "notes": "Notas",
+      "vip": "VIP"
+    },
+    "messages": {
+      "checkedInSuccess": "{{name}} ha sido registrado",
+      "checkInUndone": "El registro de {{name}} ha sido deshecho",
+      "guestsLoaded": "Datos de invitados cargados"
+    },
+    "emptyState": "Ningún invitado coincide con los filtros actuales"
   },
   "language": {
     "en": "English",

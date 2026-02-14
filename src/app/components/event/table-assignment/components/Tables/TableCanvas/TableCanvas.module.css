@@ -1,10 +1,16 @@
-.tablesCanvas {
+.canvasSizer {
+  /* This div provides the scrollable area matching the zoomed content size */
   position: relative;
+  flex-shrink: 0;
+  margin: auto;
+}
+
+.tablesCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
   padding: var(--spacing-sm);
-  width: 100%;
-  max-width: 100%;
   box-sizing: border-box;
-  min-height: 100%;
   min-width: 0;
   /* grid variables */
   --grid-color: var(--subtle-bg-hover);
@@ -33,7 +39,9 @@
   border-radius: var(--radius-md);
   background-color: var(--subtle-bg-hover);
   margin: 0;
-  overflow: auto;
+
+  /* Zoom via CSS transform — keeps layout size unchanged */
+  transform-origin: 0 0;
 }
 
 .noGrid {
@@ -58,10 +66,9 @@
 
 .canvasInner {
   display: flex;
-  justify-content: center; /* center horizontally */
-  align-items: flex-start; /* align to top so scrolling can reach the top */
+  justify-content: flex-start;
+  align-items: flex-start;
   box-sizing: border-box;
   min-width: 0;
   height: 100%;
-  overflow: auto; /* allow the inner canvas to scroll when venue is larger */
 }

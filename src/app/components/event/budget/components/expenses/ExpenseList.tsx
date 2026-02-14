@@ -117,6 +117,12 @@ export default function ExpenseList({
       render: (vendor: string) => vendor || "—",
     },
     {
+      title: t("expenseModal.methodOfPayment"),
+      dataIndex: "methodOfPayment",
+      key: "methodOfPayment",
+      render: (method: string) => method || "—",
+    },
+    {
       title: t("common.date"),
       dataIndex: "expense_date",
       key: "expense_date",

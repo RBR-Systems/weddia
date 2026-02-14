@@ -6,13 +6,16 @@ const Header = ({
   name,
   subheader,
   items,
+  align = "center",
 }: {
   name: string;
   subheader?: string;
   items?: string[];
+  align?: "left" | "center";
 }) => {
+  const cls = align === "left" ? styles["header-left"] : styles["header"];
   return (
-    <div className={styles["header"]}>
+    <div className={cls}>
       <h2>{name}</h2>
       {subheader && (
         <div className={styles["sub-header-container"]}>

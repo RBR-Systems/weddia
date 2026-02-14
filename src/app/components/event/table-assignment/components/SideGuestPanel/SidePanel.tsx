@@ -134,8 +134,14 @@ const SidePanel = (props: Props) => {
               }
               options={[
                 { label: t("tableAssignment.sidePanel.all"), value: "all" },
-                { label: t("tableAssignment.sidePanel.assigned"), value: "assigned" },
-                { label: t("tableAssignment.sidePanel.unassignedTab"), value: "unassigned" },
+                {
+                  label: t("tableAssignment.sidePanel.assigned"),
+                  value: "assigned",
+                },
+                {
+                  label: t("tableAssignment.sidePanel.unassignedTab"),
+                  value: "unassigned",
+                },
               ]}
             />
             <div>
@@ -143,7 +149,9 @@ const SidePanel = (props: Props) => {
                 danger
                 onClick={() => {
                   ctx.dispatch({ type: "UNASSIGN_ALL" });
-                  ctx.messageApi?.success(t("tableAssignment.sidePanel.allGuestsUnassigned"));
+                  ctx.messageApi?.success(
+                    t("tableAssignment.sidePanel.allGuestsUnassigned"),
+                  );
                 }}
               >
                 {t("tableAssignment.sidePanel.unassignAll")}
@@ -193,7 +201,9 @@ const SidePanel = (props: Props) => {
                             {tbl?.table_id ?? tableId}
                           </div>
                           <div className={styles.tableSubtitle}>
-                            {t("tableAssignment.sidePanel.capacity", { count: tbl?.total_number ?? "-" })}
+                            {t("tableAssignment.sidePanel.capacity", {
+                              count: tbl?.total_number ?? "-",
+                            })}
                           </div>
                         </div>
                       </List.Item>
@@ -218,7 +228,10 @@ const SidePanel = (props: Props) => {
                       {selectedTable.table_id}
                     </div>
                     <div className={styles.tableSubtitle}>
-                      {t("tableAssignment.sidePanel.capacityAndSeated", { capacity: selectedTable.total_number, seated: selectedTablePeopleCount })}
+                      {t("tableAssignment.sidePanel.capacityAndSeated", {
+                        capacity: selectedTable.total_number,
+                        seated: selectedTablePeopleCount,
+                      })}
                     </div>
                   </div>
                 </Space>
@@ -226,13 +239,27 @@ const SidePanel = (props: Props) => {
               <div className={styles.sideList + " " + styles.sideListHeight80}>
                 <List
                   size="small"
-                  locale={{ emptyText: t("tableAssignment.sidePanel.noGuestsAssigned") }}
+                  locale={{
+                    emptyText: t("tableAssignment.sidePanel.noGuestsAssigned"),
+                  }}
                   dataSource={selectedTableAssignments}
                   renderItem={(a) => {
                     const g = guestsById.get(a.guest_id);
                     if (!g) return null;
                     const relation = relationsById.get(g.relation_id);
                     const isAssigned = assignedGuestIds.has(g.guest_id);
+                    const partySize = g.party_size ?? (g.plus_one ? 2 : 1);
+                    const seatEnd = a.seat_number + partySize - 1;
+                    const maxSeat = selectedTable.total_number - partySize + 1;
+                    const seatLabel =
+                      partySize > 1
+                        ? t("tableAssignment.seatRange", {
+                            from: a.seat_number,
+                            to: seatEnd,
+                          })
+                        : t("tableAssignment.seatNumber", {
+                            number: a.seat_number,
+                          });
                     return (
                       <List.Item key={a.guest_id}>
                         <Space
@@ -241,7 +268,6 @@ const SidePanel = (props: Props) => {
                           align="center"
                           className={styles.fullWidth}
                         >
-                          <Tag color="geekblue">{t("tableAssignment.seatNumber", { number: a.seat_number })}</Tag>
                           <DraggableGuestRow
                             guest={g}
                             relationName={relation?.name}
@@ -250,28 +276,25 @@ const SidePanel = (props: Props) => {
                           <Space>
                             <Button
                               size="small"
+                              disabled={a.seat_number <= 1}
                               onClick={() => {
                                 ctx.moveGuestSeat?.(
                                   a.guest_id,
                                   selectedTable.table_id,
                                   Math.max(1, a.seat_number - 1),
                                 );
-                                ctx.messageApi?.success(t("tableAssignment.sidePanel.seatMoved"));
                               }}
                               icon={<LeftOutlined />}
                             />
                             <Button
                               size="small"
+                              disabled={a.seat_number >= maxSeat}
                               onClick={() => {
                                 ctx.moveGuestSeat?.(
                                   a.guest_id,
                                   selectedTable.table_id,
-                                  Math.min(
-                                    selectedTable.total_number,
-                                    a.seat_number + 1,
-                                  ),
+                                  Math.min(maxSeat, a.seat_number + 1),
                                 );
-                                ctx.messageApi?.success(t("tableAssignment.sidePanel.seatMoved"));
                               }}
                               icon={<RightOutlined />}
                             />

@@ -19,6 +19,7 @@ export interface Timestamps {
 
 export interface BudgetSummary {
   total_budget: number;
+  total_allocated: number;
   total_spent: number;
   total_remaining: number;
   percentage_spent: number;
@@ -45,6 +46,7 @@ export interface Expense {
   vendor_name?: string;
   expense_date: string;
   payment_status: PaymentStatus;
+  methodOfPayment: string;
   receipt_urls?: string[];
 }
 

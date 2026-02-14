@@ -15,13 +15,18 @@ import {
   Tag,
   Button,
   Alert,
+  App,
 } from "antd";
 import { BulbOutlined, CalculatorOutlined } from "@ant-design/icons";
 import { useBudget } from "../../contexts/BudgetContext";
 import { formatCurrency } from "@/utils/formatters";
 import Statistic from "@/app/common/AnimatedStatistic/AnimatedStatistic";
 import CategoryTag from "../shared/CategoryTag";
-import { CHART_COLORS, SEMANTIC_CHART_COLORS, resolveChartColor } from "@/theme/chartColors";
+import {
+  CHART_COLORS,
+  SEMANTIC_CHART_COLORS,
+  resolveChartColor,
+} from "@/theme/chartColors";
 import { useTheme } from "@/theme/ThemeProvider";
 
 const { Title, Text, Paragraph } = Typography;
@@ -112,6 +117,7 @@ export default function BudgetEstimator() {
   const { state, loadEstimate } = useBudget();
   const { mode } = useTheme();
   const { t } = useTranslation();
+  const { modal, message } = App.useApp();
   const semantic = SEMANTIC_CHART_COLORS[mode];
   const [guestCount, setGuestCount] = useState(100);
   const [weddingStyle, setWeddingStyle] = useState<WeddingStyle>("moderate");
@@ -132,17 +138,59 @@ export default function BudgetEstimator() {
   }, [estimatedBudget, mode]);
 
   const handleApplyEstimate = () => {
-    loadEstimate?.({
-      total_budget: estimatedBudget,
-      categories: categoryEstimates.map((cat) => ({
-        id: cat.name.toLowerCase().replace(/\s+/g, "_"),
-        name: cat.name,
-        allocated: cat.amount,
-        spent: 0,
-        remaining: cat.amount,
-        color: cat.color,
-      })),
-    });
+    const categoriesPayload = categoryEstimates.map((cat) => ({
+      id: cat.name.toLowerCase().replace(/\s+/g, "_"),
+      name: cat.name,
+      allocated: cat.amount,
+      percentage: cat.percentage,
+      spent: 0,
+      remaining: cat.amount,
+      color: cat.color,
+    }));
+
+    const applyAll = () => {
+      loadEstimate?.({
+        total_budget: estimatedBudget,
+        categories: categoriesPayload,
+      });
+      message.success(
+        t("budgetEstimator.estimateApplied", {
+          amount: formatCurrency(estimatedBudget, state.currency),
+        }),
+      );
+    };
+
+    const applyBudgetOnly = () => {
+      loadEstimate?.({ total_budget: estimatedBudget });
+      message.success(
+        t("budgetEstimator.estimateApplied", {
+          amount: formatCurrency(estimatedBudget, state.currency),
+        }),
+      );
+    };
+
+    // If there are existing categories, ask the user whether to apply standard allocations
+    if (state.categories && state.categories.length > 0) {
+      modal.confirm({
+        title: t("budgetEstimator.applyEstimateConfirmTitle"),
+        content: t("budgetEstimator.applyEstimateConfirmDesc"),
+        okText: t(
+          "budgetEstimator.applyEstimateConfirmOk",
+          "Apply Standard Values",
+        ),
+        cancelText: t(
+          "budgetEstimator.applyEstimateConfirmCancel",
+          "Keep Existing",
+        ),
+        onOk: applyAll,
+        onCancel: applyBudgetOnly,
+        centered: true,
+      });
+      return;
+    }
+
+    // No existing categories: apply everything
+    applyAll();
   };
 
   return (
@@ -239,8 +287,10 @@ export default function BudgetEstimator() {
             <Card
               size="small"
               style={{
-                backgroundColor: mode === "dark" ? "rgba(34, 197, 94, 0.08)" : "#F0FDF4",
-                borderColor: mode === "dark" ? "rgba(34, 197, 94, 0.25)" : "#BBF7D0",
+                backgroundColor:
+                  mode === "dark" ? "rgba(34, 197, 94, 0.08)" : "#F0FDF4",
+                borderColor:
+                  mode === "dark" ? "rgba(34, 197, 94, 0.25)" : "#BBF7D0",
               }}
             >
               <Statistic
@@ -252,7 +302,10 @@ export default function BudgetEstimator() {
                 valueStyle={{ color: semantic.success, fontSize: 28 }}
               />
               <Text type="secondary">
-                {t("budgetEstimator.basedOn", { guests: guestCount, style: STYLE_MULTIPLIERS[weddingStyle].label })}
+                {t("budgetEstimator.basedOn", {
+                  guests: guestCount,
+                  style: STYLE_MULTIPLIERS[weddingStyle].label,
+                })}
               </Text>
             </Card>
 

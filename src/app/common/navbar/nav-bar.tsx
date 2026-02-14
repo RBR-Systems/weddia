@@ -6,9 +6,10 @@ import { eventList } from "@/app/data/EventList";
 import { EventStatus } from "@/app/components/events-list/models/enums/event-list-enums";
 import { useEvent } from "@/app/contexts/EventContext";
 import { EventActions } from "@/app/contexts/EventActions";
-import { ThemeToggle } from "@/theme/ThemeToggle";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "../LanguageSwitcher/LanguageSwitcher";
+import { useTheme } from "@/theme/ThemeProvider";
+import { ThemeToggle } from "@/theme/ThemeToggle";
 
 type NavBarProps = {
   state: boolean;
@@ -59,13 +60,19 @@ export const NavBar: React.FC<NavBarProps> = ({
     });
   };
 
-  const eventViews = new Set(["events-hub", "table-assignment", "budget"]);
+  const eventViews = new Set([
+    "events-hub",
+    "table-assignment",
+    "budget",
+    "guest-list",
+  ]);
+  const { mode } = useTheme();
 
   return (
     <div className={styles["navbar"]}>
       <div className={`${styles["navbar-item"]} ${styles["start"]}`}>
         <img
-          src="/weddia-logo.svg"
+          src={mode === "dark" ? "/weddia-logo-dark.svg" : "/weddia-logo.svg"}
           alt="Wedd.IA"
           className={styles["logo"]}
           onClick={() => {

@@ -59,6 +59,7 @@ export type State = {
   tables: Table[];
   assignments: TableAssignment[];
   metersToPixels: number;
+  zoomScale: number;
   pan: { x: number; y: number };
   selectedTableId: string | null;
   guestSearch: string;

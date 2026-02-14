@@ -15,9 +15,10 @@ import EventsHub from "./components/event/event-hub/events-hub";
 import EventList from "./components/events-list/event-list";
 import TableAssignmentPage from "./components/event/table-assignment/TableAssignmentPage";
 import CreateEventModal from "./components/event/create-event-modal/create-event-modal";
-import { Schedule } from "./components/event/schedule";
+import { DayOfEvent } from "./components/event/schedule";
 import BudgetDashboard from "./components/event/budget/BudgetDashboard";
 import MultiClientPage from "./components/multi-client/MultiClientPage";
+import GuestList from "./components/event/guest-list/GuestList";
 import { useTranslation } from "react-i18next";
 
 export default function Home() {
@@ -30,6 +31,8 @@ export default function Home() {
     switch (currentView) {
       case "events-hub":
         return <EventsHub />;
+      case "guest-list":
+        return <GuestList />;
       case "events-list":
         return <EventList />;
       case "multi-client":
@@ -37,7 +40,7 @@ export default function Home() {
       case "table-assignment":
         return <TableAssignmentPage />;
       case "schedule":
-        return <Schedule />;
+        return <DayOfEvent />;
       case "budget":
         return <BudgetDashboard />;
       default:
@@ -56,6 +59,12 @@ export default function Home() {
           label: t("nav.eventsHub"),
           icon: <HomeOutlined />,
           onClick: () => setCurrentView("events-hub"),
+        },
+        {
+          key: "guest-list",
+          label: t("nav.guestList"),
+          icon: <TeamOutlined />,
+          onClick: () => setCurrentView("guest-list"),
         },
         {
           key: "budget",

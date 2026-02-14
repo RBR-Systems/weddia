@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import {
   Card,
   Row,
@@ -12,9 +12,11 @@ import {
   Progress,
   Divider,
   Alert,
+  Tooltip,
 } from "antd";
 import Statistic from "@/app/common/AnimatedStatistic/AnimatedStatistic";
 import { useTranslation } from "react-i18next";
+import { EditOutlined } from "@ant-design/icons";
 import { useBudget } from "../../contexts/BudgetContext";
 import { formatCurrency } from "@/utils/formatters";
 import type { Category } from "../../types/budget.types";
@@ -23,17 +25,30 @@ import styles from "./BudgetAllocation.module.css";
 const { Title, Text } = Typography;
 
 export default function BudgetAllocation() {
-  const { state, updateCategory } = useBudget();
+  const { state, updateCategory, updateBudget } = useBudget();
   const { t } = useTranslation();
+
+  const [editingBudget, setEditingBudget] = useState(false);
+  const [budgetInput, setBudgetInput] = useState<number>(0);
 
   const totalBudget = state.summary?.total_budget ?? 0;
   const totalAllocated = state.categories.reduce(
-    (sum, c) => sum + (c.allocated ?? 0),
+    (sum: number, c: any) => sum + (c.allocated ?? 0),
     0,
   );
   const unallocated = totalBudget - totalAllocated;
   const allocationPercentage =
     totalBudget > 0 ? Math.round((totalAllocated / totalBudget) * 100) : 0;
+
+  const handleEditBudget = () => {
+    setBudgetInput(totalBudget);
+    setEditingBudget(true);
+  };
+
+  const handleSaveBudget = () => {
+    updateBudget(budgetInput);
+    setEditingBudget(false);
+  };
 
   const handleSliderChange = (categoryId: string, value: number) => {
     updateCategory?.(categoryId, { allocated: value });
@@ -57,37 +72,84 @@ export default function BudgetAllocation() {
       title={t("budgetAllocation.title")}
       extra={
         <Space>
-          <Button onClick={distributeEvenly}>{t("budgetAllocation.distributeEvenly")}</Button>
+          <Button onClick={distributeEvenly}>
+            {t("budgetAllocation.distributeEvenly")}
+          </Button>
         </Space>
       }
     >
       <Row gutter={[16, 16]}>
-        <Col xs={24} md={8}>
-          <Card size="small">
-            <Title level={5}>{t("budgetAllocation.totalBudget")}</Title>
-              <Statistic
-                value={totalBudget}
-                formatter={(v) => formatCurrency(Number(v), state.currency)}
-              />
+        <Col xs={24} md={6}>
+          <Card
+            size="small"
+            style={{ cursor: "pointer" }}
+            onClick={!editingBudget ? handleEditBudget : undefined}
+          >
+            {editingBudget ? (
+              <Space direction="vertical" style={{ width: "100%" }}>
+                <Text type="secondary">{t("budgetAllocation.totalBudget")}</Text>
+                <InputNumber
+                  autoFocus
+                  min={0}
+                  step={1000}
+                  value={budgetInput}
+                  onChange={(v) => setBudgetInput(v ?? 0)}
+                  onPressEnter={handleSaveBudget}
+                  onBlur={handleSaveBudget}
+                  formatter={(value) =>
+                    `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  }
+                  parser={(value) => Number(value?.replace(/\$\s?|(,*)/g, "") || 0)}
+                  style={{ width: "100%" }}
+                  size="large"
+                />
+              </Space>
+            ) : (
+              <Tooltip title={t("budgetStats.clickToEdit")}>
+                <Space>
+                  <Statistic
+                    title={t("budgetAllocation.totalBudget")}
+                    value={formatCurrency(totalBudget, state.currency)}
+                  />
+                  <EditOutlined style={{ color: "var(--text-secondary)", fontSize: 14 }} />
+                </Space>
+              </Tooltip>
+            )}
           </Card>
         </Col>
-        <Col xs={24} md={8}>
+        <Col xs={24} md={6}>
           <Card size="small">
-            <Title level={5}>{t("budgetAllocation.allocated")}</Title>
-              <Statistic
-                value={totalAllocated}
-                formatter={(v) => formatCurrency(Number(v), state.currency)}
-              />
+            <Title level={5}>{t("budgetAllocation.allocation")}</Title>
+            <Statistic
+              value={totalAllocated}
+              formatter={(v) => formatCurrency(Number(v), state.currency)}
+            />
           </Card>
         </Col>
-        <Col xs={24} md={8}>
-          <Card size="small">
+        <Col xs={24} md={6}>
+              <Card size="small">
             <Title level={5}>{t("budgetAllocation.unallocated")}</Title>
-              <Statistic
-                value={unallocated}
-                formatter={(v) => formatCurrency(Number(v), state.currency)}
-                valueStyle={unallocated < 0 ? { color: 'var(--danger)' } : undefined}
-              />
+            <Statistic
+              value={unallocated}
+              formatter={(v) => formatCurrency(Number(v), state.currency)}
+                  valueStyle={
+                    unallocated < 0 ? { color: "var(--budget-danger)" } : undefined
+                  }
+            />
+          </Card>
+        </Col>
+        <Col xs={24} md={6}>
+          <Card size="small">
+            <Title level={5}>{t("budgetAllocation.allocationPercent")}</Title>
+            <Statistic
+              value={allocationPercentage}
+              suffix="%"
+              valueStyle={
+                allocationPercentage > 100
+                  ? { color: "var(--budget-danger)" }
+                  : undefined
+              }
+            />
           </Card>
         </Col>
       </Row>
@@ -95,8 +157,10 @@ export default function BudgetAllocation() {
       {unallocated < 0 && (
         <Alert
           message={t("budgetAllocation.overAllocatedTitle")}
-          description={t("budgetAllocation.overAllocatedDesc", { amount: formatCurrency(Math.abs(unallocated), state.currency) })}
-          type="warning"
+          description={t("budgetAllocation.overAllocatedDesc", {
+            amount: formatCurrency(Math.abs(unallocated), state.currency),
+          })}
+          type="error"
           showIcon
           className={styles.overAllocatedAlert}
         />
@@ -110,19 +174,36 @@ export default function BudgetAllocation() {
           const percentage =
             totalBudget > 0 ? Math.round((allocated / totalBudget) * 100) : 0;
 
+          const remainingValue = allocated - (category.spent ?? 0);
+          const remainingLabel =
+            (remainingValue >= 0 ? "+" : "-") +
+            formatCurrency(Math.abs(remainingValue), state.currency);
+
           return (
             <div key={category.id}>
               <div className={styles.categoryRow}>
                 <Space>
                   <span
                     className={styles.categoryDot}
-                    style={{ backgroundColor: category.color || "var(--status-in-progress)" }}
+                    style={{
+                      backgroundColor:
+                        category.color || "var(--status-in-progress)",
+                    }}
                   />
                   <Text strong>{category.name}</Text>
                 </Space>
-                <Text type="secondary">
-                  <Statistic value={percentage} suffix="%" /> {t("budgetAllocation.ofBudget")}
-                </Text>
+                <div style={{ textAlign: "right" }}>
+                  <Text type="secondary" className={styles.smallText}>
+                    <Statistic
+                      value={percentage}
+                      suffix={`% ${t("budgetAllocation.ofBudget")}`}
+                    />
+                    {t("budgetAllocation.remaining", {
+                      amount: remainingLabel,
+                    })}
+                  </Text>
+                  <div></div>
+                </div>
               </div>
               <Row gutter={16} align="middle">
                 <Col flex="auto">
@@ -133,9 +214,13 @@ export default function BudgetAllocation() {
                     value={allocated}
                     onChange={(value) => handleSliderChange(category.id, value)}
                     trackStyle={{
-                      backgroundColor: category.color || "var(--status-in-progress)",
+                      backgroundColor:
+                        category.color || "var(--status-in-progress)",
                     }}
-                    handleStyle={{ borderColor: category.color || "var(--status-in-progress)" }}
+                    handleStyle={{
+                      borderColor:
+                        category.color || "var(--status-in-progress)",
+                    }}
                   />
                 </Col>
                 <Col flex="150px">
@@ -157,13 +242,9 @@ export default function BudgetAllocation() {
               </Row>
               <div className={styles.categoryFooter}>
                 <Text type="secondary" className={styles.smallText}>
-                  {t("budgetAllocation.spent", { amount: formatCurrency(category.spent, state.currency) })}
-                </Text>
-                <Text
-                  type={allocated - category.spent < 0 ? "danger" : "secondary"}
-                  className={styles.smallText}
-                >
-                  {t("budgetAllocation.remaining", { amount: formatCurrency(allocated - category.spent, state.currency) })}
+                  {t("budgetAllocation.allocated", {
+                    amount: formatCurrency(allocated, state.currency),
+                  })}
                 </Text>
               </div>
             </div>

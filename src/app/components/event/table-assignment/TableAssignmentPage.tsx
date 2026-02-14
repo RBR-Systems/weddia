@@ -10,10 +10,7 @@ import {
   InputNumber,
   Tag,
 } from "antd";
-import {
-  INITIAL_METERS_TO_PIXELS,
-  DEFAULT_VENUE_WIDTH_METERS,
-} from "./constants/constants";
+import { DEFAULT_VENUE_WIDTH_METERS } from "./constants/constants";
 import { DndContext, DragOverlay, pointerWithin } from "@dnd-kit/core";
 import {
   TeamOutlined,
@@ -35,11 +32,18 @@ import { TableAssignmentProvider } from "./context/TableAssignmentContext";
 import SidePanel from "./components/SideGuestPanel/SidePanel";
 import { useTranslation } from "react-i18next";
 
-const TableAssignmentPage = () => {
+const TableAssignmentPage = ({
+  highlightTableId,
+}: {
+  highlightTableId?: string | null;
+}) => {
   const [messageApi, contextHolder] = message.useMessage();
 
   return (
-    <TableAssignmentProvider messageApi={messageApi}>
+    <TableAssignmentProvider
+      messageApi={messageApi}
+      initialSelectedTableId={highlightTableId}
+    >
       {contextHolder}
       <TableAssignmentContent />
     </TableAssignmentProvider>
@@ -58,6 +62,7 @@ function TableAssignmentContent() {
     onSelectTable,
     guestsById,
     metersToPixels,
+    zoomScale,
     sensors,
     onDragStart,
     onDragEnd,
@@ -119,8 +124,14 @@ function TableAssignmentContent() {
               {t("tableAssignment.title")}
             </Typography.Title>
             <Typography.Text type="secondary">
-              {activeLayout.name} • {t("tableAssignment.tables", { count: tablesForActiveLayout.length })} •{" "}
-              {t("tableAssignment.guests", { count: Array.from(guestsById.values()).length })}
+              {activeLayout.name} •{" "}
+              {t("tableAssignment.tables", {
+                count: tablesForActiveLayout.length,
+              })}{" "}
+              •{" "}
+              {t("tableAssignment.guests", {
+                count: Array.from(guestsById.values()).length,
+              })}
             </Typography.Text>
           </div>
         </div>
@@ -133,17 +144,24 @@ function TableAssignmentContent() {
                 <TeamOutlined />
                 <span>{t("tableAssignment.seatingChart")}</span>
                 <Tag color="blue" className={styles["tagSpacing"]}>
-                  {t("tableAssignment.guests", { count: Array.from(guestsById.values()).length })}
+                  {t("tableAssignment.guests", {
+                    count: Array.from(guestsById.values()).length,
+                  })}
                 </Tag>
                 <Tag color="orange" className={styles["tagSpacing"]}>
-                  {t("tableAssignment.unassigned", { count: Array.from(guestsById.values()).length -
-                    (assignedGuestIds?.size ?? 0) })}
+                  {t("tableAssignment.unassigned", {
+                    count:
+                      Array.from(guestsById.values()).length -
+                      (assignedGuestIds?.size ?? 0),
+                  })}
                 </Tag>
               </Space>
             }
             extra={
               <Space align="center" size={8}>
-                <Typography.Text type="secondary">{t("tableAssignment.grid")}</Typography.Text>
+                <Typography.Text type="secondary">
+                  {t("tableAssignment.grid")}
+                </Typography.Text>
                 <InputNumber
                   min={1}
                   value={activeLayout.x_grid_size}
@@ -211,7 +229,7 @@ function TableAssignmentContent() {
                 className={styles.zoomPercentage}
                 type="secondary"
               >
-                {Math.round((metersToPixels / INITIAL_METERS_TO_PIXELS) * 100)}%
+                {Math.round(zoomScale * 100)}%
               </Typography.Text>
             </div>
             <div
@@ -223,16 +241,19 @@ function TableAssignmentContent() {
                 } as React.CSSProperties
               }
             >
-              <TableCanvas
-                tableOrder={tableOrder}
-                tablesForActiveLayoutById={tablesForActiveLayoutById}
-                assignmentsByTable={assignmentsByTable}
-                selectedTableId={selectedTableId}
-                onSelectTable={onSelectTable}
-                guestsById={guestsById}
-                metersToPixels={metersToPixels}
-                activeLayout={activeLayout}
-              />
+              <div className={styles.canvasScroll}>
+                <TableCanvas
+                  tableOrder={tableOrder}
+                  tablesForActiveLayoutById={tablesForActiveLayoutById}
+                  assignmentsByTable={assignmentsByTable}
+                  selectedTableId={selectedTableId}
+                  onSelectTable={onSelectTable}
+                  guestsById={guestsById}
+                  metersToPixels={metersToPixels}
+                  activeLayout={activeLayout}
+                  zoomScale={zoomScale}
+                />
+              </div>
             </div>
           </Card>
 

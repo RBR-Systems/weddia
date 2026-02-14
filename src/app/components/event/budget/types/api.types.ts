@@ -32,6 +32,7 @@ export interface ExpenseAPI extends Timestamps {
   amount: number;
   expense_date: string;
   payment_status: "paid" | "pending" | "overdue" | "partial" | "cancelled";
+  methodOfPayment: string;
   currency: string;
   notes: string;
   receipt_url: string | null;
@@ -171,6 +172,7 @@ export interface CreateExpenseRequest {
   amount: number;
   expense_date: string;
   payment_status: "paid" | "pending" | "overdue" | "partial";
+  methodOfPayment: string;
   currency: string;
   notes?: string;
 }
@@ -182,6 +184,7 @@ export interface UpdateExpenseRequest {
   vendor_id?: string;
   expense_date?: string;
   payment_status?: "paid" | "pending" | "overdue" | "partial";
+  methodOfPayment?: string;
   notes?: string;
 }
 
