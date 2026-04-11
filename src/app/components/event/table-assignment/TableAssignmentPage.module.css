@@ -285,8 +285,11 @@
 
 .sideContainer {
   flex: 0 0 360px;
+  height: 100%;
   min-height: 0;
-  overflow: auto;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .canvasWrapper {

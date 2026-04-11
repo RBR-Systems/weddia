@@ -52,7 +52,7 @@ export default function BudgetStats() {
           onClick={!editingBudget ? handleEditBudget : undefined}
         >
           {editingBudget ? (
-            <Space direction="vertical" style={{ width: "100%" }}>
+            <Space orientation="vertical" style={{ width: "100%" }}>
               <Text type="secondary">{t("budgetStats.totalBudget")}</Text>
               <InputNumber
                 autoFocus
@@ -91,11 +91,7 @@ export default function BudgetStats() {
           <Statistic
             title={t("budgetStats.totalAllocated")}
             value={formatCurrency(totalAllocated, currency)}
-            valueStyle={
-              totalAllocated > summary.total_budget || totalAllocated < 0
-                ? { color: "var(--budget-danger)" }
-                : undefined
-            }
+            styles={{ content: { color: totalAllocated > summary.total_budget || totalAllocated < 0 ? "var(--budget-danger)" : undefined } }}
           />
         </Card>
       </Col>
@@ -105,7 +101,7 @@ export default function BudgetStats() {
           <Statistic
             title={t("budgetStats.totalSpent")}
             value={formatCurrency(summary.total_spent, currency)}
-            valueStyle={summary.total_spent < 0 ? { color: "var(--budget-danger)" } : undefined}
+            styles={{ content: { color: summary.total_spent < 0 ? "var(--budget-danger)" : undefined } }}
           />
         </Card>
       </Col>
@@ -115,7 +111,7 @@ export default function BudgetStats() {
           <Statistic
             title={t("budgetStats.remaining")}
             value={formatCurrency(summary.total_remaining, currency)}
-            valueStyle={summary.total_remaining < 0 ? { color: "var(--budget-danger)" } : undefined}
+            styles={{ content: { color: summary.total_remaining < 0 ? "var(--budget-danger)" : undefined } }}
           />
         </Card>
       </Col>
@@ -126,7 +122,7 @@ export default function BudgetStats() {
             title={t("budgetStats.spentPercent")}
             value={summary.percentage_spent}
             suffix="%"
-            valueStyle={summary.percentage_spent >= 100 ? { color: "var(--budget-danger)" } : undefined}
+            styles={{ content: { color: summary.percentage_spent >= 100 ? "var(--budget-danger)" : undefined } }}
           />
         </Card>
       </Col>
@@ -142,7 +138,7 @@ export default function BudgetStats() {
           <Statistic
             title={t("budgetStats.averageExpense")}
             value={formatCurrency(avgExpense, currency)}
-            valueStyle={avgExpense < 0 ? { color: "var(--budget-danger)" } : undefined}
+            styles={{ content: { color: avgExpense < 0 ? "var(--budget-danger)" : undefined } }}
           />
         </Card>
       </Col>

@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { App, Button, Col, Empty, Row, Space, Spin, Tag } from "antd";
 import { ReloadOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
+import { useEvent } from "@/app/contexts/EventContext";
 import {
   CheckInGuest,
   CheckInStatusFilter,
@@ -36,6 +37,8 @@ const STATUS_FILTER_COLORS: Record<string, string> = {
 const CheckInDashboard: React.FC<CheckInDashboardProps> = ({ onNavigateToTable }) => {
   const { t } = useTranslation();
   const { message } = App.useApp();
+  const { state: { events: { selectedEvent } } } = useEvent();
+  const eventId = (selectedEvent as any)?.id ?? 1;
 
   const [guests, setGuests] = useState<CheckInGuest[]>([]);
   const [relations, setRelations] = useState<
@@ -55,12 +58,13 @@ const CheckInDashboard: React.FC<CheckInDashboardProps> = ({ onNavigateToTable }
   const [actualPartySize, setActualPartySize] = useState(1);
 
   useEffect(() => {
-    fetchCheckInData().then(({ guests, relations }) => {
+    setLoading(true);
+    fetchCheckInData(eventId).then(({ guests, relations }) => {
       setGuests(guests);
       setRelations(relations);
       setLoading(false);
     });
-  }, []);
+  }, [eventId]);
 
   const stats = computeStats(guests);
 

@@ -1,6 +1,7 @@
 import { EventStatus } from "./enums/event-list-enums";
 
 export interface EventCardProps {
+  id?: number;
   eventName: string;
   status: EventStatus;
   date: string;

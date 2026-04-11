@@ -154,7 +154,7 @@ const CheckInModal: React.FC<CheckInModalProps> = ({
           {t("checkIn.modal.contactInfo")}
         </div>
         {guest.phone || guest.email ? (
-          <Space direction="vertical" size={4}>
+          <Space orientation="vertical" size={4}>
             {guest.phone && (
               <Space>
                 <PhoneOutlined />

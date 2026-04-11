@@ -25,6 +25,7 @@ interface FiltersProps {
   }) => void;
 }
 
+export default function Filters({
   relations,
   value = {},
   onChange,

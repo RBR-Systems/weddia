@@ -1,240 +1,205 @@
-.scheduleItemActive {
-  transition:
-    background 0.2s,
-    box-shadow 0.18s;
-  border-left: 4px solid var(--now-indicator) !important;
-  box-shadow: 0 8px 24px var(--now-indicator-glow);
-  animation: schedulePulse 2.4s ease-in-out infinite;
-}
-
+/* ── Card base ────────────────────────────────────────────────────── */
 .scheduleItem {
-  transition:
-    box-shadow 0.18s,
-    transform 0.12s,
-    background 0.12s,
-    opacity 0.3s;
+  border-radius: var(--radius-md) !important;
+  border-left: 3px solid transparent !important;
+  transition: box-shadow 0.15s ease, transform 0.12s ease, opacity 0.2s ease !important;
+  cursor: pointer;
+  margin-bottom: 2px;
 }
 
 .scheduleItem:hover {
-  box-shadow: var(--shadow-md);
-  transform: translateY(-3px);
-  cursor: pointer;
+  box-shadow: var(--shadow-warm-md) !important;
+  transform: translateY(-1px);
 }
 
-.scheduleItemPast {
-  opacity: 0.55;
-  filter: grayscale(30%);
-  background: transparent !important;
+/* Status border colors */
+.scheduleItemActive   { border-left-color: var(--now-indicator) !important; animation: schedulePulse 2.4s ease-in-out infinite; }
+.scheduleItemCompleted { border-left-color: var(--status-completed) !important; }
+.scheduleItemCancelled { border-left-color: var(--status-canceled) !important; }
+.scheduleItemDelayed  { border-left-color: var(--status-delayed) !important; }
+
+.scheduleItem[data-status="in_progress"] { border-left-color: var(--status-in-progress) !important; }
+.scheduleItem[data-past="true"] { opacity: 0.55; filter: grayscale(25%); }
+.scheduleItem[data-status="cancelled"]:hover { cursor: not-allowed; }
+
+@keyframes schedulePulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 77, 79, 0.15); }
+  50%       { box-shadow: 0 0 0 4px rgba(255, 77, 79, 0.08); }
 }
 
+/* ── Now progress bar ────────────────────────────────────────────── */
 .nowProgressWrap {
-  height: 6px;
+  height: 3px;
   background: var(--subtle-bg);
-  border-radius: var(--radius-sm);
+  border-radius: 2px;
   overflow: hidden;
-  margin-bottom: var(--spacing-sm);
+  margin-bottom: 8px;
 }
-
 .nowProgress {
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    var(--now-indicator),
-    var(--status-delayed)
-  );
+  background: linear-gradient(90deg, var(--now-indicator), var(--status-delayed));
   transition: width 0.4s ease;
 }
 
-@keyframes schedulePulse {
-  0% {
-    box-shadow: 0 8px 24px var(--now-indicator-glow);
-  }
-  50% {
-    box-shadow: 0 12px 36px var(--now-indicator-glow);
-  }
-  100% {
-    box-shadow: 0 8px 24px var(--now-indicator-glow);
-  }
-}
-
-.statusControls {
+/* ── Main row ────────────────────────────────────────────────────── */
+.row {
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
+  gap: 12px;
+  width: 100%;
+  min-height: 36px;
 }
 
-.timeLabel {
-  font-size: var(--fs-sm);
-  font-weight: var(--bold-font);
-  color: var(--text-color);
-  min-width: 72px;
+/* Time column */
+.timeCol {
+  flex-shrink: 0;
+  width: 52px;
   text-align: right;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  color: var(--text-color-secondary);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
 }
 
-.actionButtons {
+/* Title + meta column */
+.titleCol {
+  flex: 1;
+  min-width: 0;
   display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
+  flex-direction: column;
+  gap: 2px;
 }
 
-/* Status-based styling */
-.scheduleItemCompleted {
-  border-left: 3px solid var(--status-completed) !important;
-}
-
-.scheduleItemCancelled {
-  border-left: 3px solid var(--status-canceled) !important;
-}
-
-.scheduleItemDelayed {
-  border-left: 3px solid var(--status-delayed) !important;
-}
-
-.scheduleItem[data-status="in_progress"] {
-  border-left: 3px solid var(--status-in-progress) !important;
-  box-shadow: 0 0 0 2px var(--status-in-progress-bg);
-}
-
-.scheduleItem[data-status="completed"]:hover {
-  opacity: 0.85;
-}
-
-.scheduleItem[data-status="cancelled"]:hover {
-  opacity: 0.65;
-  cursor: not-allowed;
-}
-
-/* Additional classes used in the TSX */
-.fullWidth {
-  width: 100%;
-}
-.headerRow {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  width: 100%;
-}
-.headerRow {
-  position: relative;
-}
-
-.titleCenter {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  top: var(--spacing-sm);
-  pointer-events: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 60%;
-  text-align: center;
-}
-.titleCenter .title,
-.titleCenter .titleCancelled {
-  pointer-events: auto;
-}
-.setupTimeBlock {
-  background: linear-gradient(90deg, var(--subtle-bg), var(--subtle-bg-hover));
-  border-left: 4px solid var(--text-color-muted);
-  padding: var(--spacing-sm) var(--spacing-ms);
-  font-size: var(--fs-sm);
-  display: flex;
-  gap: var(--spacing-sm);
-  align-items: center;
-  margin-bottom: var(--spacing-sm);
-  border-radius: var(--radius-sm);
-  box-shadow: var(--shadow-xs);
-}
-.setupTimeLabel {
-  font-weight: var(--bold-font);
-  color: var(--text-color);
-  font-size: var(--fs-sm);
-}
-.setupIcon {
-  color: var(--text-color-tertiary);
-  font-size: var(--fs-lg);
-}
-.setupLabel {
-  color: var(--text-color);
-  font-weight: var(--semi-bold-font);
-}
-.headerLeft {
-  display: flex;
-  align-items: center;
-}
-.headerRight {
-  display: flex;
-  align-items: center;
-}
-.typeTag {
-  margin: 0;
-  color: #fff;
-  padding: var(--spacing-xs) var(--spacing-sm);
-  border-radius: var(--radius-sm);
-  text-transform: capitalize;
-  border: none;
-}
 .title {
-}
-.titleCancelled {
-  text-decoration: line-through;
-  color: var(--text-color-muted);
-}
-.statusLabel {
   font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--text-color);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.3;
 }
-.statusButtonsWrap {
-  margin-left: var(--spacing-xs);
+
+.titleCancelled {
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--text-color-muted);
+  text-decoration: line-through;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.3;
 }
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.metaItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: var(--fs-2xs);
+  color: var(--text-color-tertiary);
+  white-space: nowrap;
+}
+
+/* Tags column */
+.tagsCol {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.typeTag {
+  margin: 0 !important;
+  color: #fff !important;
+  font-size: 11px !important;
+  padding: 1px 7px !important;
+  border-radius: 10px !important;
+  border: none !important;
+  text-transform: capitalize;
+  line-height: 18px;
+}
+
+/* Status column */
+.statusCol {
+  flex-shrink: 0;
+  width: 86px;
+  display: flex;
+  align-items: center;
+}
+
+.statusLabel {
+  font-size: var(--fs-2xs);
+  white-space: nowrap;
+}
+
+/* Actions column */
+.actionsCol {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.scheduleItem:hover .actionsCol {
+  opacity: 1;
+}
+
+/* Status cycle buttons */
+.statusButtons {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  flex-shrink: 0;
+}
+
 .smallIconBtn {
-  padding: 0 var(--spacing-xs);
-  height: 18px;
-  font-size: var(--fs-3xs);
-  line-height: 1;
+  padding: 0 2px !important;
+  height: 16px !important;
+  font-size: 9px !important;
+  line-height: 1 !important;
+  min-width: 0 !important;
 }
-.metaRow {
+
+/* ── Setup block ─────────────────────────────────────────────────── */
+.setupTimeBlock {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  color: var(--text-color-secondary);
-  gap: var(--spacing-md);
+  gap: 6px;
+  padding: 4px 8px;
+  background: var(--subtle-bg);
+  border-left: 3px solid var(--text-color-muted);
+  border-radius: var(--radius-sm);
+  margin-bottom: 6px;
+  font-size: var(--fs-2xs);
 }
-.metaLeft {
-  display: flex;
-  gap: var(--spacing-ms);
-  align-items: center;
-}
-.location {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--spacing-xs);
-  color: var(--text-color-secondary);
-}
-.duration {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--spacing-xs);
-  color: var(--text-color-secondary);
-}
-.deleteBtn {
-  margin-left: var(--spacing-sm);
-}
+.setupTimeLabel { font-weight: 700; color: var(--text-color); }
+.setupIcon { color: var(--text-color-tertiary); font-size: 12px; }
+.setupLabel { color: var(--text-color-secondary); }
+
+/* ── Expanded area ────────────────────────────────────────────────── */
 .expandedArea {
-  width: 100%;
-  margin-top: var(--spacing-sm);
-}
-.detailLine {
-  margin-bottom: var(--spacing-sm);
-}
-.detailNotes {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--divider);
+  font-size: var(--fs-sm);
   color: var(--text-color-secondary);
-}
-.detailsFooter {
-  margin-top: var(--spacing-sm);
   display: flex;
-  justify-content: flex-end;
+  flex-direction: column;
+  gap: 4px;
 }
-.passedTag {
-  margin-right: var(--spacing-sm);
-}
+.detailLine { color: var(--text-color); }
+.detailNotes { color: var(--text-color-tertiary); font-style: italic; }
+.passedTag { align-self: flex-end; }
+
+/* ── Full width helper ───────────────────────────────────────────── */
+.fullWidth { width: 100%; }

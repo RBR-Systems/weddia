@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { Input, Button, List, Avatar, Spin, Tag } from "antd";
+import { Input, Button, Avatar, Spin, Tag } from "antd";
 import Card from "@/app/common/Card/card";
 import { useTableAssignmentContext } from "../../context/TableAssignmentContext";
 import { SendOutlined, RobotOutlined, UserOutlined } from "@ant-design/icons";
@@ -50,56 +50,38 @@ const SeatingAIChat: React.FC<SeatingAIChatProps> = ({
   return (
     <Card className={styles.chatCard}>
       <div className={styles.messagesContainer}>
-        <List
-          dataSource={messages}
-          renderItem={(msg) => (
-            <div
-              className={
-                msg.type === "user"
-                  ? styles.userMessage
-                  : styles.assistantMessage
-              }
-            >
-              <div className={styles.messageAvatar}>
-                <Avatar
-                  icon={
-                    msg.type === "user" ? <UserOutlined /> : <RobotOutlined />
-                  }
-                  className={
-                    msg.type === "user"
-                      ? styles.avatarUser
-                      : styles.avatarAssistant
-                  }
-                />
-              </div>
-              <div className={styles.messageContent}>
-                <div className={styles.messageText}>{msg.content}</div>
-                {msg.data && (
-                  <div className={styles.messageActions}>
-                    <Tag color="blue">
-                      {t("tableAssignment.aiChat.assignments", { count: msg.data.assignments.length })}
-                    </Tag>
-                    {appliedMessageId !== msg.id && (
-                      <Button
-                        type="primary"
-                        size="small"
-                        onClick={() => handleApply(msg.data!, msg.id)}
-                      >
-                        {t("tableAssignment.aiChat.applyArrangement")}
-                      </Button>
-                    )}
-                    {appliedMessageId === msg.id && (
-                      <Tag color="success">{t("tableAssignment.aiChat.arrangementApplied")}</Tag>
-                    )}
-                  </div>
-                )}
-                <div className={styles.messageTime}>
-                  {formatTime(msg.timestamp)}
-                </div>
-              </div>
+        {messages.map((msg) => (
+          <div
+            key={msg.id}
+            className={msg.type === "user" ? styles.userMessage : styles.assistantMessage}
+          >
+            <div className={styles.messageAvatar}>
+              <Avatar
+                icon={msg.type === "user" ? <UserOutlined /> : <RobotOutlined />}
+                className={msg.type === "user" ? styles.avatarUser : styles.avatarAssistant}
+              />
             </div>
-          )}
-        />
+            <div className={styles.messageContent}>
+              <div className={styles.messageText}>{msg.content}</div>
+              {msg.data && (
+                <div className={styles.messageActions}>
+                  <Tag color="blue">
+                    {t("tableAssignment.aiChat.assignments", { count: msg.data.assignments.length })}
+                  </Tag>
+                  {appliedMessageId !== msg.id && (
+                    <Button type="primary" size="small" onClick={() => handleApply(msg.data!, msg.id)}>
+                      {t("tableAssignment.aiChat.applyArrangement")}
+                    </Button>
+                  )}
+                  {appliedMessageId === msg.id && (
+                    <Tag color="success">{t("tableAssignment.aiChat.arrangementApplied")}</Tag>
+                  )}
+                </div>
+              )}
+              <div className={styles.messageTime}>{formatTime(msg.timestamp)}</div>
+            </div>
+          </div>
+        ))}
         {loading && (
           <div className={styles.loadingMessage}>
             <Spin /> {t("tableAssignment.aiChat.aiThinking")}

@@ -7,13 +7,13 @@ import {
   PlusOutlined,
 } from "@ant-design/icons";
 import {
+  App,
   Card,
   Row,
   Col,
   Button,
   Modal,
   Upload,
-  message,
   Form,
   Input,
   InputNumber,
@@ -26,10 +26,12 @@ import { formatPhone } from "@/utils/formatters";
 import Header from "@/app/common/Header/header";
 import countryCodes from "@/data/country-codes.json";
 import { useTranslation } from "react-i18next";
+import { useEvent } from "@/app/contexts/EventContext";
 import {
   fetchGuests,
   fetchRelations,
   removeGuest as removeGuestService,
+  createGuest,
 } from "./service/guest.service";
 import StatsBar from "./components/StatsBar/StatsBar";
 import GuestTable from "./components/GuestTable/GuestTable";
@@ -38,6 +40,9 @@ import styles from "./GuestList.module.css";
 
 export default function GuestList() {
   const { t } = useTranslation();
+  const { message } = App.useApp();
+  const { state: { events: { selectedEvent } } } = useEvent();
+  const eventId = (selectedEvent as any)?.id ?? 1;
   const [guests, setGuests] = useState<Guest[]>([]);
   const [importOpen, setImportOpen] = useState(false);
   const [importing, setImporting] = useState(false);
@@ -57,14 +62,14 @@ export default function GuestList() {
   }>({ status: "all" });
 
   useEffect(() => {
-    fetchGuests()
+    fetchGuests(eventId)
       .then(setGuests)
       .catch(() => setGuests([]));
 
     fetchRelations()
       .then(setRelations)
       .catch(() => setRelations([]));
-  }, []);
+  }, [eventId]);
 
   const applyFilters = (list: Guest[]) => {
     return list.filter((g) => {
@@ -510,8 +515,7 @@ export default function GuestList() {
           onFinish={async (values) => {
             setAdding(true);
             try {
-              const newGuest: Guest = {
-                guest_id: `guest-${Date.now()}`,
+              const saved = await createGuest(eventId, {
                 first_name: values.first_name || "",
                 last_name: values.last_name || "",
                 email: values.email || undefined,
@@ -523,21 +527,21 @@ export default function GuestList() {
                 dietary_restrictions: values.dietary_restrictions
                   ? String(values.dietary_restrictions)
                       .split(/,|;/)
-                      .map((s) => s.trim())
+                      .map((s: string) => s.trim())
                       .filter(Boolean)
                   : undefined,
                 accesability_needs: values.accesability_needs || undefined,
                 notes: values.notes || undefined,
                 plus_one: null,
-              } as Guest;
+              });
 
-              setGuests((prev) => [newGuest, ...prev]);
-              message.success("Guest added");
+              setGuests((prev) => [saved, ...prev]);
+              message.success(t("guestList.added", "Guest added"));
               form.resetFields();
               setAddOpen(false);
             } catch (err) {
               console.error(err);
-              message.error("Failed to add guest");
+              message.error(t("guestList.addFailed", "Failed to add guest"));
             } finally {
               setAdding(false);
             }

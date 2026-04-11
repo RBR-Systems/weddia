@@ -39,7 +39,7 @@ export default function ExpenseModal({ visible, onClose }: Props) {
       open={visible}
       onOk={onOk}
       onCancel={onClose}
-      destroyOnClose
+      destroyOnHidden
     >
       <Form form={form} layout="vertical">
                 <Form.Item

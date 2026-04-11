@@ -53,7 +53,7 @@ function DashboardContent() {
   const [vendorDrawerOpen, setVendorDrawerOpen] = useState(false);
 
   if (state.isLoading) {
-    return <Card loading className={dashboardStyles.loadingCard} />;
+    return <Card loading className={dashboardStyles.loadingCard}>{null}</Card>;
   }
 
   if (state.error) {
@@ -89,7 +89,7 @@ function DashboardContent() {
       ),
       children: (
         <Space
-          direction="vertical"
+          orientation="vertical"
           className={dashboardStyles.tabContent}
           size="large"
         >

@@ -1,6 +1,7 @@
 "use client";
 import styles from "./TableAssignmentPage.module.css";
 import {
+  App,
   Card,
   Empty,
   Space,
@@ -8,6 +9,9 @@ import {
   Button,
   FloatButton,
   InputNumber,
+  Modal,
+  Form,
+  Select,
   Tag,
 } from "antd";
 import { DEFAULT_VENUE_WIDTH_METERS } from "./constants/constants";
@@ -23,8 +27,7 @@ import {
   ZoomInOutlined,
   PlusSquareOutlined,
 } from "@ant-design/icons";
-import React from "react";
-import { message } from "antd";
+import React, { useState } from "react";
 import TableCanvas from "./components/Tables/TableCanvas/TableCanvas";
 import SeatingAIChat from "./components/AIChat/SeatingAIChat";
 import { useTableAssignmentContext } from "./context/TableAssignmentContext";
@@ -37,14 +40,13 @@ const TableAssignmentPage = ({
 }: {
   highlightTableId?: string | null;
 }) => {
-  const [messageApi, contextHolder] = message.useMessage();
+  const { message: messageApi } = App.useApp();
 
   return (
     <TableAssignmentProvider
       messageApi={messageApi}
       initialSelectedTableId={highlightTableId}
     >
-      {contextHolder}
       <TableAssignmentContent />
     </TableAssignmentProvider>
   );
@@ -98,6 +100,9 @@ function TableAssignmentContent() {
   } = useTableAssignmentContext();
 
   const canvasWrapperRef = React.useRef<HTMLDivElement | null>(null);
+  const [addTableOpen, setAddTableOpen] = useState(false);
+  const [addTableForm] = Form.useForm();
+  const { addTable } = useTableAssignmentContext() as any;
 
   if (!activeLayout) {
     return (
@@ -125,15 +130,18 @@ function TableAssignmentContent() {
             </Typography.Title>
             <Typography.Text type="secondary">
               {activeLayout.name} •{" "}
-              {t("tableAssignment.tables", {
-                count: tablesForActiveLayout.length,
-              })}{" "}
+              {t("tableAssignment.tables", { count: tablesForActiveLayout.length })}{" "}
               •{" "}
-              {t("tableAssignment.guests", {
-                count: Array.from(guestsById.values()).length,
-              })}
+              {t("tableAssignment.guests", { count: Array.from(guestsById.values()).length })}
             </Typography.Text>
           </div>
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={() => setAddTableOpen(true)}
+          >
+            {t("tableAssignment.addTable", "Add Table")}
+          </Button>
         </div>
 
         <div className={styles.contentGrid + " " + styles.contentGridFull}>
@@ -320,6 +328,51 @@ function TableAssignmentContent() {
           </div>
         ) : null}
       </DragOverlay>
+
+      {/* Add Table modal */}
+      <Modal
+        title={t("tableAssignment.addTable", "Add Table")}
+        open={addTableOpen}
+        onCancel={() => { setAddTableOpen(false); addTableForm.resetFields(); }}
+        onOk={() => addTableForm.submit()}
+        okText={t("common.add", "Add")}
+        forceRender
+      >
+        <Form
+          form={addTableForm}
+          layout="vertical"
+          initialValues={{ shape: "round", seats: 8, xGrid: 5, yGrid: 5 }}
+          onFinish={async (values) => {
+            await addTable?.({
+              shape: values.shape,
+              seats: values.seats,
+              xGrid: values.xGrid,
+              yGrid: values.yGrid,
+            });
+            setAddTableOpen(false);
+            addTableForm.resetFields();
+          }}
+        >
+          <Form.Item name="shape" label={t("tableAssignment.tableShape", "Shape")} rules={[{ required: true }]}>
+            <Select options={[
+              { value: "round", label: t("tableAssignment.shapes.round", "Round") },
+              { value: "rectangular", label: t("tableAssignment.shapes.rectangular", "Rectangular") },
+              { value: "square", label: t("tableAssignment.shapes.square", "Square") },
+            ]} />
+          </Form.Item>
+          <Form.Item name="seats" label={t("tableAssignment.numberOfSeats", "Number of seats")} rules={[{ required: true }]}>
+            <InputNumber min={1} max={30} style={{ width: "100%" }} />
+          </Form.Item>
+          <Space style={{ width: "100%" }}>
+            <Form.Item name="xGrid" label={t("tableAssignment.positionX", "Position X")} style={{ flex: 1 }}>
+              <InputNumber min={0} style={{ width: "100%" }} />
+            </Form.Item>
+            <Form.Item name="yGrid" label={t("tableAssignment.positionY", "Position Y")} style={{ flex: 1 }}>
+              <InputNumber min={0} style={{ width: "100%" }} />
+            </Form.Item>
+          </Space>
+        </Form>
+      </Modal>
     </DndContext>
   );
 }

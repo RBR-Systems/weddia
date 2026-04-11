@@ -33,9 +33,10 @@ export default function AnimatedStatistic({ value, durationMs = 800, formatter, 
   const duration = Math.max(0.1, durationMs / 1000);
 
   // If caller provided a formatter function, use it as formattingFn for CountUp.
-  const formattingFn = formatter
-    ? (n: number) => String(formatter(n as any))
-    : undefined;
+  const formattingFn =
+    formatter && typeof formatter === "function"
+      ? (n: number) => String((formatter as (v: number) => React.ReactNode)(n))
+      : undefined;
 
   const renderValue = (val: any) => (
     <CountUp

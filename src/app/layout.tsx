@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import "antd/dist/reset.css";
 import { EventProvider } from "./contexts/EventContext";
+import { AuthProvider } from "./contexts/AuthContext";
 import ThemeProvider from "@/theme/ThemeProvider";
 import I18nProvider from "./common/I18nProvider/I18nProvider";
 
@@ -31,7 +32,9 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <I18nProvider>
           <ThemeProvider>
-            <EventProvider>{children}</EventProvider>
+            <AuthProvider>
+              <EventProvider>{children}</EventProvider>
+            </AuthProvider>
           </ThemeProvider>
         </I18nProvider>
       </body>

@@ -72,7 +72,7 @@ const DayOfEvent: React.FC = () => {
         items={items}
         className={styles.tabs}
         size="large"
-        destroyInactiveTabPane={false}
+        destroyOnHidden={false}
       />
     </div>
   );

@@ -58,7 +58,7 @@ export default function StatsBar({
             title={formatStatusLabel("attending")}
             value={attending}
             prefix={<CheckCircleOutlined />}
-            valueStyle={{ color: "green" }}
+            styles={{ content: { color: "green" } }}
           />
         </Card>
       </Col>
@@ -73,7 +73,7 @@ export default function StatsBar({
             title={formatStatusLabel("pending")}
             value={pending}
             prefix={<ClockCircleOutlined />}
-            valueStyle={{ color: "#faad14" }}
+            styles={{ content: { color: "#faad14" } }}
           />
         </Card>
       </Col>
@@ -88,7 +88,7 @@ export default function StatsBar({
             title={formatStatusLabel("maybe")}
             value={maybe}
             prefix={<QuestionCircleOutlined />}
-            valueStyle={{ color: "#1890ff" }}
+            styles={{ content: { color: "#1890ff" } }}
           />
         </Card>
       </Col>

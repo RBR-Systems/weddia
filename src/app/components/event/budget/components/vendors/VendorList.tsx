@@ -118,7 +118,7 @@ export default function VendorList({ onViewVendor }: VendorListProps) {
       title: t("vendorList.columns.contact"),
       key: "contact",
       render: (_, record) => (
-        <Space direction="vertical" size={0}>
+        <Space orientation="vertical" size={0}>
           {record.email && (
             <Text className={styles["smallText"]}>
               <MailOutlined /> {record.email}

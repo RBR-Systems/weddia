@@ -1,5 +1,5 @@
 import React from "react";
-import { Space, Input, Select, List, Tag, Empty, Button } from "antd";
+import { Space, Input, Select, Tag, Empty, Button } from "antd";
 import Card from "@/app/common/Card/card";
 import { Segmented } from "antd";
 import DraggableGuestRow from "../DraggableguestRow/DraggableGuestRow";
@@ -9,6 +9,7 @@ import { UserOutlined, TeamOutlined, WarningOutlined } from "@ant-design/icons";
 import { LeftOutlined, RightOutlined } from "@ant-design/icons";
 import { useTableAssignmentContext } from "../../context/TableAssignmentContext";
 import type { Guest, TableAssignment } from "../../models/types";
+import { Progress } from "antd";
 import { useTranslation } from "react-i18next";
 
 type Props = {
@@ -64,6 +65,7 @@ const SidePanel = (props: Props) => {
   const tables = tableOrder ?? [];
   const tablesById = tablesForActiveLayoutById ?? new Map();
   const ctx = useTableAssignmentContext();
+  const assignmentsByTable = (ctx as any).assignmentsByTable as Map<string, TableAssignment[]>;
   const { t } = useTranslation();
   const handleSelectTable = onSelectTable ?? (() => {});
   const unassignedCount =
@@ -113,7 +115,8 @@ const SidePanel = (props: Props) => {
       {sideView === "guests" ? (
         <div className={styles.sideBody}>
           <UnassignedDropZone />
-          <Space direction="vertical" size={10} className={styles.spaceMargin}>
+          <div className={styles.sideFilters}>
+          <Space orientation="vertical" size={10} className={styles.spaceMargin}>
             <Input.Search
               value={guestSearch}
               onChange={(e) => setGuestSearch(e.target.value)}
@@ -158,24 +161,21 @@ const SidePanel = (props: Props) => {
               </Button>
             </div>
           </Space>
-          <div className={styles.sideList + " " + styles.sideListHeight180}>
-            <List
-              size="small"
-              dataSource={filteredGuests}
-              renderItem={(g) => {
-                const relation = relationsById.get(g.relation_id);
-                const isAssigned = assignedGuestIds.has(g.guest_id);
-                return (
-                  <List.Item key={g.guest_id} className={styles.guestRow}>
-                    <DraggableGuestRow
-                      guest={g}
-                      relationName={relation?.name}
-                      isAssigned={isAssigned}
-                    />
-                  </List.Item>
-                );
-              }}
-            />
+          </div>
+          <div className={styles.sideList}>
+            {filteredGuests.map((g) => {
+              const relation = relationsById.get(g.relation_id);
+              const isAssigned = assignedGuestIds.has(g.guest_id);
+              return (
+                <div key={g.guest_id} className={styles.guestRow}>
+                  <DraggableGuestRow
+                    guest={g}
+                    relationName={relation?.name}
+                    isAssigned={isAssigned}
+                  />
+                </div>
+              );
+            })}
           </div>
         </div>
       ) : (
@@ -185,31 +185,47 @@ const SidePanel = (props: Props) => {
               {tables.length === 0 ? (
                 <Empty description={t("tableAssignment.sidePanel.noTables")} />
               ) : (
-                <List
-                  size="small"
-                  dataSource={tables}
-                  renderItem={(tableId) => {
+                <div className={styles.tableList}>
+                  {tables.map((tableId) => {
                     const tbl = tablesById.get(tableId);
+                    const capacity = tbl?.total_number ?? 0;
+                    const assignments = assignmentsByTable?.get(tableId) ?? [];
+                    const seated = assignments.reduce((sum: number, a: any) => {
+                      const g = guestsById?.get(a.guest_id);
+                      return sum + (g?.party_size ?? 1);
+                    }, 0);
+                    const pct = capacity > 0 ? Math.round((seated / capacity) * 100) : 0;
+                    const isFull = seated >= capacity && capacity > 0;
+                    const shapeIcon = tbl?.shape === "rectangular" ? "▬" : tbl?.shape === "square" ? "■" : "●";
+
                     return (
-                      <List.Item
+                      <div
                         key={tableId}
                         className={styles.tableListItem}
                         onClick={() => handleSelectTable(tableId)}
                       >
-                        <div>
-                          <div className={styles.tableTitle}>
-                            {tbl?.table_id ?? tableId}
-                          </div>
-                          <div className={styles.tableSubtitle}>
-                            {t("tableAssignment.sidePanel.capacity", {
-                              count: tbl?.total_number ?? "-",
-                            })}
+                        <div className={styles.tableListRow}>
+                          <span className={styles.tableShapeIcon}>{shapeIcon}</span>
+                          <div className={styles.tableListInfo}>
+                            <div className={styles.tableListHeader}>
+                              <span className={styles.tableTitle}>{tableId}</span>
+                              <span className={styles.tableSeats} style={{ color: isFull ? "var(--status-canceled)" : "var(--text-color-secondary)" }}>
+                                {seated}/{capacity}
+                              </span>
+                            </div>
+                            <Progress
+                              percent={pct}
+                              size="small"
+                              showInfo={false}
+                              strokeColor={isFull ? "var(--status-canceled)" : pct > 75 ? "var(--status-delayed)" : "var(--primary)"}
+                              style={{ margin: 0 }}
+                            />
                           </div>
                         </div>
-                      </List.Item>
+                      </div>
                     );
-                  }}
-                />
+                  })}
+                </div>
               )}
             </div>
           ) : (
@@ -236,14 +252,11 @@ const SidePanel = (props: Props) => {
                   </div>
                 </Space>
               </div>
-              <div className={styles.sideList + " " + styles.sideListHeight80}>
-                <List
-                  size="small"
-                  locale={{
-                    emptyText: t("tableAssignment.sidePanel.noGuestsAssigned"),
-                  }}
-                  dataSource={selectedTableAssignments}
-                  renderItem={(a) => {
+              <div className={styles.sideList}>
+                {selectedTableAssignments.length === 0 ? (
+                  <Empty description={t("tableAssignment.sidePanel.noGuestsAssigned")} />
+                ) : (
+                  selectedTableAssignments.map((a) => {
                     const g = guestsById.get(a.guest_id);
                     if (!g) return null;
                     const relation = relationsById.get(g.relation_id);
@@ -261,9 +274,9 @@ const SidePanel = (props: Props) => {
                             number: a.seat_number,
                           });
                     return (
-                      <List.Item key={a.guest_id}>
+                      <div key={a.guest_id}>
                         <Space
-                          direction="horizontal"
+                          orientation="horizontal"
                           size={8}
                           align="center"
                           className={styles.fullWidth}
@@ -300,10 +313,10 @@ const SidePanel = (props: Props) => {
                             />
                           </Space>
                         </Space>
-                      </List.Item>
+                      </div>
                     );
-                  }}
-                />
+                  })
+                )}
               </div>
             </>
           )}

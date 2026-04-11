@@ -244,7 +244,7 @@ export default function PaymentStatusManager() {
         okText={t("paymentStatus.confirmPayment")}
       >
         {markPaidModal && (
-          <Space direction="vertical" className={payStyles.fullWidth}>
+          <Space orientation="vertical" className={payStyles.fullWidth}>
             <div>
               <Text type="secondary">{t("paymentStatus.expense")}</Text>
               <div>

@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Card,
-  List,
   Switch,
   Typography,
   Space,
@@ -198,70 +197,57 @@ export default function NotificationsPanel() {
           {notifications.length === 0 ? (
             <Empty description={t("notifications.noNotifications")} />
           ) : (
-            <List
-              dataSource={notifications}
-              renderItem={(notification) => {
+            <div>
+              {notifications.map((notification) => {
                 const config = NOTIFICATION_CONFIG[notification.type];
                 return (
-                  <List.Item
+                  <div
+                    key={notification.id}
                     className={notification.read ? notifStyles.notificationItemRead : notifStyles.notificationItemUnread}
-                    actions={[
-                      !notification.read && (
-                        <Button
-                          key="read"
-                          type="link"
-                          size="small"
-                          onClick={() => markAsRead(notification.id)}
-                        >
+                    style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", padding: "12px 0", borderBottom: "1px solid var(--border-color, #f0f0f0)" }}
+                  >
+                    <div style={{ display: "flex", gap: 12, flex: 1 }}>
+                      <span className={notifStyles.notificationIcon} style={{ color: config.color, flexShrink: 0 }}>
+                        {config.icon}
+                      </span>
+                      <div>
+                        <Space>
+                          <Text strong={!notification.read}>{notification.title}</Text>
+                          <Tag color={config.color}>{notification.type}</Tag>
+                        </Space>
+                        <Space orientation="vertical" size={0} style={{ display: "flex", flexDirection: "column" }}>
+                          <Text>{notification.message}</Text>
+                          <Text type="secondary" className={notifStyles.notificationTimestamp}>
+                            {dayjs(notification.timestamp).format("MMM D, h:mm A")}
+                          </Text>
+                        </Space>
+                      </div>
+                    </div>
+                    <Space>
+                      {!notification.read && (
+                        <Button type="link" size="small" onClick={() => markAsRead(notification.id)}>
                           {t("notifications.markRead")}
                         </Button>
-                      ),
+                      )}
                       <Button
-                        key="delete"
                         type="link"
                         danger
                         size="small"
                         icon={<DeleteOutlined />}
                         onClick={() => deleteNotification(notification.id)}
-                      />,
-                    ].filter(Boolean)}
-                  >
-                    <List.Item.Meta
-                      avatar={
-                        <span className={notifStyles.notificationIcon} style={{ color: config.color }}>
-                          {config.icon}
-                        </span>
-                      }
-                      title={
-                        <Space>
-                          <Text strong={!notification.read}>
-                            {notification.title}
-                          </Text>
-                          <Tag color={config.color}>{notification.type}</Tag>
-                        </Space>
-                      }
-                      description={
-                        <Space direction="vertical" size={0}>
-                          <Text>{notification.message}</Text>
-                            <Text type="secondary" className={notifStyles.notificationTimestamp}>
-                            {dayjs(notification.timestamp).format(
-                              "MMM D, h:mm A",
-                            )}
-                          </Text>
-                        </Space>
-                      }
-                    />
-                  </List.Item>
+                      />
+                    </Space>
+                  </div>
                 );
-              }}
-            />
+              })}
+            </div>
           )}
         </Card>
       </Col>
 
       <Col xs={24} lg={8}>
         <Card title={t("notifications.settingsTitle")}>
-            <Space direction="vertical" className={notifStyles.fullWidth} size="middle">
+            <Space orientation="vertical" className={notifStyles.fullWidth} size="middle">
             <div className={notifStyles.settingRow}>
               <div>
                 <Text strong>{t("notifications.settings.budgetAlerts")}</Text>

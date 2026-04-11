@@ -18,6 +18,7 @@ import {
   DEFAULT_CURRENCY,
 } from "../constants/budget.constants";
 import { BudgetService } from "../services/budget.service";
+import { useEvent } from "@/app/contexts/EventContext";
 
 type Action =
   | { type: "SET_LOADING"; payload: boolean }
@@ -252,12 +253,13 @@ const BudgetContext = createContext<any>(null);
 
 export function BudgetProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(reducer, initialState);
+  const { state: { events: { selectedEvent } } } = useEvent();
+  const eventId = (selectedEvent as any)?.id ?? 1;
 
-  const loadBudgetData = useCallback(async (eventId?: string) => {
+  const loadBudgetData = useCallback(async (eid?: number) => {
     dispatch({ type: "SET_LOADING", payload: true });
     try {
-      // Use the budget service to fetch data
-      const data = await BudgetService.getBudgetData(eventId || "event_001");
+      const data = await BudgetService.getBudgetData(eid ?? eventId);
 
       const budgetData: Partial<BudgetState> = {
         summary: {
@@ -287,6 +289,7 @@ export function BudgetProvider({ children }: { children: React.ReactNode }) {
           vendor_name: e.vendor_name,
           expense_date: e.expense_date,
           payment_status: e.payment_status,
+          methodOfPayment: e.methodOfPayment ?? "",
           receipt_urls: e.receipt_url ? [e.receipt_url] : [],
         })),
         currency: data.budget.currency as Currency,
@@ -303,41 +306,71 @@ export function BudgetProvider({ children }: { children: React.ReactNode }) {
     } finally {
       dispatch({ type: "SET_LOADING", payload: false });
     }
-  }, []);
+  }, [eventId]);
 
   useEffect(() => {
-    loadBudgetData();
-  }, [loadBudgetData]);
+    loadBudgetData(eventId);
+  }, [eventId, loadBudgetData]);
 
-  const refreshData = () => loadBudgetData();
+  const refreshData = () => loadBudgetData(eventId);
 
   const addExpense = (payload: Omit<Expense, "expense_id">) => {
     const expense: Expense = { ...payload, expense_id: generateId() };
     dispatch({ type: "ADD_EXPENSE", payload: expense });
+    BudgetService.createExpense(eventId, payload).catch((err) =>
+      console.error("createExpense failed:", err),
+    );
   };
 
   const updateExpense = (id: string, data: Partial<Expense>) => {
     dispatch({ type: "UPDATE_EXPENSE", payload: { id, data } });
+    BudgetService.updateExpense(eventId, id, data).catch((err) =>
+      console.error("updateExpense failed:", err),
+    );
   };
 
   const deleteExpense = (expenseId: string) => {
     dispatch({ type: "DELETE_EXPENSE", payload: expenseId });
+    BudgetService.deleteExpense(eventId, expenseId).catch((err) =>
+      console.error("deleteExpense failed:", err),
+    );
   };
 
   const addCategory = (category: Category) => {
     dispatch({ type: "ADD_CATEGORY", payload: category });
+    BudgetService.createCategory(eventId, {
+      name: category.name,
+      allocated: category.allocated ?? 0,
+    })
+      .then(({ budgetId }) => {
+        // Patch the temporary id with the real one from the API
+        dispatch({
+          type: "UPDATE_CATEGORY",
+          payload: { id: category.id, data: { id: String(budgetId) } },
+        });
+      })
+      .catch((err) => console.error("createCategory failed:", err));
   };
 
   const updateCategory = (id: string, data: Partial<Category>) => {
     dispatch({ type: "UPDATE_CATEGORY", payload: { id, data } });
+    BudgetService.updateCategory(id, data).catch((err) =>
+      console.error("updateCategory failed:", err),
+    );
   };
 
   const deleteCategory = (categoryId: string) => {
     dispatch({ type: "DELETE_CATEGORY", payload: categoryId });
+    BudgetService.deleteCategory(categoryId).catch((err) =>
+      console.error("deleteCategory failed:", err),
+    );
   };
 
   const updateBudget = (totalBudget: number) => {
     dispatch({ type: "UPDATE_BUDGET", payload: totalBudget });
+    BudgetService.updateBudget(eventId, { total_budget: totalBudget }).catch((err) =>
+      console.error("updateBudget failed:", err),
+    );
   };
 
   const loadTemplate = (template: any) => {

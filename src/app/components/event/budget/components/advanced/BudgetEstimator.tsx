@@ -203,7 +203,7 @@ export default function BudgetEstimator() {
             </>
           }
         >
-          <Space direction="vertical" style={{ width: "100%" }} size="large">
+          <Space orientation="vertical" style={{ width: "100%" }} size="large">
             <div>
               <Text strong>{t("budgetEstimator.numberOfGuests")}</Text>
               <Row gutter={16} align="middle" style={{ marginTop: 8 }}>
@@ -299,7 +299,7 @@ export default function BudgetEstimator() {
                 formatter={(value) =>
                   formatCurrency(Number(value), state.currency)
                 }
-                valueStyle={{ color: semantic.success, fontSize: 28 }}
+                styles={{ content: { color: semantic.success, fontSize: 28 } }}
               />
               <Text type="secondary">
                 {t("budgetEstimator.basedOn", {
@@ -325,7 +325,7 @@ export default function BudgetEstimator() {
           }
         >
           <Alert
-            message={t("budgetEstimator.industryStandard")}
+            title={t("budgetEstimator.industryStandard")}
             description={t("budgetEstimator.industryStandardDesc")}
             type="info"
             showIcon

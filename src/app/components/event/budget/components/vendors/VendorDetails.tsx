@@ -94,7 +94,7 @@ export default function VendorDetails({
       open={open}
       onClose={onClose}
     >
-      <Space direction="vertical" className={vendorStyles.fullWidth} size="large">
+      <Space orientation="vertical" className={vendorStyles.fullWidth} size="large">
         <Space>
           <Avatar
             size={64}
