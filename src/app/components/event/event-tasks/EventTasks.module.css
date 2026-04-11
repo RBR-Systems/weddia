@@ -1,0 +1,409 @@
+.taskDashboard {
+  padding: var(--spacing-md);
+}
+
+.dashboardTitle {
+  margin-bottom: var(--spacing-md);
+}
+
+.tabContent {
+  width: 100%;
+}
+
+.loadingCard {
+  min-height: 400px;
+}
+
+/* ── Progress Dashboard ── */
+
+.progressGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.progressCard {
+  text-align: center;
+}
+
+.progressCardValue {
+  font-size: var(--fs-2xl);
+  font-weight: var(--bold-font);
+}
+
+.progressCardLabel {
+  font-size: var(--fs-sm);
+  opacity: 0.7;
+}
+
+/* ── Category progress ── */
+
+.categoryProgressList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.categoryRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.categoryDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.categoryName {
+  min-width: 140px;
+  font-size: var(--fs-sm);
+  font-weight: var(--semi-bold-font);
+}
+
+.categoryBar {
+  flex: 1;
+}
+
+.categoryFraction {
+  font-size: var(--fs-xs);
+  min-width: 60px;
+  text-align: right;
+  opacity: 0.7;
+}
+
+/* ── Task List ── */
+
+.taskListHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+.taskListActions {
+  display: flex;
+  gap: var(--spacing-sm);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.filterRow {
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+  margin-bottom: var(--spacing-md);
+}
+
+.taskGroup {
+  margin-bottom: var(--spacing-lg);
+}
+
+.taskGroupTitle {
+  font-size: var(--fs-lg);
+  font-weight: var(--semi-bold-font);
+  margin-bottom: var(--spacing-sm);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.taskGroupCount {
+  font-size: var(--fs-xs);
+  opacity: 0.6;
+  font-weight: var(--regular-font);
+}
+
+.taskGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: var(--spacing-md);
+}
+
+/* ── Task Card ── */
+
+.taskCard {
+  border-radius: var(--radius-md);
+  transition: box-shadow 0.2s, transform 0.15s;
+  cursor: pointer;
+  position: relative;
+}
+
+.taskCard:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.taskCardOverdue {
+  border-left: 4px solid #ef4444;
+}
+
+.taskCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--spacing-xs);
+}
+
+.taskTitle {
+  font-weight: var(--semi-bold-font);
+  font-size: var(--fs-base);
+  flex: 1;
+  margin-right: var(--spacing-sm);
+}
+
+.taskDescription {
+  font-size: var(--fs-sm);
+  opacity: 0.7;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-bottom: var(--spacing-sm);
+}
+
+.taskMeta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+  margin-top: var(--spacing-sm);
+}
+
+.taskMetaLeft {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: var(--fs-xs);
+  opacity: 0.7;
+}
+
+.assigneeAvatars {
+  display: flex;
+  gap: -4px;
+}
+
+.assigneeAvatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: var(--semi-bold-font);
+  color: #fff;
+  margin-left: -4px;
+}
+
+.assigneeAvatar:first-child {
+  margin-left: 0;
+}
+
+.quickComplete {
+  position: absolute;
+  top: var(--spacing-sm);
+  right: var(--spacing-sm);
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.taskCard:hover .quickComplete {
+  opacity: 1;
+}
+
+/* ── Detail Modal ── */
+
+.detailSection {
+  margin-bottom: var(--spacing-lg);
+}
+
+.detailSectionTitle {
+  font-size: var(--fs-base);
+  font-weight: var(--semi-bold-font);
+  margin-bottom: var(--spacing-sm);
+}
+
+.detailGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-sm) var(--spacing-lg);
+}
+
+.detailLabel {
+  font-size: var(--fs-xs);
+  opacity: 0.6;
+  margin-bottom: 2px;
+}
+
+.detailValue {
+  font-size: var(--fs-sm);
+  font-weight: var(--medium-font);
+}
+
+.assigneeList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.assigneeItem {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.assigneeInfo {
+  flex: 1;
+}
+
+.assigneeName {
+  font-weight: var(--semi-bold-font);
+  font-size: var(--fs-sm);
+}
+
+.assigneeEmail {
+  font-size: var(--fs-xs);
+  opacity: 0.6;
+}
+
+/* ── Template Selector ── */
+
+.templateHeader {
+  text-align: center;
+  margin-bottom: var(--spacing-lg);
+}
+
+.templateTitle {
+  font-size: var(--fs-xl);
+  font-weight: var(--bold-font);
+}
+
+.templateDescription {
+  opacity: 0.7;
+  margin-top: var(--spacing-xs);
+}
+
+.templateSections {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--spacing-sm);
+  margin: var(--spacing-md) 0;
+}
+
+.templateSectionCard {
+  text-align: center;
+  padding: var(--spacing-sm);
+}
+
+.templateSectionName {
+  font-weight: var(--semi-bold-font);
+  font-size: var(--fs-sm);
+}
+
+.templateSectionCount {
+  font-size: var(--fs-xs);
+  opacity: 0.6;
+}
+
+.templateFeatures {
+  margin: var(--spacing-md) 0;
+}
+
+.templateFeatureItem {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-xs) 0;
+  font-size: var(--fs-sm);
+}
+
+/* ── Empty state ── */
+
+.emptyState {
+  text-align: center;
+  padding: var(--spacing-2xl) var(--spacing-md);
+}
+
+/* ── Responsive ── */
+
+@media (max-width: 768px) {
+  .taskGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .progressGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .filterRow {
+    flex-direction: column;
+  }
+
+  .detailGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .templateSections {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .calendarLayout {
+    flex-direction: column;
+  }
+
+  .calendarMain {
+    max-width: 100%;
+  }
+}
+
+/* ── Calendar ── */
+
+.calendarLayout {
+  display: flex;
+  gap: var(--spacing-md);
+  align-items: flex-start;
+}
+
+.calendarMain {
+  flex: 1;
+  min-width: 0;
+  max-width: 60%;
+}
+
+.calendarSidebar {
+  width: 380px;
+  flex-shrink: 0;
+}
+
+.calendarCell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.calendarBadge {
+  font-size: 10px;
+}
+
+.calendarDots {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+  justify-content: center;
+}
+
+.calendarDot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  display: inline-block;
+}

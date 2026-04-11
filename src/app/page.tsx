@@ -19,6 +19,7 @@ import { DayOfEvent } from "./components/event/schedule";
 import BudgetDashboard from "./components/event/budget/BudgetDashboard";
 import MultiClientPage from "./components/multi-client/MultiClientPage";
 import GuestList from "./components/event/guest-list/GuestList";
+import EventTasksDashboard from "./components/event/event-tasks/EventTasksDashboard";
 import { useTranslation } from "react-i18next";
 
 export default function Home() {
@@ -43,6 +44,8 @@ export default function Home() {
         return <DayOfEvent />;
       case "budget":
         return <BudgetDashboard />;
+      case "tasks":
+        return <EventTasksDashboard />;
       default:
         return <EventsHub />;
     }
@@ -83,6 +86,12 @@ export default function Home() {
           label: t("nav.schedule"),
           icon: <ScheduleOutlined />,
           onClick: () => setCurrentView("schedule"),
+        },
+        {
+          key: "tasks",
+          label: t("nav.tasks"),
+          icon: <UnorderedListOutlined />,
+          onClick: () => setCurrentView("tasks"),
         },
       ],
     },

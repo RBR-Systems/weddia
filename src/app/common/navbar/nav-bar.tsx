@@ -8,6 +8,7 @@ import { useEvent } from "@/app/contexts/EventContext";
 import { EventActions } from "@/app/contexts/EventActions";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "../LanguageSwitcher/LanguageSwitcher";
+import NotificationBell from "./NotificationBell";
 import { useTheme } from "@/theme/ThemeProvider";
 import { ThemeToggle } from "@/theme/ThemeToggle";
 
@@ -98,9 +99,7 @@ export const NavBar: React.FC<NavBarProps> = ({
         >
           {t("common.newEvent")}
         </Button>
-        <Badge count={3} size="small" className={styles["badge-background"]}>
-          <BellOutlined className={styles["icon"]} />
-        </Badge>
+        <NotificationBell />
         <LanguageSwitcher />
         <ThemeToggle />
       </div>

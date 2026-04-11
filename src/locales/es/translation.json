@@ -128,6 +128,7 @@
     "budget": "Presupuesto",
     "tableAssignment": "Asignación de Mesas",
     "schedule": "Cronograma",
+    "tasks": "Tareas",
     "planner": "Planificador",
     "eventsList": "Lista de Eventos",
     "multiClient": "Presupuestos Multi-Cliente",
@@ -915,6 +916,181 @@
       "guestsLoaded": "Datos de invitados cargados"
     },
     "emptyState": "Ningún invitado coincide con los filtros actuales"
+  },
+  "tasks": {
+    "title": "Gestión de Tareas",
+    "tabs": {
+      "dashboard": "Panel",
+      "tasks": "Tareas",
+      "calendar": "Calendario",
+      "templates": "Plantillas"
+    },
+    "searchPlaceholder": "Buscar tareas...",
+    "newTask": "Nueva Tarea",
+    "createFirst": "Crear Primera Tarea",
+    "emptyState": "No hay tareas aún. Crea tu primera tarea o genera desde plantilla.",
+    "groups": {
+      "overdue": "Vencidas",
+      "thisWeek": "Esta Semana",
+      "nextWeek": "Próxima Semana",
+      "later": "Más Adelante",
+      "completed": "Completadas"
+    },
+    "viewMode": {
+      "cards": "Tarjetas",
+      "table": "Tabla"
+    },
+    "priority": {
+      "label": "Prioridad",
+      "urgent": "Urgente",
+      "high": "Alta",
+      "medium": "Media",
+      "low": "Baja"
+    },
+    "status": {
+      "pending": "Pendiente",
+      "in_progress": "En Progreso",
+      "completed": "Completada",
+      "cancelled": "Cancelada",
+      "on_hold": "En Espera"
+    },
+    "sort": {
+      "dueDate": "Fecha de Vencimiento",
+      "priority": "Prioridad",
+      "createdDate": "Fecha de Creación",
+      "name": "Nombre"
+    },
+    "card": {
+      "overdueDays": "Vencida hace {{count}} días",
+      "dueToday": "Vence Hoy",
+      "dueDays": "Vence en {{count}} días",
+      "markComplete": "Marcar como completada",
+      "milestone": "Hito"
+    },
+    "roles": {
+      "owner": "Propietario",
+      "assignee": "Asignado",
+      "collaborator": "Colaborador",
+      "viewer": "Observador"
+    },
+    "assigneeStatus": {
+      "pending": "Pendiente",
+      "accepted": "Aceptado",
+      "declined": "Rechazado",
+      "completed": "Completado"
+    },
+    "visibility": {
+      "private": "Privada",
+      "shared": "Compartida",
+      "public": "Pública"
+    },
+    "detail": {
+      "progress": "Progreso",
+      "subtasks": "{{completed}} de {{total}} subtareas completadas",
+      "details": "Detalles",
+      "dueDate": "Fecha de Vencimiento",
+      "startDate": "Fecha de Inicio",
+      "estimatedHours": "Horas Estimadas",
+      "estimatedCost": "Costo Estimado",
+      "location": "Ubicación",
+      "visibility": "Visibilidad",
+      "tags": "Etiquetas",
+      "notes": "Notas",
+      "assignedTo": "Asignado a",
+      "noAssignees": "Sin asignar",
+      "attachments": "Adjuntos",
+      "createdAt": "Creado: {{date}}",
+      "updatedAt": "Actualizado: {{date}}"
+    },
+    "form": {
+      "createTitle": "Crear Tarea",
+      "editTitle": "Editar Tarea",
+      "title": "Título",
+      "titleRequired": "Por favor ingresa un título",
+      "titlePlaceholder": "ej., Contratar fotógrafo",
+      "descriptionPlaceholder": "Describe esta tarea...",
+      "dueDate": "Fecha de Vencimiento",
+      "dueDateRequired": "Por favor selecciona una fecha",
+      "startDate": "Fecha de Inicio",
+      "estimatedHours": "Horas Est.",
+      "estimatedCost": "Costo Estimado",
+      "actualCost": "Costo Real",
+      "location": "Ubicación",
+      "locationPlaceholder": "ej., Monterrey, NL",
+      "notes": "Notas",
+      "milestone": "Hito",
+      "visibility": "Visibilidad",
+      "categoryPlaceholder": "Seleccionar categoría",
+      "assignees": "Asignar Personas",
+      "assigneesPlaceholder": "Seleccionar miembros del equipo..."
+    },
+    "calendar": {
+      "title": "Calendario de Tareas",
+      "tasksLabel": "tareas",
+      "noTasks": "No hay tareas programadas para este día"
+    },
+    "progress": {
+      "overallProgress": "Progreso General",
+      "tasksCompleted": "{{completed}} de {{total}} tareas",
+      "tasksLabel": "tareas",
+      "dueThisWeek": "Vencen Esta Semana",
+      "overdue": "Vencidas",
+      "inProgress": "En Progreso",
+      "pending": "Pendientes",
+      "milestones": "Hitos",
+      "byCategory": "Progreso por Categoría",
+      "byPriority": "Por Prioridad",
+      "budgetOverview": "Resumen de Presupuesto",
+      "totalBudget": "Presupuesto Total",
+      "budgetSpent": "Presupuesto Gastado",
+      "budgetRemaining": "restante",
+      "taskCosts": "Costos de Tareas",
+      "estimatedCost": "Costo Estimado",
+      "actualCost": "Costo Real",
+      "topBudgetCategories": "Categorías Principales del Presupuesto",
+      "noBudgetLinked": "Conecta tu presupuesto para una visión completa",
+      "teamWorkload": "Carga de Trabajo del Equipo",
+      "noAssignees": "Aún no hay miembros del equipo asignados",
+      "upcomingMilestones": "Próximos Hitos",
+      "budgetTracker": "Control de Presupuesto"
+    },
+    "template": {
+      "title": "Plantillas de Tareas",
+      "description": "Usa plantillas para configurar rápidamente una línea de tiempo completa para tu evento, o previsualiza una para ver qué incluye.",
+      "mexicanDesc": "Línea de tiempo completa con 200+ tareas cubriendo ceremonias civil y religiosa, padrinos, proveedores y todas las tradiciones de boda mexicana.",
+      "preview": "Vista Previa",
+      "apply": "Aplicar",
+      "sections": "secciones",
+      "required": "Requeridas",
+      "optionalLabel": "Opcionales",
+      "comingSoon": "Más plantillas próximamente",
+      "totalTasks": "Total de tareas",
+      "createFromTemplate": "Crear desde Plantilla",
+      "createTimeline": "Crear Mi Línea de Tiempo",
+      "weddingDate": "Fecha de tu boda",
+      "weddingDatePlaceholder": "Selecciona la fecha de boda",
+      "weddingDateHelp": "Las tareas se programarán automáticamente basadas en esta fecha",
+      "includeOptional": "Incluir tareas opcionales",
+      "includeOptionalDesc": "Agrega extras como cabina fotográfica, mariachi, pirotecnia, etc.",
+      "tasks": "tareas",
+      "whatIncluded": "Qué Incluye",
+      "optional": "Opcional",
+      "feature1": "Programación basada en línea de tiempo (12 meses hasta el día de la boda)",
+      "feature2": "Requisitos de ceremonia civil y documentación",
+      "feature3": "Ceremonia religiosa con roles tradicionales (Padrinos)",
+      "feature4": "Planeación de Despedida de Soltera",
+      "feature5": "Gestión de proveedores para el mercado mexicano",
+      "successTitle": "¡Línea de Tiempo Creada!",
+      "successSubtitle": "Se generaron {{count}} tareas con fechas de vencimiento auto-calculadas",
+      "viewTasks": "Ver Tareas"
+    },
+    "messages": {
+      "taskCompleted": "\"{{title}}\" completada",
+      "taskDeleted": "Tarea eliminada",
+      "taskCreated": "Tarea creada",
+      "taskUpdated": "Tarea actualizada",
+      "templateApplied": "{{count}} tareas generadas desde plantilla"
+    }
   },
   "language": {
     "en": "English",
