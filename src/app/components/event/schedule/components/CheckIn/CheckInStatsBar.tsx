@@ -52,7 +52,7 @@ const CheckInStatsBar: React.FC<CheckInStatsBarProps> = ({
             title={t("checkIn.stats.checkedIn")}
             value={stats.checkedIn}
             prefix={<CheckCircleOutlined />}
-            valueStyle={{ color: "var(--status-completed)" }}
+            styles={{ content: { color: "var(--status-completed)" } }}
           />
         </Card>
       </Col>
@@ -66,7 +66,7 @@ const CheckInStatsBar: React.FC<CheckInStatsBarProps> = ({
             title={t("checkIn.stats.notArrived")}
             value={stats.notArrived}
             prefix={<ClockCircleOutlined />}
-            valueStyle={{ color: "#faad14" }}
+            styles={{ content: { color: "#faad14" } }}
           />
         </Card>
       </Col>
@@ -80,7 +80,7 @@ const CheckInStatsBar: React.FC<CheckInStatsBarProps> = ({
             value={stats.attendanceRate}
             suffix="%"
             prefix={<PercentageOutlined />}
-            valueStyle={{ color: "var(--status-in-progress)" }}
+            styles={{ content: { color: "var(--status-in-progress)" } }}
           />
         </Card>
       </Col>
@@ -94,7 +94,7 @@ const CheckInStatsBar: React.FC<CheckInStatsBarProps> = ({
             title={t("checkIn.stats.specialNeeds")}
             value={stats.specialNeedsCount}
             prefix={<AlertOutlined />}
-            valueStyle={{ color: "#722ed1" }}
+            styles={{ content: { color: "#722ed1" } }}
           />
         </Card>
       </Col>

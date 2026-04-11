@@ -1,31 +1,29 @@
 .sideCard {
+  /* Fill the sideContainer and become a flex column */
   height: 100%;
-  padding: var(--spacing-sm);
-  position: relative;
-  min-width: 300px;
-  max-width: 25vw;
-  z-index: 20;
+  flex: 1;
+  display: flex !important;
+  flex-direction: column !important;
   overflow: hidden;
   border-radius: var(--radius-md);
-  display: flex;
-  flex-direction: column;
-  flex: 1 0 auto;
 }
 
 .closed {
   display: none;
 }
 
-.sideTop {
-  margin-bottom: var(--spacing-sm);
+/* Card inner structure */
+.sideCard :global(.ant-card-head) {
+  flex-shrink: 0;
 }
 
 .sideCard :global(.ant-card-body) {
-  display: flex;
-  flex-direction: column;
-  padding: 0;
-  flex: 1 1 0%;
-  min-height: 0;
+  flex: 1 1 0% !important;
+  min-height: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  padding: 8px !important;
+  overflow: hidden;
 }
 
 .sideBody {
@@ -34,12 +32,27 @@
   gap: var(--spacing-ms);
   flex: 1 1 0%;
   min-height: 0;
+  overflow: hidden;
 }
 
+/* Filters area — fixed height, never shrinks */
+.sideFilters {
+  flex-shrink: 0;
+}
+
+/* Scrollable guest list — takes remaining space */
 .sideList {
-  flex: 1;
-  overflow: auto;
+  flex: 1 1 0%;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
   padding-right: var(--spacing-xs);
+}
+
+.sideList::-webkit-scrollbar { width: 4px; }
+.sideList::-webkit-scrollbar-thumb {
+  background: var(--text-color-muted);
+  border-radius: 4px;
 }
 
 .guestRow :global(.ant-list-item-meta-title) {
@@ -59,28 +72,66 @@
   color: var(--text-color-muted);
 }
 
+.tableList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
 .tableListItem {
   cursor: pointer;
-  transition:
-    background 120ms ease,
-    transform 120ms ease;
+  padding: 8px 10px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--divider);
+  background: var(--primary-background);
+  transition: background 150ms ease, box-shadow 150ms ease, transform 120ms ease;
 }
+
 .tableListItem:hover {
-  background: var(--subtle-bg-hover);
+  background: var(--primary-background-hover);
+  box-shadow: var(--shadow-warm-sm);
   transform: translateY(-1px);
+}
+
+.tableListRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.tableShapeIcon {
+  font-size: 18px;
+  color: var(--primary);
+  flex-shrink: 0;
+  width: 24px;
+  text-align: center;
+  opacity: 0.75;
+}
+
+.tableListInfo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tableListHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tableSeats {
+  font-size: var(--fs-xs);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
 }
 
 .spaceMargin {
   margin: var(--spacing-ms);
 }
 
-.sideListHeight180 {
-  height: calc(100% - 180px);
-}
-
-.sideListHeight80 {
-  height: calc(100% - 80px);
-}
 
 .fullWidth {
   width: 100%;

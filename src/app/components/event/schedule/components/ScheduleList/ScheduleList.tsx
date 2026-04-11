@@ -98,7 +98,7 @@ const ScheduleList: React.FC<Props> = ({
 
     return {
       key: item.timeline_item_id,
-      children: (
+      content: (
         <div
           ref={(el) => {
             itemRefs.current[item.timeline_item_id] = el;
@@ -166,7 +166,7 @@ const ScheduleList: React.FC<Props> = ({
         </div>
       ),
       color: "red",
-      children: (
+      content: (
         <div ref={nowItemRef} className={styles.nowIndicator}>
           <div className={styles.nowLabel}>
             <strong>{t("common.now")}</strong>
@@ -186,7 +186,7 @@ const ScheduleList: React.FC<Props> = ({
 
   return (
     <Timeline
-      mode="end"
+      mode="start"
       items={timelineItems}
       className={styles.timelineWrap}
     />

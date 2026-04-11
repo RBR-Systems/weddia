@@ -86,7 +86,7 @@ export default function BudgetAllocation() {
             onClick={!editingBudget ? handleEditBudget : undefined}
           >
             {editingBudget ? (
-              <Space direction="vertical" style={{ width: "100%" }}>
+              <Space orientation="vertical" style={{ width: "100%" }}>
                 <Text type="secondary">{t("budgetAllocation.totalBudget")}</Text>
                 <InputNumber
                   autoFocus
@@ -132,9 +132,7 @@ export default function BudgetAllocation() {
             <Statistic
               value={unallocated}
               formatter={(v) => formatCurrency(Number(v), state.currency)}
-                  valueStyle={
-                    unallocated < 0 ? { color: "var(--budget-danger)" } : undefined
-                  }
+                  styles={{ content: { color: unallocated < 0 ? "var(--budget-danger)" : undefined } }}
             />
           </Card>
         </Col>
@@ -144,11 +142,7 @@ export default function BudgetAllocation() {
             <Statistic
               value={allocationPercentage}
               suffix="%"
-              valueStyle={
-                allocationPercentage > 100
-                  ? { color: "var(--budget-danger)" }
-                  : undefined
-              }
+              styles={{ content: { color: allocationPercentage > 100 ? "var(--budget-danger)" : undefined } }}
             />
           </Card>
         </Col>
@@ -156,7 +150,7 @@ export default function BudgetAllocation() {
 
       {unallocated < 0 && (
         <Alert
-          message={t("budgetAllocation.overAllocatedTitle")}
+          title={t("budgetAllocation.overAllocatedTitle")}
           description={t("budgetAllocation.overAllocatedDesc", {
             amount: formatCurrency(Math.abs(unallocated), state.currency),
           })}
@@ -168,7 +162,7 @@ export default function BudgetAllocation() {
 
       <Divider />
 
-      <Space direction="vertical" className={styles.fullWidth} size="large">
+      <Space orientation="vertical" className={styles.fullWidth} size="large">
         {state.categories.map((category: Category) => {
           const allocated = category.allocated ?? 0;
           const percentage =

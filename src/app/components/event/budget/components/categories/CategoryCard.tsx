@@ -67,7 +67,7 @@ export default function CategoryCard({
         borderLeft: `4px solid ${color || "var(--status-in-progress)"}`,
       }}
     >
-      <Space direction="vertical" className={styles.fullWidth} size="small">
+      <Space orientation="vertical" className={styles.fullWidth} size="small">
         <div className={styles.cardHeader}>
           <Space>
             <span

@@ -39,12 +39,10 @@ const CreateEventModal = () => {
     return `$ ${end ? `${v}.${end}` : `${v}`}`;
   };
 
-  const onRequiredTypeChange = ({
-    requiredMarkValue,
-  }: {
-    requiredMarkValue: RequiredMark;
-  }) => {
-    setRequiredMarkType(requiredMarkValue);
+  const onRequiredTypeChange = (_: unknown, values: { requiredMarkValue?: RequiredMark }) => {
+    if (values?.requiredMarkValue !== undefined) {
+      setRequiredMarkType(values.requiredMarkValue);
+    }
   };
 
   const {
@@ -88,9 +86,7 @@ const CreateEventModal = () => {
               <Form.Item label={t("createEvent.form.eventName")} name="eventName" required>
                 <Input
                   placeholder={t("createEvent.form.eventNamePlaceholder")}
-                  addonBefore={
-                    <EditOutlined className={styles.iconSecondary} />
-                  }
+                  prefix={<EditOutlined className={styles.iconSecondary} />}
                 />
               </Form.Item>
               <div className={styles.eventInfoContainer}>
@@ -115,9 +111,7 @@ const CreateEventModal = () => {
                 >
                   <Input
                     placeholder={t("createEvent.form.locationPlaceholder")}
-                    addonBefore={
-                      <PushpinOutlined className={styles.iconSecondary} />
-                    }
+                    prefix={<PushpinOutlined className={styles.iconSecondary} />}
                   />
                 </Form.Item>
               </div>
@@ -151,9 +145,7 @@ const CreateEventModal = () => {
                 >
                   <InputNumber
                     formatter={formatter}
-                    addonBefore={
-                      <DollarOutlined className={styles.iconSecondary} />
-                    }
+                    prefix={<DollarOutlined className={styles.iconSecondary} />}
                     parser={(value) =>
                       value?.replace(/\$\s?|(,*)/g, "") as unknown as number
                     }

@@ -11,7 +11,6 @@ import {
   Radio,
   InputNumber,
   Select,
-  List,
   Typography,
 } from "antd";
 import {
@@ -31,12 +30,15 @@ import CurrentTimeIndicator from "./components/CurrentTimeIndicator/CurrentTimeI
 // NOTE: import antd styles globally (e.g. in root layout):
 // import 'antd/dist/reset.css';
 
-import timelineData from "../../../../data/timeline-data.json";
 import pageStyles from "./schedule-page.module.css";
 import { useTranslation } from "react-i18next";
+import { useEvent } from "@/app/contexts/EventContext";
+import { fetchTimelineItems, deleteTimelineItem } from "./services/schedule.service";
 
 const Schedule: React.FC = () => {
   const { t } = useTranslation();
+  const { state: { events: { selectedEvent } } } = useEvent();
+  const eventId = (selectedEvent as any)?.id ?? 1;
   const { message, notification } = App.useApp();
   const [items, setItems] = useState<TimelineItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -68,19 +70,16 @@ const Schedule: React.FC = () => {
   const timelineContainerRef = useRef<HTMLDivElement>(null);
   const hasScrolledToNowRef = useRef(false);
 
-  const eventId = "demo-event-id"; // TODO: Replace with actual eventId from context/props
 
   useEffect(() => {
-    const raw: any = timelineData;
-    const list = Array.isArray(raw?.timeline_items) ? raw.timeline_items : [];
-    // Ensure all items have a status field
-    const itemsWithStatus = list.map((item: any) => ({
-      ...item,
-      status: item.status || "pending",
-    }));
-    setItems(sortTimelineItems(itemsWithStatus));
-    setLoading(false);
-  }, []);
+    setLoading(true);
+    fetchTimelineItems(eventId)
+      .then((list) => {
+        setItems(sortTimelineItems(list));
+      })
+      .catch(() => setItems([]))
+      .finally(() => setLoading(false));
+  }, [eventId]);
 
   // Auto-scroll to current time on page load
   useEffect(() => {
@@ -329,6 +328,7 @@ const Schedule: React.FC = () => {
 
       setItems(sortTimelineItems(newItems));
       message.success(t("schedule.messages.itemDeleted", { title: item.title }));
+      deleteTimelineItem(item.timeline_item_id).catch(console.error);
     } catch (err) {
       setItems(original);
       message.error(t("schedule.messages.deleteFailed"));
@@ -573,10 +573,6 @@ const Schedule: React.FC = () => {
             onEdit={(item) => setEditItem(item)}
             onDelete={handleDeleteRequest}
             onStatusChange={handleStatusChange}
-            allowAutoScroll={!hasScrolledToNowRef.current}
-            onAutoScrolled={() => {
-              hasScrolledToNowRef.current = true;
-            }}
           />
         </div>
       )}
@@ -672,31 +668,27 @@ const Schedule: React.FC = () => {
             </div>
           </div>
 
-          <List
-            size="small"
-            dataSource={getAffectedItems(
+          <div>
+            {getAffectedItems(
               applyFrom === "specific" && selectedItemId
                 ? selectedItemId
                 : applyFrom,
-            ).slice(0, 5)}
-            renderItem={(item: any) => (
-              <List.Item>
-                <div className={pageStyles.previewListItem}>
-                  <div>{item.title}</div>
-                  <div className={pageStyles.previewTimeShift}>
-                    {formatTime(item.start_time)} <RightOutlined />{" "}
-                    {formatTime(
-                      calculateNewTime(
-                        item.start_time,
-                        adjustmentMinutes ?? 0,
-                        direction,
-                      ),
-                    )}
-                  </div>
+            ).slice(0, 5).map((item: any) => (
+              <div key={item.timeline_item_id} className={pageStyles.previewListItem}>
+                <div>{item.title}</div>
+                <div className={pageStyles.previewTimeShift}>
+                  {formatTime(item.start_time)} <RightOutlined />{" "}
+                  {formatTime(
+                    calculateNewTime(
+                      item.start_time,
+                      adjustmentMinutes ?? 0,
+                      direction,
+                    ),
+                  )}
                 </div>
-              </List.Item>
-            )}
-          />
+              </div>
+            ))}
+          </div>
         </div>
 
         <div className={pageStyles.modalFooter}>

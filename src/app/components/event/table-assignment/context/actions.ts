@@ -1,7 +1,17 @@
 import type { SeatingResponse as HFSeatingResponse } from "../services/huggingface.service";
-import { DragId, Table, TableAssignment } from "../models/types";
+import { DragId, Guest, Relation, Table, TableAssignment, TableLayout } from "../models/types";
 
 export type Action =
+  | {
+      type: "INIT_DATA";
+      payload: {
+        relations: Relation[];
+        guests: Guest[];
+        layouts: TableLayout[];
+        tables: Table[];
+        assignments: TableAssignment[];
+      };
+    }
   | { type: "SET_METERS_TO_PIXELS"; payload: number }
   | { type: "SET_ZOOM_SCALE"; payload: number }
   | { type: "SET_PAN"; payload: { x: number; y: number } }
@@ -33,4 +43,6 @@ export type Action =
   | {
       type: "MOVE_GUEST_SEAT";
       payload: { guestId: string; tableId: string; seatNumber: number };
-    };
+    }
+  | { type: "ADD_TABLE"; payload: Table }
+  | { type: "REMOVE_TABLE"; payload: string };

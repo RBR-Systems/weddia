@@ -6,7 +6,6 @@ import React, {
   useReducer,
   useRef,
 } from "react";
-import data from "@/data/tables-data.json";
 import { useSensor, useSensors, PointerSensor } from "@dnd-kit/core";
 import type { DragStartEvent, DragEndEvent } from "@dnd-kit/core";
 import { App } from "antd";
@@ -15,8 +14,34 @@ import {
   DEFAULT_VENUE_WIDTH_METERS,
   DEFAULT_VENUE_HEIGHT_METERS,
 } from "../constants/constants";
-import type { Guest, Relation, TableLayout } from "../models/types";
+
+import type { TableLayout } from "../models/types";
 import { fullName, parseGuestIdFromDragId } from "../utils/Table-Utils";
+import { apiGet, apiPost, apiPut, apiDelete } from "@/lib/apiClient";
+import { fetchGuests, fetchRelations } from "../../guest-list/service/guest.service";
+import type { Guest as GuestListGuest } from "../../guest-list/models/types";
+import type { Guest as TAGuest } from "../models/types";
+
+function mapGuestListToTA(g: GuestListGuest): TAGuest {
+  return {
+    guest_id: g.guest_id,
+    event_id: g.event_id ?? "",
+    first_name: g.first_name,
+    last_name: g.last_name,
+    email: g.email ?? null,
+    phone: g.phone ?? null,
+    relation_id: g.relation_id ?? "",
+    plus_one: g.plus_one != null ? Boolean(g.plus_one) : false,
+    rsvp_status: g.rsvp_status,
+    party_size: g.party_size,
+    dietary_restrictions: Array.isArray(g.dietary_restrictions)
+      ? g.dietary_restrictions.join(", ")
+      : null,
+    accessibility_needs: g.accesability_needs ?? null,
+    notes: g.notes ?? null,
+  };
+}
+import { useEvent } from "@/app/contexts/EventContext";
 
 import type { DragId } from "../models/types";
 import { reducer, createInitialState } from "./TableAssignmentReducer";
@@ -33,26 +58,86 @@ export function TableAssignmentProvider({
   initialSelectedTableId?: string | null;
 }) {
   const { message } = App.useApp();
-  const relations = data.relations as Relation[];
-  const guests = data.guests as Guest[];
-  const layouts = data.table_layouts as TableLayout[];
-  const tablesRaw = data.tables as any;
-  const assignmentsRaw = data.table_assignments as any;
+  const { state: { events: { selectedEvent } } } = useEvent();
+  const eventId = (selectedEvent as any)?.id ?? 1;
 
-  const initialState = useMemo(
-    () =>
-      createInitialState(
-        relations,
-        guests,
-        layouts,
-        tablesRaw,
-        assignmentsRaw,
-        INITIAL_METERS_TO_PIXELS,
-      ),
-    [relations, guests, layouts, tablesRaw, assignmentsRaw],
+  const emptyState = useMemo(
+    () => createInitialState([], [], [], [], [], INITIAL_METERS_TO_PIXELS),
+    [],
   );
 
-  const [state, dispatch] = useReducer(reducer, initialState);
+  const [state, dispatch] = useReducer(reducer, emptyState);
+
+  // Load all data from API on mount / when event changes
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadData() {
+      try {
+        const [layouts, rawGuests, relations] = await Promise.all([
+          apiGet<any[]>("/api/tablelayouts/active"),
+          fetchGuests(eventId),
+          fetchRelations(),
+        ]);
+        const guests = rawGuests.map(mapGuestListToTA);
+
+        const mappedLayouts: TableLayout[] = (Array.isArray(layouts) ? layouts : []).map((l: any) => ({
+          layout_id: String(l.layoutId),
+          event_id: String(eventId),
+          name: l.name,
+          description: l.description ?? null,
+          is_active: l.isActive,
+          x_grid_size: l.xGridSize,
+          y_grid_size: l.yGridSize,
+        }));
+
+        const activeLayout = mappedLayouts.find((l) => l.is_active) ?? mappedLayouts[0];
+
+        let tablesRaw: any[] = [];
+        let assignmentsRaw: any[] = [];
+
+        if (activeLayout) {
+          const layoutId = activeLayout.layout_id;
+          const [tables, assignments] = await Promise.all([
+            apiGet<any[]>(`/api/eventtables/layout/${layoutId}`),
+            apiGet<any[]>(`/api/tableassignments/layout/${layoutId}`),
+          ]);
+          tablesRaw = (Array.isArray(tables) ? tables : []).map((t: any) => ({
+            table_id: String(t.tableId),
+            layout_id: String(t.layoutId),
+            table_number: t.tableNumber,
+            total_number: t.numberOfSeats,
+            shape: t.shape,
+            x_grid: t.xGrid,
+            y_grid: t.yGrid,
+          }));
+          assignmentsRaw = (Array.isArray(assignments) ? assignments : []).map((a: any) => ({
+            table_id: String(a.tableId),
+            guest_id: String(a.guestId),
+            seat_number: a.seatNumber,
+          }));
+        }
+
+        if (!cancelled) {
+          dispatch({
+            type: "INIT_DATA",
+            payload: {
+              relations,
+              guests,
+              layouts: mappedLayouts,
+              tables: tablesRaw,
+              assignments: assignmentsRaw,
+            },
+          });
+        }
+      } catch (err) {
+        console.error("TableAssignmentProvider: failed to load data", err);
+      }
+    }
+
+    loadData();
+    return () => { cancelled = true; };
+  }, [eventId]);
 
   // Keep a ref to the latest state so callbacks always read fresh data
   const stateRef = useRef(state);
@@ -152,6 +237,65 @@ export function TableAssignmentProvider({
     return map;
   }, [state.assignments]);
 
+  // Persist a guest assignment change to the API (fire-and-forget with logging)
+  const persistAssignment = useCallback(
+    (
+      type: "assign" | "move" | "unassign",
+      guestId: string,
+      tableId: string,
+      seatNumber?: number,
+    ) => {
+      const prev = stateRef.current.assignments.find((a: any) => a.guest_id === guestId);
+      const numTableId = Number(tableId);
+      const numGuestId = Number(guestId);
+
+      if (isNaN(numTableId) || isNaN(numGuestId)) {
+        console.warn("[persistAssignment] Non-numeric id — skipping API call", { tableId, guestId });
+        return;
+      }
+
+      if (type === "unassign") {
+        if (prev) {
+          apiDelete(`/api/tableassignments/${prev.table_id}/${guestId}`)
+            .catch((e) => console.error("[persistAssignment] unassign failed:", e));
+        }
+      } else if (type === "assign") {
+        apiPost(`/api/tableassignments?adminId=1`, {
+          tableId: numTableId,
+          guestId: numGuestId,
+          seatNumber: seatNumber ?? 1,
+        }).catch((e) => console.error("[persistAssignment] assign failed:", e));
+      } else if (type === "move") {
+        if (prev && prev.table_id === tableId) {
+          // Same table — update seat
+          apiPut(`/api/tableassignments/${tableId}/${guestId}?adminId=1`, {
+            seatNumber: seatNumber ?? prev.seat_number,
+          }).catch((e) => console.error("[persistAssignment] move-same-table failed:", e));
+        } else {
+          // Different table — delete old, create new
+          if (prev) {
+            apiDelete(`/api/tableassignments/${prev.table_id}/${guestId}`)
+              .then(() =>
+                apiPost(`/api/tableassignments?adminId=1`, {
+                  tableId: numTableId,
+                  guestId: numGuestId,
+                  seatNumber: seatNumber ?? 1,
+                }),
+              )
+              .catch((e) => console.error("[persistAssignment] move-cross-table failed:", e));
+          } else {
+            apiPost(`/api/tableassignments?adminId=1`, {
+              tableId: numTableId,
+              guestId: numGuestId,
+              seatNumber: seatNumber ?? 1,
+            }).catch((e) => console.error("[persistAssignment] assign-new failed:", e));
+          }
+        }
+      }
+    },
+    [],
+  );
+
   const segmentedOptions = [
     { label: "Guests", value: "guests" as const },
     { label: "table", value: "table" as const },
@@ -191,14 +335,27 @@ export function TableAssignmentProvider({
           (t: any) => t.table_id === tableId,
         );
         if (!table) return;
+        const newX = (table.x_m ?? 0) + deltaMetersX;
+        const newY = (table.y_m ?? 0) + deltaMetersY;
         dispatch({
           type: "MOVE_TABLE",
-          payload: {
-            tableId,
-            x_m: (table.x_m ?? 0) + deltaMetersX,
-            y_m: (table.y_m ?? 0) + deltaMetersY,
-          },
+          payload: { tableId, x_m: newX, y_m: newY },
         });
+
+        // Persist new grid position to API
+        const activeLayout = currentState.layouts.find((l: any) => l.is_active) ?? currentState.layouts[0];
+        if (activeLayout) {
+          const xGrid = Math.max(0, Math.round(newX / (DEFAULT_VENUE_WIDTH_METERS / activeLayout.x_grid_size)));
+          const yGrid = Math.max(0, Math.round(newY / (DEFAULT_VENUE_HEIGHT_METERS / activeLayout.y_grid_size)));
+          apiPut(`/api/eventtables/${tableId}?adminId=1`, {
+            layoutId: Number(activeLayout.layout_id),
+            numberOfSeats: table.total_number ?? 8,
+            shape: table.shape ?? "round",
+            xGrid,
+            yGrid,
+          }).catch(console.error);
+        }
+
         const notifier = messageApi ?? message;
         notifier.success(`Table ${tableId} repositioned`);
         return;
@@ -210,7 +367,11 @@ export function TableAssignmentProvider({
       if (!overId) return;
 
       if (overId === "unassigned") {
+        const prevAssignment = stateRef.current.assignments.find((a: any) => a.guest_id === guestId);
         dispatch({ type: "UNASSIGN_GUEST", payload: { guestId } });
+        if (prevAssignment) {
+          apiDelete(`/api/tableassignments/${prevAssignment.table_id}/${guestId}`).catch(console.error);
+        }
         const notifier = messageApi ?? message;
         notifier.success("Guest unassigned");
         return;
@@ -261,6 +422,7 @@ export function TableAssignmentProvider({
               );
               return;
             }
+            persistAssignment("move", guestId, tableId, seatNumber);
             dispatch({
               type: "MOVE_GUEST_SEAT",
               payload: { guestId, tableId, seatNumber },
@@ -285,6 +447,7 @@ export function TableAssignmentProvider({
               );
               return;
             }
+            persistAssignment("move", guestId, tableId, seatNumber);
             dispatch({
               type: "MOVE_GUEST_SEAT",
               payload: { guestId, tableId, seatNumber },
@@ -315,6 +478,7 @@ export function TableAssignmentProvider({
             );
             return;
           }
+          persistAssignment("assign", guestId, tableId, foundSeat);
           dispatch({
             type: "ASSIGN_GUEST",
             payload: { tableId, guestId, seatNumber: foundSeat },
@@ -359,6 +523,7 @@ export function TableAssignmentProvider({
             (a: any) => a.guest_id === guestId,
           );
           if (guestAssigned) {
+            persistAssignment("move", guestId, tableId, foundSeat);
             dispatch({
               type: "MOVE_GUEST_SEAT",
               payload: { guestId, tableId, seatNumber: foundSeat },
@@ -367,6 +532,7 @@ export function TableAssignmentProvider({
               g ? `${fullName(g)} moved to ${tableId}` : "Moved",
             );
           } else {
+            persistAssignment("assign", guestId, tableId, foundSeat);
             dispatch({
               type: "ASSIGN_GUEST",
               payload: { tableId, guestId, seatNumber: foundSeat },
@@ -555,6 +721,7 @@ export function TableAssignmentProvider({
             );
             return false;
           }
+          persistAssignment("assign", guestId, tableId, seatNumber);
           dispatch({
             type: "ASSIGN_GUEST",
             payload: { tableId, guestId, seatNumber },
@@ -581,6 +748,7 @@ export function TableAssignmentProvider({
             );
             return false;
           }
+          persistAssignment("move", guestId, tableId, seatNumber);
           dispatch({
             type: "MOVE_GUEST_SEAT",
             payload: { guestId, tableId, seatNumber },
@@ -606,6 +774,7 @@ export function TableAssignmentProvider({
 
         // Dispatch to the reducer, which handles repacking displaced guests.
         // The reducer returns unchanged state if it can't fit everyone.
+        persistAssignment("move", guestId, tableId, seatNumber);
         dispatch({
           type: "MOVE_GUEST_SEAT",
           payload: { guestId, tableId, seatNumber },
@@ -620,6 +789,43 @@ export function TableAssignmentProvider({
       tableOrder,
       tablesForActiveLayoutById,
       messageApi: messageApi ?? message,
+      addTable: async (opts: { shape: string; seats: number; xGrid: number; yGrid: number }) => {
+        if (!activeLayout) return;
+        const tableNumber = (stateRef.current.tables.length ?? 0) + 1;
+        const tempId = `table-${Date.now()}`;
+        const newTable = {
+          table_id: tempId,
+          layout_id: activeLayout.layout_id,
+          table_number: tableNumber,
+          total_number: opts.seats,
+          shape: opts.shape,
+          x_grid: opts.xGrid,
+          y_grid: opts.yGrid,
+        };
+        dispatch({ type: "ADD_TABLE", payload: newTable });
+        try {
+          const created = await apiPost<any>(`/api/eventtables?adminId=1`, {
+            layoutId: Number(activeLayout.layout_id),
+            tableNumber,
+            numberOfSeats: opts.seats,
+            shape: opts.shape,
+            xGrid: opts.xGrid,
+            yGrid: opts.yGrid,
+          });
+          // Replace temp id with real one from API
+          dispatch({
+            type: "SET_TABLES",
+            payload: stateRef.current.tables.map((t: any) =>
+              t.table_id === tempId
+                ? { ...t, table_id: String(created.tableId) }
+                : t,
+            ),
+          });
+        } catch (err) {
+          console.error("addTable failed:", err);
+          dispatch({ type: "REMOVE_TABLE", payload: tempId });
+        }
+      },
     }),
     [
       state,

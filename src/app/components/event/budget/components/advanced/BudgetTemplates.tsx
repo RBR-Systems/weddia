@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
+  App,
   Card,
   Row,
   Col,
@@ -13,7 +14,6 @@ import {
   Typography,
   Tag,
   Space,
-  message,
   Empty,
   Popconfirm,
 } from "antd";
@@ -97,6 +97,7 @@ const DEFAULT_TEMPLATES: BudgetTemplate[] = [
 ];
 
 export default function BudgetTemplates() {
+  const { message } = App.useApp();
   const { state, loadTemplate } = useBudget();
   const { mode } = useTheme();
   const { t } = useTranslation();
@@ -303,7 +304,7 @@ export default function BudgetTemplates() {
         width={500}
       >
         {previewTemplate && (
-          <Space direction="vertical" style={{ width: "100%" }}>
+          <Space orientation="vertical" style={{ width: "100%" }}>
             <Paragraph>{previewTemplate.description}</Paragraph>
             <div>
               <Text strong>{t("budgetTemplates.suggestedBudget")}</Text>

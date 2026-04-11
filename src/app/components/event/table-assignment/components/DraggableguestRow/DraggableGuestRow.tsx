@@ -111,7 +111,7 @@ export default memo(function DraggableGuestRow({
         isDragging ? styles.dragging : "",
       ].join(" ")}
     >
-      <Space direction="vertical" size={6} className={styles.fullWidth}>
+      <Space orientation="vertical" size={6} className={styles.fullWidth}>
         <Space size={8} wrap>
           <Typography.Text strong className={styles.dragHandle}>
             {!isAssigned ? (

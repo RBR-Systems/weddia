@@ -79,6 +79,8 @@ export default function GuestTable({
       title: t("guestList.guest", "Guest"),
       dataIndex: "first_name",
       key: "guest",
+      width: 160,
+      ellipsis: true,
       render: (_: any, record: Guest) => (
         <div>
           <Text strong>
@@ -108,7 +110,7 @@ export default function GuestTable({
         <div style={{ padding: 8 }}>
           <Input
             placeholder={t("guestList.searchName", "Search name")}
-            value={selectedKeys[0]}
+            value={selectedKeys[0] as string}
             onChange={(e) =>
               setSelectedKeys(e.target.value ? [e.target.value] : [])
             }
@@ -151,13 +153,16 @@ export default function GuestTable({
       title: t("guestList.party", "Party"),
       dataIndex: "party_size",
       key: "party",
+      width: 70,
+      align: "center" as const,
       render: (ps: number) => (ps === 0 ? "—" : ps),
       sorter: (a: Guest, b: Guest) => (a.party_size ?? 0) - (b.party_size ?? 0),
     },
     {
-      title: t("guestList.rsvpStatus", "RSVP Status"),
+      title: t("guestList.rsvpStatus", "RSVP"),
       dataIndex: "rsvp_status",
       key: "status",
+      width: 110,
       render: (status: string) => {
         const label = formatStatusLabel(status);
         const color = statusColor(status);
@@ -188,6 +193,7 @@ export default function GuestTable({
       title: t("guestList.group", "Group"),
       dataIndex: "relation_id",
       key: "group",
+      width: 130,
       render: (rid: string) => {
         const rel = relations?.find((r) => r.relation_id === rid);
         return <Tag color="gold">{rel?.name ?? "—"}</Tag>;
@@ -214,6 +220,7 @@ export default function GuestTable({
       title: t("guestList.specials", "Specials"),
       dataIndex: "dietary_restrictions",
       key: "specials",
+      width: 170,
       render: (_: any, record: Guest) => (
         <Space>
           {(record.dietary_restrictions || []).map((d) => (
@@ -241,13 +248,15 @@ export default function GuestTable({
       title: t("guestList.contact", "Contact"),
       dataIndex: "email",
       key: "contact",
+      width: 180,
+      ellipsis: true,
       render: (_: any, record: Guest) => {
         const p = record.phone || "";
         const inferredCountry =
           record.country ||
           (/^\+?52/.test(p) || /^52\d{8,}$/.test(p) ? "MX" : undefined);
         return (
-          <Space direction="vertical">
+          <Space orientation="vertical">
             <div>{record.email}</div>
             <div>{formatPhone(p, inferredCountry)} </div>
           </Space>
@@ -264,7 +273,7 @@ export default function GuestTable({
         <div style={{ padding: 8 }}>
           <Input
             placeholder={t("guestList.searchContact", "Search contact")}
-            value={selectedKeys[0]}
+            value={selectedKeys[0] as string}
             onChange={(e) =>
               setSelectedKeys(e.target.value ? [e.target.value] : [])
             }
@@ -312,6 +321,7 @@ export default function GuestTable({
       title: t("guestList.sendRSVP", "Send RSVP"),
       dataIndex: "actions",
       key: "actions",
+      width: 170,
       render: (_: any, record: Guest) => {
         const mailHref = record.email
           ? `mailto:${record.email}?subject=Invitation&body=Hi%20${encodeURIComponent(record.first_name)}`
@@ -359,9 +369,11 @@ export default function GuestTable({
       },
     },
     {
-      title: t("guestList.remove", "Remove"),
+      title: "",
       dataIndex: "remove",
       key: "remove",
+      width: 50,
+      fixed: "right" as const,
       render: (_: any, record: Guest) => (
         <Popconfirm
           title={t("guestList.confirmRemove", "Remove guest?")}
@@ -430,7 +442,7 @@ export default function GuestTable({
       pagination={false}
       onChange={handleTableChange}
       size="small"
-      style={{ background: mode === "dark" ? undefined : undefined }}
+      scroll={{ x: "max-content" }}
     />
   );
 }

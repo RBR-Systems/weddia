@@ -168,8 +168,8 @@ export default function AddTimelineItemModal({
         onClose();
       }}
       onOk={() => form.submit()}
-      destroyOnClose
       okText={initialData ? "Save" : "Add"}
+      forceRender
     >
       <Form
         form={form}

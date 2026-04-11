@@ -36,7 +36,7 @@ export default function CategoryList() {
   const [form] = Form.useForm();
 
   const filteredCategories = state.categories.filter((cat: Category) =>
-    cat.name.toLowerCase().includes(searchTerm.toLowerCase()),
+    cat?.name?.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   const handleAddCategory = () => {

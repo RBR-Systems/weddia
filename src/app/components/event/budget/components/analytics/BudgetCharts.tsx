@@ -162,7 +162,7 @@ export default function BudgetCharts() {
                   )}
                 </Pie>
                 <Tooltip
-                  formatter={(value: number | string | undefined) =>
+                  formatter={(value: unknown) =>
                     formatCurrency(Number(value ?? 0), state.currency)
                   }
                 />
@@ -206,7 +206,7 @@ export default function BudgetCharts() {
                 <XAxis dataKey="month" />
                 <YAxis />
                 <Tooltip
-                  formatter={(value: number | string | undefined) =>
+                  formatter={(value: unknown) =>
                     formatCurrency(Number(value ?? 0), state.currency)
                   }
                 />
@@ -236,7 +236,7 @@ export default function BudgetCharts() {
                 <XAxis dataKey="date" />
                 <YAxis />
                 <Tooltip
-                  formatter={(value: number | string | undefined) =>
+                  formatter={(value: unknown) =>
                     formatCurrency(Number(value ?? 0), state.currency)
                   }
                 />

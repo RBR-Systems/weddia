@@ -71,6 +71,35 @@ export function createInitialState(
 
 export function reducer(state: State, action: Action): State {
   switch (action.type) {
+    case "INIT_DATA": {
+      const { relations, guests, layouts, tables, assignments } = action.payload;
+      const active = layouts.find((l) => l.is_active) ?? layouts[0];
+      const xGridCount = active?.x_grid_size ?? 10;
+      const yGridCount = active?.y_grid_size ?? 6;
+      return {
+        ...state,
+        relations,
+        guests,
+        layouts,
+        tables: tables.map((t) => tableToMeters(t as any, xGridCount, yGridCount)),
+        assignments,
+      };
+    }
+    case "ADD_TABLE": {
+      const active = state.layouts.find((l) => l.is_active) ?? state.layouts[0];
+      const xGridCount = active?.x_grid_size ?? 10;
+      const yGridCount = active?.y_grid_size ?? 6;
+      return {
+        ...state,
+        tables: [...state.tables, tableToMeters(action.payload, xGridCount, yGridCount)],
+      };
+    }
+    case "REMOVE_TABLE":
+      return {
+        ...state,
+        tables: state.tables.filter((t) => t.table_id !== action.payload),
+        assignments: state.assignments.filter((a) => a.table_id !== action.payload),
+      };
     case "SET_METERS_TO_PIXELS":
       return { ...state, metersToPixels: action.payload, pan: { x: 0, y: 0 } };
     case "SET_ZOOM_SCALE":

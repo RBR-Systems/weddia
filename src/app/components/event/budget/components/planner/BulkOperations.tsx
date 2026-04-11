@@ -234,9 +234,9 @@ export default function BulkOperations() {
       <Row gutter={[16, 16]}>
         <Col xs={24} lg={12}>
           <Card title={t("bulkOperations.importData")}>
-            <Space direction="vertical" className={bulkStyles.fullWidth}>
+            <Space orientation="vertical" className={bulkStyles.fullWidth}>
               <Alert
-                message={t("bulkOperations.csvImport")}
+                title={t("bulkOperations.csvImport")}
                 description={t("bulkOperations.csvDescription")}
                 type="info"
                 showIcon
@@ -277,7 +277,7 @@ export default function BulkOperations() {
 
         <Col xs={24} lg={12}>
           <Card title={t("bulkOperations.exportData")}>
-            <Space direction="vertical" className={bulkStyles.fullWidth}>
+            <Space orientation="vertical" className={bulkStyles.fullWidth}>
               <Button
                 icon={<DownloadOutlined />}
                 onClick={handleExportAll}
@@ -349,7 +349,7 @@ export default function BulkOperations() {
         onOk={handleBulkStatusUpdate}
         onCancel={() => setBulkActionModal(null)}
       >
-        <Space direction="vertical" className={bulkStyles.fullWidth}>
+        <Space orientation="vertical" className={bulkStyles.fullWidth}>
           <Text>{t("bulkOperations.updateExpensesTo", { count: selectedRowKeys.length })}</Text>
           <Select
             value={bulkStatus}
@@ -372,7 +372,7 @@ export default function BulkOperations() {
         onOk={handleBulkCategoryUpdate}
         onCancel={() => setBulkActionModal(null)}
       >
-        <Space direction="vertical" className={bulkStyles.fullWidth}>
+        <Space orientation="vertical" className={bulkStyles.fullWidth}>
           <Text>{t("bulkOperations.moveExpensesTo", { count: selectedRowKeys.length })}</Text>
           <Select
             value={bulkCategory}
@@ -399,7 +399,7 @@ export default function BulkOperations() {
         okButtonProps={{ danger: true }}
       >
         <Alert
-          message={t("bulkOperations.deleteConfirm", { count: selectedRowKeys.length })}
+          title={t("bulkOperations.deleteConfirm", { count: selectedRowKeys.length })}
           description={t("bulkOperations.cannotUndo")}
           type="warning"
           showIcon

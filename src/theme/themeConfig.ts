@@ -20,7 +20,10 @@ function buildTheme(t: typeof light | typeof dark): ThemeConfig {
       colorLink: t.linkColor,
       colorTextBase: t.text,
       colorBgBase: t.background,
-      borderRadius: BORDER_RADIUS,
+      borderRadius: 10,
+      borderRadiusLG: 14,
+      borderRadiusSM: 6,
+      borderRadiusXS: 4,
 
       fontFamily: FONT_FAMILY,
       fontSize: FONT_SIZE_BASE,

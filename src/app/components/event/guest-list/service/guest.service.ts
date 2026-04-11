@@ -1,61 +1,69 @@
 import { Guest } from "../models/types";
+import { apiGet, apiPost, apiDelete, apiPatch } from "@/lib/apiClient";
 
-function toArrayOfStrings(value: any): string[] | undefined {
-  if (!value && value !== "") return undefined;
-  if (Array.isArray(value)) return value.map(String);
-  if (typeof value === "string") {
-    const trimmed = value.trim();
-    if (trimmed === "") return undefined;
-    return trimmed
-      .split(/,|;/)
-      .map((s) => s.trim())
-      .filter(Boolean);
+interface ApiGuest {
+  guestId: number;
+  eventId: number;
+  firstName: string;
+  lastName: string;
+  relationId: number;
+  email?: string;
+  mobilePhone?: string;
+  phone?: string;
+  plusOne?: number | null;
+  rsvpStatus: string;
+  partySize: number;
+  dietaryRestrictions?: string | null;
+  accessibilityNeeds?: string | null;
+  notes?: string | null;
+  invitedAt?: string | null;
+  rsvpAt?: string | null;
+}
+
+function mapRsvpStatus(status: string): Guest["rsvp_status"] {
+  switch (status?.toLowerCase()) {
+    case "confirmed":
+      return "attending";
+    case "declined":
+      return "not_attending";
+    case "maybe":
+      return "maybe";
+    default:
+      return "pending";
   }
-  return undefined;
 }
 
-function normalizeStatus(s: any): Guest["rsvp_status"] {
-  const v = String(s || "").toLowerCase();
-  if (v === "attending") return "attending";
-  if (v === "not_attending" || v === "not attending" || v === "declined")
-    return "not_attending";
-  if (v === "maybe") return "maybe";
-  return "pending";
+function mapApiGuest(g: ApiGuest): Guest {
+  const status = mapRsvpStatus(g.rsvpStatus);
+  const partySize = status === "not_attending" ? 0 : g.partySize ?? 1;
+
+  const dietary = g.dietaryRestrictions
+    ? g.dietaryRestrictions.split(/,|;/).map((s) => s.trim()).filter(Boolean)
+    : undefined;
+
+  return {
+    guest_id: String(g.guestId),
+    event_id: String(g.eventId),
+    first_name: g.firstName ?? "",
+    last_name: g.lastName ?? "",
+    relation_id: String(g.relationId),
+    email: g.email ?? undefined,
+    phone: g.mobilePhone ?? g.phone ?? undefined,
+    plus_one: g.plusOne != null ? String(g.plusOne) : null,
+    rsvp_status: status,
+    party_size: partySize,
+    dietary_restrictions: dietary,
+    accesability_needs: g.accessibilityNeeds ?? undefined,
+    notes: g.notes ?? undefined,
+    invited_at: g.invitedAt ?? undefined,
+    rsvp_at: g.rsvpAt ?? undefined,
+  } as Guest;
 }
 
-export async function fetchGuests(): Promise<Guest[]> {
+export async function fetchGuests(eventId: number): Promise<Guest[]> {
   try {
-    const res = await fetch("/data/guest-list-data.json");
-    if (!res.ok) throw new Error("Failed to load guest data");
-    const json = await res.json();
-    const rawGuests = Array.isArray(json?.guests) ? json.guests : [];
-
-    const guests: Guest[] = rawGuests.map((g: any) => {
-      const status = normalizeStatus(g.rsvp_status);
-      let party = Number(g.party_size ?? g.party ?? 1) || 1;
-      if (status === "not_attending") party = 0;
-
-      return {
-        guest_id: String(g.guest_id ?? g.id ?? ""),
-        event_id: g.event_id,
-        first_name: String(g.first_name ?? ""),
-        last_name: String(g.last_name ?? ""),
-        relation_id: g.relation_id,
-        email: g.email,
-        phone: g.phone,
-        plus_one: g.plus_one ?? null,
-        rsvp_status: status,
-        party_size: party,
-        dietary_restrictions: toArrayOfStrings(g.dietary_restrictions),
-        accesability_needs:
-          g.accesability_needs || g.accessibility || undefined,
-        notes: g.notes || undefined,
-        invited_at: g.invited_at || undefined,
-        rsvp_at: g.rsvp_at || undefined,
-      } as Guest;
-    });
-
-    return guests;
+    const raw = await apiGet<ApiGuest[]>(`/api/guests/event/${eventId}`);
+    return raw.map(mapApiGuest);
   } catch (err) {
     console.error("fetchGuests error", err);
     return [];
@@ -66,22 +74,58 @@ export async function fetchRelations(): Promise<
   { relation_id: string; name: string }[]
 > {
   try {
-    const res = await fetch("/data/guest-list-data.json");
-    if (!res.ok) throw new Error("Failed to load guest data");
-    const json = await res.json();
-    const rel = Array.isArray(json?.relations) ? json.relations : [];
-    return rel.map((r: any) => ({
-      relation_id: String(r.relation_id),
-      name: String(r.name),
-    }));
+    const raw = await apiGet<{ relationId: number; name: string }[]>(
+      "/api/relations",
+    );
+    return raw.map((r) => ({ relation_id: String(r.relationId), name: r.name }));
   } catch (err) {
     console.error("fetchRelations error", err);
     return [];
   }
 }
 
-export async function removeGuest(guest_id: string): Promise<void> {
-  // Data is static in this demo app; just resolve immediately.
-  // In a real app this would call an API to remove the guest.
-  return Promise.resolve();
+export async function removeGuest(guestId: string): Promise<void> {
+  await apiDelete(`/api/guests/${guestId}`);
+}
+
+export async function updateRsvp(
+  guestId: string,
+  rsvpStatus: string,
+): Promise<void> {
+  const apiStatus =
+    rsvpStatus === "attending"
+      ? "confirmed"
+      : rsvpStatus === "not_attending"
+        ? "declined"
+        : rsvpStatus;
+  await apiPatch(`/api/guests/${guestId}/rsvp?adminId=1`, { rsvpStatus: apiStatus });
+}
+
+export async function createGuest(
+  eventId: number,
+  data: Omit<Guest, "guest_id" | "event_id">,
+): Promise<Guest> {
+  const body = {
+    eventId,
+    firstName: data.first_name,
+    lastName: data.last_name,
+    relationId: data.relation_id ? Number(data.relation_id) : undefined,
+    email: data.email ?? null,
+    mobilePhone: data.phone ?? null,
+    plusOne: data.plus_one != null ? Number(data.plus_one) : null,
+    rsvpStatus:
+      data.rsvp_status === "attending"
+        ? "confirmed"
+        : data.rsvp_status === "not_attending"
+          ? "declined"
+          : data.rsvp_status,
+    partySize: data.party_size ?? 1,
+    dietaryRestrictions: Array.isArray(data.dietary_restrictions)
+      ? data.dietary_restrictions.join(", ")
+      : data.dietary_restrictions ?? null,
+    accessibilityNeeds: data.accesability_needs ?? null,
+    notes: data.notes ?? null,
+  };
+  const created = await apiPost<ApiGuest>(`/api/guests?adminId=1`, body);
+  return mapApiGuest(created);
 }

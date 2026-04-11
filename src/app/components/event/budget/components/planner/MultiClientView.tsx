@@ -264,7 +264,7 @@ export default function MultiClientView({
             <Statistic
               title={t("multiClientView.activeWeddings")}
               value={activeClients}
-              valueStyle={{ color: semantic.info }}
+              styles={{ content: { color: semantic.info } }}
             />
           </Card>
         </Col>
@@ -282,7 +282,7 @@ export default function MultiClientView({
             <Statistic
               title={t("multiClientView.needsAttention")}
               value={atRiskClients}
-              valueStyle={{ color: atRiskClients > 0 ? semantic.error : semantic.success }}
+              styles={{ content: { color: atRiskClients > 0 ? semantic.error : semantic.success } }}
             />
           </Card>
         </Col>

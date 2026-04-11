@@ -1,8 +1,57 @@
 .timelineWrap {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
+  padding: 4px 0;
+  width: 100%;
 }
+
+/* Timeline content debe respetar el ancho disponible */
+.timelineWrap :global(.ant-timeline-item-content) {
+  width: calc(100% - 28px);
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* Menos gap vertical entre items */
+.timelineWrap :global(.ant-timeline-item) {
+  padding-bottom: 6px;
+}
+
+/* Dot del "AHORA" */
 .iconClock {
-  font-size: var(--fs-base);
+  font-size: 14px;
+  color: #ff4d4f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Indicador NOW */
+.nowDot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+}
+
+.nowIndicator {
+  padding: 0 0 4px;
+}
+
+.nowLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 77, 79, 0.07);
+  border: 1px solid rgba(255, 77, 79, 0.18);
+  border-radius: 20px;
+  padding: 2px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #ff4d4f;
+}
+
+.nowTime {
+  font-variant-numeric: tabular-nums;
+  font-weight: 400;
+  opacity: 0.75;
 }

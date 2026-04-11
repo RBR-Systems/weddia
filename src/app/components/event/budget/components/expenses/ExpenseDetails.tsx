@@ -89,7 +89,7 @@ export default function ExpenseDetails({
         </Space>
       }
     >
-      <Space direction="vertical" className={styles.fullWidth} size="large">
+      <Space orientation="vertical" className={styles.fullWidth} size="large">
         <div>
           <Title level={4} className={styles.expenseDescription}>
             {expense.description}

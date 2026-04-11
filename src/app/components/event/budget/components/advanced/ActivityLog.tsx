@@ -232,7 +232,7 @@ export default function ActivityLog() {
               dot: config.icon,
               children: (
                 <div>
-                  <Space direction="vertical" size={0}>
+                  <Space orientation="vertical" size={0}>
                     <Space>
                       <Tag color={config.color}>{activityTypeLabels[activity.type]}</Tag>
                       <Text>{activity.description}</Text>

@@ -1,15 +1,13 @@
 import { useEffect, useState } from 'react';
-import { TimelineItem } from '../models';
-import timelineData from '../../../../data/timeline-data.json';
+import { TimelineItem } from '../models/types';
+import { fetchTimelineItems } from '../services/schedule.service';
 
-export function useSchedule() {
+export function useSchedule(eventId: number = 1) {
   const [items, setItems] = useState<TimelineItem[]>([]);
 
   useEffect(() => {
-    const raw: any = timelineData;
-    const list = Array.isArray(raw?.timeline_items) ? raw.timeline_items : [];
-    setItems(list);
-  }, []);
+    fetchTimelineItems(eventId).then(setItems).catch(() => setItems([]));
+  }, [eventId]);
 
   return { items };
 }
