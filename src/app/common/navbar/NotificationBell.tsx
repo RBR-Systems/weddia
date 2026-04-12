@@ -1,7 +1,7 @@
 "use client";
 import React, { useMemo, useState } from "react";
 import { BellOutlined } from "@ant-design/icons";
-import { Badge, Popover, List, Avatar, Button, Typography, Space } from "antd";
+import { Badge, Popover, Avatar, Button, Typography, Space, Flex } from "antd";
 import styles from "./nav-bar.module.css";
 
 type Notification = {
@@ -57,41 +57,43 @@ export default function NotificationBell() {
 
   const content = (
     <div style={{ width: 320 }}>
-      <Space direction="vertical" style={{ width: "100%" }}>
+      <Space orientation="vertical" style={{ width: "100%" }}>
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           <Typography.Text strong>Notifications</Typography.Text>
           <Button type="link" onClick={markAllRead} size="small">
             Mark all read
           </Button>
         </div>
-        <List
-          dataSource={notifications}
-          locale={{ emptyText: "No notifications" }}
-          renderItem={(item) => (
-            <List.Item
-              onClick={() => markRead(item.id)}
-              style={{
-                cursor: "pointer",
-                background: item.read ? "transparent" : "var(--ant-bg-base)",
-              }}
-            >
-              <List.Item.Meta
-                avatar={<Avatar icon={<BellOutlined />} />}
-                title={
-                  <div
-                    style={{ display: "flex", justifyContent: "space-between" }}
-                  >
-                    <span>{item.title}</span>
-                    <Typography.Text type="secondary">
-                      {item.time}
-                    </Typography.Text>
-                  </div>
-                }
-                description={item.description}
-              />
-            </List.Item>
-          )}
-        />
+        {notifications.length === 0 ? (
+          <Typography.Text type="secondary">No notifications</Typography.Text>
+        ) : (
+          <Flex vertical>
+            {notifications.map((item) => (
+              <Flex
+                key={item.id}
+                align="flex-start"
+                gap={12}
+                onClick={() => markRead(item.id)}
+                style={{
+                  cursor: "pointer",
+                  padding: "8px 0",
+                  background: item.read ? "transparent" : "var(--ant-bg-base)",
+                }}
+              >
+                <Avatar icon={<BellOutlined />} />
+                <Flex vertical style={{ flex: 1, minWidth: 0 }}>
+                  <Flex justify="space-between">
+                    <Typography.Text strong>{item.title}</Typography.Text>
+                    <Typography.Text type="secondary">{item.time}</Typography.Text>
+                  </Flex>
+                  {item.description && (
+                    <Typography.Text type="secondary">{item.description}</Typography.Text>
+                  )}
+                </Flex>
+              </Flex>
+            ))}
+          </Flex>
+        )}
         <div style={{ textAlign: "center" }}>
           <Button type="link">View all</Button>
         </div>

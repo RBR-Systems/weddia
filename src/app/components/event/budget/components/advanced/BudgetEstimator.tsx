@@ -11,7 +11,7 @@ import {
   Space,
   Select,
   Divider,
-  List,
+  Flex,
   Tag,
   Button,
   Alert,
@@ -332,26 +332,22 @@ export default function BudgetEstimator() {
             style={{ marginBottom: 16 }}
           />
 
-          <List
-            dataSource={categoryEstimates}
-            renderItem={(cat) => (
-              <List.Item>
-                <List.Item.Meta
-                  avatar={
-                    <CategoryTag
-                      color={cat.color}
-                      style={{ minWidth: 100, textAlign: "center" }}
-                    >
-                      {cat.percentage}%
-                    </CategoryTag>
-                  }
-                  title={cat.name}
-                  description={cat.description}
-                />
+          <Flex vertical>
+            {categoryEstimates.map((cat) => (
+              <Flex key={cat.name} align="center" justify="space-between" style={{ padding: "8px 0" }}>
+                <Flex align="center" gap={12}>
+                  <CategoryTag color={cat.color} style={{ minWidth: 100, textAlign: "center" }}>
+                    {cat.percentage}%
+                  </CategoryTag>
+                  <Flex vertical>
+                    <Text>{cat.name}</Text>
+                    {cat.description && <Text type="secondary">{cat.description}</Text>}
+                  </Flex>
+                </Flex>
                 <Text strong>{formatCurrency(cat.amount, state.currency)}</Text>
-              </List.Item>
-            )}
-          />
+              </Flex>
+            ))}
+          </Flex>
 
           <Divider />
 

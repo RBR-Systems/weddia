@@ -7,7 +7,7 @@ import {
   Badge,
   Tooltip,
   Typography,
-  List,
+  Flex,
   Tag,
   Empty,
 } from "antd";
@@ -63,18 +63,16 @@ export default function PaymentCalendar() {
     return (
       <Tooltip
         title={
-          <List
-            size="small"
-            dataSource={expenses}
-            renderItem={(item) => (
-              <List.Item className={calStyles.tooltipItem}>
+          <Flex vertical>
+            {expenses.map((item) => (
+              <Flex key={item.expense_id} justify="space-between" className={calStyles.tooltipItem}>
                 <Text className={calStyles.tooltipText}>{item.description}</Text>
                 <Text className={calStyles.tooltipAmount}>
                   {formatCurrency(item.amount, state.currency)}
                 </Text>
-              </List.Item>
-            )}
-          />
+              </Flex>
+            ))}
+          </Flex>
         }
       >
         <ul className={calStyles.calendarList}>
@@ -160,29 +158,28 @@ export default function PaymentCalendar() {
         className={calStyles.upcomingCard}
       >
         {upcomingPayments.length > 0 ? (
-          <List
-            dataSource={upcomingPayments}
-            renderItem={(item: Expense) => {
+          <Flex vertical>
+            {upcomingPayments.map((item: Expense) => {
               const statusConfig = Object.values(PAYMENT_STATUS).find(
                 (s) => s.value === item.payment_status,
               );
               return (
-                <List.Item>
-                  <List.Item.Meta
-                    title={item.description}
-                    description={t("paymentCalendar.due", { date: dayjs(item.expense_date).format("MMM D, YYYY") })}
-                  />
-                  <div className={calStyles.paymentAmount}>
-                    <Text strong>
-                      {formatCurrency(item.amount, state.currency)}
+                <Flex key={item.expense_id} align="center" justify="space-between" style={{ padding: "8px 0" }}>
+                  <Flex vertical>
+                    <Text strong>{item.description}</Text>
+                    <Text type="secondary">
+                      {t("paymentCalendar.due", { date: dayjs(item.expense_date).format("MMM D, YYYY") })}
                     </Text>
+                  </Flex>
+                  <div className={calStyles.paymentAmount}>
+                    <Text strong>{formatCurrency(item.amount, state.currency)}</Text>
                     <br />
                     <Tag color={statusConfig?.color}>{statusConfig?.label}</Tag>
                   </div>
-                </List.Item>
+                </Flex>
               );
-            }}
-          />
+            })}
+          </Flex>
         ) : (
           <Empty description={t("paymentCalendar.noUpcoming")} />
         )}

@@ -290,7 +290,7 @@ const TemplateSelector: React.FC<TemplateSelectorProps> = ({ onApply }) => {
         ]}
       >
         {previewTemplate?.template && (
-          <Space direction="vertical" style={{ width: "100%" }} size="middle">
+          <Space orientation="vertical" style={{ width: "100%" }} size="middle">
             <Paragraph>{previewTemplate.description}</Paragraph>
 
             <div>
@@ -417,10 +417,10 @@ const TemplateSelector: React.FC<TemplateSelectorProps> = ({ onApply }) => {
             }
           />
         ) : (
-          <Space direction="vertical" style={{ width: "100%" }} size="middle">
+          <Space orientation="vertical" style={{ width: "100%" }} size="middle">
             {/* Wedding date */}
             <Card size="small">
-              <Space direction="vertical" style={{ width: "100%" }}>
+              <Space orientation="vertical" style={{ width: "100%" }}>
                 <Text strong>
                   <CalendarOutlined /> {t("tasks.template.weddingDate")} *
                 </Text>

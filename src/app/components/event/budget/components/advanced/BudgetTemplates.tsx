@@ -10,7 +10,7 @@ import {
   Modal,
   Form,
   Input,
-  List,
+  Flex,
   Typography,
   Tag,
   Space,
@@ -274,23 +274,19 @@ export default function BudgetTemplates() {
 
         <div style={{ marginTop: 16 }}>
           <Text type="secondary">{t("budgetTemplates.willInclude")}</Text>
-          <List
-            size="small"
-            dataSource={state.categories}
-            renderItem={(cat: Category) => (
-              <List.Item>
+          <Flex vertical gap={4}>
+            {state.categories.map((cat: Category) => (
+              <Flex key={cat.id} justify="space-between" align="center">
                 <CategoryTag color={cat.color}>{cat.name}</CategoryTag>
                 <Text>
                   {state.summary?.total_budget && state.summary.total_budget > 0
-                    ? Math.round(
-                        (cat.allocated / state.summary.total_budget) * 100,
-                      )
+                    ? Math.round((cat.allocated / state.summary.total_budget) * 100)
                     : 0}
                   %
                 </Text>
-              </List.Item>
-            )}
-          />
+              </Flex>
+            ))}
+          </Flex>
         </div>
       </Modal>
 
@@ -313,23 +309,19 @@ export default function BudgetTemplates() {
               </Text>
             </div>
             <Title level={5}>{t("budgetTemplates.categoryBreakdown")}</Title>
-            <List
-              dataSource={previewTemplate.categories}
-              renderItem={(cat) => (
-                <List.Item>
+            <Flex vertical gap={4}>
+              {previewTemplate.categories.map((cat) => (
+                <Flex key={cat.name} justify="space-between" align="center">
                   <CategoryTag color={resolveChartColor(cat.color, mode)}>{cat.name}</CategoryTag>
-                  <Text>{cat.percentage}%</Text>
-                  <Text type="secondary" style={{ marginLeft: 8 }}>
-                    (
-                    {formatCurrency(
-                      (previewTemplate.total_budget * cat.percentage) / 100,
-                      state.currency,
-                    )}
-                    )
-                  </Text>
-                </List.Item>
-              )}
-            />
+                  <span>
+                    <Text>{cat.percentage}%</Text>
+                    <Text type="secondary" style={{ marginLeft: 8 }}>
+                      ({formatCurrency((previewTemplate.total_budget * cat.percentage) / 100, state.currency)})
+                    </Text>
+                  </span>
+                </Flex>
+              ))}
+            </Flex>
           </Space>
         )}
       </Modal>

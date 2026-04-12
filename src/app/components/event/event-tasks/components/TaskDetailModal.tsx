@@ -319,7 +319,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
             <PaperClipOutlined /> {t("tasks.detail.attachments")} (
             {task.attachments.length})
           </div>
-          <Space direction="vertical">
+          <Space orientation="vertical">
             {task.attachments.map((a) => (
               <div key={a.file_id} style={{ fontSize: 13 }}>
                 📎 {a.name}{" "}

@@ -8,8 +8,8 @@ import {
   Row,
   Col,
   Statistic,
-  List,
   Avatar,
+  Flex,
 } from "antd";
 import {
   CheckCircleOutlined,
@@ -89,7 +89,7 @@ const ProgressDashboard: React.FC<ProgressDashboardProps> = ({
     .slice(0, 6);
 
   return (
-    <Space direction="vertical" style={{ width: "100%" }} size="large">
+    <Space orientation="vertical" style={{ width: "100%" }} size="large">
       {/* Stats Row */}
       <Row gutter={[16, 16]}>
         <Col xs={24} sm={12} md={8} lg={4}>
@@ -210,7 +210,7 @@ const ProgressDashboard: React.FC<ProgressDashboardProps> = ({
         {/* Priority breakdown */}
         <Col xs={24} md={10}>
           <Card title={t("tasks.progress.byPriority")} size="small">
-            <Space direction="vertical" style={{ width: "100%" }}>
+            <Space orientation="vertical" style={{ width: "100%" }}>
               {(["urgent", "high", "medium", "low"] as const).map((p) => {
                 const colors = { urgent: "red", high: "orange", medium: "gold", low: "green" };
                 return (
@@ -245,32 +245,26 @@ const ProgressDashboard: React.FC<ProgressDashboardProps> = ({
             size="small"
           >
             {topAssignees.length > 0 ? (
-              <List
-                dataSource={topAssignees}
-                renderItem={([userId, data], idx) => (
-                  <List.Item key={userId} style={{ padding: "6px 0" }}>
-                    <List.Item.Meta
-                      avatar={
-                        <Avatar
-                          size={32}
-                          style={{
-                            backgroundColor: avatarColors[idx % avatarColors.length],
-                            fontSize: 12,
-                          }}
-                        >
-                          {data.name
-                            .split(" ")
-                            .map((n: string) => n[0])
-                            .join("")}
-                        </Avatar>
-                      }
-                      title={<Text style={{ fontSize: 13 }}>{data.name}</Text>}
-                      description={
+              <Flex vertical>
+                {topAssignees.map(([userId, data], idx) => (
+                  <Flex key={userId} align="center" justify="space-between" style={{ padding: "6px 0" }}>
+                    <Flex align="center" gap={12}>
+                      <Avatar
+                        size={32}
+                        style={{
+                          backgroundColor: avatarColors[idx % avatarColors.length],
+                          fontSize: 12,
+                        }}
+                      >
+                        {data.name.split(" ").map((n: string) => n[0]).join("")}
+                      </Avatar>
+                      <Flex vertical>
+                        <Text style={{ fontSize: 13 }}>{data.name}</Text>
                         <Text type="secondary" style={{ fontSize: 11 }}>
                           {data.completedCount}/{data.taskCount} {t("tasks.progress.tasksLabel")}
                         </Text>
-                      }
-                    />
+                      </Flex>
+                    </Flex>
                     <Progress
                       type="circle"
                       percent={Math.round((data.completedCount / data.taskCount) * 100)}
@@ -278,9 +272,9 @@ const ProgressDashboard: React.FC<ProgressDashboardProps> = ({
                       strokeColor="#c9a38c"
                       strokeWidth={8}
                     />
-                  </List.Item>
-                )}
-              />
+                  </Flex>
+                ))}
+              </Flex>
             ) : (
               <Text type="secondary" style={{ fontSize: 13 }}>
                 {t("tasks.progress.noAssignees")}
@@ -301,37 +295,34 @@ const ProgressDashboard: React.FC<ProgressDashboardProps> = ({
           }
           size="small"
         >
-          <List
-            dataSource={upcomingMilestones}
-            renderItem={(milestone) => {
+          <Flex vertical>
+            {upcomingMilestones.map((milestone) => {
               const daysUntil = dayjs(milestone.due_date).diff(dayjs(), "day");
               return (
-                <List.Item style={{ padding: "8px 0" }}>
-                  <List.Item.Meta
-                    avatar={<FlagOutlined style={{ color: "#F59E0B", fontSize: 18 }} />}
-                    title={milestone.title}
-                    description={
+                <Flex key={milestone.task_id} align="center" justify="space-between" style={{ padding: "8px 0" }}>
+                  <Flex align="flex-start" gap={12}>
+                    <FlagOutlined style={{ color: "#F59E0B", fontSize: 18 }} />
+                    <Flex vertical>
+                      <Text>{milestone.title}</Text>
                       <Space size={4}>
-                        <Tag
-                          style={{ borderColor: milestone.category_color, color: milestone.category_color, margin: 0 }}
-                        >
+                        <Tag style={{ borderColor: milestone.category_color, color: milestone.category_color, margin: 0 }}>
                           {milestone.category_name}
                         </Tag>
                         <Text type="secondary" style={{ fontSize: 12 }}>
                           {dayjs(milestone.due_date).format("MMM D, YYYY")}
                         </Text>
                       </Space>
-                    }
-                  />
+                    </Flex>
+                  </Flex>
                   <Tag color={daysUntil <= 7 ? "orange" : "blue"}>
                     {daysUntil === 0
                       ? t("tasks.card.dueToday")
                       : t("tasks.card.dueDays", { count: daysUntil })}
                   </Tag>
-                </List.Item>
+                </Flex>
               );
-            }}
-          />
+            })}
+          </Flex>
         </Card>
       )}
     </Space>

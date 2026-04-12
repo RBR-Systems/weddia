@@ -9,8 +9,8 @@ import {
   Tooltip,
   Button,
   Empty,
-  List,
   Avatar,
+  Flex,
 } from "antd";
 import {
   PlusOutlined,
@@ -111,7 +111,7 @@ const TaskCalendar: React.FC<TaskCalendarProps> = ({
   };
 
   return (
-    <Space direction="vertical" style={{ width: "100%" }} size="large">
+    <Space orientation="vertical" style={{ width: "100%" }} size="large">
       <div className={styles.taskListHeader}>
         <Title level={5} style={{ margin: 0 }}>
           {t("tasks.calendar.title")}
@@ -159,39 +159,24 @@ const TaskCalendar: React.FC<TaskCalendarProps> = ({
                 </Button>
               </Empty>
             ) : (
-              <List
-                dataSource={selectedTasks}
-                renderItem={(task) => {
+              <Flex vertical>
+                {selectedTasks.map((task) => {
                   const isOverdue =
                     task.status !== "completed" &&
                     task.status !== "cancelled" &&
                     dayjs(task.due_date).isBefore(dayjs(), "day");
 
                   return (
-                    <List.Item
+                    <Flex
+                      key={task.task_id}
+                      align="center"
+                      justify="space-between"
                       onClick={() => onTaskClick(task)}
                       style={{ cursor: "pointer", padding: "8px 0" }}
-                      extra={
-                        task.status !== "completed" ? (
-                          <Tooltip title={t("tasks.card.markComplete")}>
-                            <Button
-                              type="text"
-                              size="small"
-                              icon={<CheckCircleOutlined style={{ color: "#22C55E" }} />}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                onQuickComplete(task);
-                              }}
-                            />
-                          </Tooltip>
-                        ) : null
-                      }
                     >
-                      <List.Item.Meta
-                        avatar={
-                          <Badge status={statusBadge[task.status]} />
-                        }
-                        title={
+                      <Flex align="flex-start" gap={8} style={{ flex: 1, minWidth: 0 }}>
+                        <Badge status={statusBadge[task.status]} />
+                        <Flex vertical>
                           <Space size={4}>
                             <span style={{ fontWeight: 500 }}>{task.title}</span>
                             <Tag color={priorityColors[task.priority]} style={{ margin: 0, fontSize: 11 }}>
@@ -203,31 +188,37 @@ const TaskCalendar: React.FC<TaskCalendarProps> = ({
                               </Tag>
                             )}
                           </Space>
-                        }
-                        description={
                           <Space size={4} wrap>
-                            <Tag
-                              style={{ borderColor: task.category_color, color: task.category_color, margin: 0, fontSize: 11 }}
-                            >
+                            <Tag style={{ borderColor: task.category_color, color: task.category_color, margin: 0, fontSize: 11 }}>
                               {task.category_name}
                             </Tag>
                             {task.assignees.slice(0, 2).map((a, idx) => (
                               <Tooltip key={a.assignment_id} title={a.user_name}>
-                                <Avatar
-                                  size={20}
-                                  style={{ backgroundColor: avatarColors[idx % avatarColors.length], fontSize: 10 }}
-                                >
+                                <Avatar size={20} style={{ backgroundColor: avatarColors[idx % avatarColors.length], fontSize: 10 }}>
                                   {a.user_name.split(" ").map((n) => n[0]).join("")}
                                 </Avatar>
                               </Tooltip>
                             ))}
                           </Space>
-                        }
-                      />
-                    </List.Item>
+                        </Flex>
+                      </Flex>
+                      {task.status !== "completed" && (
+                        <Tooltip title={t("tasks.card.markComplete")}>
+                          <Button
+                            type="text"
+                            size="small"
+                            icon={<CheckCircleOutlined style={{ color: "#22C55E" }} />}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onQuickComplete(task);
+                            }}
+                          />
+                        </Tooltip>
+                      )}
+                    </Flex>
                   );
-                }}
-              />
+                })}
+              </Flex>
             )}
           </Card>
         </div>
