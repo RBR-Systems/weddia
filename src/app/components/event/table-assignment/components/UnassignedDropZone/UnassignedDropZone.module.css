@@ -1,9 +1,10 @@
 .unassignedDropZone {
   border: 1px dashed var(--tile-hover-border);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-ms);
+  border-radius: var(--radius-md);
+  padding: 8px 12px;
   background: var(--subtle-bg-hover);
-  margin: var(--spacing-ms);
+  transition: background 150ms ease, border-color 150ms ease;
+  flex-shrink: 0;
 }
 
 .dropZoneOver {

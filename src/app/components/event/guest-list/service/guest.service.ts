@@ -1,5 +1,5 @@
 import { Guest } from "../models/types";
-import { apiGet, apiPost, apiDelete, apiPatch } from "@/lib/apiClient";
+import { apiGet, apiPost, apiDelete, apiPatch, ApiError } from "@/lib/apiClient";
 
 interface ApiGuest {
   guestId: number;
@@ -65,6 +65,7 @@ export async function fetchGuests(eventId: number): Promise<Guest[]> {
     const raw = await apiGet<ApiGuest[]>(`/api/guests/event/${eventId}`);
     return raw.map(mapApiGuest);
   } catch (err) {
+    if (err instanceof ApiError && err.status === 401) return [];
     console.error("fetchGuests error", err);
     return [];
   }
@@ -79,6 +80,7 @@ export async function fetchRelations(): Promise<
     );
     return raw.map((r) => ({ relation_id: String(r.relationId), name: r.name }));
   } catch (err) {
+    if (err instanceof ApiError && err.status === 401) return [];
     console.error("fetchRelations error", err);
     return [];
   }

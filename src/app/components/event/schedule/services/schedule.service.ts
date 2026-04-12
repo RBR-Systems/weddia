@@ -1,5 +1,5 @@
 import { TimelineItem, Status } from "../models/types";
-import { apiGet, apiPost, apiPut, apiDelete } from "@/lib/apiClient";
+import { apiGet, apiPost, apiPut, apiDelete, ApiError } from "@/lib/apiClient";
 
 interface ApiTimelineItem {
   timelineItemId: number;
@@ -52,6 +52,7 @@ export async function fetchTimelineItems(eventId: number): Promise<TimelineItem[
     const raw = await apiGet<ApiTimelineItem[]>(`/api/eventtimelineitems/event/${eventId}`);
     return Array.isArray(raw) ? raw.map(mapApiItem) : [];
   } catch (err) {
+    if (err instanceof ApiError && err.status === 401) return [];
     console.error("fetchTimelineItems error", err);
     return [];
   }

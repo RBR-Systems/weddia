@@ -71,6 +71,7 @@
   },
   "common": {
     "save": "Save",
+    "create": "Create",
     "cancel": "Cancel",
     "delete": "Delete",
     "edit": "Edit",
@@ -126,6 +127,7 @@
     "eventsHub": "Events Hub",
     "guestList": "Guest List",
     "budget": "Budget",
+    "budgetCategories": "Budget Categories",
     "tableAssignment": "Table Assignment",
     "schedule": "Schedule",
     "planner": "Planner",
@@ -203,6 +205,30 @@
       "activityLog": "Activity Log"
     }
   },
+  "budgetCategories": {
+    "title": "Budget Categories",
+    "subtitle": "{{count}} categories",
+    "newCategory": "New category",
+    "searchPlaceholder": "Search categories...",
+    "noResults": "No categories match your search",
+    "empty": "No categories yet",
+    "noDescription": "No description",
+    "createTitle": "New category",
+    "editTitle": "Edit category",
+    "fieldName": "Name",
+    "namePlaceholder": "e.g. Catering",
+    "nameRequired": "Name is required",
+    "fieldDescription": "Description",
+    "descriptionPlaceholder": "Optional description",
+    "deleteConfirmTitle": "Delete category",
+    "deleteConfirmDesc": "Are you sure you want to delete \"{{name}}\"?",
+    "createdSuccess": "Category created",
+    "updatedSuccess": "Category updated",
+    "deletedSuccess": "Category deleted",
+    "loadError": "Failed to load categories",
+    "saveError": "Failed to save category",
+    "deleteError": "Failed to delete category"
+  },
   "budgetStats": {
     "totalBudget": "Total Budget",
     "totalAllocated": "Total Allocated",
@@ -213,16 +239,32 @@
     "averageExpense": "Average Expense",
     "largestExpense": "Largest Expense",
     "topCategory": "Top Category",
-    "clickToEdit": "Click to edit budget"
+    "clickToEdit": "Click to edit budget",
+    "ofBudget": "of budget",
+    "overBudget": "Over budget"
   },
   "expenseModal": {
     "title": "Add Expense",
+    "editTitle": "Edit Expense",
     "description": "Description",
+    "descriptionPlaceholder": "e.g., Venue rental fee",
+    "descriptionRequired": "Description is required",
     "amount": "Amount",
+    "amountRequired": "Amount is required",
     "category": "Category",
+    "categoryRequired": "Please select a category",
     "vendor": "Vendor",
     "date": "Date",
-    "paymentStatus": "Payment Status"
+    "paymentStatus": "Payment Status",
+    "methodOfPayment": "Method of Payment",
+    "methodOfPaymentRequired": "Please select a method of payment",
+    "paymentMethods": {
+      "creditCard": "Card",
+      "bankTransfer": "Transfer",
+      "cash": "Cash",
+      "check": "Check",
+      "other": "Other"
+    }
   },
   "expenseList": {
     "title": "Expenses ({{count}})",
@@ -246,24 +288,52 @@
   },
   "categoryList": {
     "title": "Budget Categories",
-    "searchPlaceholder": "Search categories",
-    "addCategory": "Add Category",
-    "noCategories": "No categories found",
-    "editCategory": "Edit Category",
-    "categoryName": "Category Name",
-    "categoryNamePlaceholder": "e.g., Venue, Catering, Photography",
-    "categoryNameRequired": "Please enter a name",
-    "allocatedBudget": "Allocated Budget",
+    "searchPlaceholder": "Search budgets",
+    "addBudget": "Add Budget",
+    "editBudget": "Edit Budget",
+    "noCategories": "No budget items found",
+    "catalogCategory": "Category",
+    "categoryNameRequired": "Please select a category",
+    "budgetName": "Budget Name",
+    "budgetNamePlaceholder": "e.g., Main Venue, Wedding Cake",
+    "budgetNameRequired": "Please enter a budget name",
+    "budgetNotes": "Description",
+    "budgetNotesPlaceholder": "Optional notes about this budget",
+    "allocatedBudget": "Allocated Amount",
     "allocatedBudgetRequired": "Please enter an amount",
-    "color": "Color",
-    "categoryUpdated": "Category updated",
-    "categoryAdded": "Category added",
-    "categoryDeleted": "Category deleted"
+    "categoryUpdated": "Budget updated",
+    "categoryAdded": "Budget added",
+    "categoryDeleted": "Budget deleted",
+    "selectCategoryPlaceholder": "Select a category",
+    "allCategoriesBudgeted": "All categories are already budgeted",
+    "loadCatalogError": "Failed to load category catalog",
+    "deleteConfirm": "Delete this budget and all its items?"
+  },
+  "budgetItems": {
+    "title": "Budget Items",
+    "total": "Total",
+    "noItems": "No items yet — add sub-line items to break down this budget",
+    "addItem": "Add Item",
+    "description": "Description",
+    "descriptionPlaceholder": "e.g., Venue rental fee",
+    "amount": "Amount",
+    "notes": "Notes",
+    "notesPlaceholder": "Optional note",
+    "itemAdded": "Item added",
+    "itemUpdated": "Item updated",
+    "itemDeleted": "Item deleted",
+    "deleteConfirm": "Delete this item?",
+    "deleteError": "Could not delete item",
+    "saveError": "Could not save item",
+    "updateError": "Could not update item",
+    "descriptionRequired": "Description is required",
+    "amountRequired": "Amount is required"
   },
   "categoryCard": {
     "spent": "Spent",
     "allocated": "Allocated",
-    "remaining": "Remaining"
+    "remaining": "Remaining",
+    "expenses": "expenses"
   },
   "budgetAllocation": {
     "title": "Budget Allocation",
@@ -743,18 +813,6 @@
       "hoursPlural": "{{count}} hours",
       "hoursMinutes": "{{hours}}h {{minutes}}m",
       "invalidTime": "Invalid time"
-    }
-  },
-  "expenseModal": {
-    "methodOfPayment": "Method of Payment",
-    "methodOfPaymentRequired": "Please select a method of payment!",
-    "methodOfPaymentPlaceholder": "Select payment method",
-    "paymentMethods": {
-      "creditCard": "Credit Card",
-      "bankTransfer": "Bank Transfer",
-      "cash": "Cash",
-      "check": "Check",
-      "other": "Other"
     }
   },
   "multiClient": {

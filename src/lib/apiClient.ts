@@ -1,6 +1,18 @@
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "";
 const TOKEN_KEY = "rbr_token";
 
+export class ApiError extends Error {
+  constructor(
+    public readonly status: number,
+    method: string,
+    path: string,
+    detail: string,
+  ) {
+    super(`API ${method} ${path} → ${status}: ${detail}`);
+    this.name = "ApiError";
+  }
+}
+
 // AuthContext registers this to force logout on 401
 let onUnauthorized: (() => void) | null = null;
 export function setUnauthorizedHandler(fn: () => void) {
@@ -29,24 +41,35 @@ function authHeaders(): HeadersInit {
   };
 }
 
+/** Pass `{ silent401: true }` to suppress the global logout handler on 401.
+ *  Pass `{ signal }` to support AbortController cancellation. */
+type RequestOptions = { silent401?: boolean; signal?: AbortSignal };
+
+/** Returns true when an error is from an aborted fetch — should be silently ignored. */
+export function isAbortError(err: unknown): boolean {
+  return err instanceof DOMException && err.name === "AbortError";
+}
+
 async function request<T>(
   method: string,
   path: string,
   body?: unknown,
+  options: RequestOptions = {},
 ): Promise<T> {
   const res = await fetch(`${API_BASE}${path}`, {
     method,
     headers: authHeaders(),
+    signal: options.signal,
     ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
   });
 
   if (!res.ok) {
-    if (res.status === 401) {
+    const text = await res.text().catch(() => res.statusText);
+    if (res.status === 401 && !options.silent401) {
       clearToken();
       onUnauthorized?.();
     }
-    const text = await res.text().catch(() => res.statusText);
-    throw new Error(`API ${method} ${path} → ${res.status}: ${text}`);
+    throw new ApiError(res.status, method, path, text);
   }
 
   // Handle no-content responses (DELETE 204, PUT with empty body, etc.)
@@ -57,8 +80,8 @@ async function request<T>(
   return JSON.parse(text) as T;
 }
 
-export const apiGet = <T>(path: string) => request<T>("GET", path);
-export const apiPost = <T>(path: string, body: unknown) => request<T>("POST", path, body);
-export const apiPut = <T>(path: string, body: unknown) => request<T>("PUT", path, body);
-export const apiPatch = <T>(path: string, body: unknown) => request<T>("PATCH", path, body);
-export const apiDelete = <T>(path: string) => request<T>("DELETE", path);
+export const apiGet    = <T>(path: string, o?: RequestOptions) => request<T>("GET",    path, undefined, o);
+export const apiPost   = <T>(path: string, body: unknown, o?: RequestOptions) => request<T>("POST",   path, body, o);
+export const apiPut    = <T>(path: string, body: unknown, o?: RequestOptions) => request<T>("PUT",    path, body, o);
+export const apiPatch  = <T>(path: string, body: unknown, o?: RequestOptions) => request<T>("PATCH",  path, body, o);
+export const apiDelete = <T>(path: string, o?: RequestOptions) => request<T>("DELETE", path, undefined, o);

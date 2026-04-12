@@ -28,8 +28,12 @@ export interface BudgetSummary {
 }
 
 export interface Category {
-  id: string;
-  name: string;
+  id: string;            // budgetId (line-item PK)
+  catalog_id?: string;   // categoryId from global catalog
+  name: string;          // catalog category name
+  description?: string;  // catalog category description
+  budget_name?: string;  // user-given name for this budget entry
+  budget_notes?: string; // user notes for this budget entry
   allocated: number;
   spent: number;
   remaining: number;
@@ -50,11 +54,26 @@ export interface Expense {
   receipt_urls?: string[];
 }
 
+export interface Vendor {
+  vendor_id: string;
+  name: string;
+}
+
+export interface BudgetItem {
+  item_id: string;
+  budget_id: string;
+  category_id?: string;
+  description: string;
+  amount: number;
+  notes?: string;
+}
+
 export interface BudgetState {
   isLoading: boolean;
   error: string | null;
   summary: BudgetSummary | null;
   categories: Category[];
   expenses: Expense[];
+  vendors: Vendor[];
   currency: Currency;
 }

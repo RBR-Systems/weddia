@@ -1,5 +1,5 @@
 import React from "react";
-import { Space, Input, Select, Tag, Empty, Button } from "antd";
+import { Input, Select, Tag, Empty, Button } from "antd";
 import Card from "@/app/common/Card/card";
 import { Segmented } from "antd";
 import DraggableGuestRow from "../DraggableguestRow/DraggableGuestRow";
@@ -42,7 +42,6 @@ const SidePanel = (props: Props) => {
     sideView,
     setSideView,
     sidePanelOpen,
-    segmentedOptions,
     relationOptions,
     guestSearch,
     setGuestSearch,
@@ -62,14 +61,16 @@ const SidePanel = (props: Props) => {
     onSelectTable,
     onClearSelectedTable,
   } = props;
+
   const tables = tableOrder ?? [];
   const tablesById = tablesForActiveLayoutById ?? new Map();
   const ctx = useTableAssignmentContext();
   const assignmentsByTable = (ctx as any).assignmentsByTable as Map<string, TableAssignment[]>;
   const { t } = useTranslation();
   const handleSelectTable = onSelectTable ?? (() => {});
-  const unassignedCount =
-    (guestsById?.size ?? 0) - (assignedGuestIds?.size ?? 0);
+
+  const totalGuests = guestsById?.size ?? 0;
+  const unassignedCount = totalGuests - (assignedGuestIds?.size ?? 0);
 
   return (
     <Card
@@ -82,28 +83,23 @@ const SidePanel = (props: Props) => {
           options={[
             {
               label: (
-                <Space size={6}>
+                <>
                   {unassignedCount > 0 ? (
-                    <>
-                      <WarningOutlined style={{ color: "orange" }} />
-                      {t("tableAssignment.sidePanel.guestsTab")}
-                    </>
+                    <WarningOutlined style={{ color: "orange", marginRight: 6 }} />
                   ) : (
-                    <>
-                      <UserOutlined />
-                      {t("tableAssignment.sidePanel.guestsTab")}
-                    </>
+                    <UserOutlined style={{ marginRight: 6 }} />
                   )}
-                </Space>
+                  {t("tableAssignment.sidePanel.guestsTab")}
+                </>
               ),
               value: "guests",
             },
             {
               label: (
-                <Space size={6}>
-                  <TeamOutlined />
+                <>
+                  <TeamOutlined style={{ marginRight: 6 }} />
                   {t("tableAssignment.sidePanel.tableTab")}
-                </Space>
+                </>
               ),
               value: "table",
             },
@@ -111,47 +107,73 @@ const SidePanel = (props: Props) => {
         />
       }
       className={styles.sideCard + (sidePanelOpen ? "" : ` ${styles.closed}`)}
+      style={{ height: "100%", display: "flex", flexDirection: "column", overflow: "hidden" }}
+      styles={{
+        body: {
+          flex: "1 1 0%",
+          minHeight: 0,
+          display: "flex",
+          flexDirection: "column",
+          padding: "10px",
+          overflow: "hidden",
+        },
+      }}
     >
       {sideView === "guests" ? (
         <div className={styles.sideBody}>
           <UnassignedDropZone />
+
+          {/* Filters */}
           <div className={styles.sideFilters}>
-          <Space orientation="vertical" size={10} className={styles.spaceMargin}>
             <Input.Search
               value={guestSearch}
               onChange={(e) => setGuestSearch(e.target.value)}
               placeholder={t("tableAssignment.sidePanel.searchPlaceholder")}
               allowClear
+              size="small"
             />
             <Select
-              value={relationFilter}
-              onChange={(v) => setRelationFilter(v)}
-              placeholder={t("tableAssignment.sidePanel.filterByRelation")}
-              allowClear
-              options={relationOptions}
+              value={relationFilter ?? "__all__"}
+              onChange={(v) => setRelationFilter(v === "__all__" ? undefined : v)}
+              options={[
+                { value: "__all__", label: t("tableAssignment.sidePanel.all") },
+                ...relationOptions,
+              ]}
+              size="small"
+              style={{ width: "100%" }}
             />
             <Segmented
               value={assignedFilter ?? "all"}
               onChange={(v) =>
                 setAssignedFilter(v as "all" | "assigned" | "unassigned")
               }
+              size="small"
+              block
               options={[
                 { label: t("tableAssignment.sidePanel.all"), value: "all" },
-                {
-                  label: t("tableAssignment.sidePanel.assigned"),
-                  value: "assigned",
-                },
-                {
-                  label: t("tableAssignment.sidePanel.unassignedTab"),
-                  value: "unassigned",
-                },
+                { label: t("tableAssignment.sidePanel.assigned"), value: "assigned" },
+                { label: t("tableAssignment.sidePanel.unassignedTab"), value: "unassigned" },
               ]}
             />
-            <div>
+            <div className={styles.filterFooter}>
+              <span className={styles.guestCount}>
+                {totalGuests} {t("tableAssignment.sidePanel.guestsTab").toLowerCase()}
+                {unassignedCount > 0 && (
+                  <>
+                    {" · "}
+                    <span className={styles.unassignedBadge}>
+                      {unassignedCount} {t("tableAssignment.sidePanel.unassignedTab").toLowerCase()}
+                    </span>
+                  </>
+                )}
+              </span>
               <Button
                 danger
+                type="link"
+                size="small"
+                style={{ padding: 0, height: "auto", fontSize: "var(--fs-xs)" }}
                 onClick={() => {
-                  ctx.dispatch({ type: "UNASSIGN_ALL" });
+                  ctx.unassignAll();
                   ctx.messageApi?.success(
                     t("tableAssignment.sidePanel.allGuestsUnassigned"),
                   );
@@ -160,28 +182,36 @@ const SidePanel = (props: Props) => {
                 {t("tableAssignment.sidePanel.unassignAll")}
               </Button>
             </div>
-          </Space>
           </div>
+
+          {/* Guest list */}
           <div className={styles.sideList}>
-            {filteredGuests.map((g) => {
-              const relation = relationsById.get(g.relation_id);
-              const isAssigned = assignedGuestIds.has(g.guest_id);
-              return (
-                <div key={g.guest_id} className={styles.guestRow}>
+            {filteredGuests.length === 0 ? (
+              <Empty
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                description={t("tableAssignment.sidePanel.noGuests") ?? "Sin invitados"}
+                style={{ margin: "auto" }}
+              />
+            ) : (
+              filteredGuests.map((g) => {
+                const relation = relationsById.get(g.relation_id);
+                const isAssigned = assignedGuestIds.has(g.guest_id);
+                return (
                   <DraggableGuestRow
+                    key={g.guest_id}
                     guest={g}
                     relationName={relation?.name}
                     isAssigned={isAssigned}
                   />
-                </div>
-              );
-            })}
+                );
+              })
+            )}
           </div>
         </div>
       ) : (
         <div className={styles.sideBody}>
           {!selectedTable ? (
-            <div>
+            <>
               {tables.length === 0 ? (
                 <Empty description={t("tableAssignment.sidePanel.noTables")} />
               ) : (
@@ -196,7 +226,10 @@ const SidePanel = (props: Props) => {
                     }, 0);
                     const pct = capacity > 0 ? Math.round((seated / capacity) * 100) : 0;
                     const isFull = seated >= capacity && capacity > 0;
-                    const shapeIcon = tbl?.shape === "rectangular" ? "▬" : tbl?.shape === "square" ? "■" : "●";
+                    const shapeIcon =
+                      tbl?.shape === "rectangular" ? "▬"
+                      : tbl?.shape === "square" ? "■"
+                      : "●";
 
                     return (
                       <div
@@ -209,7 +242,14 @@ const SidePanel = (props: Props) => {
                           <div className={styles.tableListInfo}>
                             <div className={styles.tableListHeader}>
                               <span className={styles.tableTitle}>{tableId}</span>
-                              <span className={styles.tableSeats} style={{ color: isFull ? "var(--status-canceled)" : "var(--text-color-secondary)" }}>
+                              <span
+                                className={styles.tableSeats}
+                                style={{
+                                  color: isFull
+                                    ? "var(--status-canceled)"
+                                    : "var(--text-color-secondary)",
+                                }}
+                              >
                                 {seated}/{capacity}
                               </span>
                             </div>
@@ -217,7 +257,13 @@ const SidePanel = (props: Props) => {
                               percent={pct}
                               size="small"
                               showInfo={false}
-                              strokeColor={isFull ? "var(--status-canceled)" : pct > 75 ? "var(--status-delayed)" : "var(--primary)"}
+                              strokeColor={
+                                isFull
+                                  ? "var(--status-canceled)"
+                                  : pct > 75
+                                  ? "var(--status-delayed)"
+                                  : "var(--primary)"
+                              }
                               style={{ margin: 0 }}
                             />
                           </div>
@@ -227,34 +273,35 @@ const SidePanel = (props: Props) => {
                   })}
                 </div>
               )}
-            </div>
+            </>
           ) : (
             <>
               <div className={styles.tableDetailsHeader}>
-                <Space size={10} align="center">
-                  <Button
-                    type="text"
-                    icon={<LeftOutlined />}
-                    onClick={() =>
-                      onClearSelectedTable && onClearSelectedTable()
-                    }
-                  />
-                  <div>
-                    <div className={styles.tableTitle}>
-                      {selectedTable.table_id}
-                    </div>
-                    <div className={styles.tableSubtitle}>
-                      {t("tableAssignment.sidePanel.capacityAndSeated", {
-                        capacity: selectedTable.total_number,
-                        seated: selectedTablePeopleCount,
-                      })}
-                    </div>
-                  </div>
-                </Space>
+                <Button
+                  type="text"
+                  size="small"
+                  icon={<LeftOutlined />}
+                  onClick={() => onClearSelectedTable?.()}
+                  style={{ marginBottom: 6 }}
+                >
+                  {t("tableAssignment.sidePanel.tableTab")}
+                </Button>
+                <div className={styles.tableTitle}>{selectedTable.table_id}</div>
+                <div className={styles.tableSubtitle}>
+                  {t("tableAssignment.sidePanel.capacityAndSeated", {
+                    capacity: selectedTable.total_number,
+                    seated: selectedTablePeopleCount,
+                  })}
+                </div>
               </div>
+
               <div className={styles.sideList}>
                 {selectedTableAssignments.length === 0 ? (
-                  <Empty description={t("tableAssignment.sidePanel.noGuestsAssigned")} />
+                  <Empty
+                    image={Empty.PRESENTED_IMAGE_SIMPLE}
+                    description={t("tableAssignment.sidePanel.noGuestsAssigned")}
+                    style={{ margin: "auto" }}
+                  />
                 ) : (
                   selectedTableAssignments.map((a) => {
                     const g = guestsById.get(a.guest_id);
@@ -262,57 +309,41 @@ const SidePanel = (props: Props) => {
                     const relation = relationsById.get(g.relation_id);
                     const isAssigned = assignedGuestIds.has(g.guest_id);
                     const partySize = g.party_size ?? (g.plus_one ? 2 : 1);
-                    const seatEnd = a.seat_number + partySize - 1;
                     const maxSeat = selectedTable.total_number - partySize + 1;
-                    const seatLabel =
-                      partySize > 1
-                        ? t("tableAssignment.seatRange", {
-                            from: a.seat_number,
-                            to: seatEnd,
-                          })
-                        : t("tableAssignment.seatNumber", {
-                            number: a.seat_number,
-                          });
+
                     return (
-                      <div key={a.guest_id}>
-                        <Space
-                          orientation="horizontal"
-                          size={8}
-                          align="center"
-                          className={styles.fullWidth}
-                        >
-                          <DraggableGuestRow
-                            guest={g}
-                            relationName={relation?.name}
-                            isAssigned={isAssigned}
+                      <div key={a.guest_id} className={styles.tableDetailGuestRow}>
+                        <DraggableGuestRow
+                          guest={g}
+                          relationName={relation?.name}
+                          isAssigned={isAssigned}
+                        />
+                        <div className={styles.seatNavButtons}>
+                          <Button
+                            size="small"
+                            disabled={a.seat_number <= 1}
+                            onClick={() => {
+                              ctx.moveGuestSeat?.(
+                                a.guest_id,
+                                selectedTable.table_id,
+                                Math.max(1, a.seat_number - 1),
+                              );
+                            }}
+                            icon={<LeftOutlined />}
                           />
-                          <Space>
-                            <Button
-                              size="small"
-                              disabled={a.seat_number <= 1}
-                              onClick={() => {
-                                ctx.moveGuestSeat?.(
-                                  a.guest_id,
-                                  selectedTable.table_id,
-                                  Math.max(1, a.seat_number - 1),
-                                );
-                              }}
-                              icon={<LeftOutlined />}
-                            />
-                            <Button
-                              size="small"
-                              disabled={a.seat_number >= maxSeat}
-                              onClick={() => {
-                                ctx.moveGuestSeat?.(
-                                  a.guest_id,
-                                  selectedTable.table_id,
-                                  Math.min(maxSeat, a.seat_number + 1),
-                                );
-                              }}
-                              icon={<RightOutlined />}
-                            />
-                          </Space>
-                        </Space>
+                          <Button
+                            size="small"
+                            disabled={a.seat_number >= maxSeat}
+                            onClick={() => {
+                              ctx.moveGuestSeat?.(
+                                a.guest_id,
+                                selectedTable.table_id,
+                                Math.min(maxSeat, a.seat_number + 1),
+                              );
+                            }}
+                            icon={<RightOutlined />}
+                          />
+                        </div>
                       </div>
                     );
                   })

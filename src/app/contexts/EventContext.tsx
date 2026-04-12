@@ -11,7 +11,7 @@ import { EventContextInterface } from "./InitialState";
 import { EventAction, EventActions } from "./EventActions";
 import { EventCardProps } from "../components/events-list/models/event-card-props-model";
 import { EventStatus } from "../components/events-list/models/enums/event-list-enums";
-import { apiGet } from "@/lib/apiClient";
+import { apiGet, isAbortError } from "@/lib/apiClient";
 import { useAuth } from "./AuthContext";
 
 interface ApiEvent {
@@ -53,6 +53,7 @@ function mapApiEvent(e: ApiEvent): EventCardProps {
     eventName: e.eventName || e.title,
     status: mapApiStatus(e.status),
     date,
+    rawDate: e.eventDate,
     description: e.description ?? "",
     clients: "",
     location: e.eventAddress ?? "",
@@ -64,6 +65,8 @@ function mapApiEvent(e: ApiEvent): EventCardProps {
     spent: 0,
   };
 }
+
+const SELECTED_EVENT_KEY = "rbr_selected_event_id";
 
 const initialState: EventContextInterface = {
   events: {
@@ -96,6 +99,24 @@ function eventReducer(
           selectedEvent: state.events.allEvents[action.payload ?? 0] ?? null,
         },
       };
+    case EventActions.UPDATE_EVENT:
+      return {
+        ...state,
+        events: {
+          ...state.events,
+          allEvents: state.events.allEvents.map((e) =>
+            e.id === action.payload.id ? action.payload : e,
+          ),
+        },
+      };
+    case EventActions.ADD_EVENT:
+      return {
+        ...state,
+        events: {
+          ...state.events,
+          allEvents: [...state.events.allEvents, action.payload],
+        },
+      };
     default:
       return state;
   }
@@ -113,17 +134,37 @@ export function EventProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(eventReducer, initialState);
   const { token } = useAuth();
 
+  // Persist selected event id whenever it changes
+  useEffect(() => {
+    const id = state.events.selectedEvent?.id;
+    if (id != null) {
+      localStorage.setItem(SELECTED_EVENT_KEY, String(id));
+    }
+  }, [state.events.selectedEvent]);
+
   useEffect(() => {
     if (!token) return;
-    apiGet<ApiEvent[]>("/api/events")
+    const controller = new AbortController();
+    apiGet<ApiEvent[]>("/api/events", { signal: controller.signal })
       .then((events) => {
         const mapped = events.map(mapApiEvent);
         dispatch({ type: EventActions.SET_ALL_EVENTS, payload: mapped });
         if (mapped.length > 0) {
-          dispatch({ type: EventActions.SET_SELECTED_EVENT, payload: 0 });
+          const savedId = localStorage.getItem(SELECTED_EVENT_KEY);
+          const restoredIdx = savedId
+            ? mapped.findIndex((e) => String(e.id) === savedId)
+            : -1;
+          dispatch({
+            type: EventActions.SET_SELECTED_EVENT,
+            payload: restoredIdx >= 0 ? restoredIdx : 0,
+          });
         }
       })
-      .catch((err) => console.error("Failed to load events:", err));
+      .catch((err) => {
+        if (isAbortError(err)) return;
+        console.error("Failed to load events:", err);
+      });
+    return () => controller.abort();
   }, [token]);
 
   return (

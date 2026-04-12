@@ -90,7 +90,7 @@ export default function VendorDetails({
     <Drawer
       title={t("vendorDetails.title")}
       placement="right"
-      width={600}
+      style={{ width: 600 }}
       open={open}
       onClose={onClose}
     >
@@ -170,7 +170,7 @@ export default function VendorDetails({
           </Col>
         </Row>
 
-        <Divider orientation="horizontal">
+        <Divider>
           {t("vendorDetails.expenses", { count: vendorExpenses.length })}
         </Divider>
 

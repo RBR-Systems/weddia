@@ -71,6 +71,7 @@
   },
   "common": {
     "save": "Guardar",
+    "create": "Crear",
     "cancel": "Cancelar",
     "delete": "Eliminar",
     "edit": "Editar",
@@ -126,6 +127,7 @@
     "eventsHub": "Centro de Eventos",
     "guestList": "Lista de invitados",
     "budget": "Presupuesto",
+    "budgetCategories": "Categorías de Presupuesto",
     "tableAssignment": "Asignación de Mesas",
     "schedule": "Cronograma",
     "planner": "Planificador",
@@ -203,6 +205,30 @@
       "activityLog": "Registro de Actividad"
     }
   },
+  "budgetCategories": {
+    "title": "Categorías de Presupuesto",
+    "subtitle": "{{count}} categorías",
+    "newCategory": "Nueva categoría",
+    "searchPlaceholder": "Buscar categorías...",
+    "noResults": "Ninguna categoría coincide con la búsqueda",
+    "empty": "Aún no hay categorías",
+    "noDescription": "Sin descripción",
+    "createTitle": "Nueva categoría",
+    "editTitle": "Editar categoría",
+    "fieldName": "Nombre",
+    "namePlaceholder": "Ej. Catering",
+    "nameRequired": "El nombre es requerido",
+    "fieldDescription": "Descripción",
+    "descriptionPlaceholder": "Descripción opcional",
+    "deleteConfirmTitle": "Eliminar categoría",
+    "deleteConfirmDesc": "¿Seguro que deseas eliminar \"{{name}}\"?",
+    "createdSuccess": "Categoría creada",
+    "updatedSuccess": "Categoría actualizada",
+    "deletedSuccess": "Categoría eliminada",
+    "loadError": "Error al cargar categorías",
+    "saveError": "Error al guardar la categoría",
+    "deleteError": "Error al eliminar la categoría"
+  },
   "budgetStats": {
     "totalBudget": "Presupuesto Total",
     "totalAllocated": "Total Asignado",
@@ -213,16 +239,32 @@
     "averageExpense": "Gasto Promedio",
     "largestExpense": "Mayor Gasto",
     "topCategory": "Categoría Principal",
-    "clickToEdit": "Clic para editar presupuesto"
+    "clickToEdit": "Clic para editar presupuesto",
+    "ofBudget": "del presupuesto",
+    "overBudget": "Sobre presupuesto"
   },
   "expenseModal": {
     "title": "Agregar Gasto",
+    "editTitle": "Editar Gasto",
     "description": "Descripción",
+    "descriptionPlaceholder": "Ej. Renta de salón",
+    "descriptionRequired": "La descripción es obligatoria",
     "amount": "Monto",
+    "amountRequired": "El monto es obligatorio",
     "category": "Categoría",
+    "categoryRequired": "Selecciona una categoría",
     "vendor": "Proveedor",
     "date": "Fecha",
-    "paymentStatus": "Estado de Pago"
+    "paymentStatus": "Estado de Pago",
+    "methodOfPayment": "Método de Pago",
+    "methodOfPaymentRequired": "Selecciona un método de pago",
+    "paymentMethods": {
+      "creditCard": "Tarjeta",
+      "bankTransfer": "Transferencia",
+      "cash": "Efectivo",
+      "check": "Cheque",
+      "other": "Otro"
+    }
   },
   "expenseList": {
     "title": "Gastos ({{count}})",
@@ -245,25 +287,53 @@
     "awaitingPayment": "Esperando pago"
   },
   "categoryList": {
-    "title": "Categorías de Presupuesto",
-    "searchPlaceholder": "Buscar categorías",
-    "addCategory": "Agregar Categoría",
-    "noCategories": "No se encontraron categorías",
-    "editCategory": "Editar Categoría",
-    "categoryName": "Nombre de Categoría",
-    "categoryNamePlaceholder": "ej., Lugar, Catering, Fotografía",
-    "categoryNameRequired": "Por favor ingrese un nombre",
-    "allocatedBudget": "Presupuesto Asignado",
+    "title": "Presupuesto",
+    "searchPlaceholder": "Buscar presupuestos",
+    "addBudget": "Agregar Presupuesto",
+    "editBudget": "Editar Presupuesto",
+    "noCategories": "No se encontraron partidas de presupuesto",
+    "catalogCategory": "Categoría",
+    "categoryNameRequired": "Por favor selecciona una categoría",
+    "budgetName": "Nombre del Presupuesto",
+    "budgetNamePlaceholder": "ej., Salón Principal, Pastel de Boda",
+    "budgetNameRequired": "Por favor ingresa un nombre",
+    "budgetNotes": "Descripción",
+    "budgetNotesPlaceholder": "Notas opcionales sobre este presupuesto",
+    "allocatedBudget": "Monto Asignado",
     "allocatedBudgetRequired": "Por favor ingrese un monto",
-    "color": "Color",
-    "categoryUpdated": "Categoría actualizada",
-    "categoryAdded": "Categoría agregada",
-    "categoryDeleted": "Categoría eliminada"
+    "categoryUpdated": "Presupuesto actualizado",
+    "categoryAdded": "Presupuesto agregado",
+    "categoryDeleted": "Presupuesto eliminado",
+    "selectCategoryPlaceholder": "Selecciona una categoría",
+    "allCategoriesBudgeted": "Todas las categorías ya tienen presupuesto asignado",
+    "loadCatalogError": "Error al cargar el catálogo de categorías",
+    "deleteConfirm": "¿Eliminar este presupuesto y todas sus partidas?"
+  },
+  "budgetItems": {
+    "title": "Partidas del Presupuesto",
+    "total": "Total",
+    "noItems": "Sin partidas — agrega sub-líneas para desglosar este presupuesto",
+    "addItem": "Agregar Partida",
+    "description": "Descripción",
+    "descriptionPlaceholder": "ej., Renta del salón",
+    "amount": "Monto",
+    "notes": "Notas",
+    "notesPlaceholder": "Nota opcional",
+    "itemAdded": "Partida agregada",
+    "itemUpdated": "Partida actualizada",
+    "itemDeleted": "Partida eliminada",
+    "deleteConfirm": "¿Eliminar esta partida?",
+    "deleteError": "No se pudo eliminar la partida",
+    "saveError": "No se pudo guardar la partida",
+    "updateError": "No se pudo actualizar la partida",
+    "descriptionRequired": "La descripción es requerida",
+    "amountRequired": "El monto es requerido"
   },
   "categoryCard": {
     "spent": "Gastado",
-    "allocated": "Asignado: {{amount}}",
-    "remaining": "Restante"
+    "allocated": "Asignado",
+    "remaining": "Restante",
+    "expenses": "gastos"
   },
   "budgetAllocation": {
     "title": "Asignación de Presupuesto",
@@ -742,18 +812,6 @@
       "hoursPlural": "{{count}} horas",
       "hoursMinutes": "{{hours}}h {{minutes}}m",
       "invalidTime": "Hora inválida"
-    }
-  },
-  "expenseModal": {
-    "methodOfPayment": "Método de pago",
-    "methodOfPaymentRequired": "¡Por favor selecciona un método de pago!",
-    "methodOfPaymentPlaceholder": "Selecciona método de pago",
-    "paymentMethods": {
-      "creditCard": "Tarjeta de crédito",
-      "bankTransfer": "Transferencia bancaria",
-      "cash": "Efectivo",
-      "check": "Cheque",
-      "other": "Otro"
     }
   },
   "multiClient": {

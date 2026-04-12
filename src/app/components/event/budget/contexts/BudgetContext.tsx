@@ -10,6 +10,7 @@ import type {
   BudgetState,
   Category,
   Expense,
+  Vendor,
   BudgetSummary,
   Currency,
 } from "../types/budget.types";
@@ -18,6 +19,7 @@ import {
   DEFAULT_CURRENCY,
 } from "../constants/budget.constants";
 import { BudgetService } from "../services/budget.service";
+import { ApiError, isAbortError } from "@/lib/apiClient";
 import { useEvent } from "@/app/contexts/EventContext";
 
 type Action =
@@ -61,6 +63,7 @@ const initialState: BudgetState = {
     expense_count: 0,
   })),
   expenses: [],
+  vendors: [],
   currency: DEFAULT_CURRENCY as Currency,
 };
 
@@ -86,7 +89,7 @@ function reducer(state: BudgetState, action: Action): BudgetState {
       const total_spent = (state.summary?.total_spent ?? 0) + e.amount;
       const total_budget = state.summary?.total_budget ?? 0;
       const percentage_spent =
-        total_budget > 0 ? Math.round((total_spent / total_budget) * 100) : 0;
+        total_budget > 0 ? parseFloat(((total_spent / total_budget) * 100).toFixed(2)) : 0;
       const total_remaining = total_budget - total_spent;
       return {
         ...state,
@@ -119,7 +122,7 @@ function reducer(state: BudgetState, action: Action): BudgetState {
       );
       const total_budget = state.summary?.total_budget ?? 0;
       const percentage_spent =
-        total_budget > 0 ? Math.round((total_spent / total_budget) * 100) : 0;
+        total_budget > 0 ? parseFloat(((total_spent / total_budget) * 100).toFixed(2)) : 0;
       const total_remaining = total_budget - total_spent;
       return {
         ...state,
@@ -151,7 +154,7 @@ function reducer(state: BudgetState, action: Action): BudgetState {
       const total_budget = state.summary?.total_budget ?? 0;
       const total_spent = state.summary?.total_spent ?? 0;
       const percentage_spent =
-        total_budget > 0 ? Math.round((total_spent / total_budget) * 100) : 0;
+        total_budget > 0 ? parseFloat(((total_spent / total_budget) * 100).toFixed(2)) : 0;
       const total_remaining = total_budget - total_spent;
 
       return {
@@ -179,7 +182,7 @@ function reducer(state: BudgetState, action: Action): BudgetState {
       const total_budget = state.summary?.total_budget ?? 0;
       const total_spent = state.summary?.total_spent ?? 0;
       const percentage_spent =
-        total_budget > 0 ? Math.round((total_spent / total_budget) * 100) : 0;
+        total_budget > 0 ? parseFloat(((total_spent / total_budget) * 100).toFixed(2)) : 0;
       const total_remaining = total_budget - total_spent;
 
       // Recalculate remaining for the updated category if it has spent amount
@@ -188,7 +191,7 @@ function reducer(state: BudgetState, action: Action): BudgetState {
         remaining: (c.allocated ?? 0) - (c.spent ?? 0),
         percentage:
           total_allocated > 0
-            ? Math.round(((c.allocated ?? 0) / total_allocated) * 100)
+            ? parseFloat((((c.allocated ?? 0) / total_allocated) * 100).toFixed(2))
             : 0,
       }));
 
@@ -214,7 +217,7 @@ function reducer(state: BudgetState, action: Action): BudgetState {
       const total_budget = state.summary?.total_budget ?? 0;
       const total_spent = state.summary?.total_spent ?? 0;
       const percentage_spent =
-        total_budget > 0 ? Math.round((total_spent / total_budget) * 100) : 0;
+        total_budget > 0 ? parseFloat(((total_spent / total_budget) * 100).toFixed(2)) : 0;
       const total_remaining = total_budget - total_spent;
 
       return {
@@ -232,7 +235,7 @@ function reducer(state: BudgetState, action: Action): BudgetState {
       const total_budget = action.payload;
       const total_spent = state.summary?.total_spent ?? 0;
       const percentage_spent =
-        total_budget > 0 ? Math.round((total_spent / total_budget) * 100) : 0;
+        total_budget > 0 ? parseFloat(((total_spent / total_budget) * 100).toFixed(2)) : 0;
       const total_remaining = total_budget - total_spent;
       return {
         ...state,
@@ -255,25 +258,36 @@ export function BudgetProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(reducer, initialState);
   const { state: { events: { selectedEvent } } } = useEvent();
   const eventId = (selectedEvent as any)?.id ?? 1;
+  const eventBudget = (selectedEvent as any)?.budget as number | undefined;
 
-  const loadBudgetData = useCallback(async (eid?: number) => {
+  const loadBudgetData = useCallback(async (eid: number, signal?: AbortSignal) => {
     dispatch({ type: "SET_LOADING", payload: true });
     try {
-      const data = await BudgetService.getBudgetData(eid ?? eventId);
+      const data = await BudgetService.getBudgetData(eid, signal);
+
+      // Use the event's assigned budget as the source of truth for total_budget
+      const totalBudget = eventBudget ?? data.summary.total_budget;
+      const totalSpent = data.summary.total_spent;
+      const totalRemaining = totalBudget - totalSpent;
+      const percentageSpent = totalBudget > 0 ? parseFloat(((totalSpent / totalBudget) * 100).toFixed(2)) : 0;
 
       const budgetData: Partial<BudgetState> = {
         summary: {
-          total_budget: data.summary.total_budget,
+          total_budget: totalBudget,
           total_allocated: data.summary.total_allocated ?? 0,
-          total_spent: data.summary.total_spent,
-          total_remaining: data.summary.total_remaining,
-          percentage_spent: data.summary.percentage_spent,
+          total_spent: totalSpent,
+          total_remaining: totalRemaining,
+          percentage_spent: percentageSpent,
           status: data.summary.status as any,
           currency: data.budget.currency as Currency,
         },
         categories: data.categories.map((c) => ({
           id: c.category_id,
+          catalog_id: (c as any).catalog_category_id,
           name: c.name,
+          description: (c as any).description ?? "",
+          budget_name: (c as any).budget_name ?? "",
+          budget_notes: (c as any).budget_notes ?? "",
           allocated: c.allocated,
           spent: c.spent,
           remaining: c.remaining,
@@ -292,12 +306,18 @@ export function BudgetProvider({ children }: { children: React.ReactNode }) {
           methodOfPayment: e.methodOfPayment ?? "",
           receipt_urls: e.receipt_url ? [e.receipt_url] : [],
         })),
+        vendors: data.vendors.map((v) => ({
+          vendor_id: v.vendor_id,
+          name: v.name,
+        })),
         currency: data.budget.currency as Currency,
       };
 
       dispatch({ type: "SET_DATA", payload: budgetData });
       dispatch({ type: "SET_ERROR", payload: null });
     } catch (err: any) {
+      if (isAbortError(err)) return;
+      if (err instanceof ApiError && err.status === 401) return;
       console.error("Failed to load budget data:", err);
       dispatch({
         type: "SET_ERROR",
@@ -306,25 +326,62 @@ export function BudgetProvider({ children }: { children: React.ReactNode }) {
     } finally {
       dispatch({ type: "SET_LOADING", payload: false });
     }
-  }, [eventId]);
+  }, [eventBudget]);
 
   useEffect(() => {
-    loadBudgetData(eventId);
+    // Don't load until the selected event is available;
+    // selectedEvent is intentionally not in deps — eventId and loadBudgetData
+    // already change when selectedEvent transitions from null to an object.
+    if (!selectedEvent) return;
+    const controller = new AbortController();
+    loadBudgetData(eventId, controller.signal);
+    return () => controller.abort();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [eventId, loadBudgetData]);
 
   const refreshData = () => loadBudgetData(eventId);
 
+  const resolveVendorId = (vendorName?: string): string | undefined => {
+    if (!vendorName) return undefined;
+    const vendor = state.vendors.find(
+      (v) => v.name.toLowerCase() === vendorName.toLowerCase(),
+    );
+    return vendor?.vendor_id;
+  };
+
   const addExpense = (payload: Omit<Expense, "expense_id">) => {
     const expense: Expense = { ...payload, expense_id: generateId() };
     dispatch({ type: "ADD_EXPENSE", payload: expense });
-    BudgetService.createExpense(eventId, payload).catch((err) =>
+
+    // Resolve catalog categoryId and vendor_id for the API
+    const cat = state.categories.find((c) => c.id === payload.category_id);
+    const apiPayload: Partial<Expense> & { currency?: string; vendor_id?: string } = {
+      ...payload,
+      ...(cat?.catalog_id ? { category_id: cat.catalog_id } : {}),
+      vendor_id: resolveVendorId(payload.vendor_name),
+    };
+
+    BudgetService.createExpense(eventId, apiPayload).catch((err) =>
       console.error("createExpense failed:", err),
     );
   };
 
   const updateExpense = (id: string, data: Partial<Expense>) => {
     dispatch({ type: "UPDATE_EXPENSE", payload: { id, data } });
-    BudgetService.updateExpense(eventId, id, data).catch((err) =>
+
+    // Resolve catalog categoryId and vendor_id for the API
+    const apiData: Partial<Expense> & { vendor_id?: string } = { ...data };
+    if (data.category_id) {
+      const cat = state.categories.find((c) => c.id === data.category_id);
+      if (cat?.catalog_id) {
+        apiData.category_id = cat.catalog_id;
+      }
+    }
+    if (data.vendor_name !== undefined) {
+      apiData.vendor_id = resolveVendorId(data.vendor_name);
+    }
+
+    BudgetService.updateExpense(eventId, id, apiData).catch((err) =>
       console.error("updateExpense failed:", err),
     );
   };
@@ -339,11 +396,12 @@ export function BudgetProvider({ children }: { children: React.ReactNode }) {
   const addCategory = (category: Category) => {
     dispatch({ type: "ADD_CATEGORY", payload: category });
     BudgetService.createCategory(eventId, {
-      name: category.name,
+      catalogCategoryId: category.catalog_id!,
+      budget_name: category.budget_name ?? "",
+      budget_notes: category.budget_notes,
       allocated: category.allocated ?? 0,
     })
       .then(({ budgetId }) => {
-        // Patch the temporary id with the real one from the API
         dispatch({
           type: "UPDATE_CATEGORY",
           payload: { id: category.id, data: { id: String(budgetId) } },
@@ -352,11 +410,22 @@ export function BudgetProvider({ children }: { children: React.ReactNode }) {
       .catch((err) => console.error("createCategory failed:", err));
   };
 
-  const updateCategory = (id: string, data: Partial<Category>) => {
+  const updateCategory = async (id: string, data: Partial<Category>): Promise<void> => {
+    const current = state.categories.find((c) => c.id === id);
+    if (!current) return;
+
     dispatch({ type: "UPDATE_CATEGORY", payload: { id, data } });
-    BudgetService.updateCategory(id, data).catch((err) =>
-      console.error("updateCategory failed:", err),
-    );
+
+    const allocated = data.allocated ?? current.allocated;
+    await BudgetService.updateCategory(id, {
+      eventId,
+      categoryId: Number(current.catalog_id),
+      description: data.budget_name ?? current.budget_name ?? current.name,
+      allocatedAmount: allocated,
+      spentAmount: current.spent,
+      currency: state.currency,
+      notes: data.budget_notes ?? current.budget_notes ?? "",
+    });
   };
 
   const deleteCategory = (categoryId: string) => {
@@ -416,7 +485,7 @@ export function BudgetProvider({ children }: { children: React.ReactNode }) {
       const total_allocated = combined.reduce((s, x) => s + (x.allocated ?? 0), 0);
       const total_spent = state.summary?.total_spent ?? 0;
       const percentage_spent =
-        totalBudget > 0 ? Math.round((total_spent / totalBudget) * 100) : 0;
+        totalBudget > 0 ? parseFloat(((total_spent / totalBudget) * 100).toFixed(2)) : 0;
       const total_remaining = totalBudget - total_spent;
 
       dispatch({
@@ -457,9 +526,9 @@ export function BudgetProvider({ children }: { children: React.ReactNode }) {
 
         const percentage =
           typeof c.percentage === "number"
-            ? Math.round(c.percentage)
+            ? parseFloat((c.percentage).toFixed(2))
             : totalBudget > 0
-            ? Math.round((allocated / totalBudget) * 100)
+            ? parseFloat(((allocated / totalBudget) * 100).toFixed(2))
             : 0;
 
         return {
@@ -486,7 +555,7 @@ export function BudgetProvider({ children }: { children: React.ReactNode }) {
       const total_allocated = combined.reduce((s, x) => s + (x.allocated ?? 0), 0);
       const total_spent = state.summary?.total_spent ?? 0;
       const percentage_spent =
-        totalBudget > 0 ? Math.round((total_spent / totalBudget) * 100) : 0;
+        totalBudget > 0 ? parseFloat(((total_spent / totalBudget) * 100).toFixed(2)) : 0;
       const total_remaining = totalBudget - total_spent;
 
       dispatch({

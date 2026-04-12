@@ -5,68 +5,181 @@
   flex-grow: 1;
 }
 
-.cards-container {
-  width: 100%;
-  gap: var(--spacing-md);
-  display: flex;
-  flex-direction: column;
-}
-
 .table-container {
   width: 100%;
   overflow-x: auto;
 }
 
-.event-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: var(--fs-base);
+/* ── Table ───────────────────────────────────────────────────────────── */
+
+.eventTable :global(.ant-table) {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--card-border);
+  background: var(--card-background);
 }
 
-.event-table th,
-.event-table td {
-  text-align: left;
-  padding: var(--spacing-sm);
-  border-bottom: 1px solid var(--divider-light);
+.eventTable :global(.ant-table-thead > tr > th) {
+  background: var(--primary-background-hover);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-color-secondary);
+  border-bottom: 1px solid var(--card-border);
+}
+
+.tableRow {
+  transition: background 0.12s ease;
+}
+
+.tableRow:hover :global(td) {
+  background: var(--primary-background-hover) !important;
+}
+
+/* ── Event cell ──────────────────────────────────────────────────────── */
+
+.eventCell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.eventInitial {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-md);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-weight: 700;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-warm-xs);
+}
+
+.eventCellText {
+  min-width: 0;
 }
 
 .event-name {
   font-weight: var(--bold-font);
+  color: var(--text-color);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .description {
-  font-size: var(--fs-sm);
+  font-size: var(--fs-xs);
   color: var(--text-color-secondary);
-  margin-top: var(--spacing-xs);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 180px;
+}
+
+/* ── Data cells ──────────────────────────────────────────────────────── */
+
+.dateCell,
+.locationCell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--fs-sm);
+  color: var(--text-color);
+}
+
+.cellIcon {
+  color: var(--text-color-secondary);
+  font-size: 12px;
+  flex-shrink: 0;
 }
 
 .mutedText {
   color: var(--text-color-muted);
 }
 
+/* ── Budget column ───────────────────────────────────────────────────── */
+
 .budgetContainer {
-  min-width: 180px;
+  min-width: 160px;
 }
 
 .budgetRow {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   margin-bottom: var(--spacing-xs);
   font-size: var(--fs-xs);
 }
 
+.budgetTotal {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
 .tagNoMargin {
   margin: 0 !important;
+  font-size: 11px;
 }
 
-.spentText {
-  font-size: var(--fs-2xs);
-  color: var(--text-color-secondary);
-  margin-top: 2px;
+/* ── Status tag ──────────────────────────────────────────────────────── */
+
+.statusTag {
+  font-size: var(--fs-xs) !important;
+  font-weight: 500;
 }
 
-.formFullWidth {
-  width: 100%;
+/* ── Action button ───────────────────────────────────────────────────── */
+
+.editBtn {
+  opacity: 0.6;
+  transition: opacity 0.15s ease;
+}
+
+.editBtn:hover {
+  opacity: 1;
+}
+
+/* ── Edit modal ──────────────────────────────────────────────────────── */
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.modalIcon {
+  color: var(--primary);
+  font-size: 16px;
+}
+
+.editForm {
+  margin-top: 8px;
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md);
+}
+
+.formRowItem {
+  margin-bottom: 0;
+}
+
+.formActionsItem {
+  margin-bottom: 0;
+  margin-top: var(--spacing-sm);
 }
 
 .formActions {

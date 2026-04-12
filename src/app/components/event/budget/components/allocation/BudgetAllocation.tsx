@@ -38,7 +38,7 @@ export default function BudgetAllocation() {
   );
   const unallocated = totalBudget - totalAllocated;
   const allocationPercentage =
-    totalBudget > 0 ? Math.round((totalAllocated / totalBudget) * 100) : 0;
+    totalBudget > 0 ? parseFloat(((totalAllocated / totalBudget) * 100).toFixed(2)) : 0;
 
   const handleEditBudget = () => {
     setBudgetInput(totalBudget);
@@ -166,7 +166,7 @@ export default function BudgetAllocation() {
         {state.categories.map((category: Category) => {
           const allocated = category.allocated ?? 0;
           const percentage =
-            totalBudget > 0 ? Math.round((allocated / totalBudget) * 100) : 0;
+            totalBudget > 0 ? parseFloat(((allocated / totalBudget) * 100).toFixed(2)) : 0;
 
           const remainingValue = allocated - (category.spent ?? 0);
           const remainingLabel =

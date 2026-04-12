@@ -5,6 +5,8 @@ export interface EventCardProps {
   eventName: string;
   status: EventStatus;
   date: string;
+  /** Raw ISO date string preserved from the API for editing */
+  rawDate?: string;
   description: string;
   clients: string;
   location: string;

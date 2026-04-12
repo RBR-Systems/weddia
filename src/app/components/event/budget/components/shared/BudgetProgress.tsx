@@ -22,7 +22,7 @@ export default function BudgetProgress({
 }: BudgetProgressProps) {
   const { mode } = useTheme();
   const semantic = SEMANTIC_CHART_COLORS[mode];
-  const percentage = allocated > 0 ? Math.round((spent / allocated) * 100) : 0;
+  const percentage = allocated > 0 ? parseFloat(((spent / allocated) * 100).toFixed(2)) : 0;
 
   const getStatus = (): "success" | "normal" | "exception" | "active" => {
     if (percentage >= 100) return "exception";

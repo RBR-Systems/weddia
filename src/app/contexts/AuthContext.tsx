@@ -14,6 +14,7 @@ interface AuthContextValue {
   user: AuthUser | null;
   token: string | null;
   isLoading: boolean;
+  sessionExpired: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
 }
@@ -24,6 +25,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [token, setTokenState] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [sessionExpired, setSessionExpired] = useState(false);
 
   useEffect(() => {
     const stored = localStorage.getItem("rbr_token");
@@ -36,12 +38,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // When any API call returns 401, clear auth state → login page appears
     setUnauthorizedHandler(() => {
+      setSessionExpired(true);
       setTokenState(null);
       setUser(null);
     });
   }, []);
 
   const login = async (email: string, password: string) => {
+    setSessionExpired(false);
     const res = await apiPost<{ token: string; user: AuthUser }>(
       "/api/auth/login",
       { email, password },
@@ -59,7 +63,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, isLoading, login, logout }}>
+    <AuthContext.Provider value={{ user, token, isLoading, sessionExpired, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

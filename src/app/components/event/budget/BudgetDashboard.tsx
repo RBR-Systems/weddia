@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { Tabs, Empty, Button, Space, Typography, Alert } from "antd";
+import { Tabs, Empty, Space, Typography } from "antd";
 import Card from "@/app/common/Card/card";
 import {
   DashboardOutlined,
@@ -46,7 +46,9 @@ const { Title } = Typography;
 function DashboardContent() {
   const { t } = useTranslation();
   const { state, deleteExpense } = useBudget();
+  const [activeTab, setActiveTab] = useState("dashboard");
   const [expenseModalOpen, setExpenseModalOpen] = useState(false);
+  const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
   const [selectedExpense, setSelectedExpense] = useState<Expense | null>(null);
   const [expenseDrawerOpen, setExpenseDrawerOpen] = useState(false);
   const [selectedVendor, setSelectedVendor] = useState<Vendor | null>(null);
@@ -79,156 +81,63 @@ function DashboardContent() {
     setVendorDrawerOpen(true);
   };
 
-  const tabItems = [
-    {
-      key: "dashboard",
-      label: (
-        <span>
-          <DashboardOutlined /> {t("budgetDashboard.tabs.dashboard")}
-        </span>
-      ),
-      children: (
-        <Space
-          orientation="vertical"
-          className={dashboardStyles.tabContent}
-          size="large"
-        >
-          <BudgetStats />
-          <CategoryList />
-        </Space>
-      ),
-    },
-    {
-      key: "expenses",
-      label: (
-        <span>
-          <UnorderedListOutlined /> {t("budgetDashboard.tabs.expenses")}
-        </span>
-      ),
-      children: (
-        <ExpenseList
-          onAddExpense={() => setExpenseModalOpen(true)}
-          onViewExpense={handleViewExpense}
-        />
-      ),
-    },
-    {
-      key: "allocation",
-      label: (
-        <span>
-          <AppstoreOutlined /> {t("budgetDashboard.tabs.allocation")}
-        </span>
-      ),
-      children: <BudgetAllocation />,
-    },
-    {
-      key: "vendors",
-      label: (
-        <span>
-          <TeamOutlined /> {t("budgetDashboard.tabs.vendors")}
-        </span>
-      ),
-      children: <VendorList onViewVendor={handleViewVendor} />,
-    },
-    {
-      key: "payments",
-      label: (
-        <span>
-          <CalendarOutlined /> {t("budgetDashboard.tabs.payments")}
-        </span>
-      ),
-      children: (
-        <Tabs
-          defaultActiveKey="status"
-          items={[
-            {
-              key: "status",
-              label: t("budgetDashboard.subTabs.paymentStatus"),
-              children: <PaymentStatus />,
-            },
-            {
-              key: "calendar",
-              label: t("budgetDashboard.subTabs.calendarView"),
-              children: <PaymentCalendar />,
-            },
-          ]}
-        />
-      ),
-    },
-    {
-      key: "analytics",
-      label: (
-        <span>
-          <LineChartOutlined /> {t("budgetDashboard.tabs.analytics")}
-        </span>
-      ),
-      children: (
-        <Tabs
-          defaultActiveKey="charts"
-          items={[
-            {
-              key: "charts",
-              label: t("budgetDashboard.subTabs.charts"),
-              children: <BudgetCharts />,
-            },
-            {
-              key: "reports",
-              label: t("budgetDashboard.subTabs.reports"),
-              children: <ReportsPage />,
-            },
-          ]}
-        />
-      ),
-    },
-    {
-      key: "tools",
-      label: (
-        <span>
-          <SettingOutlined /> {t("budgetDashboard.tabs.tools")}
-        </span>
-      ),
-      children: (
-        <Tabs
-          defaultActiveKey="templates"
-          items={[
-            {
-              key: "templates",
-              label: t("budgetDashboard.subTabs.templates"),
-              children: <BudgetTemplates />,
-            },
-            {
-              key: "estimator",
-              label: t("budgetDashboard.subTabs.estimator"),
-              children: <BudgetEstimator />,
-            },
-            {
-              key: "activity",
-              label: t("budgetDashboard.subTabs.activityLog"),
-              children: <ActivityLog />,
-            },
-          ]}
-        />
-      ),
-    },
-    {
-      key: "notifications",
-      label: (
-        <span>
-          <BellOutlined /> {t("budgetDashboard.tabs.alerts")}
-        </span>
-      ),
-      children: <Notifications />,
-    },
-    {
-      key: "bulk",
-      label: (
-        <span>
-          <CloudUploadOutlined /> {t("budgetDashboard.tabs.bulkOperations")}
-        </span>
-      ),
-      children: <BulkOperations />,
-    },
+  const tabs = [
+    { key: "dashboard",     icon: <DashboardOutlined />,    label: t("budgetDashboard.tabs.dashboard") },
+    { key: "expenses",      icon: <UnorderedListOutlined />, label: t("budgetDashboard.tabs.expenses") },
+    { key: "allocation",    icon: <AppstoreOutlined />,      label: t("budgetDashboard.tabs.allocation") },
+    { key: "vendors",       icon: <TeamOutlined />,          label: t("budgetDashboard.tabs.vendors") },
+    { key: "payments",      icon: <CalendarOutlined />,      label: t("budgetDashboard.tabs.payments") },
+    { key: "analytics",     icon: <LineChartOutlined />,     label: t("budgetDashboard.tabs.analytics") },
+    { key: "tools",         icon: <SettingOutlined />,       label: t("budgetDashboard.tabs.tools") },
+    { key: "notifications", icon: <BellOutlined />,          label: t("budgetDashboard.tabs.alerts") },
+    { key: "bulk",          icon: <CloudUploadOutlined />,   label: t("budgetDashboard.tabs.bulkOperations") },
   ];
+
+  const renderContent = () => {
+    switch (activeTab) {
+      case "dashboard":
+        return (
+          <Space orientation="vertical" className={dashboardStyles.tabContent} size="large">
+            <BudgetStats />
+            <CategoryList />
+          </Space>
+        );
+      case "expenses":
+        return <ExpenseList onAddExpense={() => { setEditingExpense(null); setExpenseModalOpen(true); }} onViewExpense={handleViewExpense} />;
+      case "allocation":
+        return <BudgetAllocation />;
+      case "vendors":
+        return <VendorList onViewVendor={handleViewVendor} />;
+      case "payments":
+        return (
+          <Tabs defaultActiveKey="status" items={[
+            { key: "status",   label: t("budgetDashboard.subTabs.paymentStatus"), children: <PaymentStatus /> },
+            { key: "calendar", label: t("budgetDashboard.subTabs.calendarView"),  children: <PaymentCalendar /> },
+          ]} />
+        );
+      case "analytics":
+        return (
+          <Tabs defaultActiveKey="charts" items={[
+            { key: "charts",  label: t("budgetDashboard.subTabs.charts"),  children: <BudgetCharts /> },
+            { key: "reports", label: t("budgetDashboard.subTabs.reports"), children: <ReportsPage /> },
+          ]} />
+        );
+      case "tools":
+        return (
+          <Tabs defaultActiveKey="templates" items={[
+            { key: "templates", label: t("budgetDashboard.subTabs.templates"),   children: <BudgetTemplates /> },
+            { key: "estimator", label: t("budgetDashboard.subTabs.estimator"),   children: <BudgetEstimator /> },
+            { key: "activity",  label: t("budgetDashboard.subTabs.activityLog"), children: <ActivityLog /> },
+          ]} />
+        );
+      case "notifications":
+        return <Notifications />;
+      case "bulk":
+        return <BulkOperations />;
+      default:
+        return null;
+    }
+  };
 
   return (
     <div className={dashboardStyles.dashboardContainer}>
@@ -236,12 +145,26 @@ function DashboardContent() {
         {t("budgetDashboard.title")}
       </Title>
 
-      <Tabs defaultActiveKey="dashboard" items={tabItems} size="large" />
+      <nav className={dashboardStyles.tabNav}>
+        {tabs.map((tab) => (
+          <button
+            key={tab.key}
+            className={`${dashboardStyles.tabBtn} ${activeTab === tab.key ? dashboardStyles.tabBtnActive : ""}`}
+            onClick={() => setActiveTab(tab.key)}
+          >
+            <span className={dashboardStyles.tabBtnIcon}>{tab.icon}</span>
+            {tab.label}
+          </button>
+        ))}
+      </nav>
+
+      <div className={dashboardStyles.tabContent}>{renderContent()}</div>
 
       {/* Modals and Drawers */}
       <ExpenseModal
         visible={expenseModalOpen}
-        onClose={() => setExpenseModalOpen(false)}
+        onClose={() => { setExpenseModalOpen(false); setEditingExpense(null); }}
+        editingExpense={editingExpense}
       />
 
       <ExpenseDetails
@@ -249,6 +172,7 @@ function DashboardContent() {
         open={expenseDrawerOpen}
         onClose={() => setExpenseDrawerOpen(false)}
         onEdit={() => {
+          setEditingExpense(selectedExpense);
           setExpenseDrawerOpen(false);
           setExpenseModalOpen(true);
         }}

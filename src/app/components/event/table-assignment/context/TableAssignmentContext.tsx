@@ -17,7 +17,7 @@ import {
 
 import type { TableLayout } from "../models/types";
 import { fullName, parseGuestIdFromDragId } from "../utils/Table-Utils";
-import { apiGet, apiPost, apiPut, apiDelete } from "@/lib/apiClient";
+import { apiGet, apiPost, apiPut, apiDelete, isAbortError } from "@/lib/apiClient";
 import { fetchGuests, fetchRelations } from "../../guest-list/service/guest.service";
 import type { Guest as GuestListGuest } from "../../guest-list/models/types";
 import type { Guest as TAGuest } from "../models/types";
@@ -70,12 +70,13 @@ export function TableAssignmentProvider({
 
   // Load all data from API on mount / when event changes
   useEffect(() => {
-    let cancelled = false;
+    const controller = new AbortController();
+    const { signal } = controller;
 
     async function loadData() {
       try {
         const [layouts, rawGuests, relations] = await Promise.all([
-          apiGet<any[]>("/api/tablelayouts/active"),
+          apiGet<any[]>("/api/tablelayouts/active", { signal }),
           fetchGuests(eventId),
           fetchRelations(),
         ]);
@@ -99,8 +100,8 @@ export function TableAssignmentProvider({
         if (activeLayout) {
           const layoutId = activeLayout.layout_id;
           const [tables, assignments] = await Promise.all([
-            apiGet<any[]>(`/api/eventtables/layout/${layoutId}`),
-            apiGet<any[]>(`/api/tableassignments/layout/${layoutId}`),
+            apiGet<any[]>(`/api/eventtables/layout/${layoutId}`, { signal }),
+            apiGet<any[]>(`/api/tableassignments/layout/${layoutId}`, { signal }),
           ]);
           tablesRaw = (Array.isArray(tables) ? tables : []).map((t: any) => ({
             table_id: String(t.tableId),
@@ -118,7 +119,7 @@ export function TableAssignmentProvider({
           }));
         }
 
-        if (!cancelled) {
+        if (!signal.aborted) {
           dispatch({
             type: "INIT_DATA",
             payload: {
@@ -131,12 +132,13 @@ export function TableAssignmentProvider({
           });
         }
       } catch (err) {
+        if (isAbortError(err)) return;
         console.error("TableAssignmentProvider: failed to load data", err);
       }
     }
 
     loadData();
-    return () => { cancelled = true; };
+    return () => controller.abort();
   }, [eventId]);
 
   // Keep a ref to the latest state so callbacks always read fresh data
@@ -245,55 +247,59 @@ export function TableAssignmentProvider({
       tableId: string,
       seatNumber?: number,
     ) => {
-      const prev = stateRef.current.assignments.find((a: any) => a.guest_id === guestId);
-      const numTableId = Number(tableId);
-      const numGuestId = Number(guestId);
-
-      if (isNaN(numTableId) || isNaN(numGuestId)) {
-        console.warn("[persistAssignment] Non-numeric id — skipping API call", { tableId, guestId });
+      // Skip only temporary table IDs (not yet persisted to API)
+      if (tableId.startsWith("table-")) {
+        console.warn("[persistAssignment] Temp table id — skipping API call", { tableId });
         return;
       }
+
+      const prev = stateRef.current.assignments.find((a: any) => a.guest_id === guestId);
+
+      const handleError = (label: string) => (e: unknown) => {
+        console.error(`[persistAssignment] ${label} failed:`, e);
+        message.error(`Error al guardar asignación: ${label}`);
+      };
 
       if (type === "unassign") {
         if (prev) {
           apiDelete(`/api/tableassignments/${prev.table_id}/${guestId}`)
-            .catch((e) => console.error("[persistAssignment] unassign failed:", e));
+            .catch(handleError("unassign"));
         }
       } else if (type === "assign") {
         apiPost(`/api/tableassignments?adminId=1`, {
-          tableId: numTableId,
-          guestId: numGuestId,
+          tableId: Number(tableId),
+          guestId: Number(guestId),
           seatNumber: seatNumber ?? 1,
-        }).catch((e) => console.error("[persistAssignment] assign failed:", e));
+        }).catch(handleError("assign"));
       } else if (type === "move") {
         if (prev && prev.table_id === tableId) {
           // Same table — update seat
           apiPut(`/api/tableassignments/${tableId}/${guestId}?adminId=1`, {
             seatNumber: seatNumber ?? prev.seat_number,
-          }).catch((e) => console.error("[persistAssignment] move-same-table failed:", e));
+          }).catch(handleError("move-same-table"));
         } else {
           // Different table — delete old, create new
           if (prev) {
             apiDelete(`/api/tableassignments/${prev.table_id}/${guestId}`)
               .then(() =>
                 apiPost(`/api/tableassignments?adminId=1`, {
-                  tableId: numTableId,
-                  guestId: numGuestId,
+                  tableId: Number(tableId),
+                  guestId: Number(guestId),
                   seatNumber: seatNumber ?? 1,
                 }),
               )
-              .catch((e) => console.error("[persistAssignment] move-cross-table failed:", e));
+              .catch(handleError("move-cross-table"));
           } else {
             apiPost(`/api/tableassignments?adminId=1`, {
-              tableId: numTableId,
-              guestId: numGuestId,
+              tableId: Number(tableId),
+              guestId: Number(guestId),
               seatNumber: seatNumber ?? 1,
-            }).catch((e) => console.error("[persistAssignment] assign-new failed:", e));
+            }).catch(handleError("assign-new"));
           }
         }
       }
     },
-    [],
+    [message],
   );
 
   const segmentedOptions = [
@@ -689,6 +695,22 @@ export function TableAssignmentProvider({
       assignments: state.assignments,
       setAssignments: (a: typeof state.assignments) =>
         dispatch({ type: "SET_ASSIGNMENTS", payload: a }),
+      unassignAll: () => {
+        const currentAssignments = stateRef.current.assignments;
+        dispatch({ type: "UNASSIGN_ALL" });
+        currentAssignments.forEach((a: any) => {
+          apiDelete(`/api/tableassignments/${a.table_id}/${a.guest_id}`)
+            .catch((e) => console.error("[unassignAll] delete failed:", e));
+        });
+      },
+      unassignGuest: (guestId: string) => {
+        const prev = stateRef.current.assignments.find((a: any) => a.guest_id === guestId);
+        dispatch({ type: "UNASSIGN_GUEST", payload: { guestId } });
+        if (prev) {
+          apiDelete(`/api/tableassignments/${prev.table_id}/${guestId}`)
+            .catch((e) => console.error("[unassignGuest] failed:", e));
+        }
+      },
       guests: state.guests,
       moveGuestSeat: (guestId: string, tableId: string, seatNumber: number) => {
         const notifier = messageApi ?? message;

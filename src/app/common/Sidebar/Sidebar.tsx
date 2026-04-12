@@ -6,6 +6,7 @@ import {
   TeamOutlined,
   AppstoreOutlined,
   DollarOutlined,
+  TagsOutlined,
   UnorderedListOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
@@ -22,6 +23,7 @@ type View =
   | "schedule"
   | "table-assignment"
   | "budget"
+  | "budget-categories"
   | "events-list"
   | "multi-client";
 
@@ -53,6 +55,7 @@ export default function Sidebar({
     { key: "schedule", icon: <CalendarOutlined />, label: t("nav.schedule") },
     { key: "table-assignment", icon: <AppstoreOutlined />, label: t("nav.tableAssignment") },
     { key: "budget", icon: <DollarOutlined />, label: t("nav.budget") },
+    { key: "budget-categories", icon: <TagsOutlined />, label: t("nav.budgetCategories") },
   ];
 
   const initials = user

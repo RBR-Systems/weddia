@@ -1,3 +1,202 @@
-.secondRow {
-  margin-top: var(--spacing-md);
+/* ── Primary card ───────────────────────────────────────────────────── */
+
+.primaryCard {
+  background: var(--card-background);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-warm-xs);
+  overflow: hidden;
+  height: 100%;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.primaryCard.clickable {
+  cursor: pointer;
+}
+
+.primaryCard.clickable:hover {
+  box-shadow: var(--shadow-warm-md);
+  transform: translateY(-2px);
+}
+
+.primaryCard.clickable:hover .editHint {
+  opacity: 1;
+}
+
+.accentBar {
+  height: 3px;
+  background: var(--accent, var(--primary));
+}
+
+.cardInner {
+  padding: 16px 18px 18px;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.cardIcon {
+  font-size: 13px;
+  color: var(--accent, var(--primary));
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.cardLabel {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-color-secondary);
+  flex: 1;
+  white-space: nowrap;
+}
+
+.editHint {
+  font-size: 11px;
+  color: var(--text-color-muted);
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  flex-shrink: 0;
+}
+
+.cardValue {
+  line-height: 1.1;
+  margin-bottom: 10px;
+  min-height: 32px;
+}
+
+/* strip antd Statistic default title margin since we render our own label */
+.cardValue :global(.ant-statistic) {
+  line-height: inherit;
+}
+
+.cardValue :global(.ant-statistic-content) {
+  font-size: 26px !important;
+  font-weight: 700 !important;
+  line-height: 1.1 !important;
+}
+
+.cardValue :global(.ant-statistic-content-value) {
+  font-size: 26px !important;
+  font-weight: 700 !important;
+}
+
+/* ── Progress bar ── */
+
+.progressWrap {
+  height: 4px;
+  background: var(--card-border);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  margin-bottom: 7px;
+}
+
+.progressBar {
+  height: 100%;
+  border-radius: var(--radius-full);
+  transition: width 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cardSub {
+  font-size: 11px;
+  color: var(--text-color-tertiary);
+  font-weight: 500;
+}
+
+/* ── Budget edit state ── */
+
+.editActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.saveBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 14px;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.saveBtn:hover {
+  background: var(--primary-hover);
+}
+
+.cancelBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  background: transparent;
+  color: var(--text-color-secondary);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-md);
+  font-size: 12px;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.cancelBtn:hover {
+  border-color: var(--text-color-secondary);
+  color: var(--text-color);
+}
+
+/* ── Secondary card ─────────────────────────────────────────────────── */
+
+.secondaryCard {
+  background: var(--card-background);
+  border: 1px solid var(--card-border);
+  border-left: 3px solid var(--accent, var(--primary));
+  border-radius: var(--radius-lg);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  box-shadow: var(--shadow-warm-xs);
+  height: 100%;
+  transition: box-shadow 0.2s ease;
+  cursor: default;
+}
+
+.secondaryCard:hover {
+  box-shadow: var(--shadow-warm-sm);
+}
+
+.secondaryIcon {
+  font-size: 13px;
+  color: var(--accent, var(--primary));
+  margin-bottom: 2px;
+}
+
+.secondaryValue {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-color);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.secondaryLabel {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-color-secondary);
 }

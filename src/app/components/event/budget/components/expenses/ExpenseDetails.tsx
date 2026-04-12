@@ -68,7 +68,7 @@ export default function ExpenseDetails({
         </Space>
       }
       placement="right"
-      width={480}
+      style={{ width: 480 }}
       open={open}
       onClose={onClose}
       extra={
@@ -119,7 +119,7 @@ export default function ExpenseDetails({
           </Descriptions.Item> 
         </Descriptions>
 
-        <Divider orientation="horizontal">{t("expenseDetails.receipts")}</Divider>
+        <Divider >{t("expenseDetails.receipts")}</Divider>
 
         {expense.receipt_urls && expense.receipt_urls.length > 0 ? (
           <Image.PreviewGroup>
@@ -145,17 +145,17 @@ export default function ExpenseDetails({
           />
         )}
 
-        <Divider orientation="horizontal">{t("expenseDetails.activity")}</Divider>
+        <Divider >{t("expenseDetails.activity")}</Divider>
 
         <Timeline
           items={[
             {
               color: "green",
-              children: t("expenseDetails.expenseCreatedOn", { date: formatDate(expense.expense_date) }),
+              content: t("expenseDetails.expenseCreatedOn", { date: formatDate(expense.expense_date) }),
             },
             {
               color: expense.payment_status === "paid" ? "green" : "gray",
-              children:
+              content:
                 expense.payment_status === "paid"
                   ? t("expenseDetails.paymentCompleted")
                   : t("expenseDetails.awaitingPayment"),

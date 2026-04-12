@@ -13,12 +13,13 @@ interface ApiCategory { categoryId: number; name: string; description?: string }
 interface ApiBudget {
   budgetId: number; eventId: number; categoryId: number;
   description: string; allocatedAmount: number; spentAmount: number;
-  remainingAmount: number; currency: string; notes?: string;
+  remainingAmount: number; currency: string; notes?: string | null;
 }
 interface ApiExpense {
   expenseId: number; eventId: number; vendorId?: number | null;
   categoryId: number; description: string; amount: number;
   expenseDate: string; notes?: string; currency: string; receiptUrl?: string | null;
+  paymentStatus?: string | null; methodOfPayment?: string | null;
 }
 interface ApiVendor {
   vendorId: number; vendorName: string; category: string;
@@ -29,12 +30,12 @@ interface ApiVendor {
 // ─── Fetch + assemble ────────────────────────────────────────────────────────
 
 export class BudgetService {
-  static async getBudgetData(eventId: number): Promise<BudgetDataAPI> {
+  static async getBudgetData(eventId: number, signal?: AbortSignal): Promise<BudgetDataAPI> {
     const [budgets, expenses, categories, vendors] = await Promise.all([
-      apiGet<ApiBudget[]>(`/api/budgets/event/${eventId}`),
-      apiGet<ApiExpense[]>(`/api/expenses/event/${eventId}`),
-      apiGet<ApiCategory[]>("/api/categoriesexpensebudget"),
-      apiGet<ApiVendor[]>("/api/vendors"),
+      apiGet<ApiBudget[]>(`/api/budgets/event/${eventId}`, { signal }),
+      apiGet<ApiExpense[]>(`/api/expenses/event/${eventId}`, { signal }),
+      apiGet<ApiCategory[]>("/api/categoriesexpensebudget", { signal }),
+      apiGet<ApiVendor[]>("/api/vendors", { signal }),
     ]);
 
     const categoryMap = new Map<number, ApiCategory>(
@@ -53,7 +54,7 @@ export class BudgetService {
     }
 
     const totalBudget = budgets.reduce((s, b) => s + b.allocatedAmount, 0);
-    const totalSpent = budgets.reduce((s, b) => s + b.spentAmount, 0);
+    const totalSpent = expenses.reduce((s, e) => s + e.amount, 0);
     const totalAllocated = totalBudget;
     const totalRemaining = totalBudget - totalSpent;
     const currency = budgets[0]?.currency ?? "USD";
@@ -64,8 +65,11 @@ export class BudgetService {
       const expCount = expenseCountPerCategory.get(b.categoryId) ?? 0;
       return {
         category_id: String(b.budgetId),
+        catalog_category_id: String(b.categoryId),
         name: cat?.name ?? b.description,
         description: cat?.description ?? "",
+        budget_name: b.description ?? "",
+        budget_notes: b.notes ?? "",
         allocated: b.allocatedAmount,
         spent,
         remaining: b.allocatedAmount - spent,
@@ -91,8 +95,8 @@ export class BudgetService {
         description: e.description,
         amount: e.amount,
         expense_date: e.expenseDate,
-        payment_status: "paid" as const,
-        methodOfPayment: "",
+        payment_status: (e.paymentStatus ?? "pending") as import("../types/budget.types").PaymentStatus,
+        methodOfPayment: e.methodOfPayment ?? "",
         currency: e.currency ?? currency,
         notes: e.notes ?? "",
         receipt_url: e.receiptUrl ?? null,
@@ -126,6 +130,13 @@ export class BudgetService {
       pctSpent >= 80  ? "at_risk"     :
       totalSpent === 0 ? "not_started" : "on_track";
 
+    const paidExpenses    = expenses.filter((e) => e.paymentStatus === "paid");
+    const pendingExpenses = expenses.filter((e) => e.paymentStatus === "pending" || !e.paymentStatus);
+    const overdueExpenses = expenses.filter((e) => e.paymentStatus === "overdue");
+    const partialExpenses = expenses.filter((e) => e.paymentStatus === "partial");
+
+    const sumAmount = (list: ApiExpense[]) => list.reduce((s, e) => s + e.amount, 0);
+
     return {
       event_id: String(eventId),
       event_name: "",
@@ -148,9 +159,9 @@ export class BudgetService {
         currency,
         expense_count: expenses.length,
         vendor_count: vendors.length,
-        paid_count: expenses.length,
-        pending_count: 0,
-        overdue_count: 0,
+        paid_count:    paidExpenses.length,
+        pending_count: pendingExpenses.length,
+        overdue_count: overdueExpenses.length,
       },
       categories: mappedCategories,
       expenses: mappedExpenses,
@@ -161,10 +172,10 @@ export class BudgetService {
         spending_by_month: [],
         top_vendors: [],
         payment_status_breakdown: {
-          paid: { count: expenses.length, total: totalSpent, percentage: 100 },
-          pending: { count: 0, total: 0, percentage: 0 },
-          overdue: { count: 0, total: 0, percentage: 0 },
-          partial: { count: 0, total: 0, percentage: 0 },
+          paid:    { count: paidExpenses.length,    total: sumAmount(paidExpenses),    percentage: totalSpent > 0 ? (sumAmount(paidExpenses)    / totalSpent) * 100 : 0 },
+          pending: { count: pendingExpenses.length, total: sumAmount(pendingExpenses), percentage: totalSpent > 0 ? (sumAmount(pendingExpenses) / totalSpent) * 100 : 0 },
+          overdue: { count: overdueExpenses.length, total: sumAmount(overdueExpenses), percentage: totalSpent > 0 ? (sumAmount(overdueExpenses) / totalSpent) * 100 : 0 },
+          partial: { count: partialExpenses.length, total: sumAmount(partialExpenses), percentage: totalSpent > 0 ? (sumAmount(partialExpenses) / totalSpent) * 100 : 0 },
         },
         category_trends: {
           most_spent: mappedCategories[0]?.name ?? "",
@@ -177,21 +188,33 @@ export class BudgetService {
     };
   }
 
-  static async createExpense(eventId: number, expenseData: any): Promise<void> {
+  static async createExpense(eventId: number, expenseData: Partial<import("../types/budget.types").Expense> & { currency?: string; vendor_id?: string }): Promise<void> {
     await apiPost(`/api/expenses?adminId=1`, {
       eventId,
-      vendorId: expenseData.vendor_id ? Number(expenseData.vendor_id) : null,
-      categoryId: Number(expenseData.category_id),
-      description: expenseData.description,
-      amount: expenseData.amount,
-      expenseDate: expenseData.expense_date,
-      currency: expenseData.currency ?? "USD",
-      notes: expenseData.notes,
+      vendorId:        expenseData.vendor_id ? Number(expenseData.vendor_id) : null,
+      categoryId:      Number(expenseData.category_id),
+      description:     expenseData.description,
+      amount:          expenseData.amount,
+      expenseDate:     expenseData.expense_date,
+      currency:        expenseData.currency ?? "USD",
+      notes:           expenseData.notes,
+      paymentStatus:   expenseData.payment_status,
+      methodOfPayment: expenseData.methodOfPayment,
     });
   }
 
-  static async updateExpense(eventId: number, expenseId: string, updates: any): Promise<void> {
-    await apiPut(`/api/expenses/${expenseId}?adminId=1`, updates);
+  static async updateExpense(_eventId: number, expenseId: string, updates: Partial<import("../types/budget.types").Expense> & { vendor_id?: string }): Promise<void> {
+    const body: Record<string, unknown> = {};
+    if (updates.description  !== undefined) body.description     = updates.description;
+    if (updates.amount       !== undefined) body.amount          = updates.amount;
+    if (updates.category_id  !== undefined) body.categoryId      = Number(updates.category_id);
+    if (updates.vendor_id    !== undefined) body.vendorId        = updates.vendor_id ? Number(updates.vendor_id) : null;
+    if (updates.expense_date !== undefined) body.expenseDate     = updates.expense_date;
+    if (updates.notes        !== undefined) body.notes           = updates.notes;
+    if (updates.currency     !== undefined) body.currency        = updates.currency;
+    if (updates.payment_status  !== undefined) body.paymentStatus   = updates.payment_status;
+    if (updates.methodOfPayment !== undefined) body.methodOfPayment = updates.methodOfPayment;
+    await apiPut(`/api/expenses/${expenseId}?adminId=1`, body);
   }
 
   static async deleteExpense(eventId: number, expenseId: string): Promise<void> {
@@ -203,33 +226,93 @@ export class BudgetService {
   }
 
   /** budgetId = the category_id stored in the frontend (mapped from budgetId) */
-  static async updateCategory(budgetId: string, updates: { name?: string; allocated?: number; color?: string }): Promise<void> {
-    if (updates.allocated !== undefined) {
-      await apiPut(`/api/budgets/${budgetId}?adminId=1`, {
-        allocatedAmount: updates.allocated,
-      });
-    }
+  static async updateCategory(
+    budgetId: string,
+    fullBody: {
+      eventId: number;
+      categoryId: number;
+      description: string;
+      allocatedAmount: number;
+      spentAmount: number;
+      currency: string;
+      notes?: string;
+    },
+  ): Promise<void> {
+    await apiPut(`/api/budgets/${budgetId}?adminId=1`, fullBody);
   }
 
   static async deleteCategory(budgetId: string): Promise<void> {
     await apiDelete(`/api/budgets/${budgetId}`);
   }
 
-  static async createCategory(eventId: number, category: { name: string; description?: string; allocated: number; currency?: string }): Promise<{ budgetId: number; categoryId: number }> {
-    // Step 1: create the global category definition
-    const cat = await apiPost<{ categoryId: number }>(`/api/categoriesexpensebudget?adminId=1`, {
-      name: category.name,
-      description: category.description ?? "",
-    });
-    // Step 2: create a budget entry linking this category to the event
+  // ─── Budget Items ────────────────────────────────────────────────────────────
+
+  static async getBudgetItems(budgetId: string): Promise<import("../types/budget.types").BudgetItem[]> {
+    interface ApiBudgetItem {
+      budgetItemId: number; budgetId: number; categoryId?: number | null;
+      description: string; amount: number; notes?: string | null;
+    }
+    const items = await apiGet<ApiBudgetItem[]>(`/api/budgetitems/budget/${budgetId}`, { silent401: true });
+    return items.map((i) => ({
+      item_id: String(i.budgetItemId),
+      budget_id: String(i.budgetId),
+      category_id: i.categoryId != null ? String(i.categoryId) : undefined,
+      description: i.description,
+      amount: i.amount,
+      notes: i.notes ?? "",
+    }));
+  }
+
+  static async createBudgetItem(
+    budgetId: string,
+    data: { description: string; amount: number; notes?: string; category_id?: string },
+  ): Promise<import("../types/budget.types").BudgetItem> {
+    interface ApiBudgetItem {
+      budgetItemId: number; budgetId: number; categoryId?: number | null;
+      description: string; amount: number; notes?: string | null;
+    }
+    const item = await apiPost<ApiBudgetItem>(`/api/budgetitems?adminId=1`, {
+      budgetId: Number(budgetId),
+      categoryId: data.category_id != null ? Number(data.category_id) : undefined,
+      description: data.description,
+      amount: data.amount,
+      notes: data.notes ?? "",
+    }, { silent401: true });
+    return {
+      item_id: String(item.budgetItemId),
+      budget_id: String(item.budgetId),
+      category_id: item.categoryId != null ? String(item.categoryId) : undefined,
+      description: item.description,
+      amount: item.amount,
+      notes: item.notes ?? "",
+    };
+  }
+
+  static async updateBudgetItem(
+    itemId: string,
+    data: { description?: string; amount?: number; notes?: string; category_id?: string },
+  ): Promise<void> {
+    await apiPut(`/api/budgetitems/${itemId}?adminId=1`, {
+      ...data,
+      categoryId: data.category_id != null ? Number(data.category_id) : undefined,
+      category_id: undefined,
+    }, { silent401: true });
+  }
+
+  static async deleteBudgetItem(itemId: string): Promise<void> {
+    await apiDelete(`/api/budgetitems/${itemId}`, { silent401: true });
+  }
+
+  static async createCategory(eventId: number, category: { catalogCategoryId: string; budget_name: string; budget_notes?: string; allocated: number; currency?: string }): Promise<{ budgetId: number }> {
     const budget = await apiPost<{ budgetId: number }>(`/api/budgets?adminId=1`, {
       eventId,
-      categoryId: cat.categoryId,
-      description: category.name,
+      categoryId: Number(category.catalogCategoryId),
+      description: category.budget_name,
+      notes: category.budget_notes ?? "",
       allocatedAmount: category.allocated,
       spentAmount: 0,
       currency: category.currency ?? "USD",
     });
-    return { budgetId: budget.budgetId, categoryId: cat.categoryId };
+    return { budgetId: budget.budgetId };
   }
 }

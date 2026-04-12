@@ -7,7 +7,7 @@ import { useAuth } from "@/app/contexts/AuthContext";
 const { Title, Text } = Typography;
 
 export default function LoginPage() {
-  const { login } = useAuth();
+  const { login, sessionExpired } = useAuth();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -47,6 +47,16 @@ export default function LoginPage() {
           <Title level={4} style={{ margin: 0 }}>Sign in to continue</Title>
           <Text type="secondary">RBR Planning System</Text>
         </div>
+
+        {sessionExpired && (
+          <Alert
+            title="Tu sesión expiró"
+            description="Por seguridad, inicia sesión nuevamente para continuar."
+            type="warning"
+            showIcon
+            style={{ marginBottom: 16 }}
+          />
+        )}
 
         {error && (
           <Alert title={error} type="error" showIcon style={{ marginBottom: 16 }} />
