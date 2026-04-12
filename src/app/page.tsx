@@ -14,6 +14,7 @@ import BudgetDashboard from "./components/event/budget/BudgetDashboard";
 import MultiClientPage from "./components/multi-client/MultiClientPage";
 import GuestList from "./components/event/guest-list/GuestList";
 import BudgetCategoriesPage from "./components/budget-categories/BudgetCategoriesPage";
+import EventTasksDashboard from "./components/event/event-tasks/EventTasksDashboard";
 
 const VALID_VIEWS = new Set([
   "events-hub",
@@ -24,6 +25,7 @@ const VALID_VIEWS = new Set([
   "schedule",
   "events-list",
   "multi-client",
+  "tasks",
 ]);
 
 const DEFAULT_VIEW = "events-list";
@@ -55,15 +57,16 @@ export default function Home() {
 
   const renderContent = () => {
     switch (currentView) {
-      case "events-hub":       return <EventsHub />;
-      case "guest-list":       return <GuestList />;
-      case "events-list":      return <EventList />;
-      case "multi-client":     return <MultiClientPage />;
-      case "table-assignment": return <TableAssignmentPage />;
-      case "schedule":         return <DayOfEvent />;
+      case "events-hub":        return <EventsHub />;
+      case "guest-list":        return <GuestList />;
+      case "events-list":       return <EventList />;
+      case "multi-client":      return <MultiClientPage />;
+      case "table-assignment":  return <TableAssignmentPage />;
+      case "schedule":          return <DayOfEvent />;
       case "budget":            return <BudgetDashboard />;
       case "budget-categories": return <BudgetCategoriesPage />;
-      default:                 return <EventsHub />;
+      case "tasks":             return <EventTasksDashboard />;
+      default:                  return <EventsHub />;
     }
   };
 

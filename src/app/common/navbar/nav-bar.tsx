@@ -2,11 +2,12 @@
 
 import React from "react";
 import styles from "./nav-bar.module.css";
-import { BellOutlined, DownOutlined, PlusOutlined } from "@ant-design/icons";
-import { Badge, Space, Button, Dropdown, MenuProps } from "antd";
+import { DownOutlined, PlusOutlined } from "@ant-design/icons";
+import { Space, Button, Dropdown, MenuProps } from "antd";
 import { useEvent } from "@/app/contexts/EventContext";
 import { EventActions } from "@/app/contexts/EventActions";
 import { useTranslation } from "react-i18next";
+import NotificationBell from "./NotificationBell";
 import { useTheme } from "@/theme/ThemeProvider";
 import LanguageSwitcher from "../LanguageSwitcher/LanguageSwitcher";
 import { ThemeToggle } from "@/theme/ThemeToggle";
@@ -14,7 +15,6 @@ import { ThemeToggle } from "@/theme/ThemeToggle";
 type NavBarProps = {
   currentView?: string;
 };
-
 
 export const NavBar: React.FC<NavBarProps> = ({ currentView }) => {
   const { t } = useTranslation();
@@ -77,11 +77,7 @@ export const NavBar: React.FC<NavBarProps> = ({ currentView }) => {
         >
           {t("common.newEvent")}
         </Button>
-
-        <Badge count={3} size="small">
-          <Button icon={<BellOutlined />} type="text" size="small" shape="circle" />
-        </Badge>
-
+        <NotificationBell />
         <LanguageSwitcher />
         <ThemeToggle />
       </div>
