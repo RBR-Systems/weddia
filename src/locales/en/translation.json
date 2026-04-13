@@ -32,7 +32,6 @@
     "phonePlaceholder": "Include country code or national number",
     "selectCountryFirst": "Select country first",
     "partySize": "Party size",
-    "relation": "Relation",
     "rsvp": "RSVP",
     "dietaryRestrictions": "Dietary restrictions",
     "commaSeparated": "Comma separated",
@@ -63,8 +62,8 @@
     "rsvpAt": "RSVP at",
     "specialRequirements": "Special Requirements",
     "dietary": "Dietary",
-    "accessibility": "Accessibility"
-    ,"removed": "Guest removed",
+    "accessibility": "Accessibility",
+    "removed": "Guest removed",
     "removeFailed": "Failed to remove guest",
     "confirmRemove": "Remove guest?",
     "remove": "Remove"
@@ -128,6 +127,7 @@
     "guestList": "Guest List",
     "budget": "Budget",
     "budgetCategories": "Budget Categories",
+    "vendorCatalog": "Vendor Catalog",
     "tableAssignment": "Table Assignment",
     "schedule": "Schedule",
     "tasks": "Tasks",
@@ -259,6 +259,9 @@
     "paymentStatus": "Payment Status",
     "methodOfPayment": "Method of Payment",
     "methodOfPaymentRequired": "Please select a method of payment",
+    "methodOfPaymentPlaceholder": "Select payment method",
+    "receiptUrl": "Receipt URL",
+    "receiptUrlPlaceholder": "https://... (paste the receipt link)",
     "paymentMethods": {
       "creditCard": "Card",
       "bankTransfer": "Transfer",
@@ -340,7 +343,7 @@
     "title": "Budget Allocation",
     "distributeEvenly": "Distribute Evenly",
     "totalBudget": "Total Budget",
-    "allocated": "Allocated",
+    "allocated": "Allocated: {{amount}}",
     "unallocated": "Unallocated",
     "allocationPercent": "Budget Usage %",
     "allocation": "Allocation",
@@ -349,7 +352,6 @@
     "ofBudget": "of budget",
     "spent": "Spent: {{amount}}",
     "budgeted": "Budgeted: {{amount}}",
-    "allocated": "Allocated: {{amount}}",
     "remaining": "Allocation - Actual Expenses: {{amount}}"
   },
   "budgetCharts": {
@@ -393,8 +395,9 @@
     "confirmPayment": "Confirm Payment",
     "expense": "Expense:",
     "amount": "Amount:",
-    "paymentDate": "Payment Date",
-    "dueDate": "Due Date"
+    "dueDate": "Due Date",
+    "receiptUrl": "Receipt URL",
+    "receiptUrlPlaceholder": "https://... (paste the receipt link)"
   },
   "paymentCalendar": {
     "upcomingPayments": "Upcoming Payments (Next 7 Days)",
@@ -430,6 +433,28 @@
     "luxuryWedding": "Luxury Wedding",
     "luxuryDesc": "Premium vendors and full-service planning"
   },
+  "eventVendors": {
+    "title": "Event Vendors",
+    "assigned": "Assigned",
+    "assignedToEvent": "Assigned to Event",
+    "totalCatalog": "Catalog Vendors",
+    "eventSpending": "Event Spending",
+    "emptyText": "No vendors in catalog. Add vendors from the Vendor Catalog section.",
+    "noVendorsAssigned": "No vendors assigned to this event yet",
+    "cannotUnassign": "Cannot remove vendor — it has expenses associated with this event"
+  },
+  "vendorCatalog": {
+    "title": "Vendor Catalog",
+    "directory": "Vendor Directory",
+    "edit": "Edit Vendor",
+    "deleteConfirm": "Delete this vendor?",
+    "deleteSuccess": "Vendor deleted",
+    "deleteFailed": "Failed to delete vendor",
+    "updateSuccess": "Vendor updated successfully",
+    "updateFailed": "Failed to update vendor",
+    "emptyText": "No vendors yet. Add your first vendor.",
+    "loadFailed": "Failed to load vendors"
+  },
   "vendorList": {
     "totalVendors": "Total Vendors",
     "totalVendorSpending": "Total Vendor Spending",
@@ -457,7 +482,15 @@
       "email": "Email",
       "emailPlaceholder": "vendor@example.com",
       "phone": "Phone",
-      "phonePlaceholder": "+1 (555) 000-0000"
+      "phonePlaceholder": "+1 (555) 000-0000",
+      "category": "Category",
+      "categoryPlaceholder": "e.g. Catering, Florals, Music",
+      "address": "Address",
+      "addressPlaceholder": "Vendor address",
+      "notes": "Notes",
+      "notesPlaceholder": "Additional notes",
+      "vendorCreated": "Vendor created successfully",
+      "vendorCreateFailed": "Failed to create vendor"
     }
   },
   "vendorDetails": {
@@ -814,6 +847,19 @@
       "hoursPlural": "{{count}} hours",
       "hoursMinutes": "{{hours}}h {{minutes}}m",
       "invalidTime": "Invalid time"
+    },
+    "types": {
+      "ceremony": "Ceremony",
+      "reception": "Reception",
+      "photos": "Photos",
+      "entertainment": "Entertainment",
+      "mealService": "Meal Service",
+      "speeches": "Speeches",
+      "specialMoment": "Special Moment",
+      "vendorSetup": "Vendor Setup",
+      "vendorBreakdown": "Vendor Breakdown",
+      "setup": "Setup",
+      "guestActivity": "Guest Activity"
     }
   },
   "multiClient": {

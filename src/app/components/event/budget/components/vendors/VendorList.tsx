@@ -14,6 +14,7 @@ import {
   Col,
   Modal,
   Form,
+  Select,
 } from "antd";
 import {
   PlusOutlined,
@@ -21,28 +22,22 @@ import {
   PhoneOutlined,
   MailOutlined,
   EyeOutlined,
+  UserOutlined,
+  EnvironmentOutlined,
+  FileTextOutlined,
 } from "@ant-design/icons";
+import { BudgetService } from "../../services/budget.service";
+import expenseStyles from "../ExpenseModal.module.css";
 import Card from "@/app/common/Card/card";
 import Statistic from "@/app/common/AnimatedStatistic/AnimatedStatistic";
 import styles from "./vendor-list.module.css";
 import type { ColumnsType } from "antd/es/table";
 import { useBudget } from "../../contexts/BudgetContext";
 import { formatCurrency } from "@/utils/formatters";
+import type { Vendor } from "../../types/budget.types";
 
 const { Search } = Input;
 const { Text } = Typography;
-
-export interface Vendor {
-  id: string;
-  name: string;
-  category: string;
-  contact_name?: string;
-  email?: string;
-  phone?: string;
-  total_spent: number;
-  expense_count: number;
-  status: "active" | "inactive";
-}
 
 interface VendorListProps {
   onViewVendor?: (vendor: Vendor) => void;
@@ -69,16 +64,16 @@ export default function VendorList({ onViewVendor }: VendorListProps) {
         if (expense.vendor_name) {
           const existing = vendorMap.get(expense.vendor_name);
           if (existing) {
-            existing.total_spent += expense.amount;
-            existing.expense_count += 1;
+            existing.total_spent = (existing.total_spent ?? 0) + expense.amount;
+            existing.expense_count = (existing.expense_count ?? 0) + 1;
           } else {
             vendorMap.set(expense.vendor_name, {
-              id: expense.vendor_name.toLowerCase().replace(/\s+/g, "_"),
+              vendor_id: expense.vendor_name.toLowerCase().replace(/\s+/g, "_"),
               name: expense.vendor_name,
               category: expense.category_id,
               total_spent: expense.amount,
               expense_count: 1,
-              status: "active",
+              is_active: true,
             });
           }
         }
@@ -93,7 +88,7 @@ export default function VendorList({ onViewVendor }: VendorListProps) {
   );
 
   const totalVendorSpending = vendors.reduce(
-    (sum, v) => sum + v.total_spent,
+    (sum, v) => sum + (v.total_spent ?? 0),
     0,
   );
 
@@ -138,23 +133,23 @@ export default function VendorList({ onViewVendor }: VendorListProps) {
       dataIndex: "expense_count",
       key: "expense_count",
       align: "center",
-      sorter: (a, b) => a.expense_count - b.expense_count,
+      sorter: (a, b) => (a.expense_count ?? 0) - (b.expense_count ?? 0),
     },
     {
       title: t("vendorList.columns.totalSpent"),
       dataIndex: "total_spent",
       key: "total_spent",
       render: (amount: number) => formatCurrency(amount, state.currency),
-      sorter: (a, b) => a.total_spent - b.total_spent,
+      sorter: (a, b) => (a.total_spent ?? 0) - (b.total_spent ?? 0),
       align: "right",
     },
     {
       title: t("vendorList.columns.status"),
       dataIndex: "status",
       key: "status",
-      render: (status: string) => (
-        <Tag color={status === "active" ? "green" : "default"}>
-          {status === "active" ? t("vendorList.active") : t("vendorList.inactive")}
+      render: (_: unknown, record: Vendor) => (
+        <Tag color={record.is_active !== false ? "green" : "default"}>
+          {record.is_active !== false ? t("vendorList.active") : t("vendorList.inactive")}
         </Tag>
       ),
     },
@@ -173,12 +168,22 @@ export default function VendorList({ onViewVendor }: VendorListProps) {
 
   const handleAddVendor = async () => {
     try {
-      await form.validateFields();
-      message.success(t("vendorList.vendorAdded"));
+      const values = await form.validateFields();
+      await BudgetService.createVendor({
+        vendorName:    values.name,
+        category:      values.category ?? "",
+        contactPerson: values.contact_name,
+        email:         values.email,
+        mobilePhone:   values.phone,
+        address:       values.address,
+        notes:         values.notes,
+      });
+      message.success(t("vendorList.form.vendorCreated"));
       setModalOpen(false);
       form.resetFields();
-    } catch {
-      // validation error
+    } catch (err: any) {
+      if (err?.errorFields) return; // validation error, stay open
+      message.error(t("vendorList.form.vendorCreateFailed"));
     }
   };
 
@@ -205,7 +210,7 @@ export default function VendorList({ onViewVendor }: VendorListProps) {
           <Card size="small">
             <Statistic
               title={t("vendorList.activeVendors")}
-              value={vendors.filter((v) => v.status === "active").length}
+              value={vendors.filter((v) => v.is_active !== false).length}
             />
           </Card>
         </Col>
@@ -235,7 +240,7 @@ export default function VendorList({ onViewVendor }: VendorListProps) {
         <Table
           columns={columns}
           dataSource={filteredVendors}
-          rowKey="id"
+          rowKey="vendor_id"
           pagination={{ pageSize: 10 }}
           locale={{
             emptyText: t("vendorList.emptyText"),
@@ -247,25 +252,88 @@ export default function VendorList({ onViewVendor }: VendorListProps) {
         title={t("vendorList.addVendor")}
         open={modalOpen}
         onOk={handleAddVendor}
-        onCancel={() => setModalOpen(false)}
+        onCancel={() => { setModalOpen(false); form.resetFields(); }}
+        okText={t("common.create")}
+        cancelText={t("common.cancel")}
+        width={520}
+        forceRender
+        destroyOnHidden={false}
       >
-        <Form form={form} layout="vertical">
-          <Form.Item
-            name="name"
-            label={t("vendorList.form.vendorName")}
-            rules={[{ required: true }]}
-          >
-            <Input placeholder={t("vendorList.form.vendorNamePlaceholder")} />
-          </Form.Item>
-          <Form.Item name="contact_name" label={t("vendorList.form.contactPerson")}>
-            <Input placeholder={t("vendorList.form.contactPlaceholder")} />
-          </Form.Item>
-          <Form.Item name="email" label={t("vendorList.form.email")}>
-            <Input type="email" placeholder={t("vendorList.form.emailPlaceholder")} />
-          </Form.Item>
-          <Form.Item name="phone" label={t("vendorList.form.phone")}>
-            <Input placeholder={t("vendorList.form.phonePlaceholder")} />
-          </Form.Item>
+        <Form form={form} layout="vertical" style={{ marginTop: 4 }}>
+
+          {/* ── Hero: vendor name ── */}
+          <div className={expenseStyles.amountSection}>
+            <Form.Item
+              name="name"
+              label={t("vendorList.form.vendorName")}
+              rules={[{ required: true, message: t("vendorList.form.vendorName") }]}
+              style={{ marginBottom: 0 }}
+            >
+              <Input
+                placeholder={t("vendorList.form.vendorNamePlaceholder")}
+                style={{
+                  background: "transparent", border: "none",
+                  borderBottom: "1.5px solid rgba(255,255,255,0.38)",
+                  borderRadius: 0, boxShadow: "none",
+                  fontSize: 22, fontWeight: 700, color: "#fff",
+                  paddingLeft: 0,
+                }}
+              />
+            </Form.Item>
+          </div>
+
+          {/* ── Category ── */}
+          <div className={expenseStyles.paymentSection} style={{ marginBottom: 12 }}>
+            <p className={expenseStyles.sectionLabel}>{t("vendorList.form.category")}</p>
+            <Form.Item name="category" noStyle>
+              <Select
+                placeholder={t("vendorList.form.categoryPlaceholder")}
+                style={{ width: "100%" }}
+                options={[
+                  "Catering", "Florals", "Photography", "Videography",
+                  "Music / DJ", "Venue", "Decoration", "Transportation",
+                  "Hair & Makeup", "Cake", "Other",
+                ].map((c) => ({ label: c, value: c }))}
+              />
+            </Form.Item>
+          </div>
+
+          {/* ── Contact ── */}
+          <div className={expenseStyles.paymentSection} style={{ marginBottom: 12 }}>
+            <p className={expenseStyles.sectionLabel}>
+              <UserOutlined style={{ marginRight: 6 }} />
+              {t("vendorList.form.contactPerson")}
+            </p>
+            <div className={expenseStyles.twoCol}>
+              <Form.Item name="contact_name" label={t("vendorList.form.contactPerson")} style={{ marginBottom: 0 }}>
+                <Input placeholder={t("vendorList.form.contactPlaceholder")} />
+              </Form.Item>
+              <Form.Item name="phone" label={t("vendorList.form.phone")} style={{ marginBottom: 0 }}>
+                <Input placeholder={t("vendorList.form.phonePlaceholder")} prefix={<PhoneOutlined />} />
+              </Form.Item>
+            </div>
+            <Form.Item name="email" label={t("vendorList.form.email")} style={{ marginBottom: 0, marginTop: 10 }}>
+              <Input type="email" placeholder={t("vendorList.form.emailPlaceholder")} prefix={<MailOutlined />} />
+            </Form.Item>
+          </div>
+
+          {/* ── Address & Notes ── */}
+          <div className={expenseStyles.paymentSection}>
+            <p className={expenseStyles.sectionLabel}>
+              <EnvironmentOutlined style={{ marginRight: 6 }} />
+              {t("vendorList.form.address")}
+            </p>
+            <Form.Item name="address" label={t("vendorList.form.address")} style={{ marginBottom: 10 }}>
+              <Input placeholder={t("vendorList.form.addressPlaceholder")} />
+            </Form.Item>
+            <Form.Item name="notes" label={t("vendorList.form.notes")} style={{ marginBottom: 0 }}>
+              <Input.TextArea
+                rows={2}
+                placeholder={t("vendorList.form.notesPlaceholder")}
+              />
+            </Form.Item>
+          </div>
+
         </Form>
       </Modal>
     </>

@@ -43,8 +43,8 @@ export default function AnimatedStatistic({ value, durationMs = 800, formatter, 
       start={prevRef.current}
       end={Number(val)}
       duration={duration}
-      separator="," 
-      decimals={2}
+      separator=","
+      decimals={0}
       formattingFn={formattingFn}
     />
   );

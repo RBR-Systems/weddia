@@ -184,7 +184,8 @@ export default function CategoryList() {
             {t("common.create")}
           </Button>,
         ]}
-        destroyOnHidden
+        destroyOnHidden={false}
+        forceRender
       >
         <Form form={createForm} layout="vertical" style={{ marginTop: 8 }}>
           <Form.Item

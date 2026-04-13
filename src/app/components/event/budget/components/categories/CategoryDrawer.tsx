@@ -312,6 +312,8 @@ export default function CategoryDrawer({
       open={open}
       onClose={onClose}
       size="large"
+      destroyOnClose={false}
+      forceRender
       footer={
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           <Popconfirm

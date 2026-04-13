@@ -15,12 +15,14 @@ import MultiClientPage from "./components/multi-client/MultiClientPage";
 import GuestList from "./components/event/guest-list/GuestList";
 import BudgetCategoriesPage from "./components/budget-categories/BudgetCategoriesPage";
 import EventTasksDashboard from "./components/event/event-tasks/EventTasksDashboard";
+import VendorCatalog from "./components/vendors/VendorCatalog";
 
 const VALID_VIEWS = new Set([
   "events-hub",
   "guest-list",
   "budget",
   "budget-categories",
+  "vendor-catalog",
   "table-assignment",
   "schedule",
   "events-list",
@@ -65,6 +67,7 @@ export default function Home() {
       case "schedule":          return <DayOfEvent />;
       case "budget":            return <BudgetDashboard />;
       case "budget-categories": return <BudgetCategoriesPage />;
+      case "vendor-catalog":    return <VendorCatalog />;
       case "tasks":             return <EventTasksDashboard />;
       default:                  return <EventsHub />;
     }

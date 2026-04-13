@@ -160,7 +160,7 @@ const ScheduleList: React.FC<Props> = ({
 
     timelineItems.splice(insertIndex, 0, {
       key: "now-indicator",
-      dot: (
+      icon: (
         <div className={styles.nowDot}>
           <ClockCircleOutlined style={{ fontSize: 16, color: "#ff4d4f" }} />
         </div>

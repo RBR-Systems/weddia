@@ -229,7 +229,7 @@ export default function ActivityLog() {
             const config = ACTIVITY_CONFIG[activity.type];
             return {
               color: getTimelineColor(activity.type),
-              dot: config.icon,
+              icon: config.icon,
               children: (
                 <div>
                   <Space orientation="vertical" size={0}>

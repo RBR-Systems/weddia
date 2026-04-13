@@ -20,6 +20,7 @@ import {
   RightOutlined,
 } from "@ant-design/icons";
 import { Checkbox } from "antd";
+import dayjs from "dayjs";
 import { TimelineItem, Status } from "./models/types";
 import { sortTimelineItems, formatTime } from "./utils/helpers";
 import ScheduleList from "./components/ScheduleList/ScheduleList";
@@ -33,7 +34,7 @@ import CurrentTimeIndicator from "./components/CurrentTimeIndicator/CurrentTimeI
 import pageStyles from "./schedule-page.module.css";
 import { useTranslation } from "react-i18next";
 import { useEvent } from "@/app/contexts/EventContext";
-import { fetchTimelineItems, deleteTimelineItem } from "./services/schedule.service";
+import { fetchTimelineItems, createTimelineItem, updateTimelineItem, deleteTimelineItem } from "./services/schedule.service";
 
 const Schedule: React.FC = () => {
   const { t } = useTranslation();
@@ -310,16 +311,10 @@ const Schedule: React.FC = () => {
           idsToShift.includes(it.timeline_item_id)
             ? {
                 ...it,
-                start_time: new Date(
-                  new Date(it.start_time).getTime() + shift,
-                ).toISOString(),
-                end_time: new Date(
-                  new Date(it.end_time).getTime() + shift,
-                ).toISOString(),
+                start_time: dayjs(it.start_time).add(shift, "ms").format("YYYY-MM-DDTHH:mm:ss"),
+                end_time:   dayjs(it.end_time).add(shift, "ms").format("YYYY-MM-DDTHH:mm:ss"),
                 setup_time: it.setup_time
-                  ? new Date(
-                      new Date(it.setup_time).getTime() + shift,
-                    ).toISOString()
+                  ? dayjs(it.setup_time).add(shift, "ms").format("YYYY-MM-DDTHH:mm:ss")
                   : it.setup_time,
               }
             : it,
@@ -343,12 +338,9 @@ const Schedule: React.FC = () => {
     minutes: number,
     dir: string,
   ) {
-    const time = new Date(originalTime);
     const adjustmentMs = minutes * 60000;
-    if (dir === "behind")
-      return new Date(time.getTime() + adjustmentMs).toISOString();
-    if (dir === "ahead")
-      return new Date(time.getTime() - adjustmentMs).toISOString();
+    if (dir === "behind") return dayjs(originalTime).add(adjustmentMs, "ms").format("YYYY-MM-DDTHH:mm:ss");
+    if (dir === "ahead")  return dayjs(originalTime).subtract(adjustmentMs, "ms").format("YYYY-MM-DDTHH:mm:ss");
     return originalTime;
   }
 
@@ -747,9 +739,16 @@ const Schedule: React.FC = () => {
         visible={isModalVisible}
         onClose={() => setModalVisible(false)}
         eventId={eventId}
-        onAdd={(item: any) => {
+        onAdd={(item) => {
           setItems((prev) => sortTimelineItems([...prev, item]));
           setModalVisible(false);
+          createTimelineItem(Number(eventId), item).then((saved) => {
+            setItems((prev) =>
+              sortTimelineItems(
+                prev.map((it) => (it.timeline_item_id === item.timeline_item_id ? saved : it)),
+              ),
+            );
+          }).catch((err) => console.error("createTimelineItem failed:", err));
         }}
       />
 
@@ -760,13 +759,15 @@ const Schedule: React.FC = () => {
         eventId={eventId}
         initialData={editItem ?? undefined}
         onSave={(updated) => {
-          setItems((prev) => {
-            const copy = prev.map((it) =>
-              it.timeline_item_id === updated.timeline_item_id ? updated : it,
-            );
-            return sortTimelineItems(copy);
-          });
+          setItems((prev) =>
+            sortTimelineItems(prev.map((it) => (it.timeline_item_id === updated.timeline_item_id ? updated : it))),
+          );
           setEditItem(null);
+          updateTimelineItem(updated.timeline_item_id, updated).then((saved) => {
+            setItems((prev) =>
+              sortTimelineItems(prev.map((it) => (it.timeline_item_id === saved.timeline_item_id ? saved : it))),
+            );
+          }).catch((err) => console.error("updateTimelineItem failed:", err));
         }}
       />
     </div>

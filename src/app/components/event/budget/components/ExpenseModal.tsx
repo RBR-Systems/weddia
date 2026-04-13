@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect } from "react";
 import {
-  Modal, Form, Input, InputNumber, Select, DatePicker, AutoComplete,
+  Modal, Form, Input, InputNumber, Select, DatePicker,
 } from "antd";
 import {
   CreditCardOutlined, BankOutlined, DollarOutlined, FileTextOutlined,
@@ -82,6 +82,7 @@ export default function ExpenseModal({ visible, onClose, editingExpense }: Props
         expense_date:    dayjs(editingExpense.expense_date),
         methodOfPayment: editingExpense.methodOfPayment,
         payment_status:  editingExpense.payment_status,
+        receipt_url:     editingExpense.receipt_url ?? "",
       });
     } else if (visible && !editingExpense) {
       form.resetFields();
@@ -90,6 +91,7 @@ export default function ExpenseModal({ visible, onClose, editingExpense }: Props
 
   const onOk = async () => {
     const values = await form.validateFields();
+    const receiptUrl = values.receipt_url?.trim() || null;
     const payload: Omit<Expense, "expense_id"> = {
       description:     values.description,
       amount:          Number(values.amount),
@@ -98,7 +100,8 @@ export default function ExpenseModal({ visible, onClose, editingExpense }: Props
       expense_date:    dayjs(values.expense_date).toISOString(),
       payment_status:  values.payment_status || "pending",
       methodOfPayment: values.methodOfPayment || "",
-      receipt_urls:    editingExpense?.receipt_urls ?? [],
+      receipt_url:     receiptUrl,
+      receipt_urls:    receiptUrl ? [receiptUrl] : [],
     };
 
     if (isEditing) {
@@ -111,9 +114,9 @@ export default function ExpenseModal({ visible, onClose, editingExpense }: Props
     onClose();
   };
 
-  const vendorNames = Array.from(
-    new Set(state.expenses.map((e: Expense) => e.vendor_name).filter(Boolean)),
-  ).map((v) => ({ value: v }));
+  const eventVendorOptions = state.vendors
+    .filter((v: { vendor_id: string }) => state.eventVendorIds.includes(v.vendor_id))
+    .map((v: { vendor_id: string; name: string }) => ({ value: v.name, label: v.name }));
 
   return (
     <Modal
@@ -141,7 +144,8 @@ export default function ExpenseModal({ visible, onClose, editingExpense }: Props
               min={0}
               placeholder="0.00"
               formatter={(v) => `${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-              parser={(v) => (v?.replace(/,/g, "") ?? "") as unknown as number}
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              parser={(v) => Number(v?.replace(/,/g, "") ?? 0) as any}
             />
           </Form.Item>
         </div>
@@ -168,15 +172,25 @@ export default function ExpenseModal({ visible, onClose, editingExpense }: Props
           </Form.Item>
 
           <Form.Item name="vendor_name" label={t("expenseModal.vendor")}>
-            <AutoComplete
-              options={vendorNames}
+            <Select
               placeholder={t("expenseModal.vendor")}
+              allowClear
+              showSearch
               filterOption={(input, opt) =>
-                String(opt?.value ?? "").toLowerCase().includes(input.toLowerCase())
+                String(opt?.label ?? "").toLowerCase().includes(input.toLowerCase())
               }
+              options={eventVendorOptions}
+              notFoundContent={t("eventVendors.noVendorsAssigned")}
             />
           </Form.Item>
         </div>
+
+        <Form.Item name="receipt_url" label={t("expenseModal.receiptUrl")}>
+          <Input
+            placeholder={t("expenseModal.receiptUrlPlaceholder")}
+            prefix={<span style={{ opacity: 0.45, fontSize: 12 }}>URL</span>}
+          />
+        </Form.Item>
 
         <Form.Item name="expense_date" label={t("expenseModal.date")} initialValue={dayjs()}>
           <DatePicker style={{ width: "100%" }} />

@@ -25,8 +25,8 @@ import ExpenseModal from "./components/ExpenseModal";
 import { CategoryList } from "./components/categories";
 import { ExpenseList, ExpenseDetails } from "./components/expenses";
 import { BudgetAllocation } from "./components/allocation";
-import { VendorList, VendorDetails } from "./components/vendors";
-import type { Vendor } from "./components/vendors";
+import { EventVendors, VendorDetails } from "./components/vendors";
+import type { Vendor } from "./types/budget.types";
 import { PaymentStatus, PaymentCalendar } from "./components/payments";
 import { BudgetCharts, ReportsPage } from "./components/analytics";
 import {
@@ -107,7 +107,7 @@ function DashboardContent() {
       case "allocation":
         return <BudgetAllocation />;
       case "vendors":
-        return <VendorList onViewVendor={handleViewVendor} />;
+        return <EventVendors onViewVendor={handleViewVendor} />;
       case "payments":
         return (
           <Tabs defaultActiveKey="status" items={[

@@ -5,6 +5,7 @@ import {
   Drawer,
   Descriptions,
   Typography,
+  Flex,
   Space,
   Divider,
   Table,
@@ -20,8 +21,7 @@ import Statistic from "@/app/common/AnimatedStatistic/AnimatedStatistic";
 import { useBudget } from "../../contexts/BudgetContext";
 import { formatCurrency, formatDate } from "@/utils/formatters";
 import { getPaymentStatus } from "../../constants/budget.constants";
-import type { Expense, PaymentStatus } from "../../types/budget.types";
-import type { Vendor } from "./VendorList";
+import type { Expense, PaymentStatus, Vendor } from "../../types/budget.types";
 import vendorStyles from "./VendorDetails.module.css";
 
 const { Title, Text } = Typography;
@@ -90,11 +90,11 @@ export default function VendorDetails({
     <Drawer
       title={t("vendorDetails.title")}
       placement="right"
-      style={{ width: 600 }}
+      width={600}
       open={open}
       onClose={onClose}
     >
-      <Space orientation="vertical" className={vendorStyles.fullWidth} size="large">
+      <Flex vertical gap="large" style={{ width: "100%" }}>
         <Space>
           <Avatar
             size={64}
@@ -105,8 +105,8 @@ export default function VendorDetails({
             <Title level={4} className={vendorStyles.vendorName}>
               {vendor.name}
             </Title>
-            <Tag color={vendor.status === "active" ? "green" : "default"}>
-              {vendor.status}
+            <Tag color={vendor.is_active !== false ? "green" : "default"}>
+              {vendor.is_active !== false ? t("vendorList.active") : t("vendorList.inactive")}
             </Tag>
           </div>
         </Space>
@@ -185,7 +185,7 @@ export default function VendorDetails({
         ) : (
           <Empty description={t("vendorDetails.noExpenses")} />
         )}
-      </Space>
+      </Flex>
     </Drawer>
   );
 }

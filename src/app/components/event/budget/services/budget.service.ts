@@ -49,12 +49,14 @@ export class BudgetService {
     const spentPerCategory = new Map<number, number>();
     const expenseCountPerCategory = new Map<number, number>();
     for (const e of expenses) {
-      spentPerCategory.set(e.categoryId, (spentPerCategory.get(e.categoryId) ?? 0) + e.amount);
+      if (e.paymentStatus === "paid") {
+        spentPerCategory.set(e.categoryId, (spentPerCategory.get(e.categoryId) ?? 0) + e.amount);
+      }
       expenseCountPerCategory.set(e.categoryId, (expenseCountPerCategory.get(e.categoryId) ?? 0) + 1);
     }
 
     const totalBudget = budgets.reduce((s, b) => s + b.allocatedAmount, 0);
-    const totalSpent = expenses.reduce((s, e) => s + e.amount, 0);
+    const totalSpent = expenses.filter((e) => e.paymentStatus === "paid").reduce((s, e) => s + e.amount, 0);
     const totalAllocated = totalBudget;
     const totalRemaining = totalBudget - totalSpent;
     const currency = budgets[0]?.currency ?? "USD";
@@ -117,7 +119,7 @@ export class BudgetService {
       rating: v.rating,
       is_active: v.isActive,
       total_spent: expenses
-        .filter((e) => e.vendorId === v.vendorId)
+        .filter((e) => e.vendorId === v.vendorId && e.paymentStatus === "paid")
         .reduce((s, e) => s + e.amount, 0),
       expense_count: expenses.filter((e) => e.vendorId === v.vendorId).length,
       created_at: new Date().toISOString(),
@@ -200,6 +202,7 @@ export class BudgetService {
       notes:           expenseData.notes,
       paymentStatus:   expenseData.payment_status,
       methodOfPayment: expenseData.methodOfPayment,
+      receiptUrl:      expenseData.receipt_url ?? null,
     });
   }
 
@@ -214,6 +217,7 @@ export class BudgetService {
     if (updates.currency     !== undefined) body.currency        = updates.currency;
     if (updates.payment_status  !== undefined) body.paymentStatus   = updates.payment_status;
     if (updates.methodOfPayment !== undefined) body.methodOfPayment = updates.methodOfPayment;
+    if (updates.receipt_url     !== undefined) body.receiptUrl      = updates.receipt_url ?? null;
     await apiPut(`/api/expenses/${expenseId}?adminId=1`, body);
   }
 
@@ -314,5 +318,75 @@ export class BudgetService {
       currency: category.currency ?? "USD",
     });
     return { budgetId: budget.budgetId };
+  }
+
+  static async getVendors(): Promise<import("../types/budget.types").Vendor[]> {
+    const vendors = await apiGet<ApiVendor[]>("/api/vendors");
+    return vendors.map((v) => ({
+      vendor_id: String(v.vendorId),
+      name: v.vendorName,
+      category: v.category,
+      contact_name: v.contactPerson ?? "",
+      email: v.email ?? "",
+      phone: v.mobilePhone ?? v.phone ?? "",
+      address: v.address ?? "",
+      notes: v.notes ?? "",
+      rating: v.rating,
+      is_active: v.isActive,
+      total_spent: 0,
+      expense_count: 0,
+    }));
+  }
+
+  static async updateVendor(vendorId: string, data: {
+    vendorName: string;
+    category: string;
+    contactPerson?: string;
+    email?: string;
+    mobilePhone?: string;
+    address?: string;
+    notes?: string;
+    rating?: number;
+    isActive?: boolean;
+  }): Promise<void> {
+    await apiPut(`/api/vendors/${vendorId}?adminId=1`, {
+      vendorName:    data.vendorName,
+      category:      data.category,
+      contactPerson: data.contactPerson ?? null,
+      email:         data.email ?? null,
+      mobilePhone:   data.mobilePhone ?? null,
+      address:       data.address ?? null,
+      notes:         data.notes ?? null,
+      rating:        data.rating ?? 0,
+      isActive:      data.isActive ?? true,
+    });
+  }
+
+  static async deleteVendor(vendorId: string): Promise<void> {
+    await apiDelete(`/api/vendors/${vendorId}`);
+  }
+
+  static async createVendor(data: {
+    vendorName: string;
+    category: string;
+    contactPerson?: string;
+    email?: string;
+    mobilePhone?: string;
+    address?: string;
+    notes?: string;
+    rating?: number;
+  }): Promise<import("../types/budget.types").Vendor> {
+    const created = await apiPost<ApiVendor>(`/api/vendors?adminId=1`, {
+      vendorName: data.vendorName,
+      category:   data.category,
+      contactPerson: data.contactPerson ?? null,
+      email:         data.email ?? null,
+      mobilePhone:   data.mobilePhone ?? null,
+      address:       data.address ?? null,
+      notes:         data.notes ?? null,
+      rating:        data.rating ?? 0,
+      isActive:      true,
+    });
+    return { vendor_id: String(created.vendorId), name: created.vendorName };
   }
 }

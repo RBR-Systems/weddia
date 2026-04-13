@@ -10,7 +10,6 @@ import type {
   BudgetState,
   Category,
   Expense,
-  Vendor,
   BudgetSummary,
   Currency,
 } from "../types/budget.types";
@@ -21,6 +20,7 @@ import {
 import { BudgetService } from "../services/budget.service";
 import { ApiError, isAbortError } from "@/lib/apiClient";
 import { useEvent } from "@/app/contexts/EventContext";
+import { EventActions } from "@/app/contexts/EventActions";
 
 type Action =
   | { type: "SET_LOADING"; payload: boolean }
@@ -35,7 +35,8 @@ type Action =
       payload: { id: string; data: Partial<Category> };
     }
   | { type: "DELETE_CATEGORY"; payload: string }
-  | { type: "UPDATE_BUDGET"; payload: number };
+  | { type: "UPDATE_BUDGET"; payload: number }
+  | { type: "SET_EVENT_VENDOR_IDS"; payload: string[] };
 
 function generateId() {
   return `id_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 9)}`;
@@ -64,6 +65,7 @@ const initialState: BudgetState = {
   })),
   expenses: [],
   vendors: [],
+  eventVendorIds: [],
   currency: DEFAULT_CURRENCY as Currency,
 };
 
@@ -77,16 +79,17 @@ function reducer(state: BudgetState, action: Action): BudgetState {
       return { ...state, ...action.payload };
     case "ADD_EXPENSE": {
       const e = action.payload;
+      const isPaid = e.payment_status === "paid";
       const categories = state.categories.map((c) =>
         c.id === e.category_id
           ? {
               ...c,
-              spent: (c.spent ?? 0) + e.amount,
+              spent: (c.spent ?? 0) + (isPaid ? e.amount : 0),
               expense_count: (c.expense_count ?? 0) + 1,
             }
           : c,
       );
-      const total_spent = (state.summary?.total_spent ?? 0) + e.amount;
+      const total_spent = (state.summary?.total_spent ?? 0) + (isPaid ? e.amount : 0);
       const total_budget = state.summary?.total_budget ?? 0;
       const percentage_spent =
         total_budget > 0 ? parseFloat(((total_spent / total_budget) * 100).toFixed(2)) : 0;
@@ -107,18 +110,19 @@ function reducer(state: BudgetState, action: Action): BudgetState {
       const expenseId = action.payload;
       const expense = state.expenses.find((x) => x.expense_id === expenseId);
       if (!expense) return state;
+      const wasPaid = expense.payment_status === "paid";
       const categories = state.categories.map((c) =>
         c.id === expense.category_id
           ? {
               ...c,
-              spent: Math.max(0, (c.spent ?? 0) - expense.amount),
+              spent: Math.max(0, (c.spent ?? 0) - (wasPaid ? expense.amount : 0)),
               expense_count: Math.max(0, (c.expense_count ?? 1) - 1),
             }
           : c,
       );
       const total_spent = Math.max(
         0,
-        (state.summary?.total_spent ?? 0) - expense.amount,
+        (state.summary?.total_spent ?? 0) - (wasPaid ? expense.amount : 0),
       );
       const total_budget = state.summary?.total_budget ?? 0;
       const percentage_spent =
@@ -138,11 +142,32 @@ function reducer(state: BudgetState, action: Action): BudgetState {
     }
     case "UPDATE_EXPENSE": {
       const { id, data } = action.payload;
+      const prev = state.expenses.find((e) => e.expense_id === id);
+      const updated = prev ? { ...prev, ...data } : null;
+
+      // Recalculate total_spent if payment_status or amount changed
+      let total_spent = state.summary?.total_spent ?? 0;
+      if (prev && updated && (data.payment_status !== undefined || data.amount !== undefined)) {
+        const wasCounted = prev.payment_status === "paid";
+        const isCounted  = updated.payment_status === "paid";
+        if (wasCounted)  total_spent = Math.max(0, total_spent - prev.amount);
+        if (isCounted)   total_spent = total_spent + updated.amount;
+      }
+
+      const total_budget = state.summary?.total_budget ?? 0;
+      const percentage_spent =
+        total_budget > 0 ? parseFloat(((total_spent / total_budget) * 100).toFixed(2)) : 0;
+      const total_remaining = total_budget - total_spent;
+
       return {
         ...state,
-        expenses: state.expenses.map((e) =>
-          e.expense_id === id ? { ...e, ...data } : e,
-        ),
+        expenses: state.expenses.map((e) => (e.expense_id === id ? { ...e, ...data } : e)),
+        summary: {
+          ...(state.summary as BudgetSummary),
+          total_spent,
+          percentage_spent,
+          total_remaining,
+        },
       };
     }
     case "ADD_CATEGORY": {
@@ -247,6 +272,8 @@ function reducer(state: BudgetState, action: Action): BudgetState {
         },
       };
     }
+    case "SET_EVENT_VENDOR_IDS":
+      return { ...state, eventVendorIds: action.payload };
     default:
       return state;
   }
@@ -256,7 +283,7 @@ const BudgetContext = createContext<any>(null);
 
 export function BudgetProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(reducer, initialState);
-  const { state: { events: { selectedEvent } } } = useEvent();
+  const { state: { events: { selectedEvent } }, dispatch: eventDispatch } = useEvent();
   const eventId = (selectedEvent as any)?.id ?? 1;
   const eventBudget = (selectedEvent as any)?.budget as number | undefined;
 
@@ -304,11 +331,22 @@ export function BudgetProvider({ children }: { children: React.ReactNode }) {
           expense_date: e.expense_date,
           payment_status: e.payment_status,
           methodOfPayment: e.methodOfPayment ?? "",
+          receipt_url: e.receipt_url ?? null,
           receipt_urls: e.receipt_url ? [e.receipt_url] : [],
         })),
         vendors: data.vendors.map((v) => ({
           vendor_id: v.vendor_id,
           name: v.name,
+          category: (v as any).category ?? "",
+          contact_name: (v as any).contact_person ?? "",
+          email: (v as any).email ?? "",
+          phone: (v as any).phone ?? "",
+          address: (v as any).address ?? "",
+          notes: (v as any).notes ?? "",
+          rating: (v as any).rating ?? 0,
+          is_active: (v as any).is_active ?? true,
+          total_spent: (v as any).total_spent ?? 0,
+          expense_count: (v as any).expense_count ?? 0,
         })),
         currency: data.budget.currency as Currency,
       };
@@ -329,12 +367,19 @@ export function BudgetProvider({ children }: { children: React.ReactNode }) {
   }, [eventBudget]);
 
   useEffect(() => {
-    // Don't load until the selected event is available;
-    // selectedEvent is intentionally not in deps — eventId and loadBudgetData
-    // already change when selectedEvent transitions from null to an object.
     if (!selectedEvent) return;
     const controller = new AbortController();
     loadBudgetData(eventId, controller.signal);
+
+    // Load event-vendor assignments from localStorage
+    try {
+      const stored = localStorage.getItem(`rbr_event_vendors_${eventId}`);
+      const ids: string[] = stored ? JSON.parse(stored) : [];
+      dispatch({ type: "SET_EVENT_VENDOR_IDS", payload: ids });
+    } catch {
+      dispatch({ type: "SET_EVENT_VENDOR_IDS", payload: [] });
+    }
+
     return () => controller.abort();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [eventId, loadBudgetData]);
@@ -435,8 +480,27 @@ export function BudgetProvider({ children }: { children: React.ReactNode }) {
     );
   };
 
+  const assignVendor = (vendorId: string) => {
+    if (state.eventVendorIds.includes(vendorId)) return;
+    const updated = [...state.eventVendorIds, vendorId];
+    dispatch({ type: "SET_EVENT_VENDOR_IDS", payload: updated });
+    localStorage.setItem(`rbr_event_vendors_${eventId}`, JSON.stringify(updated));
+  };
+
+  const unassignVendor = (vendorId: string) => {
+    const updated = state.eventVendorIds.filter((id) => id !== vendorId);
+    dispatch({ type: "SET_EVENT_VENDOR_IDS", payload: updated });
+    localStorage.setItem(`rbr_event_vendors_${eventId}`, JSON.stringify(updated));
+  };
+
   const updateBudget = (totalBudget: number) => {
     dispatch({ type: "UPDATE_BUDGET", payload: totalBudget });
+    if (selectedEvent) {
+      eventDispatch({
+        type: EventActions.UPDATE_EVENT,
+        payload: { ...(selectedEvent as any), budget: totalBudget },
+      });
+    }
     BudgetService.updateBudget(eventId, { total_budget: totalBudget }).catch((err) =>
       console.error("updateBudget failed:", err),
     );
@@ -587,7 +651,8 @@ export function BudgetProvider({ children }: { children: React.ReactNode }) {
     updateBudget,
     loadTemplate,
     loadEstimate,
-    
+    assignVendor,
+    unassignVendor,
   };
 
   return (

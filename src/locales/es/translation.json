@@ -32,7 +32,6 @@
     "phonePlaceholder": "Incluye código de país o número nacional",
     "selectCountryFirst": "Selecciona país primero",
     "partySize": "Tamaño del grupo",
-    "relation": "Relación",
     "rsvp": "RSVP",
     "dietaryRestrictions": "Restricciones alimentarias",
     "commaSeparated": "Separados por coma",
@@ -63,8 +62,8 @@
     "rsvpAt": "RSVP el",
     "specialRequirements": "Requerimientos especiales",
     "dietary": "Alimentación",
-    "accessibility": "Accesibilidad"
-    ,"removed": "Invitado eliminado",
+    "accessibility": "Accesibilidad",
+    "removed": "Invitado eliminado",
     "removeFailed": "No se pudo eliminar el invitado",
     "confirmRemove": "¿Eliminar invitado?",
     "remove": "Eliminar"
@@ -122,12 +121,35 @@
     "now": "AHORA",
     "budget": "Presupuesto"
   },
+  "eventVendors": {
+    "title": "Proveedores del Evento",
+    "assigned": "Asignado",
+    "assignedToEvent": "Asignados al Evento",
+    "totalCatalog": "Proveedores en Catálogo",
+    "eventSpending": "Gasto del Evento",
+    "emptyText": "No hay proveedores en el catálogo. Agrega proveedores desde la sección Catálogo de Proveedores.",
+    "noVendorsAssigned": "Aún no hay proveedores asignados a este evento",
+    "cannotUnassign": "No se puede quitar el proveedor — tiene gastos asociados a este evento"
+  },
+  "vendorCatalog": {
+    "title": "Catálogo de Proveedores",
+    "directory": "Directorio de Proveedores",
+    "edit": "Editar Proveedor",
+    "deleteConfirm": "¿Eliminar este proveedor?",
+    "deleteSuccess": "Proveedor eliminado",
+    "deleteFailed": "Error al eliminar proveedor",
+    "updateSuccess": "Proveedor actualizado exitosamente",
+    "updateFailed": "Error al actualizar proveedor",
+    "emptyText": "No hay proveedores aún. Agrega tu primer proveedor.",
+    "loadFailed": "Error al cargar proveedores"
+  },
   "nav": {
     "eventPages": "Páginas de Eventos",
     "eventsHub": "Centro de Eventos",
     "guestList": "Lista de invitados",
     "budget": "Presupuesto",
     "budgetCategories": "Categorías de Presupuesto",
+    "vendorCatalog": "Catálogo de Proveedores",
     "tableAssignment": "Asignación de Mesas",
     "schedule": "Cronograma",
     "tasks": "Tareas",
@@ -259,6 +281,9 @@
     "paymentStatus": "Estado de Pago",
     "methodOfPayment": "Método de Pago",
     "methodOfPaymentRequired": "Selecciona un método de pago",
+    "methodOfPaymentPlaceholder": "Selecciona método de pago",
+    "receiptUrl": "URL del Recibo",
+    "receiptUrlPlaceholder": "https://... (pega el enlace del recibo)",
     "paymentMethods": {
       "creditCard": "Tarjeta",
       "bankTransfer": "Transferencia",
@@ -392,8 +417,9 @@
     "confirmPayment": "Confirmar Pago",
     "expense": "Gasto:",
     "amount": "Monto:",
-    "paymentDate": "Fecha de Pago",
-    "dueDate": "Fecha de Vencimiento"
+    "dueDate": "Fecha de Vencimiento",
+    "receiptUrl": "URL del Recibo",
+    "receiptUrlPlaceholder": "https://... (pega el enlace del recibo)"
   },
   "paymentCalendar": {
     "upcomingPayments": "Próximos Pagos (7 Días)",
@@ -456,7 +482,15 @@
       "email": "Email",
       "emailPlaceholder": "proveedor@ejemplo.com",
       "phone": "Teléfono",
-      "phonePlaceholder": "+1 (555) 000-0000"
+      "phonePlaceholder": "+1 (555) 000-0000",
+      "category": "Categoría",
+      "categoryPlaceholder": "Ej. Catering, Flores, Música",
+      "address": "Dirección",
+      "addressPlaceholder": "Dirección del proveedor",
+      "notes": "Notas",
+      "notesPlaceholder": "Notas adicionales",
+      "vendorCreated": "Proveedor creado exitosamente",
+      "vendorCreateFailed": "Error al crear proveedor"
     }
   },
   "vendorDetails": {
@@ -813,6 +847,19 @@
       "hoursPlural": "{{count}} horas",
       "hoursMinutes": "{{hours}}h {{minutes}}m",
       "invalidTime": "Hora inválida"
+    },
+    "types": {
+      "ceremony": "Ceremonia",
+      "reception": "Recepción",
+      "photos": "Fotos",
+      "entertainment": "Entretenimiento",
+      "mealService": "Servicio de Comida",
+      "speeches": "Discursos",
+      "specialMoment": "Momento Especial",
+      "vendorSetup": "Instalación de Proveedores",
+      "vendorBreakdown": "Desmontaje de Proveedores",
+      "setup": "Preparación",
+      "guestActivity": "Actividad de Invitados"
     }
   },
   "multiClient": {

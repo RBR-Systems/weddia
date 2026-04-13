@@ -100,8 +100,27 @@ export async function updateTimelineItem(
   if (item.status) body.status = statusMap[item.status] ?? 1;
   if (item.event_id) body.eventId = Number(item.event_id);
 
-  const updated = await apiPut<ApiTimelineItem>(`/api/eventtimelineitems/${id}?adminId=1`, body);
-  return mapApiItem(updated);
+  const response = await apiPut<ApiTimelineItem>(`/api/eventtimelineitems/${id}?adminId=1`, body);
+
+  // Some APIs return 204/empty on PUT — fall back to the data we sent
+  if (response?.timelineItemId) return mapApiItem(response);
+  return {
+    timeline_item_id: id,
+    event_id: item.event_id ?? "",
+    title: item.title ?? "",
+    type: item.type ?? "",
+    location_name: item.location_name ?? null,
+    location_address: item.location_address ?? null,
+    description: item.description ?? null,
+    notes: item.notes ?? null,
+    guests_description: item.guests_description ?? null,
+    start_time: item.start_time ?? "",
+    end_time: item.end_time ?? "",
+    setup_time: item.setup_time ?? null,
+    status: item.status ?? "pending",
+    created_at: item.created_at ?? new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  };
 }
 
 export async function deleteTimelineItem(id: string): Promise<void> {

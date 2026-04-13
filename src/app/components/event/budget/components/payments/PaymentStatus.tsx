@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import {
   App,
@@ -10,7 +10,7 @@ import {
   Select,
   Modal,
   Form,
-  DatePicker,
+  Input,
   Row,
   Col,
   Typography,
@@ -19,10 +19,10 @@ import {
   CheckCircleOutlined,
   ClockCircleOutlined,
   ExclamationCircleOutlined,
+  LinkOutlined,
 } from "@ant-design/icons";
 import Card from "@/app/common/Card/card";
 import type { ColumnsType } from "antd/es/table";
-import dayjs from "dayjs";
 import { useBudget } from "../../contexts/BudgetContext";
 import { formatCurrency, formatDate } from "@/utils/formatters";
 import { getPaymentStatus } from "../../constants/budget.constants";
@@ -62,20 +62,34 @@ export default function PaymentStatusManager() {
     .filter((e: Expense) => e.payment_status === "overdue")
     .reduce((sum: number, e: Expense) => sum + e.amount, 0);
 
+  // Sync form values when the modal target expense changes
+  useEffect(() => {
+    if (markPaidModal) {
+      form.setFieldsValue({
+        methodOfPayment: markPaidModal.methodOfPayment || undefined,
+        receipt_url:     markPaidModal.receipt_url ?? "",
+      });
+    } else {
+      form.resetFields();
+    }
+  }, [markPaidModal, form]);
+
   const handleMarkPaid = async () => {
     if (!markPaidModal) return;
     try {
       const values = await form.validateFields();
+      const receiptUrl = values.receipt_url?.trim() || null;
       updateExpense?.(markPaidModal.expense_id, {
-        payment_status: "paid",
-        payment_date: values.payment_date?.format("YYYY-MM-DD"),
+        payment_status:  "paid",
         methodOfPayment: values.methodOfPayment || markPaidModal.methodOfPayment || "",
+        receipt_url:     receiptUrl,
+        receipt_urls:    receiptUrl ? [receiptUrl] : markPaidModal.receipt_urls ?? [],
       });
       message.success(t("paymentStatus.paymentMarkedPaid"));
       setMarkPaidModal(null);
-      form.resetFields();
-    } catch {
-      // validation error
+    } catch (err) {
+      const validationErr = err as { errorFields?: unknown };
+      if (!validationErr?.errorFields) throw err;
     }
   };
 
@@ -125,26 +139,21 @@ export default function PaymentStatusManager() {
       title: t("common.status"),
       dataIndex: "payment_status",
       key: "payment_status",
-      render: (status: PaymentStatus, record) => {
-        const config = Object.values(PAYMENT_STATUS).find(
-          (s) => s.value === status,
-        );
-        return (
-          <Select
-            value={status}
-            className={payStyles.statusSelectWidth}
-            onChange={(value) => handleStatusChange(record, value)}
-            options={Object.values(PAYMENT_STATUS).map((s) => ({
-              value: s.value,
-              label: (
-                <Tag color={s.color} className={payStyles.tagNoMargin}>
-                  {s.label}
-                </Tag>
-              ),
-            }))}
-          />
-        );
-      },
+      render: (status: PaymentStatus, record) => (
+        <Select
+          value={status}
+          className={payStyles.statusSelectWidth}
+          onChange={(value) => handleStatusChange(record, value)}
+          options={Object.values(PAYMENT_STATUS).map((s) => ({
+            value: s.value,
+            label: (
+              <Tag color={s.color} className={payStyles.tagNoMargin}>
+                {s.label}
+              </Tag>
+            ),
+          }))}
+        />
+      ),
     },
     {
       title: t("common.actions"),
@@ -259,30 +268,30 @@ export default function PaymentStatusManager() {
                 </Text>
               </div>
             </div>
-            <Form form={form} layout="vertical">
-              <Form.Item
-                name="payment_date"
-                label={t("paymentStatus.paymentDate")}
-                initialValue={dayjs()}
-                rules={[{ required: true }]}
-              >
-                <DatePicker className="u-full-width" />
-              </Form.Item>
+            <Form form={form} layout="vertical" style={{ marginTop: 8 }}>
               <Form.Item
                 name="methodOfPayment"
                 label={t("expenseModal.methodOfPayment")}
-                initialValue={markPaidModal.methodOfPayment || undefined}
                 rules={[{ required: true, message: t("expenseModal.methodOfPaymentRequired") }]}
               >
                 <Select
                   options={[
-                    { value: "Credit Card", label: t("expenseModal.paymentMethods.creditCard") },
+                    { value: "Credit Card",   label: t("expenseModal.paymentMethods.creditCard") },
                     { value: "Bank Transfer", label: t("expenseModal.paymentMethods.bankTransfer") },
-                    { value: "Cash", label: t("expenseModal.paymentMethods.cash") },
-                    { value: "Check", label: t("expenseModal.paymentMethods.check") },
-                    { value: "Other", label: t("expenseModal.paymentMethods.other") },
+                    { value: "Cash",          label: t("expenseModal.paymentMethods.cash") },
+                    { value: "Check",         label: t("expenseModal.paymentMethods.check") },
+                    { value: "Other",         label: t("expenseModal.paymentMethods.other") },
                   ]}
                   placeholder={t("expenseModal.methodOfPaymentPlaceholder")}
+                />
+              </Form.Item>
+              <Form.Item
+                name="receipt_url"
+                label={t("paymentStatus.receiptUrl")}
+              >
+                <Input
+                  prefix={<LinkOutlined style={{ opacity: 0.45 }} />}
+                  placeholder={t("paymentStatus.receiptUrlPlaceholder")}
                 />
               </Form.Item>
             </Form>

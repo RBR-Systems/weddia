@@ -12,6 +12,7 @@ import {
   MenuUnfoldOutlined,
   LogoutOutlined,
   CalendarOutlined,
+  ShopOutlined,
 } from "@ant-design/icons";
 import { useAuth } from "@/app/contexts/AuthContext";
 import { useTranslation } from "react-i18next";
@@ -24,6 +25,7 @@ type View =
   | "table-assignment"
   | "budget"
   | "budget-categories"
+  | "vendor-catalog"
   | "events-list"
   | "multi-client";
 
@@ -56,6 +58,7 @@ export default function Sidebar({
     { key: "table-assignment", icon: <AppstoreOutlined />, label: t("nav.tableAssignment") },
     { key: "budget", icon: <DollarOutlined />, label: t("nav.budget") },
     { key: "budget-categories", icon: <TagsOutlined />, label: t("nav.budgetCategories") },
+    { key: "vendor-catalog", icon: <ShopOutlined />, label: t("nav.vendorCatalog") },
   ];
 
   const initials = user
