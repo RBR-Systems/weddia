@@ -18,6 +18,7 @@ import type { ColumnsType } from "antd/es/table";
 import { useTranslation } from "react-i18next";
 import { CheckInGuest } from "../../models/checkIn.models";
 import styles from "./CheckIn.module.css";
+import getKeyboardActivationProps from "@/shared/utils/keyboardActivation";
 
 export interface CheckInFilters {
   query?: string;
@@ -71,7 +72,10 @@ const CheckInTable: React.FC<CheckInTableProps> = ({
           if (s === "checked_in") return g.checked_in;
           if (s === "not_arrived") return !g.checked_in;
           if (s === "special_needs")
-            return (g.dietary_restrictions?.length ?? 0) > 0 || !!g.accesability_needs;
+            return (
+              (g.dietary_restrictions?.length ?? 0) > 0 ||
+              !!g.accesability_needs
+            );
           return true;
         }),
       );
@@ -91,7 +95,9 @@ const CheckInTable: React.FC<CheckInTableProps> = ({
         const hasDiet = filters.specialsFilter!.some((s) =>
           (g.dietary_restrictions || []).includes(s),
         );
-        const hasAcc = filters.specialsFilter!.some((s) => g.accesability_needs === s);
+        const hasAcc = filters.specialsFilter!.some(
+          (s) => g.accesability_needs === s,
+        );
         return hasDiet || hasAcc;
       });
     }
@@ -110,7 +116,10 @@ const CheckInTable: React.FC<CheckInTableProps> = ({
 
   const formatTime = (iso: string | null) => {
     if (!iso) return "—";
-    return new Date(iso).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    return new Date(iso).toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   };
 
   const columns: ColumnsType<CheckInGuest> = [
@@ -121,9 +130,17 @@ const CheckInTable: React.FC<CheckInTableProps> = ({
       width: 110,
       render: (_: any, r: CheckInGuest) => {
         if (r.checked_in)
-          return <Tag color="success" icon={<CheckCircleOutlined />}>{t("checkIn.status.checkedIn")}</Tag>;
+          return (
+            <Tag color="success" icon={<CheckCircleOutlined />}>
+              {t("checkIn.status.checkedIn")}
+            </Tag>
+          );
         if (r.rsvp_status === "attending")
-          return <Tag color="warning" icon={<ClockCircleOutlined />}>{t("checkIn.status.expected")}</Tag>;
+          return (
+            <Tag color="warning" icon={<ClockCircleOutlined />}>
+              {t("checkIn.status.expected")}
+            </Tag>
+          );
         if (r.rsvp_status === "maybe")
           return <Tag color="blue">{t("checkIn.status.maybe")}</Tag>;
         return <Tag color="default">{t("checkIn.status.pending")}</Tag>;
@@ -143,7 +160,9 @@ const CheckInTable: React.FC<CheckInTableProps> = ({
         if (value === "checked_in") return r.checked_in;
         if (value === "not_arrived") return !r.checked_in;
         if (value === "special_needs")
-          return (r.dietary_restrictions?.length ?? 0) > 0 || !!r.accesability_needs;
+          return (
+            (r.dietary_restrictions?.length ?? 0) > 0 || !!r.accesability_needs
+          );
         return true;
       },
       sorter: (a, b) => Number(a.checked_in) - Number(b.checked_in),
@@ -156,43 +175,87 @@ const CheckInTable: React.FC<CheckInTableProps> = ({
       width: 200,
       ellipsis: true,
       filteredValue: filters.query ? [filters.query] : null,
-      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+      filterDropdown: ({
+        setSelectedKeys,
+        selectedKeys,
+        confirm,
+        clearFilters,
+      }) => (
         <div style={{ padding: 8 }}>
           <Input
             placeholder={t("checkIn.search.placeholder")}
             value={selectedKeys[0] as string}
-            onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+            onChange={(e) =>
+              setSelectedKeys(e.target.value ? [e.target.value] : [])
+            }
             onPressEnter={() => confirm()}
             style={{ width: 200, marginBottom: 8, display: "block" }}
             autoFocus
           />
           <Space>
-            <Button type="primary" size="small" onClick={() => { confirm(); onFiltersChange({ query: String(selectedKeys[0] ?? "") }); }}>
+            <Button
+              type="primary"
+              size="small"
+              onClick={() => {
+                confirm();
+                onFiltersChange({ query: String(selectedKeys[0] ?? "") });
+              }}
+            >
               {t("guestList.search", "Search")}
             </Button>
-            <Button size="small" onClick={() => { clearFilters?.(); confirm(); onFiltersChange({ query: undefined }); }}>
+            <Button
+              size="small"
+              onClick={() => {
+                clearFilters?.();
+                confirm();
+                onFiltersChange({ query: undefined });
+              }}
+            >
               {t("guestList.reset", "Reset")}
             </Button>
           </Space>
         </div>
       ),
-      filterIcon: (filtered) => <SearchOutlined style={{ color: filtered ? "var(--primary)" : undefined }} />,
+      filterIcon: (filtered) => (
+        <SearchOutlined
+          style={{ color: filtered ? "var(--primary)" : undefined }}
+        />
+      ),
       onFilter: (value, r: CheckInGuest) =>
-        `${r.first_name} ${r.last_name}`.toLowerCase().includes(String(value).toLowerCase()),
+        `${r.first_name} ${r.last_name}`
+          .toLowerCase()
+          .includes(String(value).toLowerCase()),
       render: (_: any, r: CheckInGuest) => (
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <Avatar
             size={28}
-            style={{ background: "var(--primary)", color: "#fff", fontSize: 11, fontWeight: 600, flexShrink: 0 }}
+            style={{
+              background: "var(--primary)",
+              color: "#fff",
+              fontSize: 11,
+              fontWeight: 600,
+              flexShrink: 0,
+            }}
           >
-            {r.first_name?.[0]}{r.last_name?.[0]}
+            {r.first_name?.[0]}
+            {r.last_name?.[0]}
           </Avatar>
           <div style={{ minWidth: 0 }}>
-            <div style={{ fontWeight: 600, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", lineHeight: 1.3 }}>
+            <div
+              style={{
+                fontWeight: 600,
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                lineHeight: 1.3,
+              }}
+            >
               {r.first_name} {r.last_name}
               {r.is_vip && (
                 <Tooltip title={t("checkIn.badges.vip")}>
-                  <StarFilled style={{ color: "#f5a623", marginLeft: 4, fontSize: 11 }} />
+                  <StarFilled
+                    style={{ color: "#f5a623", marginLeft: 4, fontSize: 11 }}
+                  />
                 </Tooltip>
               )}
             </div>
@@ -200,7 +263,9 @@ const CheckInTable: React.FC<CheckInTableProps> = ({
         </div>
       ),
       sorter: (a, b) =>
-        `${a.last_name} ${a.first_name}`.localeCompare(`${b.last_name} ${b.first_name}`),
+        `${a.last_name} ${a.first_name}`.localeCompare(
+          `${b.last_name} ${b.first_name}`,
+        ),
     },
 
     // ── Group ───────────────────────────────────────────────────────────
@@ -210,14 +275,20 @@ const CheckInTable: React.FC<CheckInTableProps> = ({
       width: 130,
       ellipsis: true,
       render: (_: any, r: CheckInGuest) =>
-        r.relation_name
-          ? <Tag color="gold" style={{ margin: 0 }}>{r.relation_name}</Tag>
-          : <span style={{ color: "var(--text-color-muted)" }}>—</span>,
+        r.relation_name ? (
+          <Tag color="gold" style={{ margin: 0 }}>
+            {r.relation_name}
+          </Tag>
+        ) : (
+          <span style={{ color: "var(--text-color-muted)" }}>—</span>
+        ),
       filters: relations.map((r) => ({ text: r.name, value: r.relation_id })),
       filteredValue: filters.relationFilter
         ? Array.isArray(filters.relationFilter)
           ? filters.relationFilter
-          : filters.relationFilter === "all" ? null : [filters.relationFilter]
+          : filters.relationFilter === "all"
+            ? null
+            : [filters.relationFilter]
         : null,
       onFilter: (value, r) => r.relation_id === value,
     },
@@ -229,7 +300,10 @@ const CheckInTable: React.FC<CheckInTableProps> = ({
       width: 70,
       align: "center" as const,
       render: (_: any, r: CheckInGuest) => {
-        const size = r.checked_in && r.actual_party_size !== null ? r.actual_party_size : r.party_size;
+        const size =
+          r.checked_in && r.actual_party_size !== null
+            ? r.actual_party_size
+            : r.party_size;
         return (
           <Badge
             count={size}
@@ -251,6 +325,9 @@ const CheckInTable: React.FC<CheckInTableProps> = ({
       render: (_: any, r: CheckInGuest) => {
         if (!r.table_id)
           return <span style={{ color: "var(--text-color-muted)" }}>—</span>;
+        const kb = getKeyboardActivationProps(
+          onNavigateToTable && r.table_id ? () => onNavigateToTable(r.table_id!) : undefined,
+        );
         return (
           <div
             style={{
@@ -267,6 +344,7 @@ const CheckInTable: React.FC<CheckInTableProps> = ({
                 onNavigateToTable(r.table_id);
               }
             }}
+            {...kb}
           >
             <EnvironmentOutlined style={{ fontSize: 12 }} />
             <span>{r.table_id}</span>
@@ -287,7 +365,9 @@ const CheckInTable: React.FC<CheckInTableProps> = ({
       key: "alerts",
       width: 110,
       filters: specialValues.map((s) => ({ text: s, value: s })),
-      filteredValue: filters.specialsFilter?.length ? filters.specialsFilter : null,
+      filteredValue: filters.specialsFilter?.length
+        ? filters.specialsFilter
+        : null,
       onFilter: (value, r: CheckInGuest) =>
         (r.dietary_restrictions || []).includes(String(value)) ||
         r.accesability_needs === String(value),
@@ -296,27 +376,37 @@ const CheckInTable: React.FC<CheckInTableProps> = ({
         if ((r.dietary_restrictions?.length ?? 0) > 0) {
           icons.push(
             <Tooltip key="diet" title={r.dietary_restrictions!.join(", ")}>
-              <Tag color="blue" icon={<MedicineBoxOutlined />} style={{ margin: 0, cursor: "default" }} />
+              <Tag
+                color="blue"
+                icon={<MedicineBoxOutlined />}
+                style={{ margin: 0, cursor: "default" }}
+              />
             </Tooltip>,
           );
         }
         if (r.accesability_needs) {
           icons.push(
             <Tooltip key="acc" title={r.accesability_needs}>
-              <Tag color="purple" icon={<AlertOutlined />} style={{ margin: 0, cursor: "default" }} />
+              <Tag
+                color="purple"
+                icon={<AlertOutlined />}
+                style={{ margin: 0, cursor: "default" }}
+              />
             </Tooltip>,
           );
         }
         if (r.notes) {
           icons.push(
             <Tooltip key="notes" title={r.notes}>
-              <Tag color="gold" icon={<FileTextOutlined />} style={{ margin: 0, cursor: "default" }} />
+              <Tag
+                color="gold"
+                icon={<FileTextOutlined />}
+                style={{ margin: 0, cursor: "default" }}
+              />
             </Tooltip>,
           );
         }
-        return icons.length > 0
-          ? <Space size={4}>{icons}</Space>
-          : null;
+        return icons.length > 0 ? <Space size={4}>{icons}</Space> : null;
       },
     },
 
@@ -327,7 +417,15 @@ const CheckInTable: React.FC<CheckInTableProps> = ({
       width: 90,
       align: "center" as const,
       render: (_: any, r: CheckInGuest) => (
-        <span style={{ fontSize: 12, fontVariantNumeric: "tabular-nums", color: r.checked_in_at ? "var(--text-color)" : "var(--text-color-muted)" }}>
+        <span
+          style={{
+            fontSize: 12,
+            fontVariantNumeric: "tabular-nums",
+            color: r.checked_in_at
+              ? "var(--text-color)"
+              : "var(--text-color-muted)",
+          }}
+        >
           {formatTime(r.checked_in_at)}
         </span>
       ),
@@ -335,7 +433,10 @@ const CheckInTable: React.FC<CheckInTableProps> = ({
         if (!a.checked_in_at && !b.checked_in_at) return 0;
         if (!a.checked_in_at) return 1;
         if (!b.checked_in_at) return -1;
-        return new Date(a.checked_in_at).getTime() - new Date(b.checked_in_at).getTime();
+        return (
+          new Date(a.checked_in_at).getTime() -
+          new Date(b.checked_in_at).getTime()
+        );
       },
     },
 
@@ -348,11 +449,20 @@ const CheckInTable: React.FC<CheckInTableProps> = ({
       render: (_: any, r: CheckInGuest) =>
         r.checked_in ? (
           <Tooltip title={t("checkIn.actions.undoCheckIn")}>
-            <Button size="small" icon={<UndoOutlined />} onClick={() => onUndoCheckIn(r)} />
+            <Button
+              size="small"
+              icon={<UndoOutlined />}
+              onClick={() => onUndoCheckIn(r)}
+            />
           </Tooltip>
         ) : (
           <Tooltip title={t("checkIn.actions.checkIn")}>
-            <Button type="primary" size="small" icon={<LoginOutlined />} onClick={() => onCheckIn(r)} />
+            <Button
+              type="primary"
+              size="small"
+              icon={<LoginOutlined />}
+              onClick={() => onCheckIn(r)}
+            />
           </Tooltip>
         ),
     },
@@ -365,7 +475,8 @@ const CheckInTable: React.FC<CheckInTableProps> = ({
       return undefined;
     };
     onFiltersChange({
-      statusFilter: extract(tableFilters.status ?? tableFilters.checked_in) ?? "all",
+      statusFilter:
+        extract(tableFilters.status ?? tableFilters.checked_in) ?? "all",
       relationFilter: extract(tableFilters.relation) ?? null,
       query: (() => {
         const v = extract(tableFilters.name);

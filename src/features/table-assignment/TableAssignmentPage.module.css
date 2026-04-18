@@ -148,7 +148,6 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--spacing-sm);
-  align-items: center;
 }
 
 .occupancyBadge {

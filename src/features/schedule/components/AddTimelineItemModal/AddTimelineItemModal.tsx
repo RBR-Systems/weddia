@@ -72,10 +72,11 @@ function TypeChipGroup({
   );
 }
 
+import { getRandomId } from '@/shared/utils/rng';
+
 function createId() {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return (globalThis as any).crypto?.randomUUID?.() ?? `id-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+    return getRandomId('id-');
   } catch {
     return `id-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
   }

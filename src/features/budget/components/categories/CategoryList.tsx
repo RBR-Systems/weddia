@@ -1,4 +1,5 @@
 ﻿"use client";
+import { formatInputNumber, parseInputNumber } from "@/utils/formatters.utils";
 import React, { useState, useEffect, useMemo } from "react";
 import {
   App,
@@ -233,8 +234,8 @@ export default function CategoryList() {
               style={{ width: "100%" }}
               min={0}
               prefix="$"
-              formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-              parser={(value) => Number(value?.replace(/\$\s?|(,*)/g, "") || 0) as unknown as 0}
+              formatter={(value) => formatInputNumber(value)}
+              parser={(value) => parseInputNumber(value) as unknown as 0}
             />
           </Form.Item>
         </Form>

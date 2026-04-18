@@ -14,12 +14,11 @@ function getLocalDay(value: string | Date) {
   return dayjs(value).startOf("day");
 }
 
-function createTaskId(prefix: string): string {
-  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
-    return `${prefix}-${crypto.randomUUID()}`;
-  }
+import { getRandomId } from '@/shared/utils/rng';
 
-  return `${prefix}-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+function createTaskId(prefix: string): string {
+  // Use a secure id generator when available; keep prefix semantics by passing it through.
+  return getRandomId(`${prefix}-`);
 }
 
 function isOverdue(task: Task): boolean {

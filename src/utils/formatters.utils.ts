@@ -30,6 +30,32 @@ export function formatNumber(value: number) {
 
 // Simple phone formatter that supports a few common countries.
 // `phone` may contain spaces, dashes or parentheses. `country` is an ISO 3166-1 alpha-2 code or country calling code.
+/**
+ * Safe thousands-separator formatter for Ant Design InputNumber.
+ * Replaces the ReDoS-vulnerable /\B(?=(\d{3})+(?!\d))/g pattern.
+ */
+export function formatInputNumber(v: string | number | undefined): string {
+  const str = String(v ?? "");
+  const [intRaw, decPart] = str.split(".");
+  const negative = intRaw.startsWith("-");
+  const absDigits = intRaw.replace(/[-,]/g, "");
+  let grouped = "";
+  for (let i = 0; i < absDigits.length; i++) {
+    if (i > 0 && (absDigits.length - i) % 3 === 0) grouped += ",";
+    grouped += absDigits[i];
+  }
+  const intFormatted = (negative ? "-" : "") + grouped;
+  return decPart !== undefined ? `${intFormatted}.${decPart}` : intFormatted;
+}
+
+/**
+ * Safe parser for Ant Design InputNumber — strips $, spaces, and commas.
+ * Replaces the vulnerable /\$\s?|(,*)/g pattern.
+ */
+export function parseInputNumber(v: string | undefined): number {
+  return Number(String(v ?? "").replace(/[$\s,]/g, "") || 0);
+}
+
 export function formatPhone(
   phone: string | number | undefined,
   country: string = "US",
@@ -73,8 +99,11 @@ export function formatPhone(
   const fmtFR = (digits: string) => {
     if (digits.startsWith("33")) digits = digits.slice(2);
     if (digits.startsWith("0")) digits = digits.slice(1);
-    // group as X XX XX XX XX
-    return `+33 ${digits.replace(/(\d)(?=(\d{2})+(?!\d))/g, "$1 ")}`.trim();
+    // group as X XX XX XX XX — no regex needed, slice-based grouping is linear
+    const first = digits.slice(0, 1);
+    const chunks: string[] = [];
+    for (let i = 1; i < digits.length; i += 2) chunks.push(digits.slice(i, i + 2));
+    return `+33 ${[first, ...chunks].join(" ")}`.trim();
   };
 
   const fmtDE = (digits: string) => {

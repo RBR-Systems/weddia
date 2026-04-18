@@ -15,6 +15,7 @@ import type { Task, TaskFormValues, TaskCategory } from "../models/task.models";
 import { TEAM_MEMBERS } from "../api/taskApi";
 import { useTranslation } from "react-i18next";
 import dayjs from "dayjs";
+import { formatInputNumber } from "@/utils/formatters.utils";
 
 const { TextArea } = Input;
 
@@ -210,7 +211,7 @@ const TaskFormModal: React.FC<TaskFormModalProps> = ({
               min={0}
               prefix="$"
               style={{ width: "100%" }}
-              formatter={(v) => `${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+              formatter={(v) => formatInputNumber(v)}
             />
           </Form.Item>
 
@@ -219,7 +220,7 @@ const TaskFormModal: React.FC<TaskFormModalProps> = ({
               min={0}
               prefix="$"
               style={{ width: "100%" }}
-              formatter={(v) => `${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+              formatter={(v) => formatInputNumber(v)}
             />
           </Form.Item>
         </Space>

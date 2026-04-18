@@ -25,7 +25,7 @@ import {
 import type { Category, BudgetItem } from "../../models/budget.models";
 import { BudgetService } from "../../api/budgetApi";
 import { ApiError } from "@/shared/api/apiClient";
-import { formatCurrency } from "@/utils/formatters.utils";
+import { formatCurrency, formatInputNumber, parseInputNumber } from "@/utils/formatters.utils";
 import { useTranslation } from "react-i18next";
 import styles from "./CategoryDrawer.module.css";
 
@@ -230,8 +230,8 @@ export default function CategoryDrawer({
             onChange={(v) => setEditValues((p) => ({ ...p, amount: v }))}
             min={0}
             prefix="$"
-            formatter={(v) => `${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-            parser={(v) => Number(v?.replace(/\$\s?|(,*)/g, "") || 0) as unknown as 0}
+            formatter={(v) => formatInputNumber(v)}
+            parser={(v) => parseInputNumber(v) as unknown as 0}
             status={editValues.amount === null ? "error" : undefined}
           />
         ) : (
@@ -355,8 +355,8 @@ export default function CategoryDrawer({
             style={{ width: "100%" }}
             min={0}
             prefix="$"
-            formatter={(v) => `${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-            parser={(v) => Number(v?.replace(/\$\s?|(,*)/g, "") || 0) as unknown as 0}
+            formatter={(v) => formatInputNumber(v)}
+            parser={(v) => parseInputNumber(v) as unknown as 0}
           />
         </Form.Item>
       </Form>
@@ -411,8 +411,8 @@ export default function CategoryDrawer({
                     min={0}
                     prefix="$"
                     style={{ width: "100%" }}
-                    formatter={(v) => `${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-                    parser={(v) => Number(v?.replace(/\$\s?|(,*)/g, "") || 0) as unknown as 0}
+                    formatter={(v) => formatInputNumber(v)}
+                    parser={(v) => parseInputNumber(v) as unknown as 0}
                   />
                 </Form.Item>
                 <Form.Item name="notes" style={{ flex: 1, minWidth: 80, marginBottom: 0 }}>

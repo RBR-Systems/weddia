@@ -8,7 +8,10 @@ import styles from "./SidePanel.module.css";
 import { UserOutlined, TeamOutlined, WarningOutlined } from "@ant-design/icons";
 import { LeftOutlined, RightOutlined } from "@ant-design/icons";
 import { useTableAssignmentContext } from "../../context/TableAssignmentContext";
-import type { Guest, TableAssignment } from "../../models/tableAssignment.models";
+import type {
+  Guest,
+  TableAssignment,
+} from "../../models/tableAssignment.models";
 import { Progress } from "antd";
 import { useTranslation } from "react-i18next";
 
@@ -134,7 +137,9 @@ const SidePanel = (props: Props) => {
             />
             <Select
               value={relationFilter ?? "__all__"}
-              onChange={(v) => setRelationFilter(v === "__all__" ? undefined : v)}
+              onChange={(v) =>
+                setRelationFilter(v === "__all__" ? undefined : v)
+              }
               options={[
                 { value: "__all__", label: t("tableAssignment.sidePanel.all") },
                 ...relationOptions,
@@ -151,18 +156,28 @@ const SidePanel = (props: Props) => {
               block
               options={[
                 { label: t("tableAssignment.sidePanel.all"), value: "all" },
-                { label: t("tableAssignment.sidePanel.assigned"), value: "assigned" },
-                { label: t("tableAssignment.sidePanel.unassignedTab"), value: "unassigned" },
+                {
+                  label: t("tableAssignment.sidePanel.assigned"),
+                  value: "assigned",
+                },
+                {
+                  label: t("tableAssignment.sidePanel.unassignedTab"),
+                  value: "unassigned",
+                },
               ]}
             />
             <div className={styles.filterFooter}>
               <span className={styles.guestCount}>
-                {totalGuests} {t("tableAssignment.sidePanel.guestsTab").toLowerCase()}
+                {totalGuests}{" "}
+                {t("tableAssignment.sidePanel.guestsTab").toLowerCase()}
                 {unassignedCount > 0 && (
                   <>
                     {" · "}
                     <span className={styles.unassignedBadge}>
-                      {unassignedCount} {t("tableAssignment.sidePanel.unassignedTab").toLowerCase()}
+                      {unassignedCount}{" "}
+                      {t(
+                        "tableAssignment.sidePanel.unassignedTab",
+                      ).toLowerCase()}
                     </span>
                   </>
                 )}
@@ -189,7 +204,9 @@ const SidePanel = (props: Props) => {
             {filteredGuests.length === 0 ? (
               <Empty
                 image={Empty.PRESENTED_IMAGE_SIMPLE}
-                description={t("tableAssignment.sidePanel.noGuests") ?? "Sin invitados"}
+                description={
+                  t("tableAssignment.sidePanel.noGuests") ?? "Sin invitados"
+                }
                 style={{ margin: "auto" }}
               />
             ) : (
@@ -224,24 +241,46 @@ const SidePanel = (props: Props) => {
                       const g = guestsById?.get(a.guest_id);
                       return sum + (g?.party_size ?? 1);
                     }, 0);
-                    const pct = capacity > 0 ? Math.round((seated / capacity) * 100) : 0;
+                    const pct =
+                      capacity > 0 ? Math.round((seated / capacity) * 100) : 0;
                     const isFull = seated >= capacity && capacity > 0;
                     const shapeIcon =
-                      tbl?.shape === "rectangular" ? "▬"
-                      : tbl?.shape === "square" ? "■"
-                      : "●";
+                      tbl?.shape === "rectangular"
+                        ? "▬"
+                        : tbl?.shape === "square"
+                          ? "■"
+                          : "●";
 
                     return (
                       <div
                         key={tableId}
                         className={styles.tableListItem}
                         onClick={() => handleSelectTable(tableId)}
+                        role={onSelectTable ? "button" : undefined}
+                        tabIndex={onSelectTable ? 0 : undefined}
+                        onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
+                          const key = e.key;
+                          if (
+                            (key === "Enter" ||
+                              key === " " ||
+                              key === "Spacebar") &&
+                            onSelectTable
+                          ) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleSelectTable(tableId);
+                          }
+                        }}
                       >
                         <div className={styles.tableListRow}>
-                          <span className={styles.tableShapeIcon}>{shapeIcon}</span>
+                          <span className={styles.tableShapeIcon}>
+                            {shapeIcon}
+                          </span>
                           <div className={styles.tableListInfo}>
                             <div className={styles.tableListHeader}>
-                              <span className={styles.tableTitle}>{tableId}</span>
+                              <span className={styles.tableTitle}>
+                                {tableId}
+                              </span>
                               <span
                                 className={styles.tableSeats}
                                 style={{
@@ -261,8 +300,8 @@ const SidePanel = (props: Props) => {
                                 isFull
                                   ? "var(--status-canceled)"
                                   : pct > 75
-                                  ? "var(--status-delayed)"
-                                  : "var(--primary)"
+                                    ? "var(--status-delayed)"
+                                    : "var(--primary)"
                               }
                               style={{ margin: 0 }}
                             />
@@ -286,7 +325,9 @@ const SidePanel = (props: Props) => {
                 >
                   {t("tableAssignment.sidePanel.tableTab")}
                 </Button>
-                <div className={styles.tableTitle}>{selectedTable.table_id}</div>
+                <div className={styles.tableTitle}>
+                  {selectedTable.table_id}
+                </div>
                 <div className={styles.tableSubtitle}>
                   {t("tableAssignment.sidePanel.capacityAndSeated", {
                     capacity: selectedTable.total_number,
@@ -299,7 +340,9 @@ const SidePanel = (props: Props) => {
                 {selectedTableAssignments.length === 0 ? (
                   <Empty
                     image={Empty.PRESENTED_IMAGE_SIMPLE}
-                    description={t("tableAssignment.sidePanel.noGuestsAssigned")}
+                    description={t(
+                      "tableAssignment.sidePanel.noGuestsAssigned",
+                    )}
                     style={{ margin: "auto" }}
                   />
                 ) : (
@@ -312,7 +355,10 @@ const SidePanel = (props: Props) => {
                     const maxSeat = selectedTable.total_number - partySize + 1;
 
                     return (
-                      <div key={a.guest_id} className={styles.tableDetailGuestRow}>
+                      <div
+                        key={a.guest_id}
+                        className={styles.tableDetailGuestRow}
+                      >
                         <DraggableGuestRow
                           guest={g}
                           relationName={relation?.name}

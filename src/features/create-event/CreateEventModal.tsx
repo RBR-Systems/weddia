@@ -13,6 +13,7 @@ import {
   Select,
   message,
 } from "antd";
+import { formatInputNumber, parseInputNumber } from "@/utils/formatters.utils";
 import { useState } from "react";
 import dayjs from "dayjs";
 import TextArea from "antd/es/input/TextArea";
@@ -40,9 +41,7 @@ const CreateEventModal = () => {
 
   const formatter: InputNumberProps<number>["formatter"] = (value) => {
     if (!value) return "";
-    const [start, end] = `${value}`.split(".");
-    const v = `${start}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    return `$ ${end ? `${v}.${end}` : v}`;
+    return `$ ${formatInputNumber(value)}`;
   };
 
   const onRequiredTypeChange = (_: unknown, values: { requiredMarkValue?: RequiredMark }) => {
@@ -210,7 +209,7 @@ const CreateEventModal = () => {
                   formatter={formatter}
                   prefix={<DollarOutlined className={styles.iconSecondary} />}
                   parser={(value) =>
-                    value?.replace(/\$\s?|(,*)/g, "") as unknown as number
+                    parseInputNumber(value) as unknown as number
                   }
                   className={styles.budgetInput}
                 />

@@ -21,6 +21,7 @@ import { BudgetService } from "../api/budgetApi";
 import { ApiError, isAbortError } from "@/shared/api/apiClient";
 import { useEvent } from "@/shared/contexts/EventContext";
 import { EventActions } from "@/shared/contexts/eventActions";
+import { getRandomId } from '@/shared/utils/rng';
 
 type Action =
   | { type: "SET_LOADING"; payload: boolean }
@@ -39,7 +40,7 @@ type Action =
   | { type: "SET_EVENT_VENDOR_IDS"; payload: string[] };
 
 function generateId() {
-  return `id_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 9)}`;
+  return getRandomId('id_');
 }
 
 const initialState: BudgetState = {

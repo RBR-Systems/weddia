@@ -135,7 +135,10 @@ export const ScheduleItem: React.FC<Props> = ({
 
       {/* Setup time */}
       {item.setup_time && (
-        <div className={styles.setupTimeBlock} onClick={(e) => e.stopPropagation()}>
+        <div
+            className={styles.setupTimeBlock}
+            onClick={(e) => e.stopPropagation()}
+          >
           <ToolOutlined className={styles.setupIcon} />
           <span className={styles.setupTimeLabel}>{formatTime(item.setup_time)}</span>
           <span className={styles.setupLabel}>Setup · {calculateSetupDuration(item)}</span>
@@ -178,7 +181,10 @@ export const ScheduleItem: React.FC<Props> = ({
         </div>
 
         {/* Status */}
-        <div className={styles.statusCol} onClick={(e) => e.stopPropagation()}>
+        <div
+            className={styles.statusCol}
+            onClick={(e) => e.stopPropagation()}
+          >
           <Badge
             status={badgeStatus[displayStatus] ?? "default"}
             text={<span className={styles.statusLabel}>{statusInfo?.label ?? displayStatus}</span>}
@@ -186,7 +192,10 @@ export const ScheduleItem: React.FC<Props> = ({
         </div>
 
         {/* Status cycle + actions */}
-        <div className={styles.actionsCol} onClick={(e) => e.stopPropagation()}>
+        <div
+            className={styles.actionsCol}
+            onClick={(e) => e.stopPropagation()}
+          >
           <div className={styles.statusButtons}>
             <Tooltip title="Previous status">
               <Button type="text" size="small" icon={<UpOutlined />} onClick={handleStatusUp} className={styles.smallIconBtn} />

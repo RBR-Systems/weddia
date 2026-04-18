@@ -8,6 +8,7 @@ import {
   EllipsisOutlined, CheckCircleOutlined, ClockCircleOutlined,
   ExclamationCircleOutlined, SyncOutlined,
 } from "@ant-design/icons";
+import { formatInputNumber, parseInputNumber } from "@/utils/formatters.utils";
 import type { Expense } from "../models/budget.models";
 import { useBudget } from "../contexts/BudgetContext";
 import dayjs from "dayjs";
@@ -143,9 +144,9 @@ export default function ExpenseModal({ visible, onClose, editingExpense }: Props
               controls={false}
               min={0}
               placeholder="0.00"
-              formatter={(v) => `${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+              formatter={(v) => formatInputNumber(v)}
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              parser={(v) => Number(v?.replace(/,/g, "") ?? 0) as any}
+              parser={(v) => parseInputNumber(v) as any}
             />
           </Form.Item>
         </div>

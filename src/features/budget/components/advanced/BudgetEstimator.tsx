@@ -19,7 +19,7 @@ import {
 } from "antd";
 import { BulbOutlined, CalculatorOutlined } from "@ant-design/icons";
 import { useBudget } from "../../contexts/BudgetContext";
-import { formatCurrency } from "@/utils/formatters.utils";
+import { formatCurrency, formatInputNumber, parseInputNumber } from "@/utils/formatters.utils";
 import Statistic from "@/shared/components/AnimatedStatistic/AnimatedStatistic";
 import CategoryTag from "../shared/CategoryTag";
 import {
@@ -267,10 +267,10 @@ export default function BudgetEstimator() {
                 onChange={(v) => setCustomBudget(v)}
                 placeholder={t("budgetEstimator.enterCustomAmount")}
                 formatter={(value) =>
-                  `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  `$ ${formatInputNumber(value)}`
                 }
                 parser={(value) =>
-                  Number(value?.replace(/\$\s?|(,*)/g, "") || 0)
+                  parseInputNumber(value)
                 }
               />
               {customBudget && (

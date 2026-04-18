@@ -18,7 +18,7 @@ import Statistic from "@/shared/components/AnimatedStatistic/AnimatedStatistic";
 import { useTranslation } from "react-i18next";
 import { EditOutlined } from "@ant-design/icons";
 import { useBudget } from "../../contexts/BudgetContext";
-import { formatCurrency } from "@/utils/formatters.utils";
+import { formatCurrency, formatInputNumber, parseInputNumber } from "@/utils/formatters.utils";
 import type { Category } from "../../models/budget.models";
 import styles from "./BudgetAllocation.module.css";
 
@@ -97,9 +97,9 @@ export default function BudgetAllocation() {
                   onPressEnter={handleSaveBudget}
                   onBlur={handleSaveBudget}
                   formatter={(value) =>
-                    `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                    `$ ${formatInputNumber(value)}`
                   }
-                  parser={(value) => Number(value?.replace(/\$\s?|(,*)/g, "") || 0)}
+                  parser={(value) => Number(parseInputNumber(value))}
                   style={{ width: "100%" }}
                   size="large"
                 />
@@ -225,10 +225,10 @@ export default function BudgetAllocation() {
                     value={allocated}
                     onChange={(value) => handleInputChange(category.id, value)}
                     formatter={(value) =>
-                      `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                      `$ ${formatInputNumber(value)}`
                     }
                     parser={(value) =>
-                      Number(value?.replace(/\$\s?|(,*)/g, "") || 0)
+                      Number(parseInputNumber(value))
                     }
                     className="u-full-width"
                   />

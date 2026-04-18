@@ -4,6 +4,7 @@ import React, { useMemo, useState } from "react";
 import dayjs from "dayjs";
 import styles from "./event-list.module.css";
 import Header from "@/shared/components/Header/Header";
+import { formatInputNumber, parseInputNumber } from "@/utils/formatters.utils";
 import { EventStatus } from "./models/enums/eventList.models";
 import { EventCardProps } from "./models/eventCardProps.models";
 import { useEvent } from "@/shared/contexts/EventContext";
@@ -366,8 +367,8 @@ const EventList = () => {
             <InputNumber
               style={{ width: "100%" }}
               prefix={<DollarOutlined />}
-              formatter={(v) => `${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-              parser={(v) => Number(v?.replace(/,/g, "") ?? 0) as 0}
+              formatter={(v) => formatInputNumber(v)}
+              parser={(v) => parseInputNumber(v) as 0}
               min={0}
               placeholder="0"
             />

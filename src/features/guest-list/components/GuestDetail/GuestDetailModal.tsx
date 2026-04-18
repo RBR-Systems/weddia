@@ -70,8 +70,18 @@ export default function GuestDetailModal({
           </span>
           {guest.plus_one && (
             <a
+              role="button"
+              tabIndex={0}
+              href="#"
               style={{ marginLeft: 12 }}
-              onClick={() => console.log("plus-one clicked", guest.plus_one)}
+              onClick={(e) => {
+                e.preventDefault();
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                }
+              }}
             >
               {t("guestList.plusOne", "+1")}: {guest.plus_one}
             </a>

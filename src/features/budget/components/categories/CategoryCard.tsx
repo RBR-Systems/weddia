@@ -41,7 +41,7 @@ export default function CategoryCard({
       : "";
 
   return (
-    <div className={styles.card} onClick={() => onClick?.(category)}>
+    <button type="button" className={styles.card} onClick={() => onClick?.(category)}>
       {/* Color accent strip */}
       <div className={styles.accent} style={{ background: accent }} />
 
@@ -101,6 +101,6 @@ export default function CategoryCard({
           </div>
         </div>
       </div>
-    </div>
+    </button>
   );
 }

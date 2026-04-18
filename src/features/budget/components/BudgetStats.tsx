@@ -2,15 +2,24 @@
 import React, { useState } from "react";
 import { Row, Col, Tooltip, InputNumber } from "antd";
 import {
-  EditOutlined, CheckOutlined, CloseOutlined,
-  WalletOutlined, PieChartOutlined, ArrowDownOutlined,
-  SafetyOutlined, PercentageOutlined, FileTextOutlined,
-  BarChartOutlined, TrophyOutlined,
+  EditOutlined,
+  CheckOutlined,
+  CloseOutlined,
+  WalletOutlined,
+  PieChartOutlined,
+  ArrowDownOutlined,
+  SafetyOutlined,
+  PercentageOutlined,
+  FileTextOutlined,
+  BarChartOutlined,
+  TrophyOutlined,
 } from "@ant-design/icons";
 import AnimatedStatistic from "@/shared/components/AnimatedStatistic/AnimatedStatistic";
 import { useBudget } from "../contexts/BudgetContext";
-import { formatCurrency } from "@/utils/formatters.utils";
+import { formatCurrency, formatInputNumber, parseInputNumber } from "@/utils/formatters.utils";
 import { useTranslation } from "react-i18next";
+import getKeyboardActivationProps from "@/shared/utils/keyboardActivation";
+import type { Category } from "../models/budget.models";
 import styles from "./BudgetStats.module.css";
 
 // ── Sub-components (defined at module level — no inline components) ───────────
@@ -28,14 +37,24 @@ interface StatCardProps {
 }
 
 function StatCard({
-  icon, label, content, accentColor,
-  subLabel, progress, progressColor, onClick, showEditHint,
+  icon,
+  label,
+  content,
+  accentColor,
+  subLabel,
+  progress,
+  progressColor,
+  onClick,
+  showEditHint,
 }: StatCardProps) {
+  const kb = getKeyboardActivationProps(onClick);
+
   return (
     <div
       className={`${styles.primaryCard} ${onClick ? styles.clickable : ""}`}
       style={{ "--accent": accentColor } as React.CSSProperties}
       onClick={onClick}
+      {...kb}
     >
       <div className={styles.accentBar} />
       <div className={styles.cardInner}>
@@ -69,7 +88,12 @@ interface SecondaryCardProps {
   accentColor: string;
 }
 
-function SecondaryCard({ icon, label, value, accentColor }: SecondaryCardProps) {
+function SecondaryCard({
+  icon,
+  label,
+  value,
+  accentColor,
+}: SecondaryCardProps) {
   return (
     <div
       className={styles.secondaryCard}
@@ -94,29 +118,51 @@ export default function BudgetStats() {
 
   const { summary, expenses, categories, currency } = state;
 
-  const totalAllocated = categories.reduce((sum: number, c: any) => sum + (c.allocated ?? 0), 0);
+  const totalAllocated = categories.reduce(
+    (sum: number, c: Category) => sum + (c.allocated ?? 0),
+    0,
+  );
   const expenseCount = expenses?.length ?? 0;
   const avgExpense = expenseCount > 0 ? summary.total_spent / expenseCount : 0;
-  const topCategory = categories?.length > 0
-    ? categories.reduce((a: any, b: any) => (b.spent ?? 0) > (a.spent ?? 0) ? b : a)
-    : null;
+  const topCategory =
+    categories?.length > 0
+      ? categories.reduce((a: Category, b: Category) =>
+          (b.spent ?? 0) > (a.spent ?? 0) ? b : a,
+        )
+      : null;
 
-  const allocatedPct = summary.total_budget > 0 ? (totalAllocated / summary.total_budget) * 100 : 0;
-  const spentPct = summary.total_budget > 0 ? (summary.total_spent / summary.total_budget) * 100 : 0;
+  const allocatedPct =
+    summary.total_budget > 0
+      ? (totalAllocated / summary.total_budget) * 100
+      : 0;
+  const spentPct =
+    summary.total_budget > 0
+      ? (summary.total_spent / summary.total_budget) * 100
+      : 0;
 
   const remainingColor =
-    summary.total_remaining < 0 ? "var(--budget-danger)" :
-    summary.total_remaining < summary.total_budget * 0.2 ? "var(--budget-warning)" :
-    "var(--budget-success)";
+    summary.total_remaining < 0
+      ? "var(--budget-danger)"
+      : summary.total_remaining < summary.total_budget * 0.2
+        ? "var(--budget-warning)"
+        : "var(--budget-success)";
 
   const spentProgressColor =
-    spentPct >= 100 ? "var(--budget-danger)" :
-    spentPct >= 80  ? "var(--budget-warning)" :
-    "var(--status-delayed)";
+    spentPct >= 100
+      ? "var(--budget-danger)"
+      : spentPct >= 80
+        ? "var(--budget-warning)"
+        : "var(--status-delayed)";
 
-  const handleEditBudget = () => { setBudgetInput(summary.total_budget); setEditingBudget(true); };
-  const handleSaveBudget  = () => { updateBudget(budgetInput); setEditingBudget(false); };
-  const handleCancelEdit  = () => setEditingBudget(false);
+  const handleEditBudget = () => {
+    setBudgetInput(summary.total_budget);
+    setEditingBudget(true);
+  };
+  const handleSaveBudget = () => {
+    updateBudget(budgetInput);
+    setEditingBudget(false);
+  };
+  const handleCancelEdit = () => setEditingBudget(false);
 
   return (
     <>
@@ -131,8 +177,12 @@ export default function BudgetStats() {
               <div className={styles.accentBar} />
               <div className={styles.cardInner}>
                 <div className={styles.cardHeader}>
-                  <span className={styles.cardIcon}><WalletOutlined /></span>
-                  <span className={styles.cardLabel}>{t("budgetStats.totalBudget")}</span>
+                  <span className={styles.cardIcon}>
+                    <WalletOutlined />
+                  </span>
+                  <span className={styles.cardLabel}>
+                    {t("budgetStats.totalBudget")}
+                  </span>
                 </div>
                 <InputNumber
                   autoFocus
@@ -141,16 +191,20 @@ export default function BudgetStats() {
                   value={budgetInput}
                   onChange={(v) => setBudgetInput(v ?? 0)}
                   onPressEnter={handleSaveBudget}
-                  formatter={(v) => `$ ${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-                  parser={(v) => Number(v?.replace(/\$\s?|(,*)/g, "") || 0)}
+                  formatter={(v) => `$ ${formatInputNumber(v)}`}
+                  parser={(v) => Number(parseInputNumber(v))}
                   style={{ width: "100%", marginTop: 4 }}
                   size="large"
                 />
                 <div className={styles.editActions}>
                   <button className={styles.saveBtn} onClick={handleSaveBudget}>
-                    <CheckOutlined />{t("common.save")}
+                    <CheckOutlined />
+                    {t("common.save")}
                   </button>
-                  <button className={styles.cancelBtn} onClick={handleCancelEdit}>
+                  <button
+                    className={styles.cancelBtn}
+                    onClick={handleCancelEdit}
+                  >
                     <CloseOutlined />
                   </button>
                 </div>
@@ -164,7 +218,13 @@ export default function BudgetStats() {
                 content={
                   <AnimatedStatistic
                     value={formatCurrency(summary.total_budget, currency)}
-                    styles={{ content: { fontSize: 26, fontWeight: 700, lineHeight: 1.1 } }}
+                    styles={{
+                      content: {
+                        fontSize: 26,
+                        fontWeight: 700,
+                        lineHeight: 1.1,
+                      },
+                    }}
                   />
                 }
                 accentColor="var(--primary)"
@@ -185,8 +245,13 @@ export default function BudgetStats() {
                 value={formatCurrency(totalAllocated, currency)}
                 styles={{
                   content: {
-                    fontSize: 26, fontWeight: 700, lineHeight: 1.1,
-                    color: totalAllocated > summary.total_budget ? "var(--budget-danger)" : undefined,
+                    fontSize: 26,
+                    fontWeight: 700,
+                    lineHeight: 1.1,
+                    color:
+                      totalAllocated > summary.total_budget
+                        ? "var(--budget-danger)"
+                        : undefined,
                   },
                 }}
               />
@@ -208,8 +273,15 @@ export default function BudgetStats() {
                 value={formatCurrency(summary.total_spent, currency)}
                 styles={{
                   content: {
-                    fontSize: 26, fontWeight: 700, lineHeight: 1.1,
-                    color: spentPct >= 100 ? "var(--budget-danger)" : spentPct >= 80 ? "var(--budget-warning)" : undefined,
+                    fontSize: 26,
+                    fontWeight: 700,
+                    lineHeight: 1.1,
+                    color:
+                      spentPct >= 100
+                        ? "var(--budget-danger)"
+                        : spentPct >= 80
+                          ? "var(--budget-warning)"
+                          : undefined,
                   },
                 }}
               />
@@ -229,7 +301,14 @@ export default function BudgetStats() {
             content={
               <AnimatedStatistic
                 value={formatCurrency(summary.total_remaining, currency)}
-                styles={{ content: { fontSize: 26, fontWeight: 700, lineHeight: 1.1, color: remainingColor } }}
+                styles={{
+                  content: {
+                    fontSize: 26,
+                    fontWeight: 700,
+                    lineHeight: 1.1,
+                    color: remainingColor,
+                  },
+                }}
               />
             }
             accentColor={remainingColor}
@@ -269,11 +348,19 @@ export default function BudgetStats() {
           />
         </Col>
         <Col xs={12} sm={6}>
-          <Tooltip title={topCategory ? formatCurrency(topCategory.spent ?? 0, currency) : undefined}>
+          <Tooltip
+            title={
+              topCategory
+                ? formatCurrency(topCategory.spent ?? 0, currency)
+                : undefined
+            }
+          >
             <SecondaryCard
               icon={<TrophyOutlined />}
               label={t("budgetStats.topCategory")}
-              value={topCategory ? (topCategory.budget_name || topCategory.name) : "—"}
+              value={
+                topCategory ? topCategory.budget_name || topCategory.name : "—"
+              }
               accentColor="var(--status-completed)"
             />
           </Tooltip>
