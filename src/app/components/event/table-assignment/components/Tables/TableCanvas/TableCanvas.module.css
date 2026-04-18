@@ -1,36 +1,74 @@
-.tablesCanvas {
+.canvasSizer {
+  /* This div provides the scrollable area matching the zoomed content size */
   position: relative;
-  width: 100%;
-  height: 100%;
-  min-height: 0;
+  flex-shrink: 0;
+  margin: auto;
+}
+
+.tablesCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: var(--spacing-sm);
+  box-sizing: border-box;
+  min-width: 0;
+  /* grid variables */
+  --grid-color: var(--subtle-bg-hover);
+  --grid-strong-color: var(--subtle-bg);
+  --grid-bg-opacity: 0.1;
+  --grid-major-multiplier: 5;
+  --grid-major-size: calc(var(--grid-size) * var(--grid-major-multiplier));
+
+  /* layered grid: fine grid + major grid */
   background-image:
-    linear-gradient(0deg, rgba(0, 0, 0, 0.1) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 0, 0, 0.1) 1px, transparent 1px);
-  background-size: 20px 20px;
+    linear-gradient(0deg, var(--grid-color) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-color) 1px, transparent 1px),
+    linear-gradient(0deg, var(--grid-strong-color) 2px, transparent 2px),
+    linear-gradient(90deg, var(--grid-strong-color) 2px, transparent 2px);
+  background-size:
+    var(--grid-size) var(--grid-size),
+    var(--grid-size) var(--grid-size),
+    var(--grid-major-size) var(--grid-major-size),
+    var(--grid-major-size) var(--grid-major-size);
   background-position:
-    top left,
-    top left,
-    center center;
-  background-repeat: repeat, repeat, no-repeat;
-  border-radius: 8px;
-  background: #fafbfc;
-  margin: 0 auto;
-  box-sizing: content-box;
-  overflow: auto;
+    0 0,
+    0 0,
+    0 0,
+    0 0;
+  background-repeat: repeat, repeat, repeat, repeat;
+  border-radius: var(--radius-md);
+  background-color: var(--subtle-bg-hover);
+  margin: 0;
+
+  /* Zoom via CSS transform — keeps layout size unchanged */
+  transform-origin: 0 0;
+}
+
+.noGrid {
+  background-image: none !important;
+}
+
+.venueWrap {
+  position: relative;
+  display: block;
+  box-sizing: border-box;
 }
 
 .venueOutline {
   position: absolute;
-  left: 0;
-  top: 0;
-  border: 4px solid #1976d2;
-  border-radius: 12px;
-  overflow: auto;
+  inset: 0;
+  border: 4px solid var(--venue-outline);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
   pointer-events: none;
-  z-index: 1;
+  z-index: 0;
 }
 
 .canvasInner {
-  position: relative;
-  box-sizing: content-box;
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  box-sizing: border-box;
+  min-width: 0;
+  height: 100%;
 }

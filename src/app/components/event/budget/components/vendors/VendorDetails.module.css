@@ -1,0 +1,19 @@
+.fullWidth {
+  width: 100%;
+}
+
+.vendorName {
+  margin: 0;
+}
+
+.paidValue :global(.ant-statistic-content-value) {
+  color: var(--status-completed);
+}
+
+.pendingValue :global(.ant-statistic-content-value) {
+  color: var(--status-delayed);
+}
+
+.vendorAvatar {
+  background-color: var(--status-in-progress);
+}

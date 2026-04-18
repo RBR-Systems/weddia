@@ -1,0 +1,28 @@
+{
+  "guestList": {
+    "allGroups": "All groups",
+    "searchPlaceholder": "Search name or email",
+    "groupPlaceholder": "Group",
+    "all": "All",
+    "attending": "Attending",
+    "pending": "Pending",
+    "maybe": "Maybe",
+    "notAttending": "Not Attending",
+    "guest": "Guest",
+    "hasEmail": "Has email",
+    "hasPhone": "Has phone",
+    "noContact": "No contact",
+    "sendEmail": "Send Email",
+    "sendWhatsApp": "Send WhatsApp",
+    "relation": "Relation",
+    "plusOne": "+1",
+    "stats": {
+      "attending": "Attending",
+      "pending": "Pending",
+      "maybe": "Maybe",
+      "notAttending": "Not Attending",
+      "total": "Total Guests",
+      "confirmedSeats": "Confirmed Seats"
+    }
+  }
+}

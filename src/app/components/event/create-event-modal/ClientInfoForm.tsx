@@ -2,6 +2,7 @@ import { MailOutlined, PhoneOutlined } from "@ant-design/icons";
 import { Form, Input } from "antd";
 import { useState } from "react";
 import styles from "./create-event-modal.module.css";
+import { useTranslation } from "react-i18next";
 
 interface ClientInfoFormProps {
   title: string;
@@ -14,6 +15,7 @@ const ClientInfoForm = ({
   emailPlaceholder,
   phonePlaceholder,
 }: ClientInfoFormProps) => {
+  const { t } = useTranslation();
   const [phoneValue, setPhoneValue] = useState("");
 
   // Phone number formatting function
@@ -44,11 +46,11 @@ const ClientInfoForm = ({
       <div className={styles.clientInfoContainer}>
         <Form.Item
           className={styles.clientInfoItem}
-          label="Email"
+          label={t("createEvent.clients.email")}
           required
           rules={[
-            { required: true, message: "Please enter email!" },
-            { type: "email", message: "Please enter a valid email!" },
+            { required: true, message: t("createEvent.clients.emailRequired") },
+            { type: "email", message: t("createEvent.clients.emailInvalid") },
           ]}
         >
           <Input
@@ -58,13 +60,13 @@ const ClientInfoForm = ({
         </Form.Item>
         <Form.Item
           className={styles.clientInfoItem}
-          label="Phone Number"
+          label={t("createEvent.clients.phoneNumber")}
           required
           rules={[
-            { required: true, message: "Please enter phone number!" },
+            { required: true, message: t("createEvent.clients.phoneRequired") },
             {
               pattern: /^\(\d{3}\) \d{3}-\d{4}$/,
-              message: "Please enter a valid phone number!",
+              message: t("createEvent.clients.phoneInvalid"),
             },
           ]}
         >

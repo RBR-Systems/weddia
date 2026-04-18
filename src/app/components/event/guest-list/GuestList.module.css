@@ -1,0 +1,45 @@
+.container {
+  padding: 8px;
+}
+
+/* ===== Stats Cards (matching Check-In style) ===== */
+.statsRow {
+  margin-bottom: var(--spacing-md, 16px);
+}
+
+.statCard {
+  text-align: center;
+  border-radius: var(--radius-md, 8px);
+  transition: transform var(--transition-fast, 0.2s), box-shadow var(--transition-fast, 0.2s);
+  cursor: pointer;
+}
+
+.statCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.statCardActive {
+  outline: 2px solid;
+  outline-offset: -2px;
+}
+
+.statCardAttending {
+  border-left: 4px solid green;
+}
+
+.statCardPending {
+  border-left: 4px solid #faad14;
+}
+
+.statCardMaybe {
+  border-left: 4px solid #1890ff;
+}
+
+.statCardNotAttending {
+  border-left: 4px solid #d9d9d9;
+}
+
+.statCardTotal {
+  border-left: 4px solid var(--primary, #1677ff);
+}

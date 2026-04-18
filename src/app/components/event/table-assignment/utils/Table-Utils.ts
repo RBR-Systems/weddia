@@ -1,5 +1,6 @@
+import i18next from "i18next";
 import { Guest, Table } from "../models/types";
-import styles from "../components/Tables/TableTile.module.css";
+import styles from "../components/Tables/TableTileContent/TableTile.module.css";
 
 export function fullName(g: Pick<Guest, "first_name" | "last_name">) {
   return `${g.first_name} ${g.last_name}`.trim();
@@ -15,17 +16,25 @@ export function parseGuestIdFromDragId(id: unknown) {
 export function getNextAvailableSeatNumber(
   capacity: number,
   usedSeatNumbers: number[],
+  partySize = 1,
 ) {
   const used = new Set(usedSeatNumbers);
-  for (let seat = 1; seat <= capacity; seat += 1) {
-    if (!used.has(seat)) return seat;
+  for (let seat = 1; seat <= capacity - partySize + 1; seat += 1) {
+    let fits = true;
+    for (let s = seat; s < seat + partySize; s += 1) {
+      if (used.has(s)) {
+        fits = false;
+        break;
+      }
+    }
+    if (fits) return seat;
   }
   return null;
 }
 
 export function getTableLabel(table: Table) {
   const m = table.table_id.match(/(?:table[-_]?)(\d+)/i);
-  if (m) return `Table ${Number(m[1])}`;
+  if (m) return i18next.t("tableAssignment.table", { number: Number(m[1]) });
   return table.table_id
     .replace(/[-_]/g, " ")
     .replace(/\b\w/g, (c) => c.toUpperCase());

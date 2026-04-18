@@ -1,0 +1,12 @@
+.container {
+  width: 100%;
+}
+
+.tabs :global(.ant-tabs-tab) {
+  font-size: var(--fs-base);
+  padding: var(--spacing-sm) var(--spacing-md);
+}
+
+.tabs :global(.ant-tabs-tab .anticon) {
+  margin-right: var(--spacing-xs);
+}

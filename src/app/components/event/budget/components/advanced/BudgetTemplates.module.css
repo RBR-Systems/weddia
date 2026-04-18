@@ -1,0 +1,38 @@
+.templateName {
+  margin-bottom: var(--spacing-xs);
+}
+
+.templateDescription {
+  font-size: var(--fs-2xs);
+}
+
+.templateBudgetRow {
+  margin-top: var(--spacing-ms);
+}
+
+.categoryCount {
+  margin-left: var(--spacing-sm);
+}
+
+.templateTags {
+  margin-top: var(--spacing-sm);
+  gap: 6px;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.tagSpacing {
+  margin-bottom: var(--spacing-xs);
+}
+
+.templateIncludesSection {
+  margin-top: var(--spacing-md);
+}
+
+.fullWidth {
+  width: 100%;
+}
+
+.previewCategoryAmount {
+  margin-left: var(--spacing-sm);
+}

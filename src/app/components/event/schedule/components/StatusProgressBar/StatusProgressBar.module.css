@@ -1,0 +1,35 @@
+.card {
+  margin-bottom: var(--spacing-md);
+}
+.fullWidth {
+  width: 100%;
+}
+.progressHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.title {
+  margin: 0;
+  font-size: var(--fs-lg);
+  font-weight: var(--bold-font);
+}
+.percentage {
+  font-size: var(--fs-xl);
+  font-weight: var(--bold-font);
+}
+.statCol {
+  text-align: center;
+}
+.statNumber {
+  font-size: var(--fs-2xl);
+  font-weight: var(--bold-font);
+}
+.statLabel {
+  font-size: var(--fs-xs);
+  color: var(--text-color-secondary);
+}
+.statusBreakdown {
+  width: 100%;
+  justify-content: center;
+}

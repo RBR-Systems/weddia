@@ -3,8 +3,10 @@ import Header from "@/app/common/Header/header";
 import React from "react";
 import styles from "./events-hub.module.css";
 import { useEvent } from "@/app/contexts/EventContext";
+import { useTranslation } from "react-i18next";
 
 const EventsHub = () => {
+  const { t } = useTranslation();
   const {
     state: {
       events: { selectedEvent },
@@ -15,20 +17,20 @@ const EventsHub = () => {
       <Header
         name={selectedEvent?.eventName || ""}
         items={[
-          "1 year to go",
-          "Started on August 6, 2025",
-          "Wedding day on August 6, 2026",
-          "Status in progress",
+          t("eventsHub.yearToGo"),
+          t("eventsHub.startedOn", { date: "August 6, 2025" }),
+          t("eventsHub.weddingDay", { date: "August 6, 2026" }),
+          t("eventsHub.statusInProgress"),
         ]}
       ></Header>
       <Card>
         <div>
-          <p>Event 1</p>
+          <p>{t("eventsHub.event", { number: 1 })}</p>
         </div>
       </Card>
       <Card>
         <div>
-          <p>Event 2</p>
+          <p>{t("eventsHub.event", { number: 2 })}</p>
         </div>
       </Card>
     </div>

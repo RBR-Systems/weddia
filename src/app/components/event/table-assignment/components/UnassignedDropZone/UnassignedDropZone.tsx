@@ -2,9 +2,11 @@ import React, { memo } from "react";
 import { useDroppable } from "@dnd-kit/core";
 import { Space, Typography } from "antd";
 import { UserOutlined } from "@ant-design/icons";
+import { useTranslation } from "react-i18next";
 import styles from "./UnassignedDropZone.module.css";
 export default memo(function UnassignedDropZone() {
   const { setNodeRef, isOver } = useDroppable({ id: "unassigned" });
+  const { t } = useTranslation();
   return (
     <div
       ref={setNodeRef}
@@ -15,11 +17,8 @@ export default memo(function UnassignedDropZone() {
     >
       <Space size={8} align="center">
         <UserOutlined />
-        <Typography.Text strong>Drop here to unassign</Typography.Text>
+        <Typography.Text strong>{t("tableAssignment.dropToUnassign")}</Typography.Text>
       </Space>
-      <Typography.Text type="secondary" className={styles.dropZoneHint}>
-        Drag a guest onto a table tile to assign.
-      </Typography.Text>
     </div>
   );
 });

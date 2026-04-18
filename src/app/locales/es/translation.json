@@ -1,0 +1,28 @@
+{
+  "guestList": {
+    "allGroups": "Todos los grupos",
+    "searchPlaceholder": "Buscar nombre o correo",
+    "groupPlaceholder": "Grupo",
+    "all": "Todos",
+    "attending": "Asiste",
+    "pending": "Pendiente",
+    "maybe": "Quizás",
+    "notAttending": "No asiste",
+    "guest": "Invitado",
+    "hasEmail": "Tiene correo",
+    "hasPhone": "Tiene teléfono",
+    "noContact": "Sin contacto",
+    "sendEmail": "Enviar correo",
+    "sendWhatsApp": "Enviar WhatsApp",
+    "relation": "Relación",
+    "plusOne": "+1",
+    "stats": {
+      "attending": "Asisten",
+      "pending": "Pendientes",
+      "maybe": "Quizás",
+      "notAttending": "No asisten",
+      "total": "Total de invitados",
+      "confirmedSeats": "Lugares confirmados"
+    }
+  }
+}

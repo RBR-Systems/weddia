@@ -1,0 +1,187 @@
+.tableTile {
+  position: absolute;
+  border: 1px solid var(--tile-border);
+  background: linear-gradient(
+    180deg,
+    var(--tile-bg-from),
+    var(--primary-background)
+  );
+  cursor: grab;
+  transition:
+    transform 120ms ease,
+    border-color 120ms ease,
+    box-shadow 120ms ease;
+  pointer-events: auto;
+  z-index: 2;
+  padding: var(--spacing-xs);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.tileLabel {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  font-size: var(--fs-xs) !important;
+}
+
+.tableTile:active {
+  cursor: grabbing;
+}
+
+.tableTile:hover {
+  transform: translateY(-1px);
+  border-color: var(--tile-hover-border);
+  box-shadow: var(--tile-hover-shadow);
+}
+
+.tableTileSelected {
+  border-color: var(--tile-selected-border);
+  box-shadow: var(--tile-selected-shadow);
+  transform: translateY(-2px) scale(1.02);
+}
+
+.tableTileOver {
+  border-color: var(--tile-over-border);
+  box-shadow: var(--tile-over-shadow);
+}
+
+.tableRound {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  text-align: center;
+}
+
+.tableSquare {
+  width: 120px;
+  height: 120px;
+  border-radius: var(--radius-lg);
+}
+
+.tableRectangular {
+  width: 180px;
+  height: 100px;
+  border-radius: var(--radius-lg);
+}
+
+.tableRound .tableTileHeader {
+  justify-content: center;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.tableRound .tableMeta {
+  text-align: center;
+}
+
+.tableTileHeader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  flex-wrap: wrap;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.occupancyBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.occupancyBadge :global(.ant-badge-count) {
+  font-size: var(--fs-2xs);
+  font-weight: var(--bold-font);
+  min-width: 32px;
+  height: 20px;
+  padding: 0 var(--spacing-xs);
+  border-radius: 10px;
+  box-shadow: var(--shadow-sm);
+  line-height: 20px;
+}
+
+.tableMeta {
+  display: inline-block;
+  margin-top: var(--spacing-xs);
+}
+
+.shapeIcon {
+  display: inline-flex;
+  width: 22px;
+  height: 22px;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  background: var(--subtle-bg);
+}
+
+.shapeIconLarge {
+  display: inline-flex;
+  width: 34px;
+  height: 34px;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-lg);
+  background: var(--subtle-bg);
+}
+
+.seatContainer {
+  display: flex;
+  gap: var(--spacing-xs);
+  margin-top: var(--spacing-sm);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.seat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  background: var(--subtle-bg);
+  padding: var(--spacing-xs);
+  font-size: var(--fs-3xs);
+  color: var(--seat-text);
+}
+
+.seatOver {
+  background: var(--tile-over-border);
+  box-shadow: var(--tile-over-shadow);
+}
+
+.seatNumber {
+  font-weight: var(--bold-font);
+  font-size: var(--fs-3xs);
+}
+
+.seatName {
+  font-size: var(--fs-3xs);
+  color: var(--seat-text-secondary);
+}
+
+.seatCompact {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: var(--spacing-sm);
+  font-size: var(--fs-xs);
+  color: var(--seat-text);
+  min-height: 28px;
+}
+
+.popoverSeats {
+  display: flex;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm);
+  flex-wrap: wrap;
+  max-width: 260px;
+}

@@ -42,7 +42,8 @@ function buildSeatingPrompt(request: SeatingRequest): string {
       const current = g.tableId
         ? ` (currently at ${g.tableId})`
         : " (unassigned)";
-      return `- ${g.name} [ID: ${g.id}] - Tags: ${tags}${current}`;
+      const party = g.partySize && g.partySize > 1 ? ` - Party size: ${g.partySize}` : "";
+      return `- ${g.name} [ID: ${g.id}] - Tags: ${tags}${party}${current}`;
     })
     .join("\n");
 
@@ -72,6 +73,10 @@ ${userMessage}
 1. Analyze the guest tags to understand relationships (e.g., "bride_family", "groom_family", "children", "elderly").
 2. Consider table capacities and current assignments.
 3. Respond with a JSON object containing your seating recommendations.
+
+4. Important: Some guests may represent a party (e.g., +1s or families). If a guest has a party size greater than 1, seat the entire party together at the same table and ensure the chosen table can accommodate the party's size when combined with other assignments.
+
+5. When calculating capacity and assigning seats, always account for the guest's party size rather than treating each guest as a single seat.
 
 ## Response Format (JSON only, no markdown)
 {
@@ -114,6 +119,7 @@ export async function getSeatingRecommendation(
 ): Promise<SeatingResponse> {
   try {
     const prompt = buildSeatingPrompt(request);
+    const { guests, tables } = request;
     const data: unknown = await hfFetch(prompt);
 
     // Try to extract the generated text or message content from common HF shapes
@@ -208,6 +214,50 @@ export async function getSeatingRecommendation(
       console.debug("getSeatingRecommendation: parsed JSON:", result);
       console.debug("getSeatingRecommendation: raw text:", text);
       throw new Error("Invalid response structure from model");
+    }
+
+    // Post-validate assignments against table capacities considering party sizes
+    const conflicts: string[] = [];
+    const guestSizeMap = new Map<string, number>();
+    for (const g of guests) {
+      guestSizeMap.set(g.id, g.partySize && g.partySize > 0 ? g.partySize : 1);
+    }
+
+    const tableCapacityMap = new Map<string, number>();
+    for (const t of tables) {
+      tableCapacityMap.set(t.id, t.capacity);
+    }
+
+    const tableSums = new Map<string, number>();
+    const assignedGuests = new Set<string>();
+    for (const a of result.assignments) {
+      const size = guestSizeMap.get(a.guestId) ?? 1;
+      if (!guestSizeMap.has(a.guestId)) {
+        conflicts.push(`Unknown guest assigned: ${a.guestId}`);
+      }
+      if (!tableCapacityMap.has(a.tableId)) {
+        conflicts.push(`Unknown table assigned: ${a.tableId}`);
+      }
+      const prev = tableSums.get(a.tableId) ?? 0;
+      tableSums.set(a.tableId, prev + size);
+
+      if (assignedGuests.has(a.guestId)) {
+        conflicts.push(`Guest assigned more than once: ${a.guestId}`);
+      }
+      assignedGuests.add(a.guestId);
+    }
+
+    for (const [tableId, sum] of tableSums.entries()) {
+      const cap = tableCapacityMap.get(tableId) ?? 0;
+      if (sum > cap) {
+        conflicts.push(
+          `Table ${tableId} over capacity: assigned ${sum} seats but capacity is ${cap}`,
+        );
+      }
+    }
+
+    if (conflicts.length > 0) {
+      result.conflicts = Array.from(new Set([...(result.conflicts || []), ...conflicts]));
     }
     return result;
   } catch (err) {

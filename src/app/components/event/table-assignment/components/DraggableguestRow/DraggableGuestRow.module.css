@@ -1,15 +1,127 @@
-.draggableGuest {
+/* ── Guest card ───────────────────────────────────────────── */
+.guestCard {
   width: 100%;
   cursor: grab;
   user-select: none;
   touch-action: none;
+  padding: 8px 10px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--divider);
+  background: var(--primary-background);
+  transition: background 150ms ease, box-shadow 120ms ease, transform 100ms ease;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.guestCard:hover {
+  background: var(--primary-background-hover);
+  box-shadow: var(--shadow-warm-sm);
+  transform: translateY(-1px);
 }
 
 .dragging {
   cursor: grabbing;
-  opacity: 0.6;
+  opacity: 0.45;
+  transform: none !important;
 }
 
+/* ── Name row ─────────────────────────────────────────────── */
+.nameRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+}
+
+.dragDot {
+  color: var(--text-color-muted);
+  font-size: 15px;
+  flex-shrink: 0;
+  line-height: 1.55;
+  cursor: grab;
+  user-select: none;
+}
+
+.nameAndTags {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.guestName {
+  font-size: var(--fs-sm) !important;
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.warningIcon {
+  color: orange;
+  margin-right: 4px;
+}
+
+/* ── Tag row ──────────────────────────────────────────────── */
+.tagRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  align-items: center;
+}
+
+/* Override Ant Design default tag margin */
+.tagRow :global(.ant-tag) {
+  margin: 0 !important;
+  font-size: var(--fs-2xs) !important;
+  line-height: 1.5;
+  padding: 0 5px;
+}
+
+/* ── Action row (select + delete) ─────────────────────────── */
+.actionRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tableSelect {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ── Utility ──────────────────────────────────────────────── */
 .fullWidth {
   width: 100%;
+}
+
+/* ── Seat boxes (canvas usage) ────────────────────────────── */
+.seatRow {
+  display: flex;
+  gap: var(--spacing-xs);
+}
+.seatBox {
+  width: 22px;
+  height: 20px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--fs-xs);
+  color: var(--seat-text-dark);
+}
+.seatBoxAssigned {
+  background: var(--seat-assigned-bg);
+  border: 1px solid var(--seat-assigned-border);
+}
+.seatBoxEmpty {
+  background: var(--seat-empty-bg);
+  border: 1px dashed var(--seat-empty-border);
+}
+.seatNum {
+  font-weight: var(--semi-bold-font);
+}
+.seatDash {
+  opacity: 0.6;
 }

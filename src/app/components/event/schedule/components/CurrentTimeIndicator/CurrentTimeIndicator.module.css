@@ -1,0 +1,109 @@
+.nowLine {
+  position: absolute;
+  left: 200px;
+  right: 0;
+  z-index: 100;
+  pointer-events: none;
+  transition: top 0.3s ease-out;
+}
+
+.nowLabel {
+  position: absolute;
+  left: 40px;
+  top: -12px;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--now-indicator-bg);
+  color: var(--primary-foreground);
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-weight: var(--semi-bold-font);
+  font-size: var(--fs-xs);
+  box-shadow: 0 2px 8px var(--now-indicator-glow);
+  animation: pulse 2s ease-in-out infinite;
+  pointer-events: auto;
+  z-index: 101;
+}
+
+.nowText {
+  letter-spacing: 0.5px;
+}
+
+.nowTime {
+  font-weight: 500;
+  opacity: 0.95;
+}
+
+.nowDot {
+  position: absolute;
+  left: 12px;
+  transform: translateY(-50%);
+  width: 12px;
+  height: 12px;
+  background: var(--now-indicator-bg);
+  border: 3px solid var(--card-background);
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px var(--now-indicator);
+  z-index: 101;
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+.nowLineBar {
+  position: absolute;
+  left: 14px;
+  top: 0;
+  transform: translateY(-50%);
+  right: 0;
+  height: 2px;
+  background: linear-gradient(
+    to right,
+    var(--now-indicator-glow) 0%,
+    var(--now-indicator-bg) 50%,
+    var(--now-indicator-glow) 100%
+  );
+  z-index: 99;
+  box-shadow: 0 0 4px var(--now-indicator-glow);
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow: 0 2px 8px var(--now-indicator-glow);
+  }
+  50% {
+    transform: scale(1.03);
+    box-shadow: 0 2px 12px var(--now-indicator-glow);
+  }
+}
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    box-shadow: 0 0 0 2px var(--now-indicator);
+  }
+  50% {
+    box-shadow: 0 0 0 4px var(--now-indicator-glow);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .nowLabel {
+    left: 8px;
+    padding: 2px var(--spacing-sm);
+    font-size: var(--fs-3xs);
+  }
+
+  .nowDot {
+    left: 4px;
+    width: 10px;
+    height: 10px;
+  }
+
+  .nowLineBar {
+    left: 9px;
+  }
+}

@@ -1,47 +1,41 @@
+"use client";
+
 import React from "react";
 import styles from "./nav-bar.module.css";
-import { BellOutlined, DownOutlined, PlusOutlined } from "@ant-design/icons";
-import { Badge, Space, Button, Dropdown, MenuProps } from "antd";
-import { eventList } from "@/app/data/EventList";
-import { EventStatus } from "@/app/components/events-list/models/enums/event-list-enums";
+import { DownOutlined, PlusOutlined } from "@ant-design/icons";
+import { Space, Button, Dropdown, MenuProps } from "antd";
 import { useEvent } from "@/app/contexts/EventContext";
 import { EventActions } from "@/app/contexts/EventActions";
+import { useTranslation } from "react-i18next";
+import NotificationBell from "./NotificationBell";
+import { useTheme } from "@/theme/ThemeProvider";
+import LanguageSwitcher from "../LanguageSwitcher/LanguageSwitcher";
+import { ThemeToggle } from "@/theme/ThemeToggle";
 
 type NavBarProps = {
-  state: boolean;
-  setCollapsed: React.Dispatch<React.SetStateAction<boolean>>;
+  currentView?: string;
 };
 
-export const NavBar: React.FC<NavBarProps> = ({ setCollapsed }) => {
+export const NavBar: React.FC<NavBarProps> = ({ currentView }) => {
+  const { t } = useTranslation();
+  const { mode } = useTheme();
   const {
-    state,
     state: {
-      events: { selectedEvent },
+      events: { selectedEvent, allEvents },
     },
     dispatch,
   } = useEvent();
 
-  const mapEventList = eventList
-    .filter((item) => item.status === EventStatus.IN_PROGRESS)
-    .map((item) => {
-      const originalIndex = eventList.findIndex((event) => event === item);
-      return {
-        label: item.eventName,
-        key: originalIndex.toString(),
-      };
-    });
+  const mapEventList = allEvents.map((item, index) => ({
+    label: item.eventName,
+    key: index.toString(),
+  }));
 
   const handleMenuClick: MenuProps["onClick"] = (e) => {
-    const eventIndex = parseInt(e.key as string);
     dispatch({
       type: EventActions.SET_SELECTED_EVENT,
-      payload: eventIndex,
+      payload: parseInt(e.key as string),
     });
-  };
-
-  const menuProps = {
-    items: mapEventList,
-    onClick: handleMenuClick,
   };
 
   const handleNewEvent = () => {
@@ -52,41 +46,41 @@ export const NavBar: React.FC<NavBarProps> = ({ setCollapsed }) => {
   };
 
   return (
-    <div className={styles["navbar"]}>
-      <div className={`${styles["navbar-item"]} ${styles["start"]}`}>
-        <p
-          className={styles["header"]}
-          onClick={() => {
-            setCollapsed(!state);
-          }}
-        >
-          RBR Weddings
-        </p>
-      </div>
-      <div className={`${styles["navbar-item"]} ${styles["end"]}`}>
-        <Dropdown menu={menuProps}>
-          <Button>
-            <Space>
-              {selectedEvent?.eventName || "Select Event"}
-              <DownOutlined />
+    <header className={styles.navbar}>
+      {/* Left: logo + event selector */}
+      <div className={styles.start}>
+        <img
+          src={mode === "dark" ? "/weddia-logo-dark.svg" : "/weddia-logo.svg"}
+          alt="Wedd.IA"
+          className={styles.logo}
+        />
+
+        <Dropdown menu={{ items: mapEventList, onClick: handleMenuClick }}>
+          <Button size="small" className={styles.eventBtn}>
+            <Space size={4}>
+              <span className={styles.eventName}>
+                {selectedEvent?.eventName || t("common.selectEvent")}
+              </span>
+              <DownOutlined style={{ fontSize: 10, opacity: 0.6 }} />
             </Space>
           </Button>
         </Dropdown>
+      </div>
+
+      {/* Right: actions */}
+      <div className={styles.end}>
         <Button
           icon={<PlusOutlined />}
-          className={styles["button-color"]}
+          size="small"
+          type="primary"
           onClick={handleNewEvent}
         >
-          New Event
+          {t("common.newEvent")}
         </Button>
-        <Badge
-          count={3}
-          size="small"
-          style={{ backgroundColor: "var(--badge-color)" }}
-        >
-          <BellOutlined className={styles["icon"]} />
-        </Badge>
+        <NotificationBell />
+        <LanguageSwitcher />
+        <ThemeToggle />
       </div>
-    </div>
+    </header>
   );
 };

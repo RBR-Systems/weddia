@@ -59,10 +59,12 @@ export type State = {
   tables: Table[];
   assignments: TableAssignment[];
   metersToPixels: number;
+  zoomScale: number;
   pan: { x: number; y: number };
   selectedTableId: string | null;
   guestSearch: string;
   relationFilter?: string;
+  assignedFilter?: "all" | "assigned" | "unassigned";
   sideView: "guests" | "table";
   sidePanelOpen: boolean;
   aiChatOpen: boolean;

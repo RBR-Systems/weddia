@@ -1,67 +1,180 @@
+/* ── Card shell ───────────────────────────────────────────── */
 .sideCard {
   height: 100%;
-  position: relative;
-  width: 340px;
-  min-width: 300px;
-  max-width: 25vw;
-  z-index: 20;
+  flex: 1;
+  display: flex !important;
+  flex-direction: column !important;
   overflow: hidden;
-  border-radius: 8px;
-  display: flex;
-  flex-direction: column;
-  flex: 1 0 auto;
+  border-radius: var(--radius-md);
 }
 
 .closed {
   display: none;
 }
 
-.sideTop {
-  margin-bottom: 10px;
+.sideCard :global(.ant-card-head) {
+  flex-shrink: 0;
+  padding: 0 12px;
 }
 
+/* Ant Design 6 anonymous wrapper inside ant-card-body */
+.sideCard :global(.ant-card-body) > div {
+  flex: 1 1 0%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ── Body ─────────────────────────────────────────────────── */
 .sideBody {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  height: calc(100% - 44px);
+  gap: var(--spacing-sm);
+  flex: 1 1 0%;
+  min-height: 0;
+  overflow: hidden;
 }
 
+/* ── Filters ──────────────────────────────────────────────── */
+.sideFilters {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0 2px;
+}
+
+.filterFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px 0;
+}
+
+.guestCount {
+  font-size: var(--fs-xs);
+  color: var(--text-color-muted);
+}
+
+.unassignedBadge {
+  color: orange;
+  font-weight: var(--semi-bold-font);
+}
+
+/* ── Scrollable list ──────────────────────────────────────── */
 .sideList {
-  flex: 1;
-  overflow: auto;
-  padding-right: 4px;
+  flex: 1 1 0%;
+  min-height: 0;
+  height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 2px 2px 2px 0;
+  padding-right: var(--spacing-xs);
 }
 
-.guestRow :global(.ant-list-item-meta-title) {
-  margin-bottom: 2px;
+.sideList::-webkit-scrollbar { width: 4px; }
+.sideList::-webkit-scrollbar-thumb {
+  background: var(--text-color-muted);
+  border-radius: 4px;
 }
 
+/* ── Table list (table tab) ───────────────────────────────── */
 .tableDetailsHeader {
-  padding: 8px 8px 0 8px;
+  padding: var(--spacing-sm) var(--spacing-xs) 0 var(--spacing-xs);
 }
 
 .tableTitle {
-  font-weight: 600;
-  font-size: 18px;
+  font-weight: var(--semi-bold-font);
+  font-size: var(--fs-base);
 }
 
 .tableSubtitle {
-  color: rgba(0, 0, 0, 0.45);
+  font-size: var(--fs-xs);
+  color: var(--text-color-muted);
+  margin-top: 1px;
 }
 
-.spaceMargin {
-  margin: 12px;
+.tableList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 2px 2px 2px 0;
 }
 
-.sideListHeight180 {
-  height: calc(100% - 180px);
+.tableListItem {
+  cursor: pointer;
+  padding: 8px 10px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--divider);
+  background: var(--primary-background);
+  transition: background 150ms ease, box-shadow 150ms ease, transform 100ms ease;
 }
 
-.sideListHeight80 {
-  height: calc(100% - 80px);
+.tableListItem:hover {
+  background: var(--primary-background-hover);
+  box-shadow: var(--shadow-warm-sm);
+  transform: translateY(-1px);
 }
 
+.tableListRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.tableShapeIcon {
+  font-size: 18px;
+  color: var(--primary);
+  flex-shrink: 0;
+  width: 24px;
+  text-align: center;
+  opacity: 0.75;
+}
+
+.tableListInfo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tableListHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tableSeats {
+  font-size: var(--fs-xs);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+/* ── Table detail: guest row + seat nav ───────────────────── */
+.tableDetailGuestRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tableDetailGuestRow > :first-child {
+  flex: 1;
+  min-width: 0;
+}
+
+.seatNavButtons {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+/* ── Utility ──────────────────────────────────────────────── */
 .fullWidth {
   width: 100%;
 }

@@ -1,15 +1,18 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
-import { Card, Input, Button, List, Avatar, message, Spin, Tag } from "antd";
+import React from "react";
+import { Input, Button, Avatar, Spin, Tag } from "antd";
+import Card from "@/app/common/Card/card";
+import { useTableAssignmentContext } from "../../context/TableAssignmentContext";
 import { SendOutlined, RobotOutlined, UserOutlined } from "@ant-design/icons";
 import styles from "./SeatingAIChat.module.css";
 import {
-  getSeatingRecommendation,
   HFGuest,
   HFTable,
   SeatingResponse,
-  testHuggingFaceConnection,
 } from "../../services/huggingface.service";
+import { useSeatingAI } from "./hooks/useSeatingAI";
+import { formatTime } from "./utils/format";
+import { useTranslation } from "react-i18next";
 
 interface MessageItem {
   id: string;
@@ -30,165 +33,58 @@ const SeatingAIChat: React.FC<SeatingAIChatProps> = ({
   tables,
   onApplySeating,
 }) => {
-  const [messages, setMessages] = useState<MessageItem[]>([
-    {
-      id: "0",
-      type: "assistant",
-      content:
-        "Hello! I'm your AI seating assistant. I can help you arrange guests at tables based on their relationships and your preferences. Try asking me to:\n\n• Group families together\n• Separate certain guests\n• Fill tables evenly\n• Arrange by age groups\n\nWhat would you like me to do?",
-      timestamp: new Date(),
-    },
-  ]);
+  const { messageApi } = useTableAssignmentContext();
+  const { t } = useTranslation();
 
-  const [input, setInput] = useState("");
-  const [loading, setLoading] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
-
-  useEffect(() => {
-    // optional warm up
-    testHuggingFaceConnection().then((ok) => {
-      if (!ok) {
-        // don't spam the user, but log
-        console.info("Hugging Face warmup may have failed or is slow");
-      }
-    });
-  }, []);
-
-  const handleSend = async () => {
-    if (!input.trim()) return;
-
-    const userMessage: MessageItem = {
-      id: Date.now().toString(),
-      type: "user",
-      content: input,
-      timestamp: new Date(),
-    };
-
-    setMessages((prev) => [...prev, userMessage]);
-    setInput("");
-    setLoading(true);
-
-    try {
-      const response = await getSeatingRecommendation({
-        guests,
-        tables,
-        userMessage: input,
-      });
-
-      const assistantMessage: MessageItem = {
-        id: (Date.now() + 1).toString(),
-        type: "assistant",
-        content: response.explanation ?? "AI seating suggestion",
-        timestamp: new Date(),
-        data: response,
-      };
-
-      setMessages((prev) => [...prev, assistantMessage]);
-
-      if (response.conflicts && response.conflicts.length > 0) {
-        message.warning(
-          `Potential issues: ${response.conflicts.join(", ")}`,
-          5,
-        );
-      }
-    } catch (error) {
-      message.error(
-        error instanceof Error ? error.message : "Failed to get AI response",
-      );
-
-      const errorMessage: MessageItem = {
-        id: (Date.now() + 1).toString(),
-        type: "assistant",
-        content:
-          "I'm sorry, I encountered an error. Please try again or rephrase your request.",
-        timestamp: new Date(),
-      };
-
-      setMessages((prev) => [...prev, errorMessage]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const [appliedMessageId, setAppliedMessageId] = useState<string | null>(null);
-  const handleApply = (data: SeatingResponse, msgId: string) => {
-    onApplySeating(data.assignments);
-    setAppliedMessageId(msgId);
-    message.success({
-      content:
-        "Seating arrangement approved and applied! Your event layout has been updated.",
-      duration: 3,
-    });
-  };
+  const {
+    messages,
+    input,
+    setInput,
+    loading,
+    handleSend,
+    appliedMessageId,
+    handleApply,
+    messagesEndRef,
+  } = useSeatingAI({ guests, tables, onApplySeating, messageApi });
 
   return (
-    <Card
-      title={
-        <div className={styles.cardTitle}>
-          <RobotOutlined />
-          AI Seating Assistant
-        </div>
-      }
-      className={styles.chatCard}
-    >
+    <Card className={styles.chatCard}>
       <div className={styles.messagesContainer}>
-        <List
-          dataSource={messages}
-          renderItem={(msg) => (
-            <div
-              className={
-                msg.type === "user"
-                  ? styles.userMessage
-                  : styles.assistantMessage
-              }
-            >
-              <div className={styles.messageAvatar}>
-                <Avatar
-                  icon={
-                    msg.type === "user" ? <UserOutlined /> : <RobotOutlined />
-                  }
-                  className={
-                    msg.type === "user"
-                      ? styles.avatarUser
-                      : styles.avatarAssistant
-                  }
-                />
-              </div>
-              <div className={styles.messageContent}>
-                <div className={styles.messageText}>{msg.content}</div>
-                {msg.data && (
-                  <div className={styles.messageActions}>
-                    <Tag color="blue">
-                      {msg.data.assignments.length} assignments
-                    </Tag>
-                    {appliedMessageId !== msg.id && (
-                      <Button
-                        type="primary"
-                        size="small"
-                        onClick={() => handleApply(msg.data!, msg.id)}
-                      >
-                        Apply This Arrangement
-                      </Button>
-                    )}
-                    {appliedMessageId === msg.id && (
-                      <Tag color="success">Arrangement applied!</Tag>
-                    )}
-                  </div>
-                )}
-                <div className={styles.messageTime}>
-                  {msg.timestamp.toLocaleTimeString()}
-                </div>
-              </div>
+        {messages.map((msg) => (
+          <div
+            key={msg.id}
+            className={msg.type === "user" ? styles.userMessage : styles.assistantMessage}
+          >
+            <div className={styles.messageAvatar}>
+              <Avatar
+                icon={msg.type === "user" ? <UserOutlined /> : <RobotOutlined />}
+                className={msg.type === "user" ? styles.avatarUser : styles.avatarAssistant}
+              />
             </div>
-          )}
-        />
+            <div className={styles.messageContent}>
+              <div className={styles.messageText}>{msg.content}</div>
+              {msg.data && (
+                <div className={styles.messageActions}>
+                  <Tag color="blue">
+                    {t("tableAssignment.aiChat.assignments", { count: msg.data.assignments.length })}
+                  </Tag>
+                  {appliedMessageId !== msg.id && (
+                    <Button type="primary" size="small" onClick={() => handleApply(msg.data!, msg.id)}>
+                      {t("tableAssignment.aiChat.applyArrangement")}
+                    </Button>
+                  )}
+                  {appliedMessageId === msg.id && (
+                    <Tag color="success">{t("tableAssignment.aiChat.arrangementApplied")}</Tag>
+                  )}
+                </div>
+              )}
+              <div className={styles.messageTime}>{formatTime(msg.timestamp)}</div>
+            </div>
+          </div>
+        ))}
         {loading && (
           <div className={styles.loadingMessage}>
-            <Spin /> AI is thinking...
+            <Spin /> {t("tableAssignment.aiChat.aiThinking")}
           </div>
         )}
         <div ref={messagesEndRef} />
@@ -204,18 +100,18 @@ const SeatingAIChat: React.FC<SeatingAIChatProps> = ({
               handleSend();
             }
           }}
-          placeholder="Ask me to arrange the seating... (e.g., 'Put all bride\'s family at tables 1-3')"
+          placeholder={t("tableAssignment.aiChat.placeholder")}
           autoSize={{ minRows: 1, maxRows: 4 }}
           disabled={loading}
         />
         <Button
           type="primary"
           icon={<SendOutlined />}
-          onClick={handleSend}
+          onClick={() => handleSend()}
           loading={loading}
           disabled={!input.trim()}
         >
-          Send
+          {t("tableAssignment.aiChat.send")}
         </Button>
       </div>
     </Card>

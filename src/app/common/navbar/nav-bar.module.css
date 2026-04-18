@@ -1,53 +1,58 @@
 .navbar {
-  position: sticky;
-  top: 0;
-  display: flex;
-  z-index: 1000;
-  background-color: var(--primary-background);
-  opacity: 0.95;
-  padding: 1rem 2rem;
-  width: 100%;
-  flex-wrap: wrap;
-  min-height: 80px;
-  max-height: fit-content;
-  row-gap: 1rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* soft shadow */
-}
-
-.navbar-item {
-  display: flex;
-  flex: 1;
-  flex-shrink: 1;
-  gap: 2rem;
-  align-items: center;
-}
-
-.start {
-  justify-content: start;
-}
-
-.end {
-  justify-content: end;
-}
-
-.header {
-  font-weight: var(--bold-font);
-  font-size: 1.5rem;
-  cursor: pointer;
-}
-
-.item-container {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
+  height: 64px;
+  padding: 0 20px;
+  background-color: var(--primary-background);
+  border-bottom: 1px solid var(--divider);
+  flex-shrink: 0;
+  gap: 16px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+/* ── Left ─────────────────────────────────────────────────────────── */
+.start {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+
+.logo {
+  height: 28px;
+  width: auto;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.eventBtn {
+  border-radius: 20px !important;
+  max-width: 220px;
+  background: var(--secondary-background) !important;
+  border-color: var(--divider) !important;
+}
+
+.eventName {
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: inline-block;
+  vertical-align: middle;
+  white-space: nowrap;
+  font-size: 13px;
+}
+
+/* ── Right ────────────────────────────────────────────────────────── */
+.end {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
 .icon {
   font-size: var(--small-icon-size);
-}
-
-.button-color {
-  background-color: "black";
-  color: "white";
+  color: var(--text-color-secondary);
 }

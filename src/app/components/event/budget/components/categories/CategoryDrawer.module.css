@@ -1,0 +1,15 @@
+.itemsTable {
+  border: 1px solid var(--divider);
+  border-radius: var(--radius-sm);
+}
+
+.addRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 10px 12px;
+  border: 1px dashed var(--divider);
+  border-radius: var(--radius-sm);
+  background: var(--secondary-background, rgba(0,0,0,0.02));
+}
