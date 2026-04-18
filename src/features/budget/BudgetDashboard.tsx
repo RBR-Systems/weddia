@@ -1,18 +1,8 @@
 "use client";
-import React, { useState } from "react";
+import { useState } from "react";
 import { Tabs, Empty, Space, Typography } from "antd";
 import Card from "@/shared/components/Card/Card";
-import {
-  DashboardOutlined,
-  UnorderedListOutlined,
-  AppstoreOutlined,
-  TeamOutlined,
-  CalendarOutlined,
-  LineChartOutlined,
-  SettingOutlined,
-  BellOutlined,
-  CloudUploadOutlined,
-} from "@ant-design/icons";
+import { DashboardOutlined, UnorderedListOutlined, AppstoreOutlined, TeamOutlined, CalendarOutlined, LineChartOutlined, SettingOutlined, BellOutlined, CloudUploadOutlined } from "@ant-design/icons";
 import { BudgetProvider, useBudget } from "./contexts/BudgetContext";
 
 // Dashboard components
@@ -27,14 +17,8 @@ import { EventVendors, VendorDetails } from "./components/vendors";
 import type { Vendor } from "./models/budget.models";
 import { PaymentStatus, PaymentCalendar } from "./components/payments";
 import { BudgetCharts, ReportsPage } from "./components/analytics";
-import {
-  BudgetTemplates,
-  BudgetEstimator,
-  ActivityLog,
-  Notifications,
-} from "./components/advanced";
+import { BudgetTemplates, BudgetEstimator, ActivityLog, Notifications } from "./components/advanced";
 import { BulkOperations } from "./components/planner";
-
 import type { Expense } from "./models/budget.models";
 import dashboardStyles from "./BudgetDashboard.module.css";
 import { useTranslation } from "react-i18next";
@@ -193,4 +177,5 @@ export default function BudgetDashboardPageWrapper() {
     </BudgetProvider>
   );
 }
+
 

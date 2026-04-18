@@ -1,24 +1,11 @@
 "use client";
-
 import { useMemo } from "react";
 import { Tooltip, Avatar } from "antd";
-import {
-  TeamOutlined,
-  AppstoreOutlined,
-  DollarOutlined,
-  TagsOutlined,
-  UnorderedListOutlined,
-  MenuFoldOutlined,
-  MenuUnfoldOutlined,
-  LogoutOutlined,
-  CalendarOutlined,
-  ShopOutlined,
-} from "@ant-design/icons";
+import { TeamOutlined, AppstoreOutlined, DollarOutlined, TagsOutlined, UnorderedListOutlined, MenuFoldOutlined, MenuUnfoldOutlined, LogoutOutlined, CalendarOutlined, ShopOutlined } from "@ant-design/icons";
 import { useAuth } from "@/shared/contexts/AuthContext";
 import { useTranslation } from "react-i18next";
 import styles from "./Sidebar.module.css";
 import type { ReactNode } from "react";
-
 import type { View } from "@/shared/components/AppShell/models/appShell.models";
 
 
@@ -166,3 +153,4 @@ export default function Sidebar({
     </aside>
   );
 }
+

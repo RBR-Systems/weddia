@@ -1,26 +1,8 @@
 "use client";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import {
-  Card,
-  Switch,
-  Typography,
-  Space,
-  Tag,
-  Badge,
-  Button,
-  Empty,
-  Divider,
-  Row,
-  Col,
-} from "antd";
-import {
-  BellOutlined,
-  ExclamationCircleOutlined,
-  WarningOutlined,
-  ClockCircleOutlined,
-  DeleteOutlined,
-} from "@ant-design/icons";
+import { Card, Switch, Typography, Space, Tag, Badge, Button, Empty, Divider, Row, Col } from "antd";
+import { BellOutlined, ExclamationCircleOutlined, WarningOutlined, ClockCircleOutlined, DeleteOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { useBudget } from "../../contexts/BudgetContext";
 import { formatCurrency } from "@/utils/formatters.utils";
@@ -329,4 +311,5 @@ export default function NotificationsPanel() {
     </Row>
   );
 }
+
 

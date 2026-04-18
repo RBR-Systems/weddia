@@ -3,23 +3,10 @@
 import React from "react";
 import { Tag, Badge, Button, Tooltip } from "antd";
 import Card from "@/shared/components/Card/Card";
-import {
-  EditOutlined,
-  DeleteOutlined,
-  UpOutlined,
-  DownOutlined,
-  EnvironmentOutlined,
-  FieldTimeOutlined,
-  ToolOutlined,
-} from "@ant-design/icons";
+import { EditOutlined, DeleteOutlined, UpOutlined, DownOutlined, EnvironmentOutlined, FieldTimeOutlined, ToolOutlined } from "@ant-design/icons";
 import { TimelineItem, Status } from "../../models/schedule.models";
 import { useTranslation } from "react-i18next";
-import {
-  calculateDuration,
-  calculateSetupDuration,
-  formatTime,
-  getStatusOptions,
-} from "../../utils/schedule.utils";
+import { calculateDuration, calculateSetupDuration, formatTime, getStatusOptions } from "../../utils/schedule.utils";
 import styles from "./schedule-item.module.css";
 
 type Props = {
@@ -231,3 +218,4 @@ export default React.memo(ScheduleItem, (prev, next) =>
   prev.expanded === next.expanded &&
   prev.isNow === next.isNow,
 );
+

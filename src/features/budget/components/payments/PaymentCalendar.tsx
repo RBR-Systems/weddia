@@ -1,16 +1,7 @@
-﻿"use client";
-import React, { useMemo } from "react";
+"use client";
+import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import {
-  Card,
-  Calendar,
-  Badge,
-  Tooltip,
-  Typography,
-  Flex,
-  Tag,
-  Empty,
-} from "antd";
+import { Card, Calendar, Badge, Tooltip, Typography, Flex, Tag, Empty } from "antd";
 import type { Dayjs } from "dayjs";
 import dayjs from "dayjs";
 import { useBudget } from "../../contexts/BudgetContext";
@@ -197,3 +188,4 @@ export default function PaymentCalendar() {
     </div>
   );
 }
+

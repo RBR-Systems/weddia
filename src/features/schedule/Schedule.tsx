@@ -1,23 +1,7 @@
 "use client";
-
 import React, { useEffect, useState, useRef } from "react";
-import {
-  App,
-  Spin,
-  Empty,
-  Button,
-  Space,
-  Modal,
-  Radio,
-  InputNumber,
-  Select,
-} from "antd";
-import {
-  ClockCircleOutlined,
-  ThunderboltOutlined,
-  CheckCircleOutlined,
-  RightOutlined,
-} from "@ant-design/icons";
+import { App, Spin, Empty, Button, Space, Modal, Radio, InputNumber, Select } from "antd";
+import { ClockCircleOutlined, ThunderboltOutlined, CheckCircleOutlined, RightOutlined } from "@ant-design/icons";
 import { Checkbox } from "antd";
 import dayjs from "dayjs";
 import { TimelineItem, Status } from "./models/schedule.models";
@@ -774,4 +758,5 @@ const Schedule: React.FC = () => {
 };
 
 export default Schedule;
+
 

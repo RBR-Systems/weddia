@@ -1,16 +1,5 @@
-﻿import React from "react";
-import {
-  Modal,
-  Form,
-  Input,
-  Select,
-  DatePicker,
-  InputNumber,
-  Switch,
-  Space,
-  Tag,
-  Avatar,
-} from "antd";
+import React from "react";
+import { Modal, Form, Input, Select, DatePicker, InputNumber, Switch, Space, Tag, Avatar } from "antd";
 import type { Task, TaskFormValues, TaskCategory } from "../models/task.models";
 import { TEAM_MEMBERS } from "../api/taskApi";
 import { useTranslation } from "react-i18next";
@@ -293,3 +282,4 @@ const TaskFormModal: React.FC<TaskFormModalProps> = ({
 };
 
 export default TaskFormModal;
+

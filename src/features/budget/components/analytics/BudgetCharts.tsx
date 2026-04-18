@@ -2,23 +2,7 @@
 import React from "react";
 import { Row, Col, Typography, Empty } from "antd";
 import Card from "@/shared/components/Card/Card";
-import {
-  PieChart,
-  Pie,
-  Cell,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  LineChart,
-  Line,
-  AreaChart,
-  Area,
-} from "recharts";
+import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line, AreaChart, Area } from "recharts";
 import { useTranslation } from "react-i18next";
 import { useBudget } from "../../contexts/BudgetContext";
 import { formatCurrency } from "@/utils/formatters.utils";
@@ -266,3 +250,4 @@ export default function BudgetCharts() {
     </Row>
   );
 }
+

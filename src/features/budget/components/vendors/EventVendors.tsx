@@ -1,9 +1,7 @@
 "use client";
-import React, { useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import {
-  App, Table, Button, Switch, Input, Tag, Avatar, Space, Typography, Row, Col,
-} from "antd";
+import { App, Table, Button, Switch, Input, Tag, Avatar, Space, Typography, Row, Col } from "antd";
 import { ShopOutlined, EyeOutlined } from "@ant-design/icons";
 import { useBudget } from "../../contexts/BudgetContext";
 import { formatCurrency } from "@/utils/formatters.utils";
@@ -174,3 +172,4 @@ export default function EventVendors({ onViewVendor }: EventVendorsProps) {
     </>
   );
 }
+

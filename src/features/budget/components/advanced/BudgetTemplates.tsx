@@ -1,26 +1,8 @@
 "use client";
-import React, { useState } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import {
-  App,
-  Card,
-  Row,
-  Col,
-  Button,
-  Modal,
-  Form,
-  Input,
-  Flex,
-  Typography,
-  Tag,
-  Space,
-  Popconfirm,
-} from "antd";
-import {
-  SaveOutlined,
-  DownloadOutlined,
-  DeleteOutlined,
-} from "@ant-design/icons";
+import { App, Card, Row, Col, Button, Modal, Form, Input, Flex, Typography, Tag, Space, Popconfirm } from "antd";
+import { SaveOutlined, DownloadOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useBudget } from "../../contexts/BudgetContext";
 import { formatCurrency } from "@/utils/formatters.utils";
 import type { Category } from "../../models/budget.models";
@@ -326,4 +308,5 @@ export default function BudgetTemplates() {
     </>
   );
 }
+
 

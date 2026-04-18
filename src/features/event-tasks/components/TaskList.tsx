@@ -1,33 +1,7 @@
-﻿import React, { useMemo, useState } from "react";
-import {
-  Input,
-  Select,
-  Button,
-  Space,
-  Collapse,
-  Empty,
-  Typography,
-  Badge,
-  Segmented,
-  Table,
-  Tag,
-  Tooltip,
-  Avatar,
-  Progress,
-} from "antd";
+import React, { useMemo, useState } from "react";
+import { Input, Select, Button, Space, Collapse, Empty, Typography, Badge, Segmented, Table, Tag, Tooltip, Avatar, Progress } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import {
-  PlusOutlined,
-  FilterOutlined,
-  SearchOutlined,
-  ExclamationCircleOutlined,
-  ClockCircleOutlined,
-  CalendarOutlined,
-  CheckCircleFilled,
-  AppstoreOutlined,
-  UnorderedListOutlined,
-  ForwardOutlined,
-} from "@ant-design/icons";
+import { PlusOutlined, FilterOutlined, SearchOutlined, ExclamationCircleOutlined, ClockCircleOutlined, CalendarOutlined, CheckCircleFilled, AppstoreOutlined, UnorderedListOutlined, ForwardOutlined } from "@ant-design/icons";
 import type { Task, TaskFilters, TaskCategory } from "../models/task.models";
 import { groupTasks } from "../api/taskApi";
 import TaskCard from "./TaskCard";
@@ -521,3 +495,4 @@ const TaskList: React.FC<TaskListProps> = ({
 };
 
 export default TaskList;
+

@@ -1,20 +1,7 @@
 "use client";
-import React from "react";
+
 import { useTranslation } from "react-i18next";
-import {
-  Drawer,
-  Descriptions,
-  Typography,
-  Flex,
-  Space,
-  Divider,
-  Table,
-  Tag,
-  Row,
-  Col,
-  Avatar,
-  Empty,
-} from "antd";
+import { Drawer, Descriptions, Typography, Flex, Space, Divider, Table, Tag, Row, Col, Avatar, Empty } from "antd";
 import { ShopOutlined, MailOutlined, PhoneOutlined } from "@ant-design/icons";
 import Card from "@/shared/components/Card/Card";
 import Statistic from "@/shared/components/AnimatedStatistic/AnimatedStatistic";
@@ -189,3 +176,4 @@ export default function VendorDetails({
     </Drawer>
   );
 }
+

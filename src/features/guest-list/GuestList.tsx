@@ -1,45 +1,17 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import {
-  ReloadOutlined,
-  FileExcelOutlined,
-  UploadOutlined,
-  PlusOutlined,
-} from "@ant-design/icons";
-import {
-  App,
-  Card,
-  Row,
-  Col,
-  Button,
-  Modal,
-  Upload,
-  Form,
-  Input,
-  InputNumber,
-  Select,
-  Tag,
-  Space,
-} from "antd";
-import {
-  Guest,
-  formatStatusLabel,
-  statusColor,
-} from "./models/guestList.models";
+import { useEffect, useState } from "react";
+import { ReloadOutlined, FileExcelOutlined, UploadOutlined, PlusOutlined } from "@ant-design/icons";
+import { App, Row, Col, Button, Modal, Upload, Form, Input, InputNumber, Select, Tag, Space } from "antd";
+import { Guest, formatStatusLabel, statusColor } from "./models/guestList.models";
 import { formatPhone } from "@/utils/formatters.utils";
 import Header from "@/shared/components/Header/Header";
 import { useTranslation } from "react-i18next";
 import { useEvent } from "@/shared/contexts/EventContext";
-import {
-  fetchGuests,
-  fetchRelations,
-  removeGuest as removeGuestService,
-  createGuest,
-} from "./api/guestApi";
+import { fetchGuests, fetchRelations, removeGuest as removeGuestService, createGuest } from "./api/guestApi";
 import StatsBar from "./components/StatsBar/StatsBar";
 import GuestTable from "./components/GuestTable/GuestTable";
 import GuestDetailModal from "./components/GuestDetail/GuestDetailModal";
-import styles from "./GuestList.module.css";
+
 
 export default function GuestList() {
   const { t } = useTranslation();
@@ -761,3 +733,4 @@ export default function GuestList() {
     </div>
   );
 }
+

@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import { Typography, Alert } from "antd";
 import { useAuth } from "@/shared/contexts/AuthContext";
 import Card from "@/shared/components/Card/Card";
@@ -46,3 +45,4 @@ export default function LoginPage() {
     </div>
   );
 }
+

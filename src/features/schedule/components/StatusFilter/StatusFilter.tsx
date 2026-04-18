@@ -2,17 +2,10 @@
 
 import React from "react";
 import { Space, Tag, Switch, Button, Input, Select } from "antd";
-import {
-  CheckCircleOutlined,
-  ClockCircleOutlined,
-  PlayCircleOutlined,
-  WarningOutlined,
-  CloseCircleOutlined,
-  FilterOutlined,
-} from "@ant-design/icons";
+import { CheckCircleOutlined, ClockCircleOutlined, PlayCircleOutlined, WarningOutlined, CloseCircleOutlined, FilterOutlined } from "@ant-design/icons";
 import { Status } from "../../models/schedule.models";
 import { useTranslation } from "react-i18next";
-import {  calculateProgress } from "../../utils/schedule.utils";
+import { calculateProgress } from "../../utils/schedule.utils";
 import { TimelineItem } from "../../models/schedule.models";
 import styles from "./StatusFilter.module.css";
 
@@ -191,4 +184,5 @@ const StatusFilter: React.FC<Props> = ({
 };
 
 export default StatusFilter;
+
 

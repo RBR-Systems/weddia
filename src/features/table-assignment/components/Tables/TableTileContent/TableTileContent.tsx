@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+import { memo } from "react";
 import { Badge, Typography } from "antd";
 import styles from "./TableTile.module.css";
 import type { Table } from "../../../models/tableAssignment.models";
@@ -30,3 +30,4 @@ export default memo(function TableTileContent({
     </div>
   );
 });
+

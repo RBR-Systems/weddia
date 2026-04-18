@@ -1,18 +1,6 @@
 "use client";
-import React, { useState } from "react";
-import {
-  Card,
-  Row,
-  Col,
-  Slider,
-  InputNumber,
-  Typography,
-  Space,
-  Button,
-  Divider,
-  Alert,
-  Tooltip,
-} from "antd";
+import { useState } from "react";
+import { Card, Row, Col, Slider, InputNumber, Typography, Space, Button, Divider, Alert, Tooltip } from "antd";
 import Statistic from "@/shared/components/AnimatedStatistic/AnimatedStatistic";
 import { useTranslation } from "react-i18next";
 import { EditOutlined } from "@ant-design/icons";
@@ -247,4 +235,5 @@ export default function BudgetAllocation() {
     </Card>
   );
 }
+
 

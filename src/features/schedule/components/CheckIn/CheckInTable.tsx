@@ -1,19 +1,7 @@
 "use client";
-
 import React, { useMemo } from "react";
 import { Table, Tag, Button, Space, Input, Tooltip, Avatar, Badge } from "antd";
-import {
-  CheckCircleOutlined,
-  ClockCircleOutlined,
-  StarFilled,
-  EnvironmentOutlined,
-  UndoOutlined,
-  LoginOutlined,
-  MedicineBoxOutlined,
-  AlertOutlined,
-  FileTextOutlined,
-  SearchOutlined,
-} from "@ant-design/icons";
+import { CheckCircleOutlined, ClockCircleOutlined, StarFilled, EnvironmentOutlined, UndoOutlined, LoginOutlined, MedicineBoxOutlined, AlertOutlined, FileTextOutlined, SearchOutlined } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import { useTranslation } from "react-i18next";
 import { CheckInGuest } from "../../models/checkIn.models";
@@ -505,3 +493,4 @@ const CheckInTable: React.FC<CheckInTableProps> = ({
 };
 
 export default CheckInTable;
+

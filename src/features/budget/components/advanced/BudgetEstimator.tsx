@@ -1,31 +1,13 @@
 "use client";
-import React, { useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import {
-  Card,
-  Row,
-  Col,
-  InputNumber,
-  Slider,
-  Typography,
-  Space,
-  Select,
-  Divider,
-  Flex,
-  Button,
-  Alert,
-  App,
-} from "antd";
+import { Card, Row, Col, InputNumber, Slider, Typography, Space, Select, Divider, Flex, Button, Alert, App } from "antd";
 import { BulbOutlined, CalculatorOutlined } from "@ant-design/icons";
 import { useBudget } from "../../contexts/BudgetContext";
 import { formatCurrency, formatInputNumber, parseInputNumber } from "@/utils/formatters.utils";
 import Statistic from "@/shared/components/AnimatedStatistic/AnimatedStatistic";
 import CategoryTag from "../shared/CategoryTag";
-import {
-  CHART_COLORS,
-  SEMANTIC_CHART_COLORS,
-  resolveChartColor,
-} from "@/theme/chartColors";
+import { CHART_COLORS, SEMANTIC_CHART_COLORS, resolveChartColor } from "@/theme/chartColors";
 import { useTheme } from "@/theme/ThemeProvider";
 
 const { Title, Text, Paragraph } = Typography;
@@ -365,4 +347,5 @@ export default function BudgetEstimator() {
     </Row>
   );
 }
+
 

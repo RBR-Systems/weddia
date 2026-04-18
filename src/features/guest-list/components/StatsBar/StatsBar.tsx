@@ -1,15 +1,8 @@
 "use client";
-import React from "react";
+
 import { Row, Col, Statistic, Card } from "antd";
-import {
-  TeamOutlined,
-  CheckCircleOutlined,
-  ClockCircleOutlined,
-  QuestionCircleOutlined,
-  CloseCircleOutlined,
-  NumberOutlined,
-} from "@ant-design/icons";
-import { Guest, formatStatusLabel} from "../../models/guestList.models";
+import { TeamOutlined, CheckCircleOutlined, ClockCircleOutlined, QuestionCircleOutlined, CloseCircleOutlined, NumberOutlined } from "@ant-design/icons";
+import { Guest, formatStatusLabel } from "../../models/guestList.models";
 import { useTranslation } from "react-i18next";
 import styles from "../../GuestList.module.css";
 
@@ -129,4 +122,5 @@ export default function StatsBar({
     </Row>
   );
 }
+
 

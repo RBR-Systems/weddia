@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useState, useEffect, forwardRef } from "react";
 import { useTranslation } from "react-i18next";
 import styles from "./CurrentTimeIndicator.module.css";
@@ -127,3 +126,4 @@ const CurrentTimeIndicator = forwardRef<HTMLDivElement, Props>(
 CurrentTimeIndicator.displayName = "CurrentTimeIndicator";
 
 export default CurrentTimeIndicator;
+

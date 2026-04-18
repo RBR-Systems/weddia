@@ -1,24 +1,8 @@
 "use client";
 
 import React from "react";
-import {
-  Modal,
-  Button,
-  InputNumber,
-  Typography,
-  Tag,
-  Space,
-  Divider,
-} from "antd";
-import {
-  StarFilled,
-  PhoneOutlined,
-  MailOutlined,
-  EnvironmentOutlined,
-  AlertOutlined,
-  MedicineBoxOutlined,
-  FileTextOutlined,
-} from "@ant-design/icons";
+import { Modal, Button, InputNumber, Typography, Tag, Space, Divider } from "antd";
+import { StarFilled, PhoneOutlined, MailOutlined, EnvironmentOutlined, AlertOutlined, MedicineBoxOutlined, FileTextOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import { CheckInGuest } from "../../models/checkIn.models";
 import styles from "./CheckIn.module.css";
@@ -214,3 +198,4 @@ const CheckInModal: React.FC<CheckInModalProps> = ({
 };
 
 export default CheckInModal;
+

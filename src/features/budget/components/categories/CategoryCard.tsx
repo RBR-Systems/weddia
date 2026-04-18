@@ -1,5 +1,5 @@
-﻿"use client";
-import React from "react";
+"use client";
+
 import { Progress } from "antd";
 import { formatCurrency } from "@/utils/formatters.utils";
 import type { Category } from "../../models/budget.models";
@@ -104,3 +104,4 @@ export default function CategoryCard({
     </button>
   );
 }
+

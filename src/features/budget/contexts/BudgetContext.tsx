@@ -1,22 +1,7 @@
 "use client";
-import React, {
-  createContext,
-  useContext,
-  useReducer,
-  useEffect,
-  useCallback,
-} from "react";
-import type {
-  BudgetState,
-  Category,
-  Expense,
-  BudgetSummary,
-  Currency,
-} from "../models/budget.models";
-import {
-  getDefaultCategories,
-  DEFAULT_CURRENCY,
-} from "../constants/budget.constants";
+import React, { createContext, useContext, useReducer, useEffect, useCallback } from "react";
+import type { BudgetState, Category, Expense, BudgetSummary, Currency } from "../models/budget.models";
+import { getDefaultCategories, DEFAULT_CURRENCY } from "../constants/budget.constants";
 import { BudgetService } from "../api/budgetApi";
 import { ApiError, isAbortError } from "@/shared/api/apiClient";
 import { useEvent } from "@/shared/contexts/EventContext";
@@ -666,3 +651,4 @@ export function useBudget() {
   if (!ctx) throw new Error("useBudget must be used within BudgetProvider");
   return ctx;
 }
+

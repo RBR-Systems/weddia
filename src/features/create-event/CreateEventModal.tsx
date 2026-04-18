@@ -1,18 +1,8 @@
 "use client";
-
 import { EventActions } from "@/shared/contexts/eventActions";
 import { useEvent } from "@/shared/contexts/EventContext";
 import { apiPost } from "@/shared/api/apiClient";
-import {
-  DatePicker,
-  Form,
-  Input,
-  InputNumber,
-  InputNumberProps,
-  Modal,
-  Select,
-  message,
-} from "antd";
+import { DatePicker, Form, Input, InputNumber, InputNumberProps, Modal, Select, message } from "antd";
 import { formatInputNumber, parseInputNumber } from "@/utils/formatters.utils";
 import { useState } from "react";
 import dayjs from "dayjs";
@@ -21,11 +11,7 @@ import { getWeddingThemes } from "@/shared/constants/weddingThemes.constants";
 import { useLocale } from "@/shared/hooks/useLocale";
 import FormSection from "./FormSection";
 import ClientInfoForm from "./ClientInfoForm";
-import {
-  DollarOutlined,
-  EditOutlined,
-  PushpinOutlined,
-} from "@ant-design/icons";
+import { DollarOutlined, EditOutlined, PushpinOutlined } from "@ant-design/icons";
 import styles from "./create-event-modal.module.css";
 import { useTranslation } from "react-i18next";
 import { EventStatus } from "@/features/events-list/models/enums/eventList.models";
@@ -247,3 +233,4 @@ const CreateEventModal = () => {
 };
 
 export default CreateEventModal;
+

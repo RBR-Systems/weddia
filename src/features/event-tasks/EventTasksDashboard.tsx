@@ -1,26 +1,9 @@
-﻿"use client";
+"use client";
 import React, { useCallback, useEffect, useState } from "react";
 import { Tabs, Spin, message, Typography } from "antd";
-import {
-  UnorderedListOutlined,
-  DashboardOutlined,
-  CalendarOutlined,
-  FileAddOutlined,
-} from "@ant-design/icons";
-import type {
-  Task,
-  TaskSummary,
-  TaskCategory,
-  WeddingTemplate,
-  TaskFormValues,
-} from "./models/task.models";
-import {
-  fetchTasks,
-  buildCategories,
-  computeTaskSummary,
-  generateTasksFromTemplate,
-  createTaskFromForm,
-} from "./api/taskApi";
+import { UnorderedListOutlined, DashboardOutlined, CalendarOutlined, FileAddOutlined } from "@ant-design/icons";
+import type { Task, TaskSummary, TaskCategory, WeddingTemplate, TaskFormValues } from "./models/task.models";
+import { fetchTasks, buildCategories, computeTaskSummary, generateTasksFromTemplate, createTaskFromForm } from "./api/taskApi";
 import TaskList from "./components/TaskList";
 import ProgressDashboard from "./components/ProgressDashboard";
 import TaskCalendar from "./components/TaskCalendar";
@@ -318,3 +301,4 @@ const EventTasksDashboard: React.FC = () => {
 };
 
 export default EventTasksDashboard;
+

@@ -1,5 +1,4 @@
 import type { ReactNode } from 'react';
-
 import { APP_VIEWS } from '../constants/appShell.constants';
 
 // View type derived from APP_VIEWS constant to keep literals centralized
@@ -10,3 +9,4 @@ export interface AppShellProps {
   onNavigate: (view: View) => void;
   children: ReactNode;
 }
+

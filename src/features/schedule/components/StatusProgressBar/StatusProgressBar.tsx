@@ -4,13 +4,7 @@ import React from "react";
 import { Progress, Space, Tag, Row, Col } from "antd";
 import Card from "@/shared/components/Card/Card";
 import { useTranslation } from "react-i18next";
-import {
-  CheckCircleOutlined,
-  ClockCircleOutlined,
-  PlayCircleOutlined,
-  WarningOutlined,
-  CloseCircleOutlined,
-} from "@ant-design/icons";
+import { CheckCircleOutlined, ClockCircleOutlined, PlayCircleOutlined, WarningOutlined, CloseCircleOutlined } from "@ant-design/icons";
 import { calculateProgress, getStatusOptions } from "../../utils/schedule.utils";
 import { TimelineItem } from "../../models/schedule.models";
 import styles from "./StatusProgressBar.module.css";
@@ -138,3 +132,4 @@ const StatusProgressBar: React.FC<Props> = ({ items }) => {
 };
 
 export default StatusProgressBar;
+

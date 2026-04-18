@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+
 import { Progress, Tooltip } from "antd";
 import { formatCurrency } from "@/utils/formatters.utils";
 import { SEMANTIC_CHART_COLORS } from "@/theme/chartColors";
@@ -50,3 +50,4 @@ export default function BudgetProgress({
     </Tooltip>
   );
 }
+

@@ -1,5 +1,5 @@
-﻿"use client";
-import React from "react";
+"use client";
+
 import { Tag } from "antd";
 import { useTranslation } from "react-i18next";
 import type { BudgetStatus, PaymentStatus } from "../../models/budget.models";
@@ -44,3 +44,4 @@ export default function StatusBadge({
 
   return <Tag color={config.color}>{t(config.label)}</Tag>;
 }
+

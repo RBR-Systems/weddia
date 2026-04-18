@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+import { memo } from "react";
 import { useDroppable } from "@dnd-kit/core";
 import { Space, Typography } from "antd";
 import { UserOutlined } from "@ant-design/icons";
@@ -22,3 +22,4 @@ export default memo(function UnassignedDropZone() {
     </div>
   );
 });
+

@@ -1,26 +1,7 @@
 "use client";
-import React, { useState } from "react";
-import {
-  Card,
-  Table,
-  Tag,
-  Progress,
-  Space,
-  Button,
-  Input,
-  Select,
-  Row,
-  Col,
-  
-  Typography,
-  Avatar,
-} from "antd";
-import {
-  PlusOutlined,
-  EyeOutlined,
-  TeamOutlined,
-  CalendarOutlined,
-} from "@ant-design/icons";
+import { useState } from "react";
+import { Card, Table, Tag, Progress, Space, Button, Input, Select, Row, Col, Typography, Avatar } from "antd";
+import { PlusOutlined, EyeOutlined, TeamOutlined, CalendarOutlined } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
 import { formatCurrency } from "@/utils/formatters.utils";
@@ -324,4 +305,5 @@ export default function MultiClientView({
     </>
   );
 }
+
 

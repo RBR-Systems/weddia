@@ -1,5 +1,4 @@
 "use client";
-
 import { useEffect, useState } from "react";
 import { Spin } from "antd";
 import { useAuth } from "@/shared/contexts/AuthContext";
@@ -103,4 +102,5 @@ export default function Home() {
     </AppShell>
   );
 }
+
 

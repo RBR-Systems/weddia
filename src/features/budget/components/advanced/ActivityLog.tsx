@@ -1,29 +1,11 @@
 "use client";
 import React, { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import {
-  Card,
-  Timeline,
-  Typography,
-  Tag,
-  Space,
-  Select,
-  DatePicker,
-  Empty,
-  Avatar,
-  Input,
-} from "antd";
-import {
-  PlusCircleOutlined,
-  EditOutlined,
-  DeleteOutlined,
-  DollarOutlined,
-  UserOutlined,
-  CheckCircleOutlined,
-} from "@ant-design/icons";
+import { Card, Timeline, Typography, Tag, Space, Select, DatePicker, Empty, Avatar, Input } from "antd";
+import { PlusCircleOutlined, EditOutlined, DeleteOutlined, DollarOutlined, UserOutlined, CheckCircleOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { useBudget } from "../../contexts/BudgetContext";
-import { formatCurrency} from "@/utils/formatters.utils";
+import { formatCurrency } from "@/utils/formatters.utils";
 import activityStyles from "./ActivityLog.module.css";
 
 const { Text, Title } = Typography;
@@ -263,4 +245,5 @@ export default function ActivityLog() {
     </Card>
   );
 }
+
 

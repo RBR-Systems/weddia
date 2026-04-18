@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+
 import { Typography } from "antd";
 import Card from "@/shared/components/Card/Card";
 import styles from "./multi-client.module.css";
@@ -21,3 +21,4 @@ export default function MultiClientPage() {
     </div>
   );
 }
+

@@ -1,5 +1,4 @@
 "use client";
-
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { setToken, clearToken, setUnauthorizedHandler } from "@/shared/api/apiClient";
 import { login as loginApi } from "@/features/auth/api/authApi";
@@ -68,3 +67,4 @@ export function useAuth() {
   if (!ctx) throw new Error("useAuth must be used within AuthProvider");
   return ctx;
 }
+

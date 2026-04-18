@@ -1,30 +1,8 @@
 "use client";
-import React, { useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import {
-  App,
-  Table,
-  Button,
-  Input,
-  Space,
-  Tag,
-  Avatar,
-  Typography,
-  Row,
-  Col,
-  Modal,
-  Form,
-  Select,
-} from "antd";
-import {
-  PlusOutlined,
-  ShopOutlined,
-  PhoneOutlined,
-  MailOutlined,
-  EyeOutlined,
-  UserOutlined,
-  EnvironmentOutlined,
-} from "@ant-design/icons";
+import { App, Table, Button, Input, Space, Tag, Avatar, Typography, Row, Col, Modal, Form, Select } from "antd";
+import { PlusOutlined, ShopOutlined, PhoneOutlined, MailOutlined, EyeOutlined, UserOutlined, EnvironmentOutlined } from "@ant-design/icons";
 import { BudgetService } from "../../api/budgetApi";
 import expenseStyles from "../ExpenseModal.module.css";
 import Card from "@/shared/components/Card/Card";
@@ -338,4 +316,5 @@ export default function VendorList({ onViewVendor }: VendorListProps) {
     </>
   );
 }
+
 

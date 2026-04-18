@@ -1,12 +1,6 @@
-﻿import React from "react";
+import React from "react";
 import { Card, Tag, Progress, Tooltip, Button, Avatar } from "antd";
-import {
-  CalendarOutlined,
-  CheckCircleOutlined,
-  FlagOutlined,
-  PaperClipOutlined,
-  MessageOutlined,
-} from "@ant-design/icons";
+import { CalendarOutlined, CheckCircleOutlined, FlagOutlined, PaperClipOutlined, MessageOutlined } from "@ant-design/icons";
 import type { Task } from "../models/task.models";
 import styles from "../EventTasks.module.css";
 import { useTranslation } from "react-i18next";
@@ -203,3 +197,4 @@ const TaskCard: React.FC<TaskCardProps> = ({
 };
 
 export default TaskCard;
+

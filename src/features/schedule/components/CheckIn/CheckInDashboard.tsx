@@ -1,18 +1,11 @@
 "use client";
-
 import React, { useCallback, useEffect, useState } from "react";
 import { App, Button, Col, Empty, Row, Space, Spin, Tag } from "antd";
 import { ReloadOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import { useEvent } from "@/shared/contexts/EventContext";
-import {
-  CheckInGuest,
-  CheckInStatusFilter,
-} from "../../models/checkIn.models";
-import {
-  fetchCheckInData,
-  computeStats,
-} from "../../api/checkInApi";
+import { CheckInGuest, CheckInStatusFilter } from "../../models/checkIn.models";
+import { fetchCheckInData, computeStats } from "../../api/checkInApi";
 import CheckInStatsBar from "./CheckInStatsBar";
 import CheckInTable, { CheckInFilters } from "./CheckInTable";
 import CheckInModal from "./CheckInModal";
@@ -335,3 +328,4 @@ const CheckInDashboard: React.FC<CheckInDashboardProps> = ({ onNavigateToTable }
 };
 
 export default CheckInDashboard;
+

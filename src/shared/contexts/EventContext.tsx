@@ -1,12 +1,5 @@
 "use client";
-
-import React, {
-  createContext,
-  ReactNode,
-  useContext,
-  useEffect,
-  useReducer,
-} from "react";
+import React, { createContext, ReactNode, useContext, useEffect, useReducer } from "react";
 import { EventContextInterface } from "./InitialState";
 import { EventAction, EventActions } from "./eventActions";
 import { EventCardProps } from "@/features/events-list/models/eventCardProps.models";
@@ -179,3 +172,4 @@ export const useEvent = () => {
   if (!context) throw new Error("useEvent must be used within an EventProvider");
   return context;
 };
+

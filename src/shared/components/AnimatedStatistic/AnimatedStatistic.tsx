@@ -1,12 +1,5 @@
 "use client";
-import {
-  useEffect,
-  useMemo,
-  useRef,
-  useCallback,
-  type ComponentProps,
-  type ReactNode,
-} from "react";
+import { useEffect, useMemo, useRef, useCallback } from "react";
 import { Statistic as AntdStatistic } from "antd";
 import CountUp from "react-countup";
 import { extractNumber, detectDecimals } from "./utils/number.utils";
@@ -86,3 +79,4 @@ export default function AnimatedStatistic({
 
   return <AntdStatistic {...rest} value={numeric} formatter={renderValue} />;
 }
+

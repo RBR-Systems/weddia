@@ -2,13 +2,7 @@
 
 import React from "react";
 import { Row, Col, Card, Statistic } from "antd";
-import {
-  TeamOutlined,
-  CheckCircleOutlined,
-  ClockCircleOutlined,
-  PercentageOutlined,
-  AlertOutlined,
-} from "@ant-design/icons";
+import { TeamOutlined, CheckCircleOutlined, ClockCircleOutlined, PercentageOutlined, AlertOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import { CheckInStats, CheckInStatusFilter } from "../../models/checkIn.models";
 import styles from "./CheckIn.module.css";
@@ -103,3 +97,4 @@ const CheckInStatsBar: React.FC<CheckInStatsBarProps> = ({
 };
 
 export default CheckInStatsBar;
+

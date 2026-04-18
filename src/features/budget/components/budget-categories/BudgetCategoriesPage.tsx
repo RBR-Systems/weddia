@@ -1,25 +1,8 @@
 "use client";
-
-import React, { useEffect, useState, useMemo } from "react";
-import {
-  Button,
-  Input,
-  Modal,
-  Form,
-  Tooltip,
-  Empty,
-  Spin,
-  App,
-  Popconfirm,
-  Typography,
-} from "antd";
-import {
-  PlusOutlined,
-  EditOutlined,
-  DeleteOutlined,
-  TagsOutlined,
-} from "@ant-design/icons";
-import { CategoriesService, type BudgetCategory } from "../../api/categoriesApi";
+import { useEffect, useState, useMemo } from "react";
+import { Button, Input, Modal, Form, Tooltip, Empty, Spin, App, Popconfirm, Typography } from "antd";
+import { PlusOutlined, EditOutlined, DeleteOutlined, TagsOutlined } from "@ant-design/icons";
+import { CategoriesService } from "../../api/categoriesApi";
 import { useTranslation } from "react-i18next";
 import styles from "./BudgetCategoriesPage.module.css";
 
@@ -251,3 +234,4 @@ export default function BudgetCategoriesPage() {
     </div>
   );
 }
+

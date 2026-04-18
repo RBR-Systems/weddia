@@ -1,16 +1,8 @@
 import React, { memo } from "react";
-import type {
-  Table,
-  TableAssignment,
-  TableLayout,
-  Guest,
-} from "../../../models/tableAssignment.models";
+import type { Table, TableAssignment, TableLayout, Guest } from "../../../models/tableAssignment.models";
 import DroppableTableTile from "../DroppableTableTile/DroppableTableTile";
 import styles from "./TableCanvas.module.css";
-import {
-  DEFAULT_VENUE_WIDTH_METERS,
-  DEFAULT_VENUE_HEIGHT_METERS,
-} from "../../../constants/tableAssignment.constants";
+import { DEFAULT_VENUE_WIDTH_METERS, DEFAULT_VENUE_HEIGHT_METERS } from "../../../constants/tableAssignment.constants";
 
 export default memo(function TablesCanvas({
   tableOrder,
@@ -113,3 +105,4 @@ export default memo(function TablesCanvas({
     </div>
   );
 });
+

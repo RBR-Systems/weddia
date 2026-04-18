@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+
 import { Typography } from "antd";
 import { formatCurrency } from "@/utils/formatters.utils";
 
@@ -28,3 +28,4 @@ export default function CurrencyDisplay({
     </Text>
   );
 }
+

@@ -1,6 +1,6 @@
 import Card from "@/shared/components/Card/Card";
 import Header from "@/shared/components/Header/Header";
-import React from "react";
+
 import styles from "./events-hub.module.css";
 import { useEvent } from "@/shared/contexts/EventContext";
 import { useTranslation } from "react-i18next";
@@ -38,3 +38,4 @@ const EventsHub = () => {
 };
 
 export default EventsHub;
+

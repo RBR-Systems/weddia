@@ -1,6 +1,5 @@
 "use client";
-
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import dayjs from "dayjs";
 import styles from "./event-list.module.css";
 import Header from "@/shared/components/Header/Header";
@@ -10,26 +9,8 @@ import { EventCardProps } from "./models/eventCardProps.models";
 import { useEvent } from "@/shared/contexts/EventContext";
 import { EventActions } from "@/shared/contexts/eventActions";
 import { apiPut } from "@/shared/api/apiClient";
-import {
-  Table,
-  Button,
-  Modal,
-  Form,
-  Input,
-  InputNumber,
-  Select,
-  Progress,
-  Tag,
-  Tooltip,
-  DatePicker,
-  message,
-} from "antd";
-import {
-  EditOutlined,
-  DollarOutlined,
-  EnvironmentOutlined,
-  CalendarOutlined,
-} from "@ant-design/icons";
+import { Table, Button, Modal, Form, Input, InputNumber, Select, Progress, Tag, Tooltip, DatePicker, message } from "antd";
+import { EditOutlined, DollarOutlined, EnvironmentOutlined, CalendarOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 
 const { Option } = Select;
@@ -389,3 +370,4 @@ const EventList = () => {
 };
 
 export default EventList;
+

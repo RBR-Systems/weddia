@@ -1,23 +1,7 @@
-﻿"use client";
-import React from "react";
-import {
-  Drawer,
-  Descriptions,
-  Tag,
-  Typography,
-  Flex,
-  Space,
-  Divider,
-  Button,
-  Empty,
-  Timeline,
-} from "antd";
-import {
-  EditOutlined,
-  DeleteOutlined,
-  FileImageOutlined,
-  LinkOutlined,
-} from "@ant-design/icons";
+"use client";
+
+import { Drawer, Descriptions, Tag, Typography, Flex, Space, Divider, Button, Empty, Timeline } from "antd";
+import { EditOutlined, DeleteOutlined, FileImageOutlined, LinkOutlined } from "@ant-design/icons";
 import { formatCurrency, formatDate } from "@/utils/formatters.utils";
 import { useBudget } from "../../contexts/BudgetContext";
 import { getPaymentStatus } from "../../constants/budget.constants";
@@ -162,3 +146,4 @@ export default function ExpenseDetails({
     </Drawer>
   );
 }
+

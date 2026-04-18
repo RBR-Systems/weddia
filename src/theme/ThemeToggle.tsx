@@ -1,5 +1,4 @@
 "use client";
-
 import { useTheme } from "@/theme/ThemeProvider";
 import { MoonOutlined, SunOutlined } from "@ant-design/icons";
 import { Button } from "antd";
@@ -19,3 +18,4 @@ export function ThemeToggle() {
     />
   );
 }
+

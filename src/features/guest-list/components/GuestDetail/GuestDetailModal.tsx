@@ -1,12 +1,8 @@
 "use client";
-import React from "react";
+
 import { useTranslation } from "react-i18next";
 import { Drawer, Descriptions, Tag, Typography, Button, Space } from "antd";
-import {
-  Guest,
-  formatStatusLabel,
-  statusColor,
-} from "../../models/guestList.models";
+import { Guest, formatStatusLabel, statusColor } from "../../models/guestList.models";
 import { formatPhone } from "@/utils/formatters.utils";
 import { useTheme } from "@/theme/ThemeProvider";
 
@@ -170,3 +166,4 @@ export default function GuestDetailModal({
     </Drawer>
   );
 }
+

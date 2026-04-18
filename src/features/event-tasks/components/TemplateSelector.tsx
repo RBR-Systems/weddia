@@ -1,29 +1,7 @@
-﻿"use client";
+"use client";
 import React, { useEffect, useState } from "react";
-import {
-  Card,
-  Row,
-  Col,
-  Button,
-  Modal,
-  DatePicker,
-  Switch,
-  Tag,
-  Space,
-  Typography,
-  Collapse,
-  Spin,
-  Result,
-  Empty,
-} from "antd";
-import {
-  CalendarOutlined,
-  CheckCircleOutlined,
-  EyeOutlined,
-  ThunderboltOutlined,
-  UnorderedListOutlined,
-  FileAddOutlined,
-} from "@ant-design/icons";
+import { Card, Row, Col, Button, Modal, DatePicker, Switch, Tag, Space, Typography, Collapse, Spin, Result, Empty } from "antd";
+import { CalendarOutlined, CheckCircleOutlined, EyeOutlined, ThunderboltOutlined, UnorderedListOutlined, FileAddOutlined } from "@ant-design/icons";
 import type { WeddingTemplate } from "../models/task.models";
 import { fetchMexicanTemplate } from "../api/taskApi";
 import styles from "../EventTasks.module.css";
@@ -475,3 +453,4 @@ const TemplateSelector: React.FC<TemplateSelectorProps> = ({ onApply }) => {
 };
 
 export default TemplateSelector;
+

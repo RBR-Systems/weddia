@@ -1,30 +1,9 @@
 "use client";
 import styles from "./TableAssignmentPage.module.css";
-import {
-  App,
-  Card,
-  Empty,
-  Space,
-  Typography,
-  Button,
-  FloatButton,
-  InputNumber,
-  Modal,
-  Form,
-  Select,
-  Tag,
-} from "antd";
+import { App, Card, Empty, Space, Typography, Button, FloatButton, InputNumber, Modal, Form, Select, Tag } from "antd";
 import { DEFAULT_VENUE_WIDTH_METERS } from "./constants/tableAssignment.constants";
 import { DndContext, DragOverlay, pointerWithin } from "@dnd-kit/core";
-import {
-  TeamOutlined,
-  MessageOutlined,
-  UndoOutlined,
-  PlusOutlined,
-  ZoomOutOutlined,
-  ZoomInOutlined,
-  PlusSquareOutlined,
-} from "@ant-design/icons";
+import { TeamOutlined, MessageOutlined, UndoOutlined, PlusOutlined, ZoomOutOutlined, ZoomInOutlined, PlusSquareOutlined } from "@ant-design/icons";
 import React, { useState } from "react";
 import TableCanvas from "./components/Tables/TableCanvas/TableCanvas";
 import SeatingAIChat from "./components/AIChat/SeatingAIChat";
@@ -376,4 +355,5 @@ function TableAssignmentContent() {
 }
 
 export default TableAssignmentPage;
+
 

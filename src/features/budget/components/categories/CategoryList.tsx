@@ -1,21 +1,7 @@
-﻿"use client";
+"use client";
 import { formatInputNumber, parseInputNumber } from "@/utils/formatters.utils";
-import React, { useState, useEffect, useMemo } from "react";
-import {
-  App,
-  Row,
-  Col,
-  Card,
-  Button,
-  Empty,
-  Input,
-  Space,
-  Modal,
-  Form,
-  InputNumber,
-  Select,
-  Typography,
-} from "antd";
+import { useState, useEffect, useMemo } from "react";
+import { App, Row, Col, Card, Button, Empty, Input, Space, Modal, Form, InputNumber, Select, Typography } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { useBudget } from "../../contexts/BudgetContext";
 import CategoryCard from "./CategoryCard";
@@ -24,7 +10,7 @@ import type { Category } from "../../models/budget.models";
 import { CHART_COLORS } from "@/theme/chartColors";
 import { useTheme } from "@/theme/ThemeProvider";
 import { useTranslation } from "react-i18next";
-import { CategoriesService, type BudgetCategory } from "@/features/budget/api/categoriesApi";
+import { CategoriesService } from "@/features/budget/api/categoriesApi";
 
 const { Search } = Input;
 const { Text } = Typography;
@@ -253,4 +239,5 @@ export default function CategoryList() {
     </>
   );
 }
+
 

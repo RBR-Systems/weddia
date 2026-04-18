@@ -1,23 +1,6 @@
-﻿import React, { useState } from "react";
-import {
-  Calendar,
-  Badge,
-  Card,
-  Typography,
-  Tag,
-  Space,
-  Tooltip,
-  Button,
-  Empty,
-  Avatar,
-  Flex,
-} from "antd";
-import {
-  PlusOutlined,
-  CheckCircleOutlined,
-  ClockCircleOutlined,
-  ExclamationCircleOutlined,
-} from "@ant-design/icons";
+import React, { useState } from "react";
+import { Calendar, Badge, Card, Typography, Tag, Space, Tooltip, Button, Empty, Avatar, Flex } from "antd";
+import { PlusOutlined, CheckCircleOutlined, ClockCircleOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
 import type { Dayjs } from "dayjs";
 import dayjs from "dayjs";
 import type { Task, TaskCategory } from "../models/task.models";
@@ -299,3 +282,4 @@ function CalendarIcon() {
 }
 
 export default TaskCalendar;
+

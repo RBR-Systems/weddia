@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Status } from "../models/schedule.models";
+
 
 type KeyboardShortcutHandlers = {
   onComplete?: () => void;
@@ -71,3 +71,4 @@ export function useKeyboardShortcuts(
 }
 
 export default useKeyboardShortcuts;
+

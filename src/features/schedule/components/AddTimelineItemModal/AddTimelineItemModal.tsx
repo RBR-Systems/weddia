@@ -2,21 +2,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { Modal, Form, Input, DatePicker } from "antd";
-import {
-  HeartOutlined,
-  StarOutlined,
-  CameraOutlined,
-  ToolOutlined,
-  PlayCircleOutlined,
-  CoffeeOutlined,
-  SoundOutlined,
-  FireOutlined,
-  SettingOutlined,
-  TeamOutlined,
-  ClockCircleOutlined,
-  EnvironmentOutlined,
-  FileTextOutlined,
-} from "@ant-design/icons";
+import { HeartOutlined, StarOutlined, CameraOutlined, ToolOutlined, PlayCircleOutlined, CoffeeOutlined, SoundOutlined, FireOutlined, SettingOutlined, TeamOutlined, ClockCircleOutlined, EnvironmentOutlined, FileTextOutlined } from "@ant-design/icons";
 import type { Status, TimelineItem } from "../../models/schedule.models";
 import dayjs from "dayjs";
 import { suggestSetupTime, calculateSetupTime } from "../../utils/schedule.utils";
@@ -71,7 +57,6 @@ function TypeChipGroup({
     </div>
   );
 }
-
 import { getRandomId } from '@/shared/utils/rng';
 
 function createId() {
@@ -283,3 +268,4 @@ export default function AddTimelineItemModal({
     </Modal>
   );
 }
+

@@ -1,16 +1,5 @@
-import {
-  DEFAULT_VENUE_HEIGHT_METERS,
-  DEFAULT_VENUE_WIDTH_METERS,
-  SNAP_METERS,
-} from "../constants/tableAssignment.constants";
-import type {
-  Guest,
-  Relation,
-  State,
-  Table,
-  TableAssignment,
-  TableLayout,
-} from "../models/tableAssignment.models";
+import { DEFAULT_VENUE_HEIGHT_METERS, DEFAULT_VENUE_WIDTH_METERS, SNAP_METERS } from "../constants/tableAssignment.constants";
+import type { Guest, Relation, State, Table, TableAssignment, TableLayout } from "../models/tableAssignment.models";
 import { getNextAvailableSeatNumber } from "../utils/table.utils";
 import { Action } from "./actions";
 
@@ -406,3 +395,4 @@ export function reducer(state: State, action: Action): State {
       return state;
   }
 }
+

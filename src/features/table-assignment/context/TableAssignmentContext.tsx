@@ -1,20 +1,9 @@
 "use client";
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useReducer,
-  useRef,
-} from "react";
+import React, { useCallback, useEffect, useMemo, useReducer, useRef } from "react";
 import { useSensor, useSensors, PointerSensor } from "@dnd-kit/core";
 import type { DragStartEvent, DragEndEvent } from "@dnd-kit/core";
 import { App } from "antd";
-import {
-  INITIAL_METERS_TO_PIXELS,
-  DEFAULT_VENUE_WIDTH_METERS,
-  DEFAULT_VENUE_HEIGHT_METERS,
-} from "../constants/tableAssignment.constants";
-
+import { INITIAL_METERS_TO_PIXELS, DEFAULT_VENUE_WIDTH_METERS, DEFAULT_VENUE_HEIGHT_METERS } from "../constants/tableAssignment.constants";
 import type { TableLayout } from "../models/tableAssignment.models";
 import { fullName, parseGuestIdFromDragId } from "../utils/table.utils";
 import { apiGet, apiPost, apiPut, apiDelete, isAbortError } from "@/shared/api/apiClient";
@@ -42,7 +31,6 @@ function mapGuestListToTA(g: GuestListGuest): TAGuest {
   };
 }
 import { useEvent } from "@/shared/contexts/EventContext";
-
 import type { DragId } from "../models/tableAssignment.models";
 import { reducer, createInitialState } from "./tableAssignmentReducer";
 
@@ -880,3 +868,4 @@ export function useTableAssignmentContext() {
 }
 
 export default TableAssignmentContext;
+

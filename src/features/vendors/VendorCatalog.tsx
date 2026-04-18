@@ -1,14 +1,8 @@
 "use client";
-import React, { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import {
-  App, Table, Button, Input, Tag, Avatar, Space, Typography,
-  Row, Col, Modal, Form, Select, Popconfirm, Switch,
-} from "antd";
-import {
-  PlusOutlined, ShopOutlined, PhoneOutlined, MailOutlined,
-  EditOutlined, DeleteOutlined, UserOutlined, EnvironmentOutlined,
-} from "@ant-design/icons";
+import { App, Table, Button, Input, Tag, Avatar, Space, Typography, Row, Col, Modal, Form, Select, Popconfirm, Switch } from "antd";
+import { PlusOutlined, ShopOutlined, PhoneOutlined, MailOutlined, EditOutlined, DeleteOutlined, UserOutlined, EnvironmentOutlined } from "@ant-design/icons";
 import { BudgetService } from "@/features/budget/api/budgetApi";
 import type { Vendor } from "@/features/budget/models/budget.models";
 import type { ColumnsType } from "antd/es/table";
@@ -326,3 +320,4 @@ export default function VendorCatalog() {
     </>
   );
 }
+

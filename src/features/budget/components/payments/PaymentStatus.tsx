@@ -1,26 +1,8 @@
 "use client";
-import React, { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import {
-  App,
-  Table,
-  Tag,
-  Button,
-  Space,
-  Select,
-  Modal,
-  Form,
-  Input,
-  Row,
-  Col,
-  Typography,
-} from "antd";
-import {
-  CheckCircleOutlined,
-  ClockCircleOutlined,
-  ExclamationCircleOutlined,
-  LinkOutlined,
-} from "@ant-design/icons";
+import { App, Table, Tag, Button, Space, Select, Modal, Form, Input, Row, Col, Typography } from "antd";
+import { CheckCircleOutlined, ClockCircleOutlined, ExclamationCircleOutlined, LinkOutlined } from "@ant-design/icons";
 import Card from "@/shared/components/Card/Card";
 import type { ColumnsType } from "antd/es/table";
 import { useBudget } from "../../contexts/BudgetContext";
@@ -301,3 +283,4 @@ export default function PaymentStatusManager() {
     </>
   );
 }
+

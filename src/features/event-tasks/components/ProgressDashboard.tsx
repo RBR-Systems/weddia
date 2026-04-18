@@ -1,24 +1,6 @@
-﻿import React from "react";
-import {
-  Card,
-  Progress,
-  Typography,
-  Tag,
-  Space,
-  Row,
-  Col,
-  Statistic,
-  Avatar,
-  Flex,
-} from "antd";
-import {
-  CheckCircleOutlined,
-  ClockCircleOutlined,
-  ExclamationCircleOutlined,
-  CalendarOutlined,
-  FlagOutlined,
-  TeamOutlined,
-} from "@ant-design/icons";
+import React from "react";
+import { Card, Progress, Typography, Tag, Space, Row, Col, Statistic, Avatar, Flex } from "antd";
+import { CheckCircleOutlined, ClockCircleOutlined, ExclamationCircleOutlined, CalendarOutlined, FlagOutlined, TeamOutlined } from "@ant-design/icons";
 import type { Task, TaskSummary, TaskCategory } from "../models/task.models";
 import styles from "../EventTasks.module.css";
 import { useTranslation } from "react-i18next";
@@ -367,3 +349,4 @@ const ProgressDashboard: React.FC<ProgressDashboardProps> = ({
 };
 
 export default ProgressDashboard;
+

@@ -1,20 +1,10 @@
 "use client";
-import React from "react";
+
 import { Table, Tag, Space, Typography, Button, Input, Popconfirm } from "antd";
 import { useTranslation } from "react-i18next";
-import {
-  MailOutlined,
-  MessageOutlined,
-  SearchOutlined,
-  DeleteOutlined,
-} from "@ant-design/icons";
+import { MailOutlined, MessageOutlined, SearchOutlined, DeleteOutlined } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
-import {
-  Guest,
-  formatStatusLabel,
-  statusColor,
-  STATUS_LABELS,
-} from "../../models/guestList.models";
+import { Guest, formatStatusLabel, statusColor, STATUS_LABELS } from "../../models/guestList.models";
 import { formatPhone } from "@/utils/formatters.utils";
 import { useTheme } from "@/theme/ThemeProvider";
 import { light as lightTokens, dark as darkTokens } from "@/theme/tokens";
@@ -448,3 +438,4 @@ export default function GuestTable({
     />
   );
 }
+

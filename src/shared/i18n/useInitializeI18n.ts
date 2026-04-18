@@ -1,5 +1,4 @@
 "use client";
-
 import { useEffect } from "react";
 import i18n, { SUPPORTED_LANGUAGES, STORAGE_KEY } from "@/i18n";
 
@@ -71,3 +70,4 @@ export function useInitializeI18n(): void {
     })();
   }, []);
 }
+

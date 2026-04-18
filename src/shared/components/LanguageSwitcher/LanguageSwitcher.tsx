@@ -1,5 +1,4 @@
 "use client";
-
 import { useMemo, useCallback } from "react";
 import { GlobalOutlined } from "@ant-design/icons";
 import { Select } from "antd";
@@ -41,3 +40,4 @@ export default function LanguageSwitcher() {
     />
   );
 }
+

@@ -1,5 +1,5 @@
 "use client";
-import React, { useMemo, useState, useCallback } from "react";
+import { useMemo, useState, useCallback } from "react";
 import { BellOutlined } from "@ant-design/icons";
 import { Badge, Popover, Avatar, Button, Typography, Space, Flex } from "antd";
 import styles from "./nav-bar.module.css";
@@ -121,3 +121,4 @@ export default function NotificationBell() {
     </Popover>
   );
 }
+

@@ -1,5 +1,4 @@
 "use client";
-
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { App, ConfigProvider, theme as antTheme } from "antd";
 import { lightTheme, darkTheme } from "./themeConfig";
@@ -67,3 +66,4 @@ export default function ThemeProvider({
     </ThemeContext.Provider>
   );
 }
+

@@ -1,15 +1,11 @@
-import React, { memo, useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import { useDraggable, useDroppable } from "@dnd-kit/core";
 import type { CSSProperties } from "react";
 import styles from "../TableTileContent/TableTile.module.css";
 import { Popover } from "antd";
 import type { Table, TableAssignment, Guest } from "../../../models/tableAssignment.models";
 import TableTileContent from "../TableTileContent/TableTileContent";
-import {
-  getTableLabel,
-  getBadgeColor,
-  getTableShapeClass,
-} from "../../../utils/table.utils";
+import { getTableLabel, getBadgeColor, getTableShapeClass } from "../../../utils/table.utils";
 import { useTranslation } from "react-i18next";
 
 function SeatTile({
@@ -183,3 +179,4 @@ export default memo(function DroppableTableTile({
     </Popover>
   );
 });
+

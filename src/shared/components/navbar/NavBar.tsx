@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useCallback } from "react";
 import styles from "./nav-bar.module.css";
 import { MenuProps } from "antd";
@@ -68,3 +67,4 @@ const NavBarComponent: React.FC<NavBarProps> = ({ currentView }) => {
 };
 
 export const NavBar = React.memo(NavBarComponent);
+

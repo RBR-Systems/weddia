@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useMemo } from "react";
 import { Dropdown, Button, Space, MenuProps } from "antd";
 import { DownOutlined } from "@ant-design/icons";
@@ -37,3 +36,4 @@ const EventSelector: React.FC<EventSelectorProps> = ({
 };
 
 export default React.memo(EventSelector);
+
