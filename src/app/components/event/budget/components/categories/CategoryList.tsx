@@ -23,7 +23,7 @@ import type { Category } from "../../types/budget.types";
 import { CHART_COLORS } from "@/theme/chartColors";
 import { useTheme } from "@/theme/ThemeProvider";
 import { useTranslation } from "react-i18next";
-import { CategoriesService, type BudgetCategory } from "@/app/components/budget-categories/categories.service";
+import { CategoriesService, type BudgetCategory } from "@/features/budget/components/budget-categories/categories.service";
 
 const { Search } = Input;
 const { Text } = Typography;
@@ -252,3 +252,4 @@ export default function CategoryList() {
     </>
   );
 }
+

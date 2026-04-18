@@ -5,15 +5,15 @@ import { Spin } from "antd";
 import { useAuth } from "./contexts/AuthContext";
 import LoginPage from "./components/auth/LoginPage";
 import AppShell from "./common/AppShell/AppShell";
-import EventsHub from "./components/event/event-hub/events-hub";
-import EventList from "./components/events-list/event-list";
+import EventsHub from "./components/event/event-hub/EventsHub";
+import EventList from "./components/events-list/EventList";
 import TableAssignmentPage from "./components/event/table-assignment/TableAssignmentPage";
-import CreateEventModal from "./components/event/create-event-modal/create-event-modal";
+import CreateEventModal from "./components/event/create-event-modal/CreateEventModal";
 import { DayOfEvent } from "./components/event/schedule";
 import BudgetDashboard from "./components/event/budget/BudgetDashboard";
 import MultiClientPage from "./components/multi-client/MultiClientPage";
 import GuestList from "./components/event/guest-list/GuestList";
-import BudgetCategoriesPage from "./components/budget-categories/BudgetCategoriesPage";
+import BudgetCategoriesPage from "@/features/budget/components/budget-categories/BudgetCategoriesPage";
 import EventTasksDashboard from "./components/event/event-tasks/EventTasksDashboard";
 import VendorCatalog from "./components/vendors/VendorCatalog";
 
@@ -59,23 +59,34 @@ export default function Home() {
 
   const renderContent = () => {
     switch (currentView) {
-      case "events-hub":        return <EventsHub />;
-      case "guest-list":        return <GuestList />;
-      case "events-list":       return <EventList />;
-      case "multi-client":      return <MultiClientPage />;
-      case "table-assignment":  return <TableAssignmentPage />;
-      case "schedule":          return <DayOfEvent />;
-      case "budget":            return <BudgetDashboard />;
-      case "budget-categories": return <BudgetCategoriesPage />;
-      case "vendor-catalog":    return <VendorCatalog />;
-      case "tasks":             return <EventTasksDashboard />;
-      default:                  return <EventsHub />;
+      case "events-hub":
+        return <EventsHub />;
+      case "guest-list":
+        return <GuestList />;
+      case "events-list":
+        return <EventList />;
+      case "multi-client":
+        return <MultiClientPage />;
+      case "table-assignment":
+        return <TableAssignmentPage />;
+      case "schedule":
+        return <DayOfEvent />;
+      case "budget":
+        return <BudgetDashboard />;
+      case "budget-categories":
+        return <BudgetCategoriesPage />;
+      case "vendor-catalog":
+        return <VendorCatalog />;
+      case "tasks":
+        return <EventTasksDashboard />;
+      default:
+        return <EventsHub />;
     }
   };
 
   if (isLoading) {
     return (
-      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div className="fullscreen-center">
         <Spin size="large" />
       </div>
     );
@@ -92,3 +103,4 @@ export default function Home() {
     </AppShell>
   );
 }
+
