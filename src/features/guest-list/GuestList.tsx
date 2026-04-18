@@ -8,6 +8,7 @@ import {
 } from "@ant-design/icons";
 import {
   App,
+  Card,
   Row,
   Col,
   Button,
@@ -38,7 +39,7 @@ import {
 import StatsBar from "./components/StatsBar/StatsBar";
 import GuestTable from "./components/GuestTable/GuestTable";
 import GuestDetailModal from "./components/GuestDetail/GuestDetailModal";
-import from "./GuestList.module.css";
+import styles from "./GuestList.module.css";
 
 export default function GuestList() {
   const { t } = useTranslation();
@@ -760,4 +761,3 @@ export default function GuestList() {
     </div>
   );
 }
-
