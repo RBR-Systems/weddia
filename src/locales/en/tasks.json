@@ -1,0 +1,177 @@
+{
+  "tasks": {
+    "title": "Task Management",
+    "tabs": {
+      "dashboard": "Dashboard",
+      "tasks": "Tasks",
+      "calendar": "Calendar",
+      "templates": "Templates"
+    },
+    "searchPlaceholder": "Search tasks...",
+    "newTask": "New Task",
+    "createFirst": "Create First Task",
+    "emptyState": "No tasks yet. Create your first task or generate from template.",
+    "groups": {
+      "overdue": "Overdue",
+      "thisWeek": "This Week",
+      "nextWeek": "Next Week",
+      "later": "Later",
+      "completed": "Completed"
+    },
+    "viewMode": {
+      "cards": "Cards",
+      "table": "Table"
+    },
+    "priority": {
+      "label": "Priority",
+      "urgent": "Urgent",
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low"
+    },
+    "status": {
+      "pending": "Pending",
+      "in_progress": "In Progress",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "on_hold": "On Hold"
+    },
+    "sort": {
+      "dueDate": "Due Date",
+      "priority": "Priority",
+      "createdDate": "Created Date",
+      "name": "Name"
+    },
+    "card": {
+      "overdueDays": "Overdue by {{count}} days",
+      "dueToday": "Due Today",
+      "dueDays": "Due in {{count}} days",
+      "markComplete": "Mark as complete",
+      "milestone": "Milestone"
+    },
+    "roles": {
+      "owner": "Owner",
+      "assignee": "Assignee",
+      "collaborator": "Collaborator",
+      "viewer": "Viewer"
+    },
+    "assigneeStatus": {
+      "pending": "Pending",
+      "accepted": "Accepted",
+      "declined": "Declined",
+      "completed": "Completed"
+    },
+    "visibility": {
+      "private": "Private",
+      "shared": "Shared",
+      "public": "Public"
+    },
+    "detail": {
+      "progress": "Progress",
+      "subtasks": "{{completed}} of {{total}} subtasks completed",
+      "details": "Details",
+      "dueDate": "Due Date",
+      "startDate": "Start Date",
+      "estimatedHours": "Estimated Hours",
+      "estimatedCost": "Estimated Cost",
+      "location": "Location",
+      "visibility": "Visibility",
+      "tags": "Tags",
+      "notes": "Notes",
+      "assignedTo": "Assigned To",
+      "noAssignees": "No one assigned",
+      "attachments": "Attachments",
+      "createdAt": "Created: {{date}}",
+      "updatedAt": "Updated: {{date}}"
+    },
+    "form": {
+      "createTitle": "Create Task",
+      "editTitle": "Edit Task",
+      "title": "Title",
+      "titleRequired": "Please enter a task title",
+      "titlePlaceholder": "e.g., Book photographer",
+      "descriptionPlaceholder": "Describe this task...",
+      "dueDate": "Due Date",
+      "dueDateRequired": "Please select a due date",
+      "startDate": "Start Date",
+      "estimatedHours": "Est. Hours",
+      "estimatedCost": "Estimated Cost",
+      "actualCost": "Actual Cost",
+      "location": "Location",
+      "locationPlaceholder": "e.g., Monterrey, NL",
+      "notes": "Notes",
+      "milestone": "Milestone",
+      "visibility": "Visibility",
+      "categoryPlaceholder": "Select category",
+      "assignees": "Assign People",
+      "assigneesPlaceholder": "Select team members..."
+    },
+    "calendar": {
+      "title": "Task Calendar",
+      "tasksLabel": "tasks",
+      "noTasks": "No tasks scheduled for this day"
+    },
+    "progress": {
+      "overallProgress": "Overall Progress",
+      "tasksCompleted": "{{completed}} of {{total}} tasks",
+      "tasksLabel": "tasks",
+      "dueThisWeek": "Due This Week",
+      "overdue": "Overdue",
+      "inProgress": "In Progress",
+      "pending": "Pending",
+      "milestones": "Milestones",
+      "byCategory": "Progress by Category",
+      "byPriority": "By Priority",
+      "budgetOverview": "Budget Overview",
+      "totalBudget": "Total Budget",
+      "budgetSpent": "Budget Spent",
+      "budgetRemaining": "remaining",
+      "taskCosts": "Task Costs",
+      "estimatedCost": "Estimated Cost",
+      "actualCost": "Actual Cost",
+      "topBudgetCategories": "Top Budget Categories",
+      "noBudgetLinked": "Connect your budget for a full overview",
+      "teamWorkload": "Team Workload",
+      "noAssignees": "No team members assigned yet",
+      "upcomingMilestones": "Upcoming Milestones",
+      "budgetTracker": "Budget Tracker"
+    },
+    "template": {
+      "title": "Task Templates",
+      "description": "Use templates to quickly set up a complete task timeline for your event, or preview one to see what's included.",
+      "mexicanDesc": "Complete planning timeline with 200+ tasks covering civil and religious ceremonies, padrinos, vendors, and all Mexican wedding traditions.",
+      "preview": "Preview",
+      "apply": "Apply",
+      "sections": "sections",
+      "required": "Required",
+      "optionalLabel": "Optional",
+      "comingSoon": "More templates coming soon",
+      "totalTasks": "Total tasks",
+      "createFromTemplate": "Create from Template",
+      "createTimeline": "Create My Timeline",
+      "weddingDate": "Your wedding date",
+      "weddingDatePlaceholder": "Select wedding date",
+      "weddingDateHelp": "Tasks will be automatically scheduled based on this date",
+      "includeOptional": "Include optional tasks",
+      "includeOptionalDesc": "Adds extras like photo booth, mariachi, fireworks, etc.",
+      "tasks": "tasks",
+      "whatIncluded": "What's Included",
+      "optional": "Optional",
+      "feature1": "Timeline-based scheduling (12 months to wedding day)",
+      "feature2": "Civil ceremony requirements and documentation",
+      "feature3": "Religious ceremony with traditional roles (Padrinos)",
+      "feature4": "Bachelorette party planning",
+      "feature5": "Vendor management for the Mexican market",
+      "successTitle": "Timeline Created!",
+      "successSubtitle": "{{count}} tasks have been generated with auto-calculated due dates",
+      "viewTasks": "View Tasks"
+    },
+    "messages": {
+      "taskCompleted": "\"{{title}}\" completed",
+      "taskDeleted": "Task deleted",
+      "taskCreated": "Task created",
+      "taskUpdated": "Task updated",
+      "templateApplied": "{{count}} tasks generated from template"
+    }
+  }
+}

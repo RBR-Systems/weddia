@@ -1,0 +1,90 @@
+{
+  "eventVendors": {
+    "title": "Proveedores del Evento",
+    "assigned": "Asignado",
+    "assignedToEvent": "Asignados al Evento",
+    "totalCatalog": "Proveedores en Catálogo",
+    "eventSpending": "Gasto del Evento",
+    "emptyText": "No hay proveedores en el catálogo. Agrega proveedores desde la sección Catálogo de Proveedores.",
+    "noVendorsAssigned": "Aún no hay proveedores asignados a este evento",
+    "cannotUnassign": "No se puede quitar el proveedor — tiene gastos asociados a este evento"
+  },
+  "vendorCatalog": {
+    "title": "Catálogo de Proveedores",
+    "directory": "Directorio de Proveedores",
+    "edit": "Editar Proveedor",
+    "deleteConfirm": "¿Eliminar este proveedor?",
+    "deleteSuccess": "Proveedor eliminado",
+    "deleteFailed": "Error al eliminar proveedor",
+    "updateSuccess": "Proveedor actualizado exitosamente",
+    "updateFailed": "Error al actualizar proveedor",
+    "emptyText": "No hay proveedores aún. Agrega tu primer proveedor.",
+    "loadFailed": "Error al cargar proveedores"
+  },
+  "vendorList": {
+    "totalVendors": "Total de Proveedores",
+    "totalVendorSpending": "Gasto Total en Proveedores",
+    "activeVendors": "Proveedores Activos",
+    "vendorDirectory": "Directorio de Proveedores",
+    "searchPlaceholder": "Buscar proveedores...",
+    "addVendor": "Agregar Proveedor",
+    "emptyText": "No hay proveedores aún. Agregue gastos con nombres de proveedores.",
+    "vendorAdded": "Proveedor agregado (los proveedores se crean automáticamente desde los gastos)",
+    "columns": {
+      "vendor": "Proveedor",
+      "contact": "Contacto",
+      "expenses": "Gastos",
+      "totalSpent": "Total Gastado",
+      "status": "Estado",
+      "actions": "Acciones"
+    },
+    "active": "Activo",
+    "inactive": "Inactivo",
+    "form": {
+      "vendorName": "Nombre del Proveedor",
+      "vendorNamePlaceholder": "Ingrese nombre del proveedor",
+      "contactPerson": "Persona de Contacto",
+      "contactPlaceholder": "Nombre de contacto",
+      "email": "Email",
+      "emailPlaceholder": "proveedor@ejemplo.com",
+      "phone": "Teléfono",
+      "phonePlaceholder": "+1 (555) 000-0000",
+      "category": "Categoría",
+      "categoryPlaceholder": "Ej. Catering, Flores, Música",
+      "address": "Dirección",
+      "addressPlaceholder": "Dirección del proveedor",
+      "notes": "Notas",
+      "notesPlaceholder": "Notas adicionales",
+      "vendorCreated": "Proveedor creado exitosamente",
+      "vendorCreateFailed": "Error al crear proveedor"
+    }
+  },
+  "vendorDetails": {
+    "title": "Detalles del Proveedor",
+    "totalSpent": "Total Gastado",
+    "paid": "Pagado",
+    "pending": "Pendiente",
+    "expenses": "Gastos ({{count}})",
+    "noExpenses": "Sin gastos de este proveedor",
+    "contact": "Contacto",
+    "email": "Email",
+    "phone": "Teléfono",
+    "category": "Categoría",
+    "columns": {
+      "description": "Descripción",
+      "amount": "Monto",
+      "date": "Fecha",
+      "status": "Estado"
+    }
+  },
+  "statusBadge": {
+    "onTrack": "En Curso",
+    "atRisk": "En Riesgo",
+    "overBudget": "Excede Presupuesto",
+    "notStarted": "No Iniciado",
+    "paid": "Pagado",
+    "pending": "Pendiente",
+    "overdue": "Vencido",
+    "partial": "Parcial"
+  }
+}

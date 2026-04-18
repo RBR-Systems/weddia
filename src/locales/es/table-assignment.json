@@ -1,0 +1,62 @@
+{
+  "tableAssignment": {
+    "title": "Asignación de Mesas",
+    "emptyState": "No hay diseños de mesas disponibles. Cree un diseño primero.",
+    "seatingChart": "Plano de asientos",
+    "guests": "{{count}} invitados",
+    "tables": "{{count}} mesas",
+    "unassigned": "{{count}} sin asignar",
+    "grid": "Cuadrícula",
+    "zoom": {
+      "out": "Alejar",
+      "reset": "Restablecer zoom",
+      "fit": "Ajustar",
+      "in": "Acercar"
+    },
+    "aiAssistant": "Asistente IA de Asientos",
+    "subtitle": "{{layoutName}} • {{tableCount}} mesas • {{guestCount}} invitados",
+    "sidePanel": {
+      "guestsTab": "Invitados",
+      "tableTab": "Mesa",
+      "searchPlaceholder": "Buscar invitados por nombre o email",
+      "filterByRelation": "Filtrar por relación",
+      "assigned": "Asignados",
+      "unassignedTab": "Sin Asignar",
+      "unassignAll": "Desasignar todos",
+      "allGuestsUnassigned": "Todos los invitados desasignados",
+      "noTables": "No hay mesas disponibles.",
+      "noGuestsAssigned": "No hay invitados asignados aún.",
+      "seatMoved": "Asiento movido",
+      "all": "Todos",
+      "capacity": "Capacidad {{count}}",
+      "capacityAndSeated": "Capacidad {{capacity}} • {{seated}} sentados"
+    },
+    "dropToUnassign": "Soltar aquí para desasignar",
+    "unknownRelation": "Relación desconocida",
+    "unassignedTag": "Sin asignar",
+    "assignToTable": "Asignar a mesa",
+    "tableFull": "Esa mesa está llena",
+    "reassigned": "{{name}} reasignado a {{table}}",
+    "guestUnassigned": "Invitado desasignado",
+    "deleteNotAvailable": "Manejador de eliminación no disponible",
+    "aiChat": {
+      "greeting": "¡Hola! Soy tu asistente de asientos con IA. Puedo ayudarte a organizar invitados en las mesas según sus relaciones y tus preferencias. Prueba pedirme:\n\n• Agrupar familias juntas\n• Separar ciertos invitados\n• Llenar mesas equitativamente\n• Organizar por grupos de edad\n\n¿Qué te gustaría que hiciera?",
+      "applyArrangement": "Aplicar Este Arreglo",
+      "arrangementApplied": "¡Arreglo aplicado!",
+      "assignments": "{{count}} asignaciones",
+      "aiThinking": "La IA está pensando...",
+      "placeholder": "Pídeme organizar los asientos... (ej., 'Pon a toda la familia de la novia en las mesas 1-3')",
+      "aiSuggestion": "Sugerencia de asientos por IA",
+      "errorMessage": "Lo siento, encontré un error. Por favor intenta de nuevo o reformula tu solicitud.",
+      "arrangementAppliedSuccess": "¡Arreglo de asientos aprobado y aplicado! Tu diseño de evento ha sido actualizado.",
+      "failedResponse": "Error al obtener respuesta de la IA",
+      "potentialIssues": "Posibles problemas: {{issues}}",
+      "send": "Enviar"
+    },
+    "table": "Mesa {{number}}",
+    "seatedCount": "{{occupancy}}/{{capacity}} sentados",
+    "seatNumber": "Asiento {{number}}",
+    "seatRange": "Asientos {{from}}–{{to}}",
+    "seatLabel": "Asiento(s) {{seats}}"
+  }
+}

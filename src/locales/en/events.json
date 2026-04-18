@@ -1,0 +1,119 @@
+{
+  "eventsHub": {
+    "yearToGo": "1 year to go",
+    "startedOn": "Started on {{date}}",
+    "weddingDay": "Wedding day on {{date}}",
+    "statusInProgress": "Status in progress",
+    "event": "Event {{number}}"
+  },
+  "eventList": {
+    "title": "Events",
+    "subheader": "Planning Center",
+    "columns": {
+      "event": "Event",
+      "date": "Date",
+      "clients": "Clients",
+      "location": "Location",
+      "invites": "Invites",
+      "rsvp": "RSVP",
+      "tasks": "Tasks",
+      "budget": "Budget",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "editEvent": "Edit Event",
+    "totalBudget": "Total Budget",
+    "overBudget": "Over Budget!",
+    "remaining": "Remaining",
+    "spent": "Spent: {{amount}}",
+    "form": {
+      "eventName": "Event name",
+      "date": "Date",
+      "clients": "Clients",
+      "location": "Location",
+      "invites": "Invites",
+      "rsvp": "RSVP",
+      "tasks": "Tasks",
+      "sits": "Sits",
+      "budget": "Budget ($)",
+      "spent": "Spent ($)",
+      "status": "Status"
+    },
+    "status": {
+      "Not Started": "Not Started",
+      "In Progress": "In Progress",
+      "Completed": "Completed",
+      "Canceled": "Canceled"
+    }
+  },
+  "createEvent": {
+    "title": "Create Event",
+    "closeButton": "Close button",
+    "sections": {
+      "eventInfo": "Event Info",
+      "details": "Details",
+      "clients": "Clients"
+    },
+    "form": {
+      "eventName": "Event Name",
+      "eventNamePlaceholder": "Sarah's & Mike's Wedding",
+      "dateTime": "Date and Time",
+      "dateTimePlaceholder": "Select date and time",
+      "location": "Location",
+      "locationPlaceholder": "Location",
+      "description": "Description",
+      "descriptionPlaceholder": "Give a brief description",
+      "theme": "Theme",
+      "themePlaceholder": "Select a wedding theme",
+      "budget": "Budget",
+      "comments": "Comments",
+      "commentsPlaceholder": "Comments about the event"
+    },
+    "clients": {
+      "bride": "Bride",
+      "groom": "Groom",
+      "brideEmail": "Bride email",
+      "bridePhone": "Bride phone number",
+      "groomEmail": "Groom email",
+      "groomPhone": "Groom phone number",
+      "email": "Email",
+      "phoneNumber": "Phone Number",
+      "emailRequired": "Please enter email!",
+      "emailInvalid": "Please enter a valid email!",
+      "phoneRequired": "Please enter phone number!",
+      "phoneInvalid": "Please enter a valid phone number!"
+    }
+  },
+  "weddingThemes": {
+    "classic": "Classic & Elegant",
+    "rustic": "Rustic & Country",
+    "vintage": "Vintage & Retro",
+    "modern": "Modern & Minimalist",
+    "bohemian": "Bohemian & Boho",
+    "garden": "Garden & Outdoor",
+    "beach": "Beach & Coastal",
+    "industrial": "Industrial & Urban",
+    "romantic": "Romantic & Soft",
+    "tropical": "Tropical & Exotic",
+    "winter": "Winter Wonderland",
+    "spring": "Spring & Floral",
+    "summer": "Summer & Bright",
+    "autumn": "Autumn & Warm",
+    "mediterranean": "Mediterranean",
+    "asian": "Asian & Oriental",
+    "french": "French Countryside",
+    "tuscany": "Tuscan & Italian",
+    "nordic": "Nordic & Scandinavian",
+    "artDeco": "Art Deco & Glamorous",
+    "barn": "Barn & Farmhouse",
+    "winery": "Winery & Vineyard",
+    "castle": "Castle & Fairytale",
+    "destination": "Destination Wedding",
+    "cultural": "Cultural & Traditional",
+    "eclectic": "Eclectic & Unique",
+    "luxury": "Luxury & Opulent",
+    "intimate": "Intimate & Cozy",
+    "grand": "Grand & Extravagant",
+    "casual": "Casual & Relaxed"
+  }
+}

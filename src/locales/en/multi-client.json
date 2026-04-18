@@ -1,0 +1,29 @@
+{
+  "multiClient": {
+    "title": "Multi-Client Budget Management"
+  },
+  "multiClientView": {
+    "totalClients": "Total Clients",
+    "activeWeddings": "Active Weddings",
+    "totalManaged": "Total Managed",
+    "needsAttention": "Needs Attention",
+    "clientBudgets": "Client Budgets",
+    "searchClients": "Search clients...",
+    "filterByStatus": "Filter by status",
+    "addClient": "Add Client",
+    "columns": {
+      "client": "Client",
+      "budget": "Budget",
+      "status": "Status",
+      "expenses": "Expenses",
+      "daysUntil": "Days Until",
+      "actions": "Actions"
+    },
+    "status": {
+      "onTrack": "On Track",
+      "atRisk": "At Risk",
+      "overBudget": "Over Budget",
+      "completed": "Completed"
+    }
+  }
+}

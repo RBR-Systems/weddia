@@ -1,0 +1,62 @@
+{
+  "tableAssignment": {
+    "title": "Table Assignment",
+    "emptyState": "No table layouts available yet. Create a layout first.",
+    "seatingChart": "Seating chart",
+    "guests": "{{count}} guests",
+    "tables": "{{count}} tables",
+    "unassigned": "{{count}} unassigned",
+    "grid": "Grid",
+    "zoom": {
+      "out": "Zoom out",
+      "reset": "Reset zoom",
+      "fit": "Fit",
+      "in": "Zoom in"
+    },
+    "aiAssistant": "AI Seating Assistant",
+    "subtitle": "{{layoutName}} • {{tableCount}} tables • {{guestCount}} guests",
+    "sidePanel": {
+      "guestsTab": "Guests",
+      "tableTab": "Table",
+      "searchPlaceholder": "Search guests by name or email",
+      "filterByRelation": "Filter by relation",
+      "assigned": "Assigned",
+      "unassignedTab": "Unassigned",
+      "unassignAll": "Unassign all",
+      "allGuestsUnassigned": "All guests unassigned",
+      "noTables": "No tables available.",
+      "noGuestsAssigned": "No guests assigned yet.",
+      "seatMoved": "Seat moved",
+      "all": "All",
+      "capacity": "Capacity {{count}}",
+      "capacityAndSeated": "Capacity {{capacity}} • {{seated}} seated"
+    },
+    "dropToUnassign": "Drop here to unassign",
+    "unknownRelation": "Unknown relation",
+    "unassignedTag": "Unassigned",
+    "assignToTable": "Assign to table",
+    "tableFull": "That table is full",
+    "reassigned": "{{name}} reassigned to {{table}}",
+    "guestUnassigned": "Guest unassigned",
+    "deleteNotAvailable": "Delete handler not available",
+    "aiChat": {
+      "greeting": "Hello! I'm your AI seating assistant. I can help you arrange guests at tables based on their relationships and your preferences. Try asking me to:\n\n• Group families together\n• Separate certain guests\n• Fill tables evenly\n• Arrange by age groups\n\nWhat would you like me to do?",
+      "applyArrangement": "Apply This Arrangement",
+      "arrangementApplied": "Arrangement applied!",
+      "assignments": "{{count}} assignments",
+      "aiThinking": "AI is thinking...",
+      "placeholder": "Ask me to arrange the seating... (e.g., 'Put all bride's family at tables 1-3')",
+      "aiSuggestion": "AI seating suggestion",
+      "errorMessage": "I'm sorry, I encountered an error. Please try again or rephrase your request.",
+      "arrangementAppliedSuccess": "Seating arrangement approved and applied! Your event layout has been updated.",
+      "failedResponse": "Failed to get AI response",
+      "potentialIssues": "Potential issues: {{issues}}",
+      "send": "Send"
+    },
+    "table": "Table {{number}}",
+    "seatedCount": "{{occupancy}}/{{capacity}} seated",
+    "seatNumber": "Seat {{number}}",
+    "seatRange": "Seats {{from}}–{{to}}",
+    "seatLabel": "Seat(s) {{seats}}"
+  }
+}

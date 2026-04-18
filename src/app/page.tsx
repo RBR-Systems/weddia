@@ -2,20 +2,20 @@
 
 import { useEffect, useState } from "react";
 import { Spin } from "antd";
-import { useAuth } from "./contexts/AuthContext";
-import LoginPage from "./components/auth/LoginPage";
-import AppShell from "./common/AppShell/AppShell";
-import EventsHub from "./components/event/event-hub/EventsHub";
-import EventList from "./components/events-list/EventList";
-import TableAssignmentPage from "./components/event/table-assignment/TableAssignmentPage";
-import CreateEventModal from "./components/event/create-event-modal/CreateEventModal";
-import { DayOfEvent } from "./components/event/schedule";
-import BudgetDashboard from "./components/event/budget/BudgetDashboard";
-import MultiClientPage from "./components/multi-client/MultiClientPage";
-import GuestList from "./components/event/guest-list/GuestList";
+import { useAuth } from "@/shared/contexts/AuthContext";
+import LoginPage from "@/features/auth/LoginPage";
+import AppShell from "@/shared/components/AppShell/AppShell";
+import EventsHub from "@/features/event-hub/EventsHub";
+import EventList from "@/features/events-list/EventList";
+import TableAssignmentPage from "@/features/table-assignment/TableAssignmentPage";
+import CreateEventModal from "@/features/create-event/CreateEventModal";
+import { DayOfEvent } from "@/features/schedule";
+import BudgetDashboard from "@/features/budget/BudgetDashboard";
+import MultiClientPage from "@/features/multi-client/MultiClientPage";
+import GuestList from "@/features/guest-list/GuestList";
 import BudgetCategoriesPage from "@/features/budget/components/budget-categories/BudgetCategoriesPage";
-import EventTasksDashboard from "./components/event/event-tasks/EventTasksDashboard";
-import VendorCatalog from "./components/vendors/VendorCatalog";
+import EventTasksDashboard from "@/features/event-tasks/EventTasksDashboard";
+import VendorCatalog from "@/features/vendors/VendorCatalog";
 
 const VALID_VIEWS = new Set([
   "events-hub",

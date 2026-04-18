@@ -1,0 +1,76 @@
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  padding: 0 20px;
+  background-color: var(--primary-background);
+  border-bottom: 1px solid var(--divider);
+  flex-shrink: 0;
+  gap: 16px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+/* ── Left ─────────────────────────────────────────────────────────── */
+.start {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+
+.logo {
+  height: 28px;
+  width: auto;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.eventBtn {
+  border-radius: 20px !important;
+  max-width: 220px;
+  background: var(--secondary-background) !important;
+  border-color: var(--divider) !important;
+}
+
+.eventName {
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: inline-block;
+  vertical-align: middle;
+  white-space: nowrap;
+  font-size: 13px;
+}
+
+/* ── Right ────────────────────────────────────────────────────────── */
+.end {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.icon {
+  font-size: var(--small-icon-size);
+  color: var(--text-color-secondary);
+}
+
+/* Icons */
+.downIcon {
+  font-size: 10px;
+  opacity: 0.6;
+}
+
+/* Popover content */
+.popoverContent { width: 320px; }
+.popoverFullWidth { width: 100%; }
+.popoverHeader { display: flex; justify-content: space-between; }
+
+/* Notifications list */
+.notificationList { display: flex; flex-direction: column; gap: 8px; }
+.notificationItem { cursor: pointer; padding: 8px 0; display: flex; gap: 12px; align-items: flex-start; }
+.unread { background: var(--ant-bg-base); }
+.notificationBody { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.viewAll { text-align: center; }
