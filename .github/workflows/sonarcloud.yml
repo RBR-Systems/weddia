@@ -31,4 +31,5 @@ jobs:
             -Dsonar.projectKey=rbr-systems_weddia
             -Dsonar.organization=rbr-systems
             -Dsonar.sources=.
+            -Dsonar.qualitygate.wait=true
           projectBaseDir: .
