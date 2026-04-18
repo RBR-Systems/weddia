@@ -9,7 +9,7 @@ import {
   CloseCircleOutlined,
   NumberOutlined,
 } from "@ant-design/icons";
-import { Guest, formatStatusLabel, statusColor } from "../../models/guestList.models";
+import { Guest, formatStatusLabel} from "../../models/guestList.models";
 import { useTranslation } from "react-i18next";
 import styles from "../../GuestList.module.css";
 
@@ -129,3 +129,4 @@ export default function StatsBar({
     </Row>
   );
 }
+

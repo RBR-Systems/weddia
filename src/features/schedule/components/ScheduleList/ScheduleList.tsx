@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { Timeline, Divider, Typography } from "antd";
+import { Timeline,  Typography } from "antd";
 import { ClockCircleOutlined } from "@ant-design/icons";
 import { TimelineItem, Status } from "../../models/schedule.models";
 import ScheduleItem from "../ScheduleItem/ScheduleItem";
@@ -194,3 +194,4 @@ const ScheduleList: React.FC<Props> = ({
 };
 
 export default ScheduleList;
+

@@ -11,7 +11,6 @@ import {
   Radio,
   InputNumber,
   Select,
-  Typography,
 } from "antd";
 import {
   ClockCircleOutlined,
@@ -775,3 +774,4 @@ const Schedule: React.FC = () => {
 };
 
 export default Schedule;
+

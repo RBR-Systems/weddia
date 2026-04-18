@@ -12,7 +12,7 @@ import {
 } from "@ant-design/icons";
 import { Status } from "../../models/schedule.models";
 import { useTranslation } from "react-i18next";
-import { getStatusOptions, calculateProgress } from "../../utils/schedule.utils";
+import {  calculateProgress } from "../../utils/schedule.utils";
 import { TimelineItem } from "../../models/schedule.models";
 import styles from "./StatusFilter.module.css";
 
@@ -191,3 +191,4 @@ const StatusFilter: React.FC<Props> = ({
 };
 
 export default StatusFilter;
+

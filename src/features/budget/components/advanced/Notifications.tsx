@@ -11,13 +11,11 @@ import {
   Button,
   Empty,
   Divider,
-  Alert,
   Row,
   Col,
 } from "antd";
 import {
   BellOutlined,
-  CheckCircleOutlined,
   ExclamationCircleOutlined,
   WarningOutlined,
   ClockCircleOutlined,
@@ -331,3 +329,4 @@ export default function NotificationsPanel() {
     </Row>
   );
 }
+

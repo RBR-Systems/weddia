@@ -14,10 +14,8 @@ import {
   Typography,
 } from "antd";
 import {
-  DownloadOutlined,
   PrinterOutlined,
   FileExcelOutlined,
-  FilePdfOutlined,
 } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
@@ -337,3 +335,4 @@ export default function ReportsPage() {
     </div>
   );
 }
+

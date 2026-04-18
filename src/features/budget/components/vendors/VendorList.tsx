@@ -24,7 +24,6 @@ import {
   EyeOutlined,
   UserOutlined,
   EnvironmentOutlined,
-  FileTextOutlined,
 } from "@ant-design/icons";
 import { BudgetService } from "../../api/budgetApi";
 import expenseStyles from "../ExpenseModal.module.css";
@@ -339,3 +338,4 @@ export default function VendorList({ onViewVendor }: VendorListProps) {
     </>
   );
 }
+

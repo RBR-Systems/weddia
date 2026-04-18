@@ -9,7 +9,6 @@ import {
   Typography,
   Space,
   Button,
-  Progress,
   Divider,
   Alert,
   Tooltip,
@@ -248,3 +247,4 @@ export default function BudgetAllocation() {
     </Card>
   );
 }
+

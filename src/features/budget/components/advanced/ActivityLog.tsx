@@ -23,7 +23,7 @@ import {
 } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { useBudget } from "../../contexts/BudgetContext";
-import { formatCurrency, formatDate } from "@/utils/formatters.utils";
+import { formatCurrency} from "@/utils/formatters.utils";
 import activityStyles from "./ActivityLog.module.css";
 
 const { Text, Title } = Typography;
@@ -263,3 +263,4 @@ export default function ActivityLog() {
     </Card>
   );
 }
+

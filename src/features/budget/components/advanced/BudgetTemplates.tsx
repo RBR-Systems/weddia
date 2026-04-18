@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
@@ -14,14 +14,12 @@ import {
   Typography,
   Tag,
   Space,
-  Empty,
   Popconfirm,
 } from "antd";
 import {
   SaveOutlined,
   DownloadOutlined,
   DeleteOutlined,
-  CopyOutlined,
 } from "@ant-design/icons";
 import { useBudget } from "../../contexts/BudgetContext";
 import { formatCurrency } from "@/utils/formatters.utils";
@@ -328,3 +326,4 @@ export default function BudgetTemplates() {
     </>
   );
 }
+

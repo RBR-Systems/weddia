@@ -19,10 +19,8 @@ import { DndContext, DragOverlay, pointerWithin } from "@dnd-kit/core";
 import {
   TeamOutlined,
   MessageOutlined,
-  CloseOutlined,
   UndoOutlined,
   PlusOutlined,
-  MinusOutlined,
   ZoomOutOutlined,
   ZoomInOutlined,
   PlusSquareOutlined,
@@ -378,3 +376,4 @@ function TableAssignmentContent() {
 }
 
 export default TableAssignmentPage;
+

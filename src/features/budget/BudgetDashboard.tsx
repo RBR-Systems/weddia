@@ -11,8 +11,6 @@ import {
   LineChartOutlined,
   SettingOutlined,
   BellOutlined,
-  FileTextOutlined,
-  CalculatorOutlined,
   CloudUploadOutlined,
 } from "@ant-design/icons";
 import { BudgetProvider, useBudget } from "./contexts/BudgetContext";
@@ -195,3 +193,4 @@ export default function BudgetDashboardPageWrapper() {
     </BudgetProvider>
   );
 }
+
