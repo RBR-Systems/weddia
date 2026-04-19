@@ -332,7 +332,9 @@ const CheckInTable: React.FC<CheckInTableProps> = ({
                 onNavigateToTable(r.table_id);
               }
             }}
-            {...kb}
+            role={kb.role}
+            tabIndex={kb.tabIndex}
+            onKeyDown={kb.onKeyDown}
           >
             <EnvironmentOutlined style={{ fontSize: 12 }} />
             <span>{r.table_id}</span>
