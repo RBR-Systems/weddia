@@ -60,11 +60,8 @@ function TypeChipGroup({
 import { getRandomId } from '@/shared/utils/rng';
 
 function createId() {
-  try {
-    return getRandomId('id-');
-  } catch {
-    return `id-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-  }
+  // Delegate ID generation to shared utility which handles crypto/no-crypto fallbacks (without using Math.random).
+  return getRandomId('id-');
 }
 
 export default function AddTimelineItemModal({

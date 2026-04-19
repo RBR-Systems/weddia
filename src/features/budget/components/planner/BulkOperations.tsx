@@ -7,10 +7,57 @@ import { useBudget } from "../../contexts/BudgetContext";
 import { useTranslation } from "react-i18next";
 import CategoryTag from "../shared/CategoryTag";
 import { formatCurrency, formatDate } from "@/utils/formatters.utils";
-import type { Expense, PaymentStatus } from "../../models/budget.models";
+import type { Category, Expense, PaymentStatus } from "../../models/budget.models";
 import bulkStyles from "./BulkOperations.module.css";
 
 const { Text } = Typography;
+
+const CSV_HEADERS = ["Description", "Amount", "Category", "Vendor", "Date", "Status"];
+
+function buildExpenseCsvRows(expenses: Expense[], categories: Category[]): string {
+  const rows = expenses.map((e) => {
+    const cat = categories.find((c) => c.id === e.category_id);
+    return [
+      `"${e.description}"`,
+      e.amount,
+      `"${cat?.name || ""}"`,
+      `"${e.vendor_name || ""}"`,
+      e.expense_date,
+      e.payment_status,
+    ].join(",");
+  });
+  return [CSV_HEADERS.join(","), ...rows].join("\n");
+}
+
+function triggerCsvDownload(content: string, filename: string): void {
+  const blob = new Blob([content], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function simulateImportProgress(
+  setProgress: React.Dispatch<React.SetStateAction<number | null>>,
+  onComplete: () => void,
+): void {
+  setProgress(0);
+  const interval = setInterval(() => {
+    setProgress((prev) => {
+      if (prev === null || prev >= 100) {
+        clearInterval(interval);
+        return null;
+      }
+      return prev + 10;
+    });
+  }, 200);
+  setTimeout(() => {
+    onComplete();
+    setProgress(null);
+  }, 2500);
+}
 
 export default function BulkOperations() {
   const { t } = useTranslation();
@@ -25,38 +72,8 @@ export default function BulkOperations() {
   const [importProgress, setImportProgress] = useState<number | null>(null);
 
   const handleExportAll = () => {
-    const headers = [
-      "Description",
-      "Amount",
-      "Category",
-      "Vendor",
-      "Date",
-      "Status",
-    ];
-    const csvContent = [
-      headers.join(","),
-      ...state.expenses.map((e: Expense) => {
-        const cat = state.categories.find(
-          (c: { id: string }) => c.id === e.category_id,
-        );
-        return [
-          `"${e.description}"`,
-          e.amount,
-          `"${cat?.name || ""}"`,
-          `"${e.vendor_name || ""}"`,
-          e.expense_date,
-          e.payment_status,
-        ].join(",");
-      }),
-    ].join("\n");
-
-    const blob = new Blob([csvContent], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `budget-expenses-export.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
+    const csv = buildExpenseCsvRows(state.expenses, state.categories);
+    triggerCsvDownload(csv, "budget-expenses-export.csv");
     message.success(t("bulkOperations.exportSuccess"));
   };
 
@@ -65,44 +82,18 @@ export default function BulkOperations() {
       message.warning(t("bulkOperations.noExpensesSelected"));
       return;
     }
-
-    const selectedExpenses = state.expenses.filter((e: Expense) =>
+    const selected = state.expenses.filter((e: Expense) =>
       selectedRowKeys.includes(e.expense_id),
     );
+    const csv = buildExpenseCsvRows(selected, state.categories);
+    triggerCsvDownload(csv, "budget-expenses-selected.csv");
+    message.success(t("bulkOperations.exportedCount", { count: selected.length }));
+  };
 
-    const headers = [
-      "Description",
-      "Amount",
-      "Category",
-      "Vendor",
-      "Date",
-      "Status",
-    ];
-    const csvContent = [
-      headers.join(","),
-      ...selectedExpenses.map((e: Expense) => {
-        const cat = state.categories.find(
-          (c: { id: string }) => c.id === e.category_id,
-        );
-        return [
-          `"${e.description}"`,
-          e.amount,
-          `"${cat?.name || ""}"`,
-          `"${e.vendor_name || ""}"`,
-          e.expense_date,
-          e.payment_status,
-        ].join(",");
-      }),
-    ].join("\n");
-
-    const blob = new Blob([csvContent], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `budget-expenses-selected.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
-    message.success(t("bulkOperations.exportedCount", { count: selectedExpenses.length }));
+  const handleDownloadTemplate = () => {
+    const template =
+      "Description,Amount,Category,Vendor,Date,Status\nExample Expense,1000,venue,Vendor Name,2026-03-15,pending";
+    triggerCsvDownload(template, "budget-import-template.csv");
   };
 
   const uploadProps: UploadProps = {
@@ -110,25 +101,10 @@ export default function BulkOperations() {
     showUploadList: false,
     beforeUpload: (file) => {
       const reader = new FileReader();
-      reader.onload = () => {
-        setImportProgress(0);
-
-        // Simulate import progress
-        const interval = setInterval(() => {
-          setImportProgress((prev) => {
-            if (prev === null || prev >= 100) {
-              clearInterval(interval);
-              return null;
-            }
-            return prev + 10;
-          });
-        }, 200);
-
-        setTimeout(() => {
-          message.success(t("bulkOperations.importCompleted"));
-          setImportProgress(null);
-        }, 2500);
-      };
+      reader.onload = () =>
+        simulateImportProgress(setImportProgress, () =>
+          message.success(t("bulkOperations.importCompleted")),
+        );
       reader.readAsText(file);
       return false;
     },
@@ -182,7 +158,7 @@ export default function BulkOperations() {
       dataIndex: "category_id",
       key: "category_id",
       render: (id: string) => {
-        const cat = state.categories.find((c: { id: string }) => c.id === id);
+        const cat = state.categories.find((c: Category) => c.id === id);
         return <CategoryTag color={cat?.color}>{cat?.name || id}</CategoryTag>;
       },
     },
@@ -233,17 +209,7 @@ export default function BulkOperations() {
               <Text type="secondary">{t("bulkOperations.downloadTemplateLabel")}</Text>
               <Button
                 icon={<DownloadOutlined />}
-                onClick={() => {
-                  const template =
-                    "Description,Amount,Category,Vendor,Date,Status\nExample Expense,1000,venue,Vendor Name,2026-03-15,pending";
-                  const blob = new Blob([template], { type: "text/csv" });
-                  const url = URL.createObjectURL(blob);
-                  const a = document.createElement("a");
-                  a.href = url;
-                  a.download = "budget-import-template.csv";
-                  a.click();
-                  URL.revokeObjectURL(url);
-                }}
+                onClick={handleDownloadTemplate}
               >
                 {t("bulkOperations.downloadTemplate")}
               </Button>

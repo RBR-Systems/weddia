@@ -23,7 +23,7 @@ export default function LanguageSwitcher() {
 
   const handleChange = useCallback(
     (value: string) => {
-      void i18n.changeLanguage(value);
+      i18n.changeLanguage(value);
     },
     [i18n],
   );
@@ -40,4 +40,3 @@ export default function LanguageSwitcher() {
     />
   );
 }
-
