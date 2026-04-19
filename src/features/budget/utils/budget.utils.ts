@@ -10,7 +10,7 @@ export const computeSpentSummary = (
 ): Pick<BudgetSummary, 'percentage_spent' | 'total_remaining'> => ({
   percentage_spent:
     totalBudget > 0
-      ? parseFloat(((totalSpent / totalBudget) * 100).toFixed(2))
+      ? Number.parseFloat(((totalSpent / totalBudget) * 100).toFixed(2))
       : 0,
   total_remaining: totalBudget - totalSpent,
 });
@@ -105,3 +105,4 @@ export const mapApiDataToBudgetState = (
     currency: data.budget.currency as Currency,
   };
 };
+

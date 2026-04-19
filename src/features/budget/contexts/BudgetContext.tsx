@@ -278,9 +278,9 @@ export function BudgetProvider({ children }: { children: React.ReactNode }) {
           : Math.round(((c.percentage ?? 0) * totalBudget) / 100),
       (c, allocated, totalBudget) =>
         typeof c.percentage === "number"
-          ? parseFloat(c.percentage.toFixed(2))
+          ? Number.parseFloat(c.percentage.toFixed(2))
           : totalBudget > 0
-          ? parseFloat(((allocated / totalBudget) * 100).toFixed(2))
+          ? Number.parseFloat(((allocated / totalBudget) * 100).toFixed(2))
           : 0,
     );
 
@@ -311,4 +311,5 @@ export function useBudget() {
   if (!ctx) throw new Error("useBudget must be used within BudgetProvider");
   return ctx;
 }
+
 

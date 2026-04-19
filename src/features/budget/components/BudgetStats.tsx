@@ -6,7 +6,7 @@ import AnimatedStatistic from "@/shared/components/AnimatedStatistic/AnimatedSta
 import { useBudget } from "../contexts/BudgetContext";
 import { formatCurrency, formatInputNumber, parseInputNumber } from "@/utils/formatters.utils";
 import { useTranslation } from "react-i18next";
-import getKeyboardActivationProps from "@/shared/utils/keyboardActivation";
+
 import type { Category } from "../models/budget.models";
 import styles from "./BudgetStats.module.css";
 
@@ -45,15 +45,15 @@ function findTopCategory(categories: Category[]): Category | null {
 // ── Sub-components (defined at module level — no inline components) ───────────
 
 interface StatCardProps {
-  icon: React.ReactNode;
-  label: string;
-  content: React.ReactNode;
-  accentColor: string;
-  subLabel?: string;
-  progress?: number;
-  progressColor?: string;
-  onClick?: () => void;
-  showEditHint?: boolean;
+  readonly icon: React.ReactNode;
+  readonly label: string;
+  readonly content: React.ReactNode;
+  readonly accentColor: string;
+  readonly subLabel?: string;
+  readonly progress?: number;
+  readonly progressColor?: string;
+  readonly onClick?: () => void;
+  readonly showEditHint?: boolean;
 }
 
 function StatCard({
@@ -67,17 +67,10 @@ function StatCard({
   onClick,
   showEditHint,
 }: StatCardProps) {
-  const kb = getKeyboardActivationProps(onClick);
+  const className = `${styles.primaryCard} ${onClick ? styles.clickable : ""}`;
 
-  return (
-    <div
-      className={`${styles.primaryCard} ${onClick ? styles.clickable : ""}`}
-      style={{ "--accent": accentColor } as React.CSSProperties}
-      onClick={onClick}
-      role={kb.role}
-      tabIndex={kb.tabIndex}
-      onKeyDown={kb.onKeyDown}
-    >
+  const inner = (
+    <>
       <div className={styles.accentBar} />
       <div className={styles.cardInner}>
         <div className={styles.cardHeader}>
@@ -99,15 +92,37 @@ function StatCard({
         )}
         {subLabel && <div className={styles.cardSub}>{subLabel}</div>}
       </div>
+    </>
+  );
+
+  if (onClick) {
+    return (
+      <button
+        type="button"
+        className={className}
+        style={{ "--accent": accentColor } as React.CSSProperties}
+        onClick={onClick}
+      >
+        {inner}
+      </button>
+    );
+  }
+
+  return (
+    <div
+      className={className}
+      style={{ "--accent": accentColor } as React.CSSProperties}
+    >
+      {inner}
     </div>
   );
 }
 
 interface SecondaryCardProps {
-  icon: React.ReactNode;
-  label: string;
-  value: React.ReactNode;
-  accentColor: string;
+  readonly icon: React.ReactNode;
+  readonly label: string;
+  readonly value: React.ReactNode;
+  readonly accentColor: string;
 }
 
 function SecondaryCard({
@@ -159,7 +174,7 @@ export default function BudgetStats() {
   const remainingSubLabel =
     summary.total_remaining < 0
       ? t("budgetStats.overBudget")
-      : `${parseFloat((Math.abs(summary.total_remaining / (summary.total_budget || 1)) * 100).toFixed(2))}% ${t("budgetStats.remaining")}`;
+      : `${Number.parseFloat((Math.abs(summary.total_remaining / (summary.total_budget || 1)) * 100).toFixed(2))}% ${t("budgetStats.remaining")}`;
   const topCategoryName = topCategory?.budget_name || topCategory?.name || "—";
   const topCategoryTooltip =
     topCategory != null ? formatCurrency(topCategory.spent ?? 0, currency) : undefined;
@@ -266,7 +281,7 @@ export default function BudgetStats() {
             accentColor="var(--status-in-progress)"
             progress={allocatedPct}
             progressColor="var(--status-in-progress)"
-            subLabel={`${parseFloat(allocatedPct.toFixed(2))}% ${t("budgetStats.ofBudget")}`}
+            subLabel={`${Number.parseFloat(allocatedPct.toFixed(2))}% ${t("budgetStats.ofBudget")}`}
           />
         </Col>
 
@@ -291,7 +306,7 @@ export default function BudgetStats() {
             accentColor="var(--status-delayed)"
             progress={spentPct}
             progressColor={spentProgressColor}
-            subLabel={`${parseFloat(spentPct.toFixed(2))}% ${t("budgetStats.ofBudget")}`}
+            subLabel={`${Number.parseFloat(spentPct.toFixed(2))}% ${t("budgetStats.ofBudget")}`}
           />
         </Col>
 
@@ -325,7 +340,7 @@ export default function BudgetStats() {
           <SecondaryCard
             icon={<PercentageOutlined />}
             label={t("budgetStats.spentPercent")}
-            value={`${parseFloat(summary.percentage_spent.toFixed(2))}%`}
+            value={`${Number.parseFloat(summary.percentage_spent.toFixed(2))}%`}
             accentColor="var(--primary)"
           />
         </Col>
@@ -359,4 +374,5 @@ export default function BudgetStats() {
     </>
   );
 }
+
 

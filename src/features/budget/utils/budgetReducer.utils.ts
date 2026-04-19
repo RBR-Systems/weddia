@@ -91,7 +91,7 @@ export const handleUpdateCategory = (
     remaining: (c.allocated ?? 0) - (c.spent ?? 0),
     percentage:
       total_allocated > 0
-        ? parseFloat((((c.allocated ?? 0) / total_allocated) * 100).toFixed(2))
+        ? Number.parseFloat((((c.allocated ?? 0) / total_allocated) * 100).toFixed(2))
         : 0,
   }));
   return {
@@ -113,3 +113,4 @@ export const handleUpdateBudget = (state: BudgetState, totalBudget: number): Bud
     ...computeSpentSummary(totalBudget, state.summary?.total_spent ?? 0),
   },
 });
+

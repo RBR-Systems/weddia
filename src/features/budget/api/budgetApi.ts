@@ -127,10 +127,16 @@ export class BudgetService {
     }));
 
     const pctSpent = totalBudget > 0 ? (totalSpent / totalBudget) * 100 : 0;
-    const status =
-      pctSpent >= 100 ? "over_budget" :
-      pctSpent >= 80  ? "at_risk"     :
-      totalSpent === 0 ? "not_started" : "on_track";
+    let status: string;
+    if (pctSpent >= 100) {
+      status = "over_budget";
+    } else if (pctSpent >= 80) {
+      status = "at_risk";
+    } else if (totalSpent === 0) {
+      status = "not_started";
+    } else {
+      status = "on_track";
+    }
 
     const paidExpenses    = expenses.filter((e) => e.paymentStatus === "paid");
     const pendingExpenses = expenses.filter((e) => e.paymentStatus === "pending" || !e.paymentStatus);
@@ -260,7 +266,7 @@ export class BudgetService {
     return items.map((i) => ({
       item_id: String(i.budgetItemId),
       budget_id: String(i.budgetId),
-      category_id: i.categoryId != null ? String(i.categoryId) : undefined,
+      category_id: (i.categoryId !== undefined && i.categoryId !== null) ? String(i.categoryId) : undefined,
       description: i.description,
       amount: i.amount,
       notes: i.notes ?? "",
@@ -277,7 +283,7 @@ export class BudgetService {
     }
     const item = await apiPost<ApiBudgetItem>(`/api/budgetitems?adminId=1`, {
       budgetId: Number(budgetId),
-      categoryId: data.category_id != null ? Number(data.category_id) : undefined,
+      categoryId: (data.category_id !== undefined && data.category_id !== null) ? Number(data.category_id) : undefined,
       description: data.description,
       amount: data.amount,
       notes: data.notes ?? "",
@@ -285,7 +291,7 @@ export class BudgetService {
     return {
       item_id: String(item.budgetItemId),
       budget_id: String(item.budgetId),
-      category_id: item.categoryId != null ? String(item.categoryId) : undefined,
+      category_id: (item.categoryId !== undefined && item.categoryId !== null) ? String(item.categoryId) : undefined,
       description: item.description,
       amount: item.amount,
       notes: item.notes ?? "",
@@ -298,7 +304,7 @@ export class BudgetService {
   ): Promise<void> {
     await apiPut(`/api/budgetitems/${itemId}?adminId=1`, {
       ...data,
-      categoryId: data.category_id != null ? Number(data.category_id) : undefined,
+      categoryId: (data.category_id !== undefined && data.category_id !== null) ? Number(data.category_id) : undefined,
       category_id: undefined,
     }, { silent401: true });
   }

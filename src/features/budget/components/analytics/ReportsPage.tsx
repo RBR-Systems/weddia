@@ -105,7 +105,7 @@ export default function ReportsPage() {
       key: "usage",
       render: (_, record) =>
         record.allocated > 0
-          ? `${parseFloat(((record.spent / record.allocated) * 100).toFixed(2))}%`
+          ? `${Number.parseFloat(((record.spent / record.allocated) * 100).toFixed(2))}%`
           : "0%",
       align: "center",
     },
@@ -320,5 +320,6 @@ export default function ReportsPage() {
     </div>
   );
 }
+
 
 

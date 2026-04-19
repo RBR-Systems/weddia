@@ -9,11 +9,11 @@ import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
 import styles from "./ExpenseModal.module.css";
 
-type Props = {
+type Props = Readonly<{
   visible: boolean;
   onClose: () => void;
   editingExpense?: Expense | null;
-};
+}>;
 
 const METHOD_OPTIONS = [
   { value: "Credit Card",   icon: <CreditCardOutlined />,       labelKey: "expenseModal.paymentMethods.creditCard"   },

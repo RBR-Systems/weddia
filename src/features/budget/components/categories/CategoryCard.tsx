@@ -20,7 +20,7 @@ export default function CategoryCard({
   const { t } = useTranslation();
   const { name, budget_name, budget_notes, allocated, spent, expense_count, color } = category;
   const remaining = allocated - spent;
-  const percentage = allocated > 0 ? parseFloat(((spent / allocated) * 100).toFixed(2)) : 0;
+  const percentage = allocated > 0 ? Number.parseFloat(((spent / allocated) * 100).toFixed(2)) : 0;
   const accent = color || "var(--primary)";
 
   const displayName = budget_name || name;
@@ -104,4 +104,5 @@ export default function CategoryCard({
     </button>
   );
 }
+
 
