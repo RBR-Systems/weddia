@@ -42,7 +42,9 @@ function StatCard({
       className={`${styles.primaryCard} ${onClick ? styles.clickable : ""}`}
       style={{ "--accent": accentColor } as React.CSSProperties}
       onClick={onClick}
-      {...kb}
+      role={kb.role}
+      tabIndex={kb.tabIndex}
+      onKeyDown={kb.onKeyDown}
     >
       <div className={styles.accentBar} />
       <div className={styles.cardInner}>
