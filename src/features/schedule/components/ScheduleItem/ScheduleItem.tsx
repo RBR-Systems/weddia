@@ -8,6 +8,7 @@ import { TimelineItem, Status } from "../../models/schedule.models";
 import { useTranslation } from "react-i18next";
 import { calculateDuration, calculateSetupDuration, formatTime, getStatusOptions } from "../../utils/schedule.utils";
 import styles from "./schedule-item.module.css";
+import getKeyboardActivationProps from "@/shared/utils/keyboardActivation";
 
 type Props = {
   item: TimelineItem;
@@ -69,6 +70,8 @@ export const ScheduleItem: React.FC<Props> = ({
   const displayStatus: Status =
     isNow && actualStatus === "pending" ? "in_progress" : actualStatus;
   const statusInfo = getStatusOptions()[displayStatus];
+  const kbToggle = getKeyboardActivationProps(() => onToggle(item.timeline_item_id));
+  const kbStop = getKeyboardActivationProps(() => {});
 
   const now = Date.now();
   const isPast = new Date(item.end_time).getTime() < now;
@@ -101,6 +104,9 @@ export const ScheduleItem: React.FC<Props> = ({
       size="small"
       variant="borderless"
       onClick={() => onToggle(item.timeline_item_id)}
+      role={kbToggle.role}
+      tabIndex={kbToggle.tabIndex}
+      onKeyDown={kbToggle.onKeyDown}
       className={[
         styles.scheduleItem,
         isNow ? styles.scheduleItemActive : "",
@@ -125,6 +131,9 @@ export const ScheduleItem: React.FC<Props> = ({
         <div
             className={styles.setupTimeBlock}
             onClick={(e) => e.stopPropagation()}
+            role={kbStop.role}
+            tabIndex={kbStop.tabIndex}
+            onKeyDown={kbStop.onKeyDown}
           >
           <ToolOutlined className={styles.setupIcon} />
           <span className={styles.setupTimeLabel}>{formatTime(item.setup_time)}</span>
@@ -171,6 +180,9 @@ export const ScheduleItem: React.FC<Props> = ({
         <div
             className={styles.statusCol}
             onClick={(e) => e.stopPropagation()}
+            role={kbStop.role}
+            tabIndex={kbStop.tabIndex}
+            onKeyDown={kbStop.onKeyDown}
           >
           <Badge
             status={badgeStatus[displayStatus] ?? "default"}
@@ -182,6 +194,9 @@ export const ScheduleItem: React.FC<Props> = ({
         <div
             className={styles.actionsCol}
             onClick={(e) => e.stopPropagation()}
+            role={kbStop.role}
+            tabIndex={kbStop.tabIndex}
+            onKeyDown={kbStop.onKeyDown}
           >
           <div className={styles.statusButtons}>
             <Tooltip title="Previous status">
