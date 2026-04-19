@@ -265,14 +265,66 @@ export async function getSeatingRecommendation(
       }
     }
 
-    // Extract JSON from the text
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
+    // Extract JSON from the text using a safe, linear-time scan that is aware of JSON strings
+    // to avoid relying on a greedy regex which could be risky on large or malicious inputs.
+    const extractJsonObject = (str: string): string | null => {
+      let inString = false;
+      let stringChar = "";
+      let escape = false;
+      let depth = 0;
+      let start = -1;
+
+      for (let i = 0; i < str.length; i++) {
+        const ch = str[i];
+
+        if (!inString) {
+          if (ch === '"' || ch === '\'') {
+            inString = true;
+            stringChar = ch;
+            continue;
+          }
+
+          if (ch === '{') {
+            if (depth === 0) start = i;
+            depth++;
+            continue;
+          }
+
+          if (ch === '}') {
+            if (depth > 0) {
+              depth--;
+              if (depth === 0 && start !== -1) {
+                return str.slice(start, i + 1);
+              }
+            }
+            continue;
+          }
+        } else {
+          if (escape) {
+            escape = false;
+            continue;
+          }
+          if (ch === '\\') {
+            escape = true;
+            continue;
+          }
+          if (ch === stringChar) {
+            inString = false;
+            stringChar = "";
+          }
+        }
+      }
+      return null;
+    };
+
+    const jsonText = extractJsonObject(text);
+    if (!jsonText) {
       throw new Error("No JSON found in model response");
     }
+
     let result: SeatingResponse;
     try {
-      result = JSON.parse(jsonMatch[0]);
+      result = JSON.parse(jsonText);
     } catch {
       throw new Error("Failed to parse JSON from model response");
     }
