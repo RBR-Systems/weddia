@@ -10,6 +10,37 @@ import getKeyboardActivationProps from "@/shared/utils/keyboardActivation";
 import type { Category } from "../models/budget.models";
 import styles from "./BudgetStats.module.css";
 
+// ── Module-level pure helpers (keep complexity out of BudgetStats) ────────────
+
+function pctOfBudget(amount: number, budget: number): number {
+  return budget > 0 ? (amount / budget) * 100 : 0;
+}
+
+function getRemainingColor(remaining: number, budget: number): string {
+  if (remaining < 0) return "var(--budget-danger)";
+  if (remaining < budget * 0.2) return "var(--budget-warning)";
+  return "var(--budget-success)";
+}
+
+function getSpentProgressColor(pct: number): string {
+  if (pct >= 100) return "var(--budget-danger)";
+  if (pct >= 80) return "var(--budget-warning)";
+  return "var(--status-delayed)";
+}
+
+function getSpentTextColor(pct: number): string | undefined {
+  if (pct >= 100) return "var(--budget-danger)";
+  if (pct >= 80) return "var(--budget-warning)";
+  return undefined;
+}
+
+function findTopCategory(categories: Category[]): Category | null {
+  if (categories.length === 0) return null;
+  return categories.reduce((a, b) =>
+    (b.spent ?? 0) > (a.spent ?? 0) ? b : a,
+  );
+}
+
 // ── Sub-components (defined at module level — no inline components) ───────────
 
 interface StatCardProps {
@@ -114,35 +145,23 @@ export default function BudgetStats() {
   );
   const expenseCount = expenses?.length ?? 0;
   const avgExpense = expenseCount > 0 ? summary.total_spent / expenseCount : 0;
-  const topCategory =
-    categories?.length > 0
-      ? categories.reduce((a: Category, b: Category) =>
-          (b.spent ?? 0) > (a.spent ?? 0) ? b : a,
-        )
-      : null;
+  const topCategory = findTopCategory(categories ?? []);
 
-  const allocatedPct =
-    summary.total_budget > 0
-      ? (totalAllocated / summary.total_budget) * 100
-      : 0;
-  const spentPct =
-    summary.total_budget > 0
-      ? (summary.total_spent / summary.total_budget) * 100
-      : 0;
+  const allocatedPct = pctOfBudget(totalAllocated, summary.total_budget);
+  const spentPct = pctOfBudget(summary.total_spent, summary.total_budget);
 
-  const remainingColor =
+  const remainingColor = getRemainingColor(summary.total_remaining, summary.total_budget);
+  const spentProgressColor = getSpentProgressColor(spentPct);
+  const spentTextColor = getSpentTextColor(spentPct);
+  const allocatedColor = totalAllocated > summary.total_budget ? "var(--budget-danger)" : undefined;
+
+  const remainingSubLabel =
     summary.total_remaining < 0
-      ? "var(--budget-danger)"
-      : summary.total_remaining < summary.total_budget * 0.2
-        ? "var(--budget-warning)"
-        : "var(--budget-success)";
-
-  const spentProgressColor =
-    spentPct >= 100
-      ? "var(--budget-danger)"
-      : spentPct >= 80
-        ? "var(--budget-warning)"
-        : "var(--status-delayed)";
+      ? t("budgetStats.overBudget")
+      : `${parseFloat((Math.abs(summary.total_remaining / (summary.total_budget || 1)) * 100).toFixed(2))}% ${t("budgetStats.remaining")}`;
+  const topCategoryName = topCategory?.budget_name || topCategory?.name || "—";
+  const topCategoryTooltip =
+    topCategory != null ? formatCurrency(topCategory.spent ?? 0, currency) : undefined;
 
   const handleEditBudget = () => {
     setBudgetInput(summary.total_budget);
@@ -238,10 +257,7 @@ export default function BudgetStats() {
                     fontSize: 26,
                     fontWeight: 700,
                     lineHeight: 1.1,
-                    color:
-                      totalAllocated > summary.total_budget
-                        ? "var(--budget-danger)"
-                        : undefined,
+                    color: allocatedColor,
                   },
                 }}
               />
@@ -266,12 +282,7 @@ export default function BudgetStats() {
                     fontSize: 26,
                     fontWeight: 700,
                     lineHeight: 1.1,
-                    color:
-                      spentPct >= 100
-                        ? "var(--budget-danger)"
-                        : spentPct >= 80
-                          ? "var(--budget-warning)"
-                          : undefined,
+                    color: spentTextColor,
                   },
                 }}
               />
@@ -302,11 +313,7 @@ export default function BudgetStats() {
               />
             }
             accentColor={remainingColor}
-            subLabel={
-              summary.total_remaining < 0
-                ? t("budgetStats.overBudget")
-                : `${parseFloat((Math.abs(summary.total_remaining / (summary.total_budget || 1)) * 100).toFixed(2))}% ${t("budgetStats.remaining")}`
-            }
+            subLabel={remainingSubLabel}
           />
         </Col>
       </Row>
@@ -338,19 +345,11 @@ export default function BudgetStats() {
           />
         </Col>
         <Col xs={12} sm={6}>
-          <Tooltip
-            title={
-              topCategory
-                ? formatCurrency(topCategory.spent ?? 0, currency)
-                : undefined
-            }
-          >
+          <Tooltip title={topCategoryTooltip}>
             <SecondaryCard
               icon={<TrophyOutlined />}
               label={t("budgetStats.topCategory")}
-              value={
-                topCategory ? topCategory.budget_name || topCategory.name : "—"
-              }
+              value={topCategoryName}
               accentColor="var(--status-completed)"
             />
           </Tooltip>
