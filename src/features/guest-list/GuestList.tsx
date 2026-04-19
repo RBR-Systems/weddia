@@ -24,7 +24,7 @@ export default function GuestList() {
   const eventId = (selectedEvent as any)?.id ?? 1;
   const [guests, setGuests] = useState<Guest[]>([]);
   const [importOpen, setImportOpen] = useState(false);
-  const [importing, setImporting] = useState(false);
+  const [, setImporting] = useState(false);
   const [selected, setSelected] = useState<Guest | null>(null);
   const [addOpen, setAddOpen] = useState(false);
   const [adding, setAdding] = useState(false);

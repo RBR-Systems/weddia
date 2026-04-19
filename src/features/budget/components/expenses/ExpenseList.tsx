@@ -1,6 +1,6 @@
 "use client";
 import { useState, useMemo } from "react";
-import { App, Card, Table, Button, Input, Select, Space, Tag, Popconfirm, DatePicker, Row, Col } from "antd";
+import { App, Card, Table, Button, Input, Select, Space, Tag, Popconfirm, Row, Col } from "antd";
 import { PlusOutlined, DeleteOutlined, EyeOutlined, FilterOutlined } from "@ant-design/icons";
 import type { ColumnsType, TablePaginationConfig } from "antd/es/table";
 import { useBudget } from "../../contexts/BudgetContext";
@@ -12,7 +12,6 @@ import expenseStyles from "./ExpenseList.module.css";
 import { useTranslation } from "react-i18next";
 
 const { Search } = Input;
-const { RangePicker } = DatePicker;
 
 interface ExpenseListProps {
   onAddExpense?: () => void;

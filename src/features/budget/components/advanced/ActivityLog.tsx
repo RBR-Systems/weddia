@@ -8,7 +8,7 @@ import { useBudget } from "../../contexts/BudgetContext";
 import { formatCurrency } from "@/utils/formatters.utils";
 import activityStyles from "./ActivityLog.module.css";
 
-const { Text, Title } = Typography;
+const { Text } = Typography;
 const { RangePicker } = DatePicker;
 const { Search } = Input;
 
@@ -189,7 +189,7 @@ export default function ActivityLog() {
             style={{ width: 150 }}
             options={[
               { value: "all", label: t("activityLog.allActivities") },
-              ...Object.entries(ACTIVITY_CONFIG).map(([key, config]) => ({
+              ...Object.entries(ACTIVITY_CONFIG).map(([key]) => ({
                 value: key,
                 label: activityTypeLabels[key as ActivityType],
               })),

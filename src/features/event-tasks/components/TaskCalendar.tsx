@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { Calendar, Badge, Card, Typography, Tag, Space, Tooltip, Button, Empty, Avatar, Flex } from "antd";
 import { PlusOutlined, CheckCircleOutlined, ClockCircleOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
-import type { Dayjs } from "dayjs";
-import dayjs from "dayjs";
+import dayjs, { type Dayjs } from "dayjs";
 import type { Task, TaskCategory } from "../models/task.models";
 import { getTasksForDate } from "../api/taskApi";
 import styles from "../EventTasks.module.css";
@@ -47,7 +46,6 @@ const avatarColors = [
 
 const TaskCalendar: React.FC<TaskCalendarProps> = ({
   tasks,
-  categories,
   onTaskClick,
   onQuickComplete,
   onNewTask,

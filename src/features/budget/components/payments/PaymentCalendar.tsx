@@ -2,8 +2,7 @@
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Card, Calendar, Badge, Tooltip, Typography, Flex, Tag, Empty } from "antd";
-import type { Dayjs } from "dayjs";
-import dayjs from "dayjs";
+import dayjs, { type Dayjs } from "dayjs";
 import { useBudget } from "../../contexts/BudgetContext";
 import { formatCurrency } from "@/utils/formatters.utils";
 import { getPaymentStatus } from "../../constants/budget.constants";
@@ -28,9 +27,6 @@ export default function PaymentCalendar() {
   }, [state.expenses]);
 
   const getStatusBadge = (status: PaymentStatus) => {
-    const config = Object.values(PAYMENT_STATUS).find(
-      (s) => s.value === status,
-    );
     switch (status) {
       case "paid":
         return "success";

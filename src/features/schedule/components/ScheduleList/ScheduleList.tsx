@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useMemo, useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { Timeline, Typography } from "antd";
+import { Timeline } from "antd";
 import { ClockCircleOutlined } from "@ant-design/icons";
 import { TimelineItem, Status } from "../../models/schedule.models";
 import ScheduleItem from "../ScheduleItem/ScheduleItem";
@@ -14,7 +14,6 @@ type Props = {
   onStatusChange?: (itemId: string, newStatus: Status) => void;
 };
 
-const { Text } = Typography;
 
 const typeColors: Record<string, string> = {
   ceremony: "#D4AF37",

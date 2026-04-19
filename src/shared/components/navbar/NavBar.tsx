@@ -12,7 +12,7 @@ import type { View } from "@/shared/components/AppShell/models/appShell.models";
 
 type NavBarProps = { currentView?: View };
 
-const NavBarComponent: React.FC<NavBarProps> = ({ currentView }) => {
+const NavBarComponent: React.FC<NavBarProps> = () => {
   const { t } = useTranslation();
   const { mode } = useTheme();
   const {

@@ -1,8 +1,7 @@
 "use client";
 import React, { useEffect, useState, useRef } from "react";
-import { App, Spin, Empty, Button, Space, Modal, Radio, InputNumber, Select } from "antd";
+import { App, Spin, Empty, Button, Space, Modal, Radio, InputNumber, Select, Checkbox } from "antd";
 import { ClockCircleOutlined, ThunderboltOutlined, CheckCircleOutlined, RightOutlined } from "@ant-design/icons";
-import { Checkbox } from "antd";
 import dayjs from "dayjs";
 import { TimelineItem, Status } from "./models/schedule.models";
 import { sortTimelineItems, formatTime } from "./utils/schedule.utils";
@@ -38,7 +37,7 @@ const Schedule: React.FC = () => {
   );
   const [adjustmentMinutes, setAdjustmentMinutes] = useState<number | null>(15);
   const [applyFrom, setApplyFrom] = useState<string>("all-remaining");
-  const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
+  const [selectedItemId] = useState<string | null>(null);
   const [isApplying, setIsApplying] = useState(false);
   const [adjustmentHistory, setAdjustmentHistory] = useState<any[]>([]);
 
@@ -143,7 +142,6 @@ const Schedule: React.FC = () => {
     if (!item) return;
 
     // Optimistic update
-    const originalItems = [...items];
     setItems((prev) =>
       prev.map((it) =>
         it.timeline_item_id === itemId
@@ -187,7 +185,7 @@ const Schedule: React.FC = () => {
   // Filter items based on active filter and hideCompleted
   function getFilteredItems() {
     const q = (searchQuery || "").trim().toLowerCase();
-    let filtered = [...items].filter((item) => {
+    const filtered = [...items].filter((item) => {
       // Search
       if (q) {
         const matches =
@@ -307,7 +305,7 @@ const Schedule: React.FC = () => {
       setItems(sortTimelineItems(newItems));
       message.success(t("schedule.messages.itemDeleted", { title: item.title }));
       deleteTimelineItem(item.timeline_item_id).catch(console.error);
-    } catch (err) {
+    } catch {
       setItems(original);
       message.error(t("schedule.messages.deleteFailed"));
     } finally {
@@ -367,36 +365,6 @@ const Schedule: React.FC = () => {
     }
   }
 
-  function validateAdjustment(
-    affected: TimelineItem[],
-    minutes: number | null,
-    dir: string,
-  ) {
-    const warnings: string[] = [];
-    if (!minutes || minutes <= 0) return warnings;
-
-    const latestNew = affected.reduce(
-      (latest: string | null, item) => {
-        const newEnd = calculateNewTime(item.end_time, minutes, dir);
-        return !latest || newEnd > latest ? newEnd : latest;
-      },
-      null as string | null,
-    );
-
-    if (latestNew) {
-      const end = new Date(latestNew);
-      if (end.getHours() >= 23 || end.getHours() < 5)
-        warnings.push(
-          t("schedule.warnings.lateActivities"),
-        );
-    }
-    if ((minutes ?? 0) > 60)
-      warnings.push(
-        t("schedule.warnings.largeShift", { minutes }),
-      );
-    return warnings;
-  }
-
   async function applyAdjustment() {
     const mins = adjustmentMinutes ?? 0;
     const affected = getAffectedItems(
@@ -453,7 +421,7 @@ const Schedule: React.FC = () => {
       });
 
       setAdjustModalOpen(false);
-    } catch (err) {
+    } catch {
       message.error(t("schedule.messages.adjustFailed"));
     } finally {
       setIsApplying(false);

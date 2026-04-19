@@ -10,14 +10,6 @@ import { useSeatingAI } from "./hooks/useSeatingAI";
 import { formatTime } from "./utils/seatingAI.utils";
 import { useTranslation } from "react-i18next";
 
-interface MessageItem {
-  id: string;
-  type: "user" | "assistant";
-  content: string;
-  timestamp: Date;
-  data?: SeatingResponse;
-}
-
 interface SeatingAIChatProps {
   guests: HFGuest[];
   tables: HFTable[];

@@ -1,8 +1,7 @@
 "use client";
 
 import { useTranslation } from "react-i18next";
-import { Input, Select, Segmented, Row, Col } from "antd";
-import type { SelectProps } from "antd";
+import { Input, Select, Segmented, Row, Col, type SelectProps } from "antd";
 
 type StatusOption = "all" | "pending" | "attending" | "maybe" | "not_attending";
 

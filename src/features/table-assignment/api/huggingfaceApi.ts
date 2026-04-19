@@ -31,8 +31,6 @@ export interface SeatingResponse {
   conflicts?: string[];
 }
 
-const MODEL = "mistralai/Mistral-7B-Instruct-v0.2"; // change if you prefer another model
-
 function buildSeatingPrompt(request: SeatingRequest): string {
   const { guests, tables, userMessage, constraints } = request;
 
@@ -262,7 +260,7 @@ export async function getSeatingRecommendation(
       // Fallback: try to stringify
       try {
         text = JSON.stringify(data);
-      } catch (e) {
+      } catch {
         text = String(data);
       }
     }
@@ -275,7 +273,7 @@ export async function getSeatingRecommendation(
     let result: SeatingResponse;
     try {
       result = JSON.parse(jsonMatch[0]);
-    } catch (e) {
+    } catch {
       throw new Error("Failed to parse JSON from model response");
     }
     if (!result.assignments || !Array.isArray(result.assignments)) {

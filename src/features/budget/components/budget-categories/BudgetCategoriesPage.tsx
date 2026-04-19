@@ -1,12 +1,11 @@
 "use client";
 import { useEffect, useState, useMemo } from "react";
-import { Button, Input, Modal, Form, Tooltip, Empty, Spin, App, Popconfirm, Typography } from "antd";
+import { Button, Input, Modal, Form, Tooltip, Empty, Spin, App, Popconfirm } from "antd";
 import { PlusOutlined, EditOutlined, DeleteOutlined, TagsOutlined } from "@ant-design/icons";
 import { CategoriesService } from "../../api/categoriesApi";
 import { useTranslation } from "react-i18next";
 import styles from "./BudgetCategoriesPage.module.css";
 
-const { Text } = Typography;
 
 export default function BudgetCategoriesPage() {
   const { t } = useTranslation();

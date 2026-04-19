@@ -10,7 +10,7 @@ import CategoryTag from "../shared/CategoryTag";
 import { CHART_COLORS, SEMANTIC_CHART_COLORS, resolveChartColor } from "@/theme/chartColors";
 import { useTheme } from "@/theme/ThemeProvider";
 
-const { Title, Text, Paragraph } = Typography;
+const { Text } = Typography;
 
 interface EstimateCategory {
   name: string;

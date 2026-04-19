@@ -1,7 +1,6 @@
 "use client";
 import React from "react";
-import { Tag } from "antd";
-import type { TagProps } from "antd";
+import { Tag, type TagProps } from "antd";
 import { useTheme } from "@/theme/ThemeProvider";
 
 interface CategoryTagProps extends Omit<TagProps, "color"> {

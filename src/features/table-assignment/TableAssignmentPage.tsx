@@ -7,8 +7,7 @@ import { TeamOutlined, MessageOutlined, UndoOutlined, PlusOutlined, ZoomOutOutli
 import React, { useState } from "react";
 import TableCanvas from "./components/Tables/TableCanvas/TableCanvas";
 import SeatingAIChat from "./components/AIChat/SeatingAIChat";
-import { useTableAssignmentContext } from "./context/TableAssignmentContext";
-import { TableAssignmentProvider } from "./context/TableAssignmentContext";
+import { useTableAssignmentContext, TableAssignmentProvider } from "./context/TableAssignmentContext";
 import SidePanel from "./components/SideGuestPanel/SidePanel";
 import { useTranslation } from "react-i18next";
 

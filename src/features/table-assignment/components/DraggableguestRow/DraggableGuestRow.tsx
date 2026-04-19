@@ -1,13 +1,11 @@
-import { memo, useMemo } from "react";
+import { memo, useMemo, type CSSProperties } from "react";
 import { useDraggable } from "@dnd-kit/core";
 import { Tag, Typography, Select, Button } from "antd";
-import type { CSSProperties } from "react";
 import styles from "./DraggableGuestRow.module.css";
 import type { Guest } from "../../models/tableAssignment.models";
 import { fullName, getNextAvailableSeatNumber, getTableLabel } from "../../utils/table.utils";
-import { WarningOutlined } from "@ant-design/icons";
+import { WarningOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useTableAssignmentContext } from "../../context/TableAssignmentContext";
-import { DeleteOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 
 export default memo(function DraggableGuestRow({

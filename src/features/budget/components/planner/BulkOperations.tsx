@@ -1,8 +1,7 @@
 "use client";
 import React, { useState } from "react";
-import { App, Card, Row, Col, Upload, Button, Table, Space, Modal, Select, Alert, Typography, Divider, Progress } from "antd";
+import { App, Card, Row, Col, Upload, Button, Table, Space, Modal, Select, Alert, Typography, Divider, Progress, type UploadProps } from "antd";
 import { UploadOutlined, DownloadOutlined, DeleteOutlined, EditOutlined, CheckSquareOutlined } from "@ant-design/icons";
-import type { UploadProps } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { useBudget } from "../../contexts/BudgetContext";
 import { useTranslation } from "react-i18next";
@@ -11,7 +10,7 @@ import { formatCurrency, formatDate } from "@/utils/formatters.utils";
 import type { Expense, PaymentStatus } from "../../models/budget.models";
 import bulkStyles from "./BulkOperations.module.css";
 
-const { Text, Paragraph, Title } = Typography;
+const { Text } = Typography;
 
 export default function BulkOperations() {
   const { t } = useTranslation();
@@ -111,7 +110,7 @@ export default function BulkOperations() {
     showUploadList: false,
     beforeUpload: (file) => {
       const reader = new FileReader();
-      reader.onload = (e) => {
+      reader.onload = () => {
         setImportProgress(0);
 
         // Simulate import progress

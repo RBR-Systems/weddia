@@ -4,9 +4,8 @@ import { useTranslation } from "react-i18next";
 import { Drawer, Descriptions, Tag, Typography, Button, Space } from "antd";
 import { Guest, formatStatusLabel, statusColor } from "../../models/guestList.models";
 import { formatPhone } from "@/utils/formatters.utils";
-import { useTheme } from "@/theme/ThemeProvider";
 
-const { Text, Title } = Typography;
+const { Title } = Typography;
 
 export default function GuestDetailModal({
   guest,
@@ -19,7 +18,6 @@ export default function GuestDetailModal({
   onClose: () => void;
   countryCodes?: Record<string, string>;
 }) {
-  const { mode } = useTheme();
   const { t } = useTranslation();
 
   const relationName =

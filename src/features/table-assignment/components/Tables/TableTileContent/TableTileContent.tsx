@@ -4,7 +4,6 @@ import styles from "./TableTile.module.css";
 import type { Table } from "../../../models/tableAssignment.models";
 
 export default memo(function TableTileContent({
-  table,
   occupancy,
   capacity,
   label,

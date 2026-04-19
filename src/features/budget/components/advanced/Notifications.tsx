@@ -8,7 +8,7 @@ import { useBudget } from "../../contexts/BudgetContext";
 import { formatCurrency } from "@/utils/formatters.utils";
 import notifStyles from "./Notifications.module.css";
 
-const { Title, Text, Paragraph } = Typography;
+const { Text } = Typography;
 
 type NotificationType = "warning" | "alert" | "reminder" | "info";
 

@@ -1,6 +1,5 @@
-import { memo, useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState, type CSSProperties } from "react";
 import { useDraggable, useDroppable } from "@dnd-kit/core";
-import type { CSSProperties } from "react";
 import styles from "../TableTileContent/TableTile.module.css";
 import { Popover } from "antd";
 import type { Table, TableAssignment, Guest } from "../../../models/tableAssignment.models";
@@ -11,7 +10,6 @@ import { useTranslation } from "react-i18next";
 function SeatTile({
   tableId,
   num,
-  assign,
   guest,
   indexInParty = 0,
 }: {
@@ -49,7 +47,6 @@ export default memo(function DroppableTableTile({
   table,
   occupancy,
   isSelected,
-  full,
   onSelect,
   metersToPixels,
   assignments = [],

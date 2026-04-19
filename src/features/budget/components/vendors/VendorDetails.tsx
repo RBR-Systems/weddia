@@ -11,7 +11,7 @@ import { getPaymentStatus } from "../../constants/budget.constants";
 import type { Expense, PaymentStatus, Vendor } from "../../models/budget.models";
 import vendorStyles from "./VendorDetails.module.css";
 
-const { Title, Text } = Typography;
+const { Title } = Typography;
 
 interface VendorDetailsProps {
   vendor: Vendor | null;

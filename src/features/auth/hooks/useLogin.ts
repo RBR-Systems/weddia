@@ -14,7 +14,7 @@ export function useLogin() {
     setLoading(true);
     try {
       await login(creds.email, creds.password);
-    } catch (err) {
+    } catch {
       setError(t("auth.invalidCredentials"));
     } finally {
       setLoading(false);

@@ -10,7 +10,7 @@ import { CHART_COLORS, SEMANTIC_CHART_COLORS } from "@/theme/chartColors";
 import { useTheme } from "@/theme/ThemeProvider";
 
 const { Search } = Input;
-const { Text, Title } = Typography;
+const { Text } = Typography;
 import Statistic from "@/shared/components/AnimatedStatistic/AnimatedStatistic";
 
 interface ClientBudget {
@@ -111,7 +111,7 @@ export default function MultiClientView({
   const semantic = SEMANTIC_CHART_COLORS[mode];
 
   const totalManagedBudget = clients.reduce((sum, c) => sum + c.totalBudget, 0);
-  const totalManagedSpent = clients.reduce((sum, c) => sum + c.totalSpent, 0);
+
   const activeClients = clients.filter((c) => c.status !== "completed").length;
   const atRiskClients = clients.filter(
     (c) => c.status === "at_risk" || c.status === "over_budget",

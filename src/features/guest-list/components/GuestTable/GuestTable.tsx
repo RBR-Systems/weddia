@@ -60,12 +60,6 @@ export default function GuestTable({
   });
   const specialOptions = Array.from(specialValues);
 
-  const contactFilters = [
-    { text: t("guestList.hasEmail", "Has email"), value: "email" },
-    { text: t("guestList.hasPhone", "Has phone"), value: "phone" },
-    { text: t("guestList.noContact", "No contact"), value: "none" },
-  ];
-
   const columns: ColumnsType<Guest> = [
     {
       title: t("guestList.guest", "Guest"),
@@ -376,7 +370,7 @@ export default function GuestTable({
             if (!onRemoveGuest) return;
             try {
               await onRemoveGuest(record.guest_id);
-            } catch (err) {
+            } catch {
               // parent will show error
             }
           }}

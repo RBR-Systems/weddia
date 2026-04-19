@@ -14,12 +14,11 @@ import { CategoryList } from "./components/categories";
 import { ExpenseList, ExpenseDetails } from "./components/expenses";
 import { BudgetAllocation } from "./components/allocation";
 import { EventVendors, VendorDetails } from "./components/vendors";
-import type { Vendor } from "./models/budget.models";
+import type { Vendor, Expense } from "./models/budget.models";
 import { PaymentStatus, PaymentCalendar } from "./components/payments";
 import { BudgetCharts, ReportsPage } from "./components/analytics";
 import { BudgetTemplates, BudgetEstimator, ActivityLog, Notifications } from "./components/advanced";
 import { BulkOperations } from "./components/planner";
-import type { Expense } from "./models/budget.models";
 import dashboardStyles from "./BudgetDashboard.module.css";
 import { useTranslation } from "react-i18next";
 
