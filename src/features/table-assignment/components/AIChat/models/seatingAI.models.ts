@@ -1,4 +1,4 @@
-﻿import { SeatingResponse } from "../../../api/huggingfaceApi";
+﻿import type { SeatingResponse } from "../../../models/huggingface.models";
 export interface MessageItem {
   id: string;
   type: "user" | "assistant";

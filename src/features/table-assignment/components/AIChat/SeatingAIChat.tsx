@@ -5,7 +5,7 @@ import Card from "@/shared/components/Card/Card";
 import { useTableAssignmentContext } from "../../context/TableAssignmentContext";
 import { SendOutlined, RobotOutlined, UserOutlined } from "@ant-design/icons";
 import styles from "./SeatingAIChat.module.css";
-import { HFGuest, HFTable, SeatingResponse } from "../../api/huggingfaceApi";
+import type { HFGuest, HFTable, SeatingResponse } from "../../models/huggingface.models";
 import { useSeatingAI } from "./hooks/useSeatingAI";
 import { formatTime } from "./utils/seatingAI.utils";
 import { useTranslation } from "react-i18next";

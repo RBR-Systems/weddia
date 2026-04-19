@@ -1,15 +1,16 @@
 "use client";
 import React, { useCallback, useEffect, useMemo, useReducer, useRef } from "react";
-import { useSensor, useSensors, PointerSensor, type DragStartEvent, type DragEndEvent } from "@dnd-kit/core";
+import { useSensor, useSensors, PointerSensor } from "@dnd-kit/core";
 import { App } from "antd";
 import { INITIAL_METERS_TO_PIXELS, DEFAULT_VENUE_WIDTH_METERS, DEFAULT_VENUE_HEIGHT_METERS } from "../constants/tableAssignment.constants";
-import type { TableLayout, Guest as TAGuest, DragId } from "../models/tableAssignment.models";
-import { fullName, parseGuestIdFromDragId } from "../utils/table.utils";
+import type { TableLayout, Guest as TAGuest } from "../models/tableAssignment.models";
+import { fullName } from "../utils/table.utils";
 import { apiGet, apiPost, apiPut, apiDelete, isAbortError } from "@/shared/api/apiClient";
 import { fetchGuests, fetchRelations } from "../../guest-list/api/guestApi";
 import type { Guest as GuestListGuest } from "../../guest-list/models/guestList.models";
 import { useEvent } from "@/shared/contexts/EventContext";
 import { reducer, createInitialState } from "./tableAssignmentReducer";
+import { useDragHandlers } from "../hooks/useDragHandlers";
 
 function mapGuestListToTA(g: GuestListGuest): TAGuest {
   return {
@@ -296,253 +297,20 @@ export function TableAssignmentProvider({
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
   );
 
-  const onDragStart = useCallback(
-    (evt: DragStartEvent) =>
-      dispatch({
-        type: "SET_ACTIVE_DRAG_ID",
-        payload: evt.active.id as DragId,
-      }),
-    [],
+  const notifier = useMemo(
+    () => messageApi ?? message,
+    [messageApi, message],
   );
 
-  const onDragEnd = useCallback(
-    (evt: DragEndEvent) => {
-      dispatch({ type: "SET_ACTIVE_DRAG_ID", payload: null });
-      // Read fresh state from ref to avoid stale closures
-      const currentState = stateRef.current;
-
-      if (
-        typeof evt.active.id === "string" &&
-        evt.active.id.startsWith("table:") &&
-        evt.active.data.current?.type === "table"
-      ) {
-        const tableId = evt.active.id.slice("table:".length);
-        const delta = evt.delta;
-        const deltaMetersX =
-          delta.x / (currentState.metersToPixels * currentState.zoomScale);
-        const deltaMetersY =
-          delta.y / (currentState.metersToPixels * currentState.zoomScale);
-        const table = currentState.tables.find(
-          (t: any) => t.table_id === tableId,
-        );
-        if (!table) return;
-        const newX = (table.x_m ?? 0) + deltaMetersX;
-        const newY = (table.y_m ?? 0) + deltaMetersY;
-        dispatch({
-          type: "MOVE_TABLE",
-          payload: { tableId, x_m: newX, y_m: newY },
-        });
-
-        // Persist new grid position to API
-        const activeLayout = currentState.layouts.find((l: any) => l.is_active) ?? currentState.layouts[0];
-        if (activeLayout) {
-          const xGrid = Math.max(0, Math.round(newX / (DEFAULT_VENUE_WIDTH_METERS / activeLayout.x_grid_size)));
-          const yGrid = Math.max(0, Math.round(newY / (DEFAULT_VENUE_HEIGHT_METERS / activeLayout.y_grid_size)));
-          apiPut(`/api/eventtables/${tableId}?adminId=1`, {
-            layoutId: Number(activeLayout.layout_id),
-            numberOfSeats: table.total_number ?? 8,
-            shape: table.shape ?? "round",
-            xGrid,
-            yGrid,
-          }).catch(console.error);
-        }
-
-        const notifier = messageApi ?? message;
-        notifier.success(`Table ${tableId} repositioned`);
-        return;
-      }
-
-      const guestId = parseGuestIdFromDragId(evt.active.id);
-      if (!guestId) return;
-      const overId = evt.over?.id;
-      if (!overId) return;
-
-      if (overId === "unassigned") {
-        const prevAssignment = stateRef.current.assignments.find((a: any) => a.guest_id === guestId);
-        dispatch({ type: "UNASSIGN_GUEST", payload: { guestId } });
-        if (prevAssignment) {
-          apiDelete(`/api/tableassignments/${prevAssignment.table_id}/${guestId}`).catch(console.error);
-        }
-        const notifier = messageApi ?? message;
-        notifier.success("Guest unassigned");
-        return;
-      }
-
-      // support seat-specific drops with id `table:{tableId}:seat:{n}`
-      if (typeof overId === "string") {
-        const seatMatch = overId.match(/^table:([^:]+):seat:(\d+)$/);
-        if (seatMatch) {
-          const tableId = seatMatch[1];
-          const seatNumber = Number(seatMatch[2]);
-          const targetTable = tablesForActiveLayout.find(
-            (t: any) => t.table_id === tableId,
-          );
-          if (!targetTable) return;
-
-          const currentAssignments = currentState.assignments;
-          // Check occupant accounting for party_size range
-          const occupant = currentAssignments.find((a: any) => {
-            if (a.table_id !== tableId) return false;
-            const g = guestsById.get(a.guest_id);
-            const ps = g?.party_size ?? (g?.plus_one ? 2 : 1);
-            return (
-              seatNumber >= a.seat_number && seatNumber < a.seat_number + ps
-            );
-          });
-          const guestAssigned = currentAssignments.find(
-            (a: any) => a.guest_id === guestId,
-          );
-
-          const notifier = messageApi ?? message;
-
-          // If seat is free -> move guest there, but validate party size fits
-          if (!occupant) {
-            const g = guestsById.get(guestId);
-            const partySize = g?.party_size ?? (g?.plus_one ? 2 : 1);
-            if (
-              !seatsFitAt(
-                tableId,
-                seatNumber,
-                partySize,
-                currentAssignments,
-                guestId,
-              )
-            ) {
-              notifier.error(
-                "Not enough contiguous seats for that guest's party",
-              );
-              return;
-            }
-            persistAssignment("move", guestId, tableId, seatNumber);
-            dispatch({
-              type: "MOVE_GUEST_SEAT",
-              payload: { guestId, tableId, seatNumber },
-            });
-            notifier.success(
-              g ? `${fullName(g)} assigned to ${tableId}` : "Assigned",
-            );
-            return;
-          }
-
-          // If occupied and moving guest already assigned somewhere -> swap seats
-          if (occupant && guestAssigned) {
-            const g = guestsById.get(guestId);
-            const occGuest = guestsById.get(occupant.guest_id);
-            const gSize = g?.party_size ?? (g?.plus_one ? 2 : 1);
-            const occSize =
-              occGuest?.party_size ?? (occGuest?.plus_one ? 2 : 1);
-            // conservative: only allow swaps when both parties are single-seat
-            if (gSize > 1 || occSize > 1) {
-              notifier.error(
-                "Cannot swap seats for multi-person parties. Unassign and reassign instead.",
-              );
-              return;
-            }
-            persistAssignment("move", guestId, tableId, seatNumber);
-            dispatch({
-              type: "MOVE_GUEST_SEAT",
-              payload: { guestId, tableId, seatNumber },
-            });
-            notifier.success(
-              g ? `${fullName(g)} moved to seat ${seatNumber}` : "Moved",
-            );
-            return;
-          }
-
-          // If occupied and guest was unassigned, fallback to assigning to next available seat
-          const g = guestsById.get(guestId);
-          const partySize = g?.party_size ?? (g?.plus_one ? 2 : 1);
-          // find first contiguous fit starting at 1..capacity
-          const capacity = targetTable.total_number ?? 0;
-          let foundSeat: number | null = null;
-          for (let s = 1; s <= capacity; s += 1) {
-            if (
-              seatsFitAt(tableId, s, partySize, currentAssignments, guestId)
-            ) {
-              foundSeat = s;
-              break;
-            }
-          }
-          if (!foundSeat) {
-            notifier.warning(
-              "That table does not have enough contiguous seats for that party",
-            );
-            return;
-          }
-          persistAssignment("assign", guestId, tableId, foundSeat);
-          dispatch({
-            type: "ASSIGN_GUEST",
-            payload: { tableId, guestId, seatNumber: foundSeat },
-          });
-          notifier.success(
-            g
-              ? `${fullName(g)} reassigned to ${tableId}`
-              : `Reassigned to ${tableId}`,
-          );
-          return;
-        }
-
-        // support dropping onto the table body: id `table:{tableId}`
-        const tableMatch = overId.match(/^table:([^:]+)$/);
-        if (tableMatch) {
-          const tableId = tableMatch[1];
-          const targetTable = tablesForActiveLayout.find(
-            (t: any) => t.table_id === tableId,
-          );
-          if (!targetTable) return;
-          const g = guestsById.get(guestId);
-          const partySize = g?.party_size ?? (g?.plus_one ? 2 : 1);
-          const currentAssignments = currentState.assignments;
-          const capacity = targetTable.total_number ?? 0;
-          let foundSeat: number | null = null;
-          for (let s = 1; s <= capacity; s += 1) {
-            if (
-              seatsFitAt(tableId, s, partySize, currentAssignments, guestId)
-            ) {
-              foundSeat = s;
-              break;
-            }
-          }
-          const notifier = messageApi ?? message;
-          if (!foundSeat) {
-            notifier.warning(
-              "That table does not have enough contiguous seats for that party",
-            );
-            return;
-          }
-          const guestAssigned = currentAssignments.find(
-            (a: any) => a.guest_id === guestId,
-          );
-          if (guestAssigned) {
-            persistAssignment("move", guestId, tableId, foundSeat);
-            dispatch({
-              type: "MOVE_GUEST_SEAT",
-              payload: { guestId, tableId, seatNumber: foundSeat },
-            });
-            notifier.success(
-              g ? `${fullName(g)} moved to ${tableId}` : "Moved",
-            );
-          } else {
-            persistAssignment("assign", guestId, tableId, foundSeat);
-            dispatch({
-              type: "ASSIGN_GUEST",
-              payload: { tableId, guestId, seatNumber: foundSeat },
-            });
-            notifier.success(
-              g ? `${fullName(g)} assigned to ${tableId}` : "Assigned",
-            );
-          }
-          return;
-        }
-      }
-    },
-    [tablesForActiveLayout, guestsById, seatsFitAt, messageApi, message],
-  );
-
-  const onDragCancel = useCallback(
-    () => dispatch({ type: "SET_ACTIVE_DRAG_ID", payload: null }),
-    [],
-  );
+  const { onDragStart, onDragEnd, onDragCancel } = useDragHandlers({
+    dispatch,
+    stateRef,
+    tablesForActiveLayout,
+    guestsById,
+    seatsFitAt,
+    persistAssignment,
+    notifier,
+  });
 
   const value = useMemo(
     () => ({

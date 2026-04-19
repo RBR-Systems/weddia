@@ -1,4 +1,4 @@
-﻿import type { SeatingResponse as HFSeatingResponse } from "../api/huggingfaceApi";
+﻿import type { SeatingResponse as HFSeatingResponse } from "../models/huggingface.models";
 import { DragId, Guest, Relation, Table, TableAssignment, TableLayout } from "../models/tableAssignment.models";
 
 export type Action =

@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { getSeatingRecommendation, HFGuest, HFTable, SeatingResponse, testHuggingFaceConnection } from "../../../api/huggingfaceApi";
+import { getSeatingRecommendation, testHuggingFaceConnection } from "../../../api/huggingfaceApi";
+import type { HFGuest, HFTable, SeatingResponse } from "../../../models/huggingface.models";
 import { MessageItem } from "../models/seatingAI.models";
 import { useTranslation } from "react-i18next";
 
