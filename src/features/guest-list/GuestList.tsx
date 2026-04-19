@@ -136,7 +136,7 @@ export default function GuestList() {
     if (v === null || v === undefined) return "";
     const s = String(v);
     if (s.includes(",") || s.includes('"') || s.includes("\n")) {
-      return `"${s.replace(/"/g, '""')}"`;
+      return `"${s.replaceAll(/"/g, '""')}"`;
     }
     return s;
   };
@@ -599,7 +599,7 @@ export default function GuestList() {
                   const s = String(value || "").trim();
                   // allow formatting characters; keep leading + if present
                   const cleaned =
-                    (s.startsWith("+") ? "+" : "") + s.replace(/[^0-9]/g, "");
+                    (s.startsWith("+") ? "+" : "") + s.replaceAll(/[^0-9]/g, "");
                   const digits = cleaned.startsWith("+")
                     ? cleaned.slice(1)
                     : cleaned;

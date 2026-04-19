@@ -177,8 +177,8 @@ export default function ReportsPage() {
           <>
             <Title level={4}>{t("reports.budgetSummary")}</Title>
             <Row gutter={16}>
-              {summaryData.map((item, index) => (
-                <Col xs={24} sm={12} md={6} key={index}>
+              {summaryData.map((item) => (
+                <Col xs={24} sm={12} md={6} key={item.label}>
                   <Card size="small">
                     <Statistic
                       title={item.label}
