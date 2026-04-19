@@ -89,7 +89,7 @@ const STYLE_MULTIPLIERS: Record<
   { label: string; multiplier: number; perGuest: number }
 > = {
   budget: { label: "Budget-Friendly", multiplier: 0.7, perGuest: 100 },
-  moderate: { label: "Moderate", multiplier: 1.0, perGuest: 200 },
+  moderate: { label: "Moderate", multiplier: 1, perGuest: 200 },
   upscale: { label: "Upscale", multiplier: 1.5, perGuest: 350 },
   luxury: { label: "Luxury", multiplier: 2.5, perGuest: 500 },
 };
@@ -120,7 +120,7 @@ export default function BudgetEstimator() {
 
   const handleApplyEstimate = () => {
     const categoriesPayload = categoryEstimates.map((cat) => ({
-      id: cat.name.toLowerCase().replace(/\s+/g, "_"),
+      id: cat.name.toLowerCase().replaceAll(/\s+/g, "_"),
       name: cat.name,
       allocated: cat.amount,
       percentage: cat.percentage,

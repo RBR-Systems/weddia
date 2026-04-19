@@ -11,8 +11,8 @@ export function tableToMeters(
   let width = 1.8,
     height = 1.8;
   if (t.shape === "rectangular") {
-    width = 2.0;
-    height = 1.0;
+    width = 2;
+    height = 1;
   } else if (t.shape === "square") {
     width = 1.5;
     height = 1.5;
@@ -193,7 +193,7 @@ export function reducer(state: State, action: Action): State {
     case "APPLY_AI_SEATING": {
       const assignmentsFromAI = action.payload;
       const withoutAI = state.assignments.filter(
-        (a) => !assignmentsFromAI.find((x) => x.guestId === a.guest_id),
+        (a) => !assignmentsFromAI.some((x) => x.guestId === a.guest_id),
       );
       const usedSeats = new Map<string, number[]>();
       for (const a of withoutAI) {

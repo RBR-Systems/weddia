@@ -172,7 +172,7 @@ export const ScheduleItem: React.FC<Props> = ({
             className={styles.typeTag}
             style={{ background: typeColors[item.type] ?? "#aaa" }}
           >
-            {item.type.replace(/_/g, " ")}
+            {item.type.replaceAll(/_/g, " ")}
           </Tag>
         </div>
 

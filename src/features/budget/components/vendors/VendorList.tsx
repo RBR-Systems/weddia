@@ -45,7 +45,7 @@ export default function VendorList({ onViewVendor }: VendorListProps) {
             existing.expense_count = (existing.expense_count ?? 0) + 1;
           } else {
             vendorMap.set(expense.vendor_name, {
-              vendor_id: expense.vendor_name.toLowerCase().replace(/\s+/g, "_"),
+              vendor_id: expense.vendor_name.toLowerCase().replaceAll(/\s+/g, "_"),
               name: expense.vendor_name,
               category: expense.category_id,
               total_spent: expense.amount,

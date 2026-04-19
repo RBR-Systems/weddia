@@ -38,7 +38,7 @@ export function formatInputNumber(v: string | number | undefined): string {
   const str = String(v ?? "");
   const [intRaw, decPart] = str.split(".");
   const negative = intRaw.startsWith("-");
-  const absDigits = intRaw.replace(/[-,]/g, "");
+  const absDigits = intRaw.replaceAll(/[-,]/g, "");
   let grouped = "";
   for (let i = 0; i < absDigits.length; i++) {
     if (i > 0 && (absDigits.length - i) % 3 === 0) grouped += ",";
@@ -53,7 +53,7 @@ export function formatInputNumber(v: string | number | undefined): string {
  * Replaces the vulnerable /\$\s?|(,*)/g pattern.
  */
 export function parseInputNumber(v: string | undefined): number {
-  return Number(String(v ?? "").replace(/[$\s,]/g, "") || 0);
+  return Number(String(v ?? "").replaceAll(/[$\s,]/g, "") || 0);
 }
 
 export function formatPhone(
@@ -67,7 +67,7 @@ export function formatPhone(
 
   // preserve leading + and digits
   const leadingPlus = s.startsWith("+");
-  s = s.replace(/[^0-9]/g, "");
+  s = s.replaceAll(/[^0-9]/g, "");
 
   const fmtUS = (digits: string) => {
     if (digits.length === 11 && digits.startsWith("1")) {
@@ -118,7 +118,7 @@ export function formatPhone(
   const fmtES = (digits: string) => {
     if (digits.startsWith("34")) digits = digits.slice(2);
     if (digits.startsWith("0")) digits = digits.slice(1);
-    return `+34 ${digits.replace(/(\d{3})(?=\d)/g, "$1 ")}`.trim();
+    return `+34 ${digits.replaceAll(/(\d{3})(?=\d)/g, "$1 ")}`.trim();
   };
 
   const fmtMX = (digits: string) => {

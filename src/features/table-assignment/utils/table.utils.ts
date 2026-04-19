@@ -36,8 +36,8 @@ export function getTableLabel(table: Table) {
   const m = table.table_id.match(/(?:table[-_]?)(\d+)/i);
   if (m) return i18next.t("tableAssignment.table", { number: Number(m[1]) });
   return table.table_id
-    .replace(/[-_]/g, " ")
-    .replace(/\b\w/g, (c) => c.toUpperCase());
+    .replaceAll(/[-_]/g, " ")
+    .replaceAll(/\b\w/g, (c) => c.toUpperCase());
 }
 
 export function getBadgeColor(occupancy: number, capacity: number) {

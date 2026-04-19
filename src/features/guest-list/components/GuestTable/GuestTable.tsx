@@ -313,7 +313,7 @@ export default function GuestTable({
           ? `mailto:${record.email}?subject=Invitation&body=Hi%20${encodeURIComponent(record.first_name)}`
           : undefined;
         const rawPhone = record.phone || "";
-        const phoneDigits = rawPhone.replace(/[^0-9]/g, "");
+        const phoneDigits = rawPhone.replaceAll(/[^0-9]/g, "");
         const waHref = phoneDigits
           ? `https://wa.me/${phoneDigits}?text=${encodeURIComponent(`Hi ${record.first_name},`)}`
           : undefined;

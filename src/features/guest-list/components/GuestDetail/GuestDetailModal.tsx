@@ -42,7 +42,7 @@ export default function GuestDetailModal({
   const whatsappLink = guest.phone
     ? (() => {
         // Try to normalize phone to digits only
-        const digits = String(guest.phone).replace(/[^0-9]/g, "");
+        const digits = String(guest.phone).replaceAll(/[^0-9]/g, "");
         if (digits.length >= 7)
           return `https://wa.me/${digits}?text=${whatsappText}`;
         return `https://api.whatsapp.com/send?text=${whatsappText}`;

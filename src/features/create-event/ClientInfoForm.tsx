@@ -20,7 +20,7 @@ const ClientInfoForm = ({
 
   // Phone number formatting function
   const formatPhoneNumber = (value: string) => {
-    const phoneNumber = value.replace(/\D/g, "");
+    const phoneNumber = value.replaceAll(/\D/g, "");
 
     if (phoneNumber.length === 0) return "";
     if (phoneNumber.length <= 2) {

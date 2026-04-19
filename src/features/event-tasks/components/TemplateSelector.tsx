@@ -308,7 +308,7 @@ const TemplateSelector: React.FC<TemplateSelectorProps> = ({ onApply }) => {
             {/* Features */}
             <div className={styles.templateFeatures}>
               {previewTemplate.highlights.map((h, idx) => (
-                <div key={idx} className={styles.templateFeatureItem}>
+                <div key={h} className={styles.templateFeatureItem}>
                   <CheckCircleOutlined style={{ color: "#22C55E" }} />
                   <span>{h}</span>
                 </div>

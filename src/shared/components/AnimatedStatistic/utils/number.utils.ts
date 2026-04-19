@@ -22,7 +22,7 @@ export function extractNumber(value: unknown): number | null {
     .replace(/^\((.*)\)$/, "-$1");
   const m = s.match(/-?\d[\d,]*\.?\d*/);
   if (!m) return null;
-  const cleaned = m[0].replace(/,/g, "");
+  const cleaned = m[0].replaceAll(/,/g, "");
   const num = Number(cleaned);
   return Number.isFinite(num) ? num : null;
 }

@@ -92,8 +92,8 @@ export default function BudgetCharts() {
           }}
         >
           <p style={{ margin: 0, fontWeight: "bold" }}>{label}</p>
-          {payload.map((entry: any, index: number) => (
-            <p key={index} style={{ margin: 0, color: entry.color }}>
+          {payload.map((entry: any) => (
+            <p key={entry.name} style={{ margin: 0, color: entry.color }}>
               {entry.name}: {formatCurrency(entry.value, state.currency)}
             </p>
           ))}
@@ -140,7 +140,7 @@ export default function BudgetCharts() {
                       entry: { name: string; value: number; color: string },
                       index: number,
                     ) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
+                      <Cell key={`cell-${entry.name}`} fill={entry.color} />
                     ),
                   )}
                 </Pie>

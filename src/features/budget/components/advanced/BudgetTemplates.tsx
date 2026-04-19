@@ -124,7 +124,7 @@ export default function BudgetTemplates() {
   };
 
   const handleDeleteTemplate = (templateId: string) => {
-    if (DEFAULT_TEMPLATES.find((t) => t.id === templateId)) {
+    if (DEFAULT_TEMPLATES.some((t) => t.id === templateId)) {
       message.error(t("budgetTemplates.cannotDeleteDefault"));
       return;
     }
@@ -169,7 +169,7 @@ export default function BudgetTemplates() {
                   >
                     {t("common.apply")}
                   </Button>,
-                  !DEFAULT_TEMPLATES.find((t) => t.id === template.id) && (
+                  !DEFAULT_TEMPLATES.some((t) => t.id === template.id) && (
                     <Popconfirm
                       key="delete"
                       title={t("budgetTemplates.deleteConfirm")}
@@ -211,7 +211,7 @@ export default function BudgetTemplates() {
                 >
                   {template.categories.slice(0, 3).map((cat, idx) => (
                     <CategoryTag
-                      key={idx}
+                      key={cat.name}
                       color={resolveChartColor(cat.color, mode)}
                       style={{ marginBottom: 4 }}
                     >
