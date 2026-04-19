@@ -97,6 +97,28 @@ const CheckInDashboard: React.FC<CheckInDashboardProps> = ({ onNavigateToTable }
     });
   }, []);
 
+  const handleRemoveStatusFilter = useCallback((s: string) => {
+    setFilters((prev) => {
+      const cur = prev.statusFilter;
+      if (Array.isArray(cur)) {
+        const next = cur.filter((x) => x !== s);
+        return { ...prev, statusFilter: next.length ? next : "all" };
+      }
+      return { ...prev, statusFilter: "all" };
+    });
+  }, []);
+
+  const handleRemoveRelationFilter = useCallback((rid: string) => {
+    setFilters((prev) => {
+      const cur = prev.relationFilter;
+      if (Array.isArray(cur)) {
+        const next = cur.filter((x) => x !== rid);
+        return { ...prev, relationFilter: next.length ? next : null };
+      }
+      return { ...prev, relationFilter: null };
+    });
+  }, []);
+
   const hasActiveFilters =
     !!filters.query ||
     (!!filters.statusFilter &&
@@ -170,18 +192,25 @@ const CheckInDashboard: React.FC<CheckInDashboardProps> = ({ onNavigateToTable }
   if (loading) return <Spin style={{ display: "block", margin: "40px auto" }} />;
   if (!guests.length) return <Empty />;
 
+  const activeStatusList =
+    filters.statusFilter && filters.statusFilter !== "all"
+      ? Array.isArray(filters.statusFilter)
+        ? filters.statusFilter
+        : [filters.statusFilter]
+      : [];
+
+  const activeRelationIds = filters.relationFilter
+    ? Array.isArray(filters.relationFilter)
+      ? filters.relationFilter
+      : [filters.relationFilter]
+    : [];
+
   return (
     <div>
       {/* Stats — clickable cards for filtering */}
       <CheckInStatsBar
         stats={stats}
-        activeStatuses={
-          filters.statusFilter && filters.statusFilter !== "all"
-            ? Array.isArray(filters.statusFilter)
-              ? filters.statusFilter
-              : [filters.statusFilter]
-            : []
-        }
+        activeStatuses={activeStatusList}
         onStatusClick={handleStatusCardClick}
       />
 
@@ -203,72 +232,37 @@ const CheckInDashboard: React.FC<CheckInDashboardProps> = ({ onNavigateToTable }
               )}
 
               {/* One tag per selected status */}
-              {(() => {
-                const statuses =
-                  filters.statusFilter && filters.statusFilter !== "all"
-                    ? Array.isArray(filters.statusFilter)
-                      ? filters.statusFilter
-                      : [filters.statusFilter]
-                    : [];
-                return statuses.map((s) => (
-                  <Tag
-                    key={`status-${s}`}
-                    closable
-                    color={STATUS_FILTER_COLORS[s] || "default"}
-                    onClose={(e) => {
-                      e.preventDefault();
-                      setFilters((prev) => {
-                        const cur = prev.statusFilter;
-                        if (Array.isArray(cur)) {
-                          const next = cur.filter((x) => x !== s);
-                          return {
-                            ...prev,
-                            statusFilter: next.length ? next : "all",
-                          };
-                        }
-                        return { ...prev, statusFilter: "all" };
-                      });
-                    }}
-                  >
-                    {t(
-                      `checkIn.filters.${s === "checked_in" ? "checkedIn" : s === "not_arrived" ? "notArrived" : "specialNeeds"}`,
-                      STATUS_FILTER_LABELS[s] || s,
-                    )}
-                  </Tag>
-                ));
-              })()}
+              {activeStatusList.map((s) => (
+                <Tag
+                  key={`status-${s}`}
+                  closable
+                  color={STATUS_FILTER_COLORS[s] || "default"}
+                  onClose={(e) => {
+                    e.preventDefault();
+                    handleRemoveStatusFilter(s);
+                  }}
+                >
+                  {t(
+                    `checkIn.filters.${s === "checked_in" ? "checkedIn" : s === "not_arrived" ? "notArrived" : "specialNeeds"}`,
+                    STATUS_FILTER_LABELS[s] || s,
+                  )}
+                </Tag>
+              ))}
 
               {/* One tag per selected relation */}
-              {(() => {
-                const rIds = filters.relationFilter
-                  ? Array.isArray(filters.relationFilter)
-                    ? filters.relationFilter
-                    : [filters.relationFilter]
-                  : [];
-                return rIds.map((rid) => (
-                  <Tag
-                    key={`rel-${rid}`}
-                    closable
-                    color="gold"
-                    onClose={(e) => {
-                      e.preventDefault();
-                      setFilters((prev) => {
-                        const cur = prev.relationFilter;
-                        if (Array.isArray(cur)) {
-                          const next = cur.filter((x) => x !== rid);
-                          return {
-                            ...prev,
-                            relationFilter: next.length ? next : null,
-                          };
-                        }
-                        return { ...prev, relationFilter: null };
-                      });
-                    }}
-                  >
-                    {relations.find((r) => r.relation_id === rid)?.name || rid}
-                  </Tag>
-                ));
-              })()}
+              {activeRelationIds.map((rid) => (
+                <Tag
+                  key={`rel-${rid}`}
+                  closable
+                  color="gold"
+                  onClose={(e) => {
+                    e.preventDefault();
+                    handleRemoveRelationFilter(rid);
+                  }}
+                >
+                  {relations.find((r) => r.relation_id === rid)?.name || rid}
+                </Tag>
+              ))}
 
               {/* One tag per selected special */}
               {(filters.specialsFilter || []).map((sp) => (

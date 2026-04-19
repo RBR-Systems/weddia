@@ -47,3 +47,17 @@ export interface GuestFilters {
   status?: "all" | string | string[];
   specials?: string[];
 }
+
+export interface GuestFormValues {
+  first_name?: string;
+  last_name?: string;
+  email?: string;
+  phone?: string;
+  country?: string;
+  party_size?: number;
+  relation_id?: string;
+  rsvp_status?: string;
+  dietary_restrictions?: string;
+  accesability_needs?: string;
+  notes?: string;
+}

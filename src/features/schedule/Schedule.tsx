@@ -447,6 +447,26 @@ const Schedule: React.FC = () => {
     message.success(t("schedule.messages.adjustmentUndone"));
   }
 
+  function replaceItemInList(prev: TimelineItem[], updated: TimelineItem): TimelineItem[] {
+    return sortTimelineItems(prev.map((it) => (it.timeline_item_id === updated.timeline_item_id ? updated : it)));
+  }
+
+  function handleAddItem(item: TimelineItem) {
+    setItems((prev) => sortTimelineItems([...prev, item]));
+    setModalVisible(false);
+    createTimelineItem(Number(eventId), item)
+      .then((saved) => setItems((prev) => replaceItemInList(prev, saved)))
+      .catch((err) => console.error("createTimelineItem failed:", err));
+  }
+
+  function handleSaveItem(updated: TimelineItem) {
+    setItems((prev) => replaceItemInList(prev, updated));
+    setEditItem(null);
+    updateTimelineItem(updated.timeline_item_id, updated)
+      .then((saved) => setItems((prev) => replaceItemInList(prev, saved)))
+      .catch((err) => console.error("updateTimelineItem failed:", err));
+  }
+
   if (loading) return <Spin />;
   if (!items.length) return <Empty description={t("schedule.emptyState")} />;
 
@@ -690,17 +710,7 @@ const Schedule: React.FC = () => {
         visible={isModalVisible}
         onClose={() => setModalVisible(false)}
         eventId={eventId}
-        onAdd={(item) => {
-          setItems((prev) => sortTimelineItems([...prev, item]));
-          setModalVisible(false);
-          createTimelineItem(Number(eventId), item).then((saved) => {
-            setItems((prev) =>
-              sortTimelineItems(
-                prev.map((it) => (it.timeline_item_id === item.timeline_item_id ? saved : it)),
-              ),
-            );
-          }).catch((err) => console.error("createTimelineItem failed:", err));
-        }}
+        onAdd={handleAddItem}
       />
 
       {/* Edit modal (reuses same component) */}
@@ -709,17 +719,7 @@ const Schedule: React.FC = () => {
         onClose={() => setEditItem(null)}
         eventId={eventId}
         initialData={editItem ?? undefined}
-        onSave={(updated) => {
-          setItems((prev) =>
-            sortTimelineItems(prev.map((it) => (it.timeline_item_id === updated.timeline_item_id ? updated : it))),
-          );
-          setEditItem(null);
-          updateTimelineItem(updated.timeline_item_id, updated).then((saved) => {
-            setItems((prev) =>
-              sortTimelineItems(prev.map((it) => (it.timeline_item_id === saved.timeline_item_id ? saved : it))),
-            );
-          }).catch((err) => console.error("updateTimelineItem failed:", err));
-        }}
+        onSave={handleSaveItem}
       />
     </div>
   );

@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { ReloadOutlined, FileExcelOutlined, UploadOutlined, PlusOutlined } from "@ant-design/icons";
 import { App, Row, Col, Button, Modal, Upload, Form, Input, InputNumber, Select, Tag, Space } from "antd";
-import { Guest, formatStatusLabel, statusColor, GuestFilters } from "./models/guestList.models";
+import { Guest, RsvpStatus, formatStatusLabel, statusColor, GuestFilters, GuestFormValues } from "./models/guestList.models";
 import { applyGuestFilters, escapeCsv } from "./utils/guestList.utils";
 import { formatPhone } from "@/utils/formatters.utils";
 import Header from "@/shared/components/Header/Header";
@@ -88,6 +88,85 @@ export default function GuestList() {
       (!Array.isArray(filters.status) || filters.status.length > 0)) ||
     (!!filters.specials && filters.specials.length > 0);
 
+  const handleRemoveQueryFilter = () =>
+    setFilters((prev) => ({ ...prev, query: undefined }));
+
+  const handleRemoveRelationFilter = (rid: string) =>
+    setFilters((prev) => {
+      const cur = prev.relation_id;
+      if (Array.isArray(cur)) {
+        const next = cur.filter((x) => x !== rid);
+        return { ...prev, relation_id: next.length ? next : null };
+      }
+      return { ...prev, relation_id: null };
+    });
+
+  const handleRemoveStatusFilter = (s: string) =>
+    setFilters((prev) => {
+      const cur = prev.status;
+      if (Array.isArray(cur)) {
+        const next = cur.filter((x) => x !== s);
+        return { ...prev, status: next.length ? next : "all" };
+      }
+      return { ...prev, status: "all" };
+    });
+
+  const handleRemoveSpecialFilter = (sp: string) =>
+    setFilters((prev) => {
+      const next = (prev.specials || []).filter((x) => x !== sp);
+      return { ...prev, specials: next.length ? next : undefined };
+    });
+
+  const handleClearAllFilters = () =>
+    setFilters({ status: "all", relation_id: undefined, query: undefined, specials: undefined });
+
+  const handleStatusClick = (s: string) =>
+    setFilters((prev) => {
+      const cur = prev.status;
+      if (cur === "all" || cur === undefined) return { ...prev, status: [s] };
+      if (Array.isArray(cur)) {
+        const has = cur.includes(s);
+        const next = has ? cur.filter((x) => x !== s) : [...cur, s];
+        return { ...prev, status: next.length ? next : "all" };
+      }
+      if (cur === s) return { ...prev, status: "all" };
+      return { ...prev, status: [cur, s] };
+    });
+
+  const handleAddGuest = async (values: GuestFormValues) => {
+    setAdding(true);
+    try {
+      const saved = await createGuest(eventId, {
+        first_name: values.first_name || "",
+        last_name: values.last_name || "",
+        email: values.email || undefined,
+        phone: values.phone || undefined,
+        country: values.country || undefined,
+        relation_id: values.relation_id || undefined,
+        rsvp_status: (values.rsvp_status as RsvpStatus) || "pending",
+        party_size: Number(values.party_size) || 1,
+        dietary_restrictions: values.dietary_restrictions
+          ? String(values.dietary_restrictions)
+              .split(/,|;/)
+              .map((s: string) => s.trim())
+              .filter(Boolean)
+          : undefined,
+        accesability_needs: values.accesability_needs || undefined,
+        notes: values.notes || undefined,
+        plus_one: null,
+      });
+      setGuests((prev) => [saved, ...prev]);
+      message.success(t("guestList.added", "Guest added"));
+      form.resetFields();
+      setAddOpen(false);
+    } catch (err) {
+      console.error(err);
+      message.error(t("guestList.addFailed", "Failed to add guest"));
+    } finally {
+      setAdding(false);
+    }
+  };
+
   const handleExport= () => {
     const list = guests;
     const headers = [
@@ -129,6 +208,19 @@ export default function GuestList() {
     onClose: () => setImportOpen(false),
   });
 
+  const relationIds: string[] = filters.relation_id
+    ? Array.isArray(filters.relation_id)
+      ? filters.relation_id
+      : [filters.relation_id]
+    : [];
+
+  const activeStatusList: string[] =
+    filters.status && filters.status !== "all"
+      ? Array.isArray(filters.status)
+        ? filters.status
+        : [filters.status]
+      : [];
+
   return (
     <div>
       <Header name={t("nav.guestList")} align="left" />
@@ -164,28 +256,8 @@ export default function GuestList() {
       </Row>
       <StatsBar
         guests={guests}
-        activeStatuses={
-          filters.status && filters.status !== "all"
-            ? Array.isArray(filters.status)
-              ? (filters.status as string[])
-              : [filters.status as string]
-            : []
-        }
-        onStatusClick={(s) =>
-          setFilters((prev) => {
-            const cur = prev.status;
-            if (cur === "all" || cur === undefined)
-              return { ...prev, status: [s] };
-            if (Array.isArray(cur)) {
-              const has = cur.includes(s);
-              const next = has ? cur.filter((x) => x !== s) : [...cur, s];
-              return { ...prev, status: next.length ? next : "all" };
-            }
-            // cur is a single string
-            if (cur === s) return { ...prev, status: "all" };
-            return { ...prev, status: [cur, s] };
-          })
-        }
+        activeStatuses={activeStatusList}
+        onStatusClick={handleStatusClick}
       />
 
       {/* Filter tags area: placed below stats and above the table */}
@@ -198,7 +270,7 @@ export default function GuestList() {
                   closable
                   onClose={(e) => {
                     e.preventDefault();
-                    setFilters((prev) => ({ ...prev, query: undefined }));
+                    handleRemoveQueryFilter();
                   }}
                 >
                   {t("guestList.searchTag", "Search")}:{" "}
@@ -207,69 +279,34 @@ export default function GuestList() {
               )}
 
               {/* One tag per selected relation */}
-              {(() => {
-                const rIds = filters.relation_id
-                  ? Array.isArray(filters.relation_id)
-                    ? filters.relation_id
-                    : [filters.relation_id]
-                  : [];
-                return rIds.map((rid) => (
-                  <Tag
-                    key={`rel-${rid}`}
-                    closable
-                    color="gold"
-                    onClose={(e) => {
-                      e.preventDefault();
-                      setFilters((prev) => {
-                        const cur = prev.relation_id;
-                        if (Array.isArray(cur)) {
-                          const next = cur.filter((x) => x !== rid);
-                          return {
-                            ...prev,
-                            relation_id: next.length ? next : null,
-                          };
-                        }
-                        return { ...prev, relation_id: null };
-                      });
-                    }}
-                  >
-                    {relations.find((r) => r.relation_id === rid)?.name || rid}
-                  </Tag>
-                ));
-              })()}
+              {relationIds.map((rid) => (
+                <Tag
+                  key={`rel-${rid}`}
+                  closable
+                  color="gold"
+                  onClose={(e) => {
+                    e.preventDefault();
+                    handleRemoveRelationFilter(rid);
+                  }}
+                >
+                  {relations.find((r) => r.relation_id === rid)?.name || rid}
+                </Tag>
+              ))}
 
               {/* One tag per selected status */}
-              {(() => {
-                const statuses =
-                  filters.status && filters.status !== "all"
-                    ? Array.isArray(filters.status)
-                      ? filters.status
-                      : [filters.status]
-                    : [];
-                return statuses.map((s) => (
-                  <Tag
-                    key={`status-${s}`}
-                    closable
-                    color={statusColor(s)}
-                    onClose={(e) => {
-                      e.preventDefault();
-                      setFilters((prev) => {
-                        const cur = prev.status;
-                        if (Array.isArray(cur)) {
-                          const next = cur.filter((x) => x !== s);
-                          return {
-                            ...prev,
-                            status: next.length ? next : "all",
-                          };
-                        }
-                        return { ...prev, status: "all" };
-                      });
-                    }}
-                  >
-                    {formatStatusLabel(s)}
-                  </Tag>
-                ));
-              })()}
+              {activeStatusList.map((s) => (
+                <Tag
+                  key={`status-${s}`}
+                  closable
+                  color={statusColor(s)}
+                  onClose={(e) => {
+                    e.preventDefault();
+                    handleRemoveStatusFilter(s);
+                  }}
+                >
+                  {formatStatusLabel(s)}
+                </Tag>
+              ))}
 
               {/* One tag per selected special */}
               {(filters.specials || []).map((sp) => (
@@ -279,15 +316,7 @@ export default function GuestList() {
                   color="green"
                   onClose={(e) => {
                     e.preventDefault();
-                    setFilters((prev) => {
-                      const next = (prev.specials || []).filter(
-                        (x) => x !== sp,
-                      );
-                      return {
-                        ...prev,
-                        specials: next.length ? next : undefined,
-                      };
-                    });
+                    handleRemoveSpecialFilter(sp);
                   }}
                 >
                   {sp}
@@ -297,14 +326,7 @@ export default function GuestList() {
           </Col>
           <Col>
             <Button
-              onClick={() =>
-                setFilters({
-                  status: "all",
-                  relation_id: undefined,
-                  query: undefined,
-                  specials: undefined,
-                })
-              }
+              onClick={handleClearAllFilters}
               size="middle"
               type="primary"
               icon={<ReloadOutlined />}
@@ -372,40 +394,7 @@ export default function GuestList() {
         <Form
           layout="vertical"
           form={form}
-          onFinish={async (values) => {
-            setAdding(true);
-            try {
-              const saved = await createGuest(eventId, {
-                first_name: values.first_name || "",
-                last_name: values.last_name || "",
-                email: values.email || undefined,
-                phone: values.phone || undefined,
-                country: values.country || undefined,
-                relation_id: values.relation_id || undefined,
-                rsvp_status: (values.rsvp_status as any) || "pending",
-                party_size: Number(values.party_size) || 1,
-                dietary_restrictions: values.dietary_restrictions
-                  ? String(values.dietary_restrictions)
-                      .split(/,|;/)
-                      .map((s: string) => s.trim())
-                      .filter(Boolean)
-                  : undefined,
-                accesability_needs: values.accesability_needs || undefined,
-                notes: values.notes || undefined,
-                plus_one: null,
-              });
-
-              setGuests((prev) => [saved, ...prev]);
-              message.success(t("guestList.added", "Guest added"));
-              form.resetFields();
-              setAddOpen(false);
-            } catch (err) {
-              console.error(err);
-              message.error(t("guestList.addFailed", "Failed to add guest"));
-            } finally {
-              setAdding(false);
-            }
-          }}
+          onFinish={handleAddGuest}
         >
           <Form.Item
             name="first_name"
@@ -435,7 +424,7 @@ export default function GuestList() {
           >
             <Input />
           </Form.Item>
-          <Form.Item name="country" label={t("guestList.country", "Country")}>
+          <Form.Item name="country" label={t("guestList.country", "Country")} initialValue="US">
             <Select
               showSearch
               optionFilterProp="children"
@@ -504,19 +493,6 @@ export default function GuestList() {
                 });
               }}
             />
-          </Form.Item>
-          <Form.Item
-            name="country"
-            label={t("guestList.country", "Country")}
-            initialValue="US"
-          >
-            <Select showSearch optionFilterProp="children">
-              {Object.keys(countryCodes).map((iso) => (
-                <Select.Option key={iso} value={iso}>
-                  {iso} (+{(countryCodes as any)[iso]})
-                </Select.Option>
-              ))}
-            </Select>
           </Form.Item>
 
           <Form.Item
