@@ -40,3 +40,10 @@ export function formatStatusLabel(s: string) {
 export function statusColor(s: string) {
   return STATUS_COLORS[s] ?? "default";
 }
+
+export interface GuestFilters {
+  query?: string;
+  relation_id?: string | null | string[];
+  status?: "all" | string | string[];
+  specials?: string[];
+}

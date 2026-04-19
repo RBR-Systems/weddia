@@ -1,8 +1,9 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ReloadOutlined, FileExcelOutlined, UploadOutlined, PlusOutlined } from "@ant-design/icons";
 import { App, Row, Col, Button, Modal, Upload, Form, Input, InputNumber, Select, Tag, Space } from "antd";
-import { Guest, formatStatusLabel, statusColor } from "./models/guestList.models";
+import { Guest, formatStatusLabel, statusColor, GuestFilters } from "./models/guestList.models";
+import { applyGuestFilters, escapeCsv } from "./utils/guestList.utils";
 import { formatPhone } from "@/utils/formatters.utils";
 import Header from "@/shared/components/Header/Header";
 import { useTranslation } from "react-i18next";
@@ -11,6 +12,7 @@ import { fetchGuests, fetchRelations, removeGuest as removeGuestService, createG
 import StatsBar from "./components/StatsBar/StatsBar";
 import GuestTable from "./components/GuestTable/GuestTable";
 import GuestDetailModal from "./components/GuestDetail/GuestDetailModal";
+import { useGuestImport } from "./hooks/useGuestImport";
 
 
 export default function GuestList() {
@@ -24,7 +26,6 @@ export default function GuestList() {
   const eventId = (selectedEvent as any)?.id ?? 1;
   const [guests, setGuests] = useState<Guest[]>([]);
   const [importOpen, setImportOpen] = useState(false);
-  const [, setImporting] = useState(false);
   const [selected, setSelected] = useState<Guest | null>(null);
   const [addOpen, setAddOpen] = useState(false);
   const [adding, setAdding] = useState(false);
@@ -52,12 +53,7 @@ export default function GuestList() {
   const [relations, setRelations] = useState<
     { relation_id: string; name: string }[]
   >([]);
-  const [filters, setFilters] = useState<{
-    query?: string;
-    relation_id?: string | null | string[];
-    status?: "all" | string | string[];
-    specials?: string[];
-  }>({ status: "all" });
+  const [filters, setFilters] = useState<GuestFilters>({ status: "all" });
 
   useEffect(() => {
     fetchGuests(eventId)
@@ -69,47 +65,7 @@ export default function GuestList() {
       .catch(() => setRelations([]));
   }, [eventId]);
 
-  const applyFilters = (list: Guest[]) => {
-    return list.filter((g) => {
-      // status
-      if (filters.status && filters.status !== "all") {
-        if (Array.isArray(filters.status)) {
-          if (!filters.status.includes(g.rsvp_status)) return false;
-        } else {
-          if (g.rsvp_status !== filters.status) return false;
-        }
-      }
-      // relation
-      if (filters.relation_id) {
-        if (Array.isArray(filters.relation_id)) {
-          if (!filters.relation_id.includes(g.relation_id || "")) return false;
-        } else {
-          if (g.relation_id !== filters.relation_id) return false;
-        }
-      }
-      // specials
-      if (filters.specials && filters.specials.length > 0) {
-        const hasDiet = filters.specials.some((s) =>
-          (g.dietary_restrictions || []).includes(s),
-        );
-        const hasAcc = filters.specials.some((s) => g.accesability_needs === s);
-        if (!hasDiet && !hasAcc) return false;
-      }
-      // query
-      if (filters.query && filters.query.trim() !== "") {
-        const q = filters.query.toLowerCase();
-        const inName = `${g.first_name} ${g.last_name}`
-          .toLowerCase()
-          .includes(q);
-        const inEmail = (g.email || "").toLowerCase().includes(q);
-        if (!inName && !inEmail) return false;
-      }
-
-      return true;
-    });
-  };
-
-  const filteredGuests = applyFilters(guests);
+  const filteredGuests = useMemo(() => applyGuestFilters(guests, filters), [guests, filters]);
 
   const handleRemoveGuest = async (guest_id: string) => {
     try {
@@ -132,16 +88,7 @@ export default function GuestList() {
       (!Array.isArray(filters.status) || filters.status.length > 0)) ||
     (!!filters.specials && filters.specials.length > 0);
 
-  const escapeCsv = (v: any) => {
-    if (v === null || v === undefined) return "";
-    const s = String(v);
-    if (s.includes(",") || s.includes('"') || s.includes("\n")) {
-      return `"${s.replaceAll(/"/g, '""')}"`;
-    }
-    return s;
-  };
-
-  const handleExport = () => {
+  const handleExport= () => {
     const list = guests;
     const headers = [
       "guest_id",
@@ -177,97 +124,10 @@ export default function GuestList() {
     message.success("Guest list exported");
   };
 
-  function parseCsv(text: string) {
-    const rows: string[][] = [];
-    let cur = "";
-    let row: string[] = [];
-    let inQuotes = false;
-    for (let i = 0; i < text.length; i++) {
-      const ch = text[i];
-      if (ch === '"') {
-        if (inQuotes && text[i + 1] === '"') {
-          cur += '"';
-          i++;
-        } else {
-          inQuotes = !inQuotes;
-        }
-        continue;
-      }
-      if (!inQuotes && (ch === "," || ch === "\n" || ch === "\r")) {
-        if (ch === ",") {
-          row.push(cur);
-          cur = "";
-        } else if (ch === "\n") {
-          row.push(cur);
-          rows.push(row);
-          row = [];
-          cur = "";
-        }
-        continue;
-      }
-      cur += ch;
-    }
-    if (cur !== "" || row.length) {
-      row.push(cur);
-      rows.push(row);
-    }
-    return rows;
-  }
-
-  const handleFile = (file: File) => {
-    setImporting(true);
-    const reader = new FileReader();
-    reader.onload = () => {
-      try {
-        const text = String(reader.result || "");
-        const rows = parseCsv(text);
-        if (!rows.length) throw new Error("Empty CSV");
-        const headers = rows[0].map((h) => h.trim());
-        const items = rows.slice(1).map((r, idx) => {
-          const obj: any = {};
-          headers.forEach((h, i) => (obj[h] = r[i] ?? ""));
-          const status = obj.rsvp_status || "pending";
-          let party = Number(obj.party_size || obj.party || 1) || 1;
-          if (String(status).toLowerCase() === "not_attending") party = 0;
-          return {
-            guest_id: obj.guest_id || `import-${Date.now()}-${idx}`,
-            first_name: obj.first_name || obj.first || "",
-            last_name: obj.last_name || obj.last || "",
-            email: obj.email || undefined,
-            phone: obj.phone || undefined,
-            relation_id: obj.relation_id || undefined,
-            rsvp_status: (String(status) as any) || "pending",
-            party_size: party,
-            dietary_restrictions: obj.dietary_restrictions
-              ? String(obj.dietary_restrictions)
-                  .split(/,|;/)
-                  .map((s) => s.trim())
-                  .filter(Boolean)
-              : undefined,
-            accesability_needs:
-              obj.accesability_needs || obj.accessibility || undefined,
-            notes: obj.notes || undefined,
-            plus_one: obj.plus_one || null,
-          } as Guest;
-        });
-
-        setGuests((prev) => [...items, ...prev]);
-        message.success(`Imported ${items.length} guests`);
-      } catch (err) {
-        console.error(err);
-        message.error("Failed to import CSV");
-      } finally {
-        setImporting(false);
-        setImportOpen(false);
-      }
-    };
-    reader.onerror = () => {
-      message.error("Failed to read file");
-      setImporting(false);
-    };
-    reader.readAsText(file);
-    return false; // prevent upload
-  };
+  const { handleFile } = useGuestImport({
+    onImported: (imported) => setGuests((prev) => [...imported, ...prev]),
+    onClose: () => setImportOpen(false),
+  });
 
   return (
     <div>
