@@ -6,7 +6,23 @@ import { BudgetService } from "../api/budgetApi";
 import { ApiError, isAbortError } from "@/shared/api/apiClient";
 import { useEvent } from "@/shared/contexts/EventContext";
 import { EventActions } from "@/shared/contexts/eventActions";
-import { getRandomId } from '@/shared/utils/rng';
+import {
+  generateBudgetId,
+  computeSpentSummary,
+  computeAllocatedTotal,
+  mergeTemplateCategories,
+  mapApiDataToBudgetState,
+  type TemplateCategoryRaw,
+} from "../utils/budget.utils";
+import {
+  handleAddExpense,
+  handleDeleteExpense,
+  handleUpdateExpense,
+  handleAddCategory,
+  handleUpdateCategory,
+  handleDeleteCategory,
+  handleUpdateBudget,
+} from "../utils/budgetReducer.utils";
 
 type Action =
   | { type: "SET_LOADING"; payload: boolean }
@@ -16,17 +32,10 @@ type Action =
   | { type: "UPDATE_EXPENSE"; payload: { id: string; data: Partial<Expense> } }
   | { type: "DELETE_EXPENSE"; payload: string }
   | { type: "ADD_CATEGORY"; payload: Category }
-  | {
-      type: "UPDATE_CATEGORY";
-      payload: { id: string; data: Partial<Category> };
-    }
+  | { type: "UPDATE_CATEGORY"; payload: { id: string; data: Partial<Category> } }
   | { type: "DELETE_CATEGORY"; payload: string }
   | { type: "UPDATE_BUDGET"; payload: number }
   | { type: "SET_EVENT_VENDOR_IDS"; payload: string[] };
-
-function generateId() {
-  return getRandomId('id_');
-}
 
 const initialState: BudgetState = {
   isLoading: false,
@@ -57,211 +66,18 @@ const initialState: BudgetState = {
 
 function reducer(state: BudgetState, action: Action): BudgetState {
   switch (action.type) {
-    case "SET_LOADING":
-      return { ...state, isLoading: action.payload };
-    case "SET_ERROR":
-      return { ...state, error: action.payload };
-    case "SET_DATA":
-      return { ...state, ...action.payload };
-    case "ADD_EXPENSE": {
-      const e = action.payload;
-      const isPaid = e.payment_status === "paid";
-      const categories = state.categories.map((c) =>
-        c.id === e.category_id
-          ? {
-              ...c,
-              spent: (c.spent ?? 0) + (isPaid ? e.amount : 0),
-              expense_count: (c.expense_count ?? 0) + 1,
-            }
-          : c,
-      );
-      const total_spent = (state.summary?.total_spent ?? 0) + (isPaid ? e.amount : 0);
-      const total_budget = state.summary?.total_budget ?? 0;
-      const percentage_spent =
-        total_budget > 0 ? parseFloat(((total_spent / total_budget) * 100).toFixed(2)) : 0;
-      const total_remaining = total_budget - total_spent;
-      return {
-        ...state,
-        expenses: [...state.expenses, e],
-        categories,
-        summary: {
-          ...(state.summary as BudgetSummary),
-          total_spent,
-          percentage_spent,
-          total_remaining,
-        },
-      };
-    }
-    case "DELETE_EXPENSE": {
-      const expenseId = action.payload;
-      const expense = state.expenses.find((x) => x.expense_id === expenseId);
-      if (!expense) return state;
-      const wasPaid = expense.payment_status === "paid";
-      const categories = state.categories.map((c) =>
-        c.id === expense.category_id
-          ? {
-              ...c,
-              spent: Math.max(0, (c.spent ?? 0) - (wasPaid ? expense.amount : 0)),
-              expense_count: Math.max(0, (c.expense_count ?? 1) - 1),
-            }
-          : c,
-      );
-      const total_spent = Math.max(
-        0,
-        (state.summary?.total_spent ?? 0) - (wasPaid ? expense.amount : 0),
-      );
-      const total_budget = state.summary?.total_budget ?? 0;
-      const percentage_spent =
-        total_budget > 0 ? parseFloat(((total_spent / total_budget) * 100).toFixed(2)) : 0;
-      const total_remaining = total_budget - total_spent;
-      return {
-        ...state,
-        expenses: state.expenses.filter((x) => x.expense_id !== expenseId),
-        categories,
-        summary: {
-          ...(state.summary as BudgetSummary),
-          total_spent,
-          percentage_spent,
-          total_remaining,
-        },
-      };
-    }
-    case "UPDATE_EXPENSE": {
-      const { id, data } = action.payload;
-      const prev = state.expenses.find((e) => e.expense_id === id);
-      const updated = prev ? { ...prev, ...data } : null;
-
-      // Recalculate total_spent if payment_status or amount changed
-      let total_spent = state.summary?.total_spent ?? 0;
-      if (prev && updated && (data.payment_status !== undefined || data.amount !== undefined)) {
-        const wasCounted = prev.payment_status === "paid";
-        const isCounted  = updated.payment_status === "paid";
-        if (wasCounted)  total_spent = Math.max(0, total_spent - prev.amount);
-        if (isCounted)   total_spent = total_spent + updated.amount;
-      }
-
-      const total_budget = state.summary?.total_budget ?? 0;
-      const percentage_spent =
-        total_budget > 0 ? parseFloat(((total_spent / total_budget) * 100).toFixed(2)) : 0;
-      const total_remaining = total_budget - total_spent;
-
-      return {
-        ...state,
-        expenses: state.expenses.map((e) => (e.expense_id === id ? { ...e, ...data } : e)),
-        summary: {
-          ...(state.summary as BudgetSummary),
-          total_spent,
-          percentage_spent,
-          total_remaining,
-        },
-      };
-    }
-    case "ADD_CATEGORY": {
-      const updatedCategories = [...state.categories, action.payload];
-      const total_allocated = updatedCategories.reduce(
-        (sum, c) => sum + (c.allocated ?? 0),
-        0,
-      );
-      const total_budget = state.summary?.total_budget ?? 0;
-      const total_spent = state.summary?.total_spent ?? 0;
-      const percentage_spent =
-        total_budget > 0 ? parseFloat(((total_spent / total_budget) * 100).toFixed(2)) : 0;
-      const total_remaining = total_budget - total_spent;
-
-      return {
-        ...state,
-        categories: updatedCategories,
-        summary: {
-          ...(state.summary as BudgetSummary),
-          total_allocated,
-          percentage_spent,
-          total_remaining,
-        },
-      };
-    }
-    case "UPDATE_CATEGORY": {
-      const { id, data } = action.payload;
-      const updatedCategories = state.categories.map((c) =>
-        c.id === id ? { ...c, ...data } : c,
-      );
-
-      // Recalculate total allocated from categories
-      const total_allocated = updatedCategories.reduce(
-        (sum, c) => sum + (c.allocated ?? 0),
-        0,
-      );
-      const total_budget = state.summary?.total_budget ?? 0;
-      const total_spent = state.summary?.total_spent ?? 0;
-      const percentage_spent =
-        total_budget > 0 ? parseFloat(((total_spent / total_budget) * 100).toFixed(2)) : 0;
-      const total_remaining = total_budget - total_spent;
-
-      // Recalculate remaining for the updated category if it has spent amount
-      const updatedCategoriesWithRemaining = updatedCategories.map((c) => ({
-        ...c,
-        remaining: (c.allocated ?? 0) - (c.spent ?? 0),
-        percentage:
-          total_allocated > 0
-            ? parseFloat((((c.allocated ?? 0) / total_allocated) * 100).toFixed(2))
-            : 0,
-      }));
-
-      return {
-        ...state,
-        categories: updatedCategoriesWithRemaining,
-        summary: {
-          ...(state.summary as BudgetSummary),
-          total_allocated,
-          percentage_spent,
-          total_remaining,
-        },
-      };
-    }
-    case "DELETE_CATEGORY": {
-      const updatedCategories = state.categories.filter(
-        (c) => c.id !== action.payload,
-      );
-      const total_allocated = updatedCategories.reduce(
-        (sum, c) => sum + (c.allocated ?? 0),
-        0,
-      );
-      const total_budget = state.summary?.total_budget ?? 0;
-      const total_spent = state.summary?.total_spent ?? 0;
-      const percentage_spent =
-        total_budget > 0 ? parseFloat(((total_spent / total_budget) * 100).toFixed(2)) : 0;
-      const total_remaining = total_budget - total_spent;
-
-      return {
-        ...state,
-        categories: updatedCategories,
-        summary: {
-          ...(state.summary as BudgetSummary),
-          total_allocated,
-          percentage_spent,
-          total_remaining,
-        },
-      };
-    }
-    case "UPDATE_BUDGET": {
-      const total_budget = action.payload;
-      const total_spent = state.summary?.total_spent ?? 0;
-      const percentage_spent =
-        total_budget > 0 ? parseFloat(((total_spent / total_budget) * 100).toFixed(2)) : 0;
-      const total_remaining = total_budget - total_spent;
-      return {
-        ...state,
-        summary: {
-          ...(state.summary as BudgetSummary),
-          total_budget,
-          percentage_spent,
-          total_remaining,
-        },
-      };
-    }
-    case "SET_EVENT_VENDOR_IDS":
-      return { ...state, eventVendorIds: action.payload };
-    default:
-      return state;
+    case "SET_LOADING":          return { ...state, isLoading: action.payload };
+    case "SET_ERROR":            return { ...state, error: action.payload };
+    case "SET_DATA":             return { ...state, ...action.payload };
+    case "ADD_EXPENSE":          return handleAddExpense(state, action.payload);
+    case "DELETE_EXPENSE":       return handleDeleteExpense(state, action.payload);
+    case "UPDATE_EXPENSE":       return handleUpdateExpense(state, action.payload.id, action.payload.data);
+    case "ADD_CATEGORY":         return handleAddCategory(state, action.payload);
+    case "UPDATE_CATEGORY":      return handleUpdateCategory(state, action.payload.id, action.payload.data);
+    case "DELETE_CATEGORY":      return handleDeleteCategory(state, action.payload);
+    case "UPDATE_BUDGET":        return handleUpdateBudget(state, action.payload);
+    case "SET_EVENT_VENDOR_IDS": return { ...state, eventVendorIds: action.payload };
+    default:                     return state;
   }
 }
 
@@ -277,76 +93,13 @@ export function BudgetProvider({ children }: { children: React.ReactNode }) {
     dispatch({ type: "SET_LOADING", payload: true });
     try {
       const data = await BudgetService.getBudgetData(eid, signal);
-
-      // Use the event's assigned budget as the source of truth for total_budget
-      const totalBudget = eventBudget ?? data.summary.total_budget;
-      const totalSpent = data.summary.total_spent;
-      const totalRemaining = totalBudget - totalSpent;
-      const percentageSpent = totalBudget > 0 ? parseFloat(((totalSpent / totalBudget) * 100).toFixed(2)) : 0;
-
-      const budgetData: Partial<BudgetState> = {
-        summary: {
-          total_budget: totalBudget,
-          total_allocated: data.summary.total_allocated ?? 0,
-          total_spent: totalSpent,
-          total_remaining: totalRemaining,
-          percentage_spent: percentageSpent,
-          status: data.summary.status as any,
-          currency: data.budget.currency as Currency,
-        },
-        categories: data.categories.map((c) => ({
-          id: c.category_id,
-          catalog_id: (c as any).catalog_category_id,
-          name: c.name,
-          description: (c as any).description ?? "",
-          budget_name: (c as any).budget_name ?? "",
-          budget_notes: (c as any).budget_notes ?? "",
-          allocated: c.allocated,
-          spent: c.spent,
-          remaining: c.remaining,
-          percentage: c.percentage,
-          expense_count: c.expense_count,
-          color: c.color,
-        })),
-        expenses: data.expenses.map((e) => ({
-          expense_id: e.expense_id,
-          description: e.description,
-          amount: e.amount,
-          category_id: e.category_id,
-          vendor_name: e.vendor_name,
-          expense_date: e.expense_date,
-          payment_status: e.payment_status,
-          methodOfPayment: e.methodOfPayment ?? "",
-          receipt_url: e.receipt_url ?? null,
-          receipt_urls: e.receipt_url ? [e.receipt_url] : [],
-        })),
-        vendors: data.vendors.map((v) => ({
-          vendor_id: v.vendor_id,
-          name: v.name,
-          category: (v as any).category ?? "",
-          contact_name: (v as any).contact_person ?? "",
-          email: (v as any).email ?? "",
-          phone: (v as any).phone ?? "",
-          address: (v as any).address ?? "",
-          notes: (v as any).notes ?? "",
-          rating: (v as any).rating ?? 0,
-          is_active: (v as any).is_active ?? true,
-          total_spent: (v as any).total_spent ?? 0,
-          expense_count: (v as any).expense_count ?? 0,
-        })),
-        currency: data.budget.currency as Currency,
-      };
-
-      dispatch({ type: "SET_DATA", payload: budgetData });
+      dispatch({ type: "SET_DATA", payload: mapApiDataToBudgetState(data, eventBudget) });
       dispatch({ type: "SET_ERROR", payload: null });
     } catch (err: any) {
       if (isAbortError(err)) return;
       if (err instanceof ApiError && err.status === 401) return;
       console.error("Failed to load budget data:", err);
-      dispatch({
-        type: "SET_ERROR",
-        payload: err?.message ?? "Failed to load budget data",
-      });
+      dispatch({ type: "SET_ERROR", payload: err?.message ?? "Failed to load budget data" });
     } finally {
       dispatch({ type: "SET_LOADING", payload: false });
     }
@@ -356,8 +109,6 @@ export function BudgetProvider({ children }: { children: React.ReactNode }) {
     if (!selectedEvent) return;
     const controller = new AbortController();
     loadBudgetData(eventId, controller.signal);
-
-    // Load event-vendor assignments from localStorage
     try {
       const stored = localStorage.getItem(`rbr_event_vendors_${eventId}`);
       const ids: string[] = stored ? JSON.parse(stored) : [];
@@ -365,53 +116,35 @@ export function BudgetProvider({ children }: { children: React.ReactNode }) {
     } catch {
       dispatch({ type: "SET_EVENT_VENDOR_IDS", payload: [] });
     }
-
     return () => controller.abort();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [eventId, loadBudgetData]);
 
   const refreshData = () => loadBudgetData(eventId);
 
-  const resolveVendorId = (vendorName?: string): string | undefined => {
-    if (!vendorName) return undefined;
-    const vendor = state.vendors.find(
-      (v) => v.name.toLowerCase() === vendorName.toLowerCase(),
-    );
-    return vendor?.vendor_id;
-  };
+  const resolveVendorId = (vendorName?: string): string | undefined =>
+    vendorName
+      ? state.vendors.find((v) => v.name.toLowerCase() === vendorName.toLowerCase())?.vendor_id
+      : undefined;
 
   const addExpense = (payload: Omit<Expense, "expense_id">) => {
-    const expense: Expense = { ...payload, expense_id: generateId() };
-    dispatch({ type: "ADD_EXPENSE", payload: expense });
-
-    // Resolve catalog categoryId and vendor_id for the API
+    dispatch({ type: "ADD_EXPENSE", payload: { ...payload, expense_id: generateBudgetId() } });
     const cat = state.categories.find((c) => c.id === payload.category_id);
-    const apiPayload: Partial<Expense> & { currency?: string; vendor_id?: string } = {
+    BudgetService.createExpense(eventId, {
       ...payload,
       ...(cat?.catalog_id ? { category_id: cat.catalog_id } : {}),
       vendor_id: resolveVendorId(payload.vendor_name),
-    };
-
-    BudgetService.createExpense(eventId, apiPayload).catch((err) =>
-      console.error("createExpense failed:", err),
-    );
+    }).catch((err) => console.error("createExpense failed:", err));
   };
 
   const updateExpense = (id: string, data: Partial<Expense>) => {
     dispatch({ type: "UPDATE_EXPENSE", payload: { id, data } });
-
-    // Resolve catalog categoryId and vendor_id for the API
     const apiData: Partial<Expense> & { vendor_id?: string } = { ...data };
     if (data.category_id) {
       const cat = state.categories.find((c) => c.id === data.category_id);
-      if (cat?.catalog_id) {
-        apiData.category_id = cat.catalog_id;
-      }
+      if (cat?.catalog_id) apiData.category_id = cat.catalog_id;
     }
-    if (data.vendor_name !== undefined) {
-      apiData.vendor_id = resolveVendorId(data.vendor_name);
-    }
-
+    if (data.vendor_name !== undefined) apiData.vendor_id = resolveVendorId(data.vendor_name);
     BudgetService.updateExpense(eventId, id, apiData).catch((err) =>
       console.error("updateExpense failed:", err),
     );
@@ -432,27 +165,21 @@ export function BudgetProvider({ children }: { children: React.ReactNode }) {
       budget_notes: category.budget_notes,
       allocated: category.allocated ?? 0,
     })
-      .then(({ budgetId }) => {
-        dispatch({
-          type: "UPDATE_CATEGORY",
-          payload: { id: category.id, data: { id: String(budgetId) } },
-        });
-      })
+      .then(({ budgetId }) =>
+        dispatch({ type: "UPDATE_CATEGORY", payload: { id: category.id, data: { id: String(budgetId) } } }),
+      )
       .catch((err) => console.error("createCategory failed:", err));
   };
 
   const updateCategory = async (id: string, data: Partial<Category>): Promise<void> => {
     const current = state.categories.find((c) => c.id === id);
     if (!current) return;
-
     dispatch({ type: "UPDATE_CATEGORY", payload: { id, data } });
-
-    const allocated = data.allocated ?? current.allocated;
     await BudgetService.updateCategory(id, {
       eventId,
       categoryId: Number(current.catalog_id),
       description: data.budget_name ?? current.budget_name ?? current.name,
-      allocatedAmount: allocated,
+      allocatedAmount: data.allocated ?? current.allocated,
       spentAmount: current.spent,
       currency: state.currency,
       notes: data.budget_notes ?? current.budget_notes ?? "",
@@ -492,137 +219,70 @@ export function BudgetProvider({ children }: { children: React.ReactNode }) {
     );
   };
 
-  const loadTemplate = (template: any) => {
-    const totalBudget =
-      template.total_budget ?? state.summary?.total_budget ?? 0;
+  const applyCategoryPatch = (
+    source: { total_budget?: number; categories?: TemplateCategoryRaw[] },
+    getAllocated: (c: TemplateCategoryRaw, totalBudget: number) => number,
+    getPercentage: (c: TemplateCategoryRaw, allocated: number, totalBudget: number) => number,
+  ) => {
+    const totalBudget = source.total_budget ?? state.summary?.total_budget ?? 0;
+    if (source.total_budget) dispatch({ type: "UPDATE_BUDGET", payload: source.total_budget });
+    if (!source.categories) return;
 
-    if (template.total_budget) {
-      dispatch({ type: "UPDATE_BUDGET", payload: template.total_budget });
-    }
-
-    if (template.categories) {
-      const existingByName = new Map<string, Category>();
-      state.categories.forEach((c) => existingByName.set(c.name.trim().toLowerCase(), c));
-
-      const mapped = template.categories.map((c: any) => {
-        const key = (c.name || "").trim().toLowerCase();
-        const existing = existingByName.get(key);
-        const allocated = Math.round(((c.percentage ?? 0) * totalBudget) / 100);
-
+    const combined = mergeTemplateCategories(
+      source.categories,
+      state.categories,
+      (c, match) => {
+        const allocated = getAllocated(c, totalBudget);
         return {
-          id: existing?.id ?? generateId(),
+          id: match?.id ?? generateBudgetId(),
           name: c.name,
           allocated,
-          // Preserve existing spent/expense_count when matching by name
-          spent: existing?.spent ?? 0,
-          expense_count: existing?.expense_count ?? 0,
-          remaining: allocated - (existing?.spent ?? 0),
-          percentage: c.percentage ?? 0,
-          color: c.color ?? existing?.color,
+          spent: match?.spent ?? (typeof c.spent === "number" ? c.spent : 0),
+          expense_count: match?.expense_count ?? 0,
+          remaining: allocated - (match?.spent ?? (c.spent ?? 0)),
+          percentage: getPercentage(c, allocated, totalBudget),
+          color: c.color ?? match?.color,
         } as Category;
-      });
+      },
+    );
 
-      // Keep any existing categories not present in the template
-      const templateNames = new Set(
-        template.categories.map((c: any) => (c.name || "").trim().toLowerCase()),
-      );
-      const others = state.categories.filter(
-        (c) => !templateNames.has(c.name.trim().toLowerCase()),
-      );
-
-      const combined = [...mapped, ...others];
-
-      const total_allocated = combined.reduce((s, x) => s + (x.allocated ?? 0), 0);
-      const total_spent = state.summary?.total_spent ?? 0;
-      const percentage_spent =
-        totalBudget > 0 ? parseFloat(((total_spent / totalBudget) * 100).toFixed(2)) : 0;
-      const total_remaining = totalBudget - total_spent;
-
-      dispatch({
-        type: "SET_DATA",
-        payload: {
-          categories: combined,
-          summary: {
-            ...(state.summary as BudgetSummary),
-            total_allocated,
-            percentage_spent,
-            total_remaining,
-            total_budget: totalBudget,
-          },
+    const total_allocated = computeAllocatedTotal(combined);
+    const total_spent = state.summary?.total_spent ?? 0;
+    dispatch({
+      type: "SET_DATA",
+      payload: {
+        categories: combined,
+        summary: {
+          ...(state.summary as BudgetSummary),
+          ...computeSpentSummary(totalBudget, total_spent),
+          total_allocated,
+          total_budget: totalBudget,
         },
-      });
-    }
+      },
+    });
   };
 
-  const loadEstimate = (estimate: any) => {
-    const totalBudget =
-      estimate.total_budget ?? state.summary?.total_budget ?? 0;
+  const loadTemplate = (template: any) =>
+    applyCategoryPatch(
+      template,
+      (c, totalBudget) => Math.round(((c.percentage ?? 0) * totalBudget) / 100),
+      (c) => c.percentage ?? 0,
+    );
 
-    if (estimate.total_budget) {
-      dispatch({ type: "UPDATE_BUDGET", payload: estimate.total_budget });
-    }
-
-    if (estimate.categories) {
-      const existingByName = new Map<string, Category>();
-      state.categories.forEach((c) => existingByName.set(c.name.trim().toLowerCase(), c));
-
-      const mapped = estimate.categories.map((c: any) => {
-        const key = (c.name || "").trim().toLowerCase();
-        const existing = existingByName.get(key);
-        const allocated =
-          typeof c.allocated === "number"
-            ? Math.round(c.allocated)
-            : Math.round(((c.percentage ?? 0) * totalBudget) / 100);
-
-        const percentage =
-          typeof c.percentage === "number"
-            ? parseFloat((c.percentage).toFixed(2))
-            : totalBudget > 0
-            ? parseFloat(((allocated / totalBudget) * 100).toFixed(2))
-            : 0;
-
-        return {
-          id: existing?.id ?? generateId(),
-          name: c.name,
-          allocated,
-          spent: existing?.spent ?? (typeof c.spent === "number" ? c.spent : 0),
-          expense_count: existing?.expense_count ?? 0,
-          remaining: allocated - (existing?.spent ?? (c.spent ?? 0)),
-          percentage,
-          color: c.color ?? existing?.color,
-        } as Category;
-      });
-
-      const templateNames = new Set(
-        estimate.categories.map((c: any) => (c.name || "").trim().toLowerCase()),
-      );
-      const others = state.categories.filter(
-        (c) => !templateNames.has(c.name.trim().toLowerCase()),
-      );
-
-      const combined = [...mapped, ...others];
-
-      const total_allocated = combined.reduce((s, x) => s + (x.allocated ?? 0), 0);
-      const total_spent = state.summary?.total_spent ?? 0;
-      const percentage_spent =
-        totalBudget > 0 ? parseFloat(((total_spent / totalBudget) * 100).toFixed(2)) : 0;
-      const total_remaining = totalBudget - total_spent;
-
-      dispatch({
-        type: "SET_DATA",
-        payload: {
-          categories: combined,
-          summary: {
-            ...(state.summary as BudgetSummary),
-            total_allocated,
-            percentage_spent,
-            total_remaining,
-            total_budget: totalBudget,
-          },
-        },
-      });
-    }
-  };
+  const loadEstimate = (estimate: any) =>
+    applyCategoryPatch(
+      estimate,
+      (c, totalBudget) =>
+        typeof c.allocated === "number"
+          ? Math.round(c.allocated)
+          : Math.round(((c.percentage ?? 0) * totalBudget) / 100),
+      (c, allocated, totalBudget) =>
+        typeof c.percentage === "number"
+          ? parseFloat(c.percentage.toFixed(2))
+          : totalBudget > 0
+          ? parseFloat(((allocated / totalBudget) * 100).toFixed(2))
+          : 0,
+    );
 
   const value = {
     state,

@@ -36,8 +36,9 @@ function getSpentTextColor(pct: number): string | undefined {
 
 function findTopCategory(categories: Category[]): Category | null {
   if (categories.length === 0) return null;
-  return categories.reduce((a, b) =>
-    (b.spent ?? 0) > (a.spent ?? 0) ? b : a,
+  return categories.reduce(
+    (a, b) => (b.spent ?? 0) > (a.spent ?? 0) ? b : a,
+    categories[0],
   );
 }
 
