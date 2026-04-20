@@ -20,7 +20,14 @@ export default function CurrencyDisplay({
   type,
   strong = false,
 }: CurrencyDisplayProps) {
-  const fontSize = size === "small" ? 12 : size === "large" ? 24 : 14;
+  let fontSize: number;
+  if (size === "small") {
+    fontSize = 12;
+  } else if (size === "large") {
+    fontSize = 24;
+  } else {
+    fontSize = 14;
+  }
 
   return (
     <Text style={{ fontSize }} type={type} strong={strong}>
