@@ -12,10 +12,10 @@ export function useInitializeI18n(): void {
   useEffect(() => {
     const isLocalStorageAvailable = (): boolean => {
       try {
-        if (typeof window === "undefined" || !(globalThis as any).localStorage) return false;
+        if (typeof window === "undefined" || !globalThis.localStorage) return false;
         const testKey = "__i18n_test__";
-        (globalThis as any).localStorage.setItem(testKey, testKey);
-        (globalThis as any).localStorage.removeItem(testKey);
+        globalThis.localStorage.setItem(testKey, testKey);
+        globalThis.localStorage.removeItem(testKey);
         return true;
       } catch {
         return false;
@@ -25,7 +25,7 @@ export function useInitializeI18n(): void {
     const getSavedLanguage = (): string | null => {
       if (!isLocalStorageAvailable()) return null;
       try {
-        return (globalThis as any).localStorage.getItem(STORAGE_KEY);
+        return globalThis.localStorage.getItem(STORAGE_KEY);
       } catch {
         return null;
       }
@@ -62,7 +62,7 @@ export function useInitializeI18n(): void {
 
       if (isLocalStorageAvailable()) {
         try {
-          (globalThis as any).localStorage.setItem(STORAGE_KEY, lang);
+          globalThis.localStorage.setItem(STORAGE_KEY, lang);
         } catch {
           // ignore
         }

@@ -6,7 +6,7 @@ import type { ColumnsType } from "antd/es/table";
 import { useBudget } from "../../contexts/BudgetContext";
 import { useTranslation } from "react-i18next";
 import CategoryTag from "../shared/CategoryTag";
-import { formatCurrency, formatDate } from "@/utils/formatters.utils";
+import { formatCurrency, formatDate } from "@/shared/utils/formatters.utils";
 import type { Category, Expense, PaymentStatus } from "../../models/budget.models";
 import bulkStyles from "./BulkOperations.module.css";
 

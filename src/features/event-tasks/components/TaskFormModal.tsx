@@ -4,7 +4,7 @@ import type { Task, TaskFormValues, TaskCategory } from "../models/task.models";
 import { TEAM_MEMBERS } from "../api/taskApi";
 import { useTranslation } from "react-i18next";
 import dayjs from "dayjs";
-import { formatInputNumber } from "@/utils/formatters.utils";
+import { formatInputNumber } from "@/shared/utils/formatters.utils";
 
 const { TextArea } = Input;
 

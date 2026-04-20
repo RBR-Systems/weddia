@@ -1,7 +1,7 @@
 "use client";
 
 import { Typography } from "antd";
-import { formatCurrency } from "@/utils/formatters.utils";
+import { formatCurrency } from "@/shared/utils/formatters.utils";
 
 const { Text } = Typography;
 

@@ -3,7 +3,7 @@
 import { useTranslation } from "react-i18next";
 import { Drawer, Descriptions, Tag, Typography, Button, Space } from "antd";
 import { Guest, formatStatusLabel, statusColor } from "../../models/guestList.models";
-import { formatPhone } from "@/utils/formatters.utils";
+import { formatPhone } from "@/shared/utils/formatters.utils";
 
 const { Title } = Typography;
 

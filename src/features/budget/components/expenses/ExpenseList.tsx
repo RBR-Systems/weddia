@@ -4,7 +4,7 @@ import { App, Card, Table, Button, Input, Select, Space, Tag, Popconfirm, Row, C
 import { PlusOutlined, DeleteOutlined, EyeOutlined, FilterOutlined } from "@ant-design/icons";
 import type { ColumnsType, TablePaginationConfig } from "antd/es/table";
 import { useBudget } from "../../contexts/BudgetContext";
-import { formatCurrency, formatDate } from "@/utils/formatters.utils";
+import { formatCurrency, formatDate } from "@/shared/utils/formatters.utils";
 import { getPaymentStatus } from "../../constants/budget.constants";
 import type { Expense, PaymentStatus } from "../../models/budget.models";
 import CategoryTag from "../shared/CategoryTag";

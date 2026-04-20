@@ -6,7 +6,7 @@ import { CheckCircleOutlined, ClockCircleOutlined, ExclamationCircleOutlined, Li
 import Card from "@/shared/components/Card/Card";
 import type { ColumnsType } from "antd/es/table";
 import { useBudget } from "../../contexts/BudgetContext";
-import { formatCurrency, formatDate } from "@/utils/formatters.utils";
+import { formatCurrency, formatDate } from "@/shared/utils/formatters.utils";
 import { getPaymentStatus } from "../../constants/budget.constants";
 import type { Expense, PaymentStatus } from "../../models/budget.models";
 import payStyles from "./PaymentStatus.module.css";
@@ -164,7 +164,7 @@ export default function PaymentStatusManager() {
               value={paidTotal}
               className={payStyles.paidValue}
               prefix={<CheckCircleOutlined />}
-              formatter={(value) =>
+              formatter={(value: number | string) =>
                 formatCurrency(Number(value), state.currency)
               }
             />
@@ -177,7 +177,7 @@ export default function PaymentStatusManager() {
               value={pendingTotal}
               className={payStyles.pendingValue}
               prefix={<ClockCircleOutlined />}
-              formatter={(value) =>
+              formatter={(value: number | string) =>
                 formatCurrency(Number(value), state.currency)
               }
             />
@@ -190,7 +190,7 @@ export default function PaymentStatusManager() {
               value={overdueTotal}
               className={payStyles.overdueValue}
               prefix={<ExclamationCircleOutlined />}
-              formatter={(value) =>
+              formatter={(value: number | string) =>
                 formatCurrency(Number(value), state.currency)
               }
             />

@@ -1,7 +1,7 @@
 "use client";
 
 import { Progress } from "antd";
-import { formatCurrency } from "@/utils/formatters.utils";
+import { formatCurrency } from "@/shared/utils/formatters.utils";
 import type { Category } from "../../models/budget.models";
 import styles from "./CategoryCard.module.css";
 import { useTranslation } from "react-i18next";

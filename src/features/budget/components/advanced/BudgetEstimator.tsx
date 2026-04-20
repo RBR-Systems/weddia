@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Card, Row, Col, InputNumber, Slider, Typography, Space, Select, Divider, Flex, Button, Alert, App } from "antd";
 import { BulbOutlined, CalculatorOutlined } from "@ant-design/icons";
 import { useBudget } from "../../contexts/BudgetContext";
-import { formatCurrency, formatInputNumber, parseInputNumber } from "@/utils/formatters.utils";
+import { formatCurrency, formatInputNumber, parseInputNumber } from "@/shared/utils/formatters.utils";
 import Statistic from "@/shared/components/AnimatedStatistic/AnimatedStatistic";
 import CategoryTag from "../shared/CategoryTag";
 import { CHART_COLORS, SEMANTIC_CHART_COLORS, resolveChartColor } from "@/theme/chartColors";
@@ -277,7 +277,7 @@ export default function BudgetEstimator() {
               <Statistic
                 title={t("budgetEstimator.estimatedTotal")}
                 value={estimatedBudget}
-                formatter={(value) =>
+                formatter={(value: number | string) =>
                   formatCurrency(Number(value), state.currency)
                 }
                 styles={{ content: { color: semantic.success, fontSize: 28 } }}

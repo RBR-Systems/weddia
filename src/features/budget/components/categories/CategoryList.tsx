@@ -1,5 +1,5 @@
 "use client";
-import { formatInputNumber, parseInputNumber } from "@/utils/formatters.utils";
+import { formatInputNumber, parseInputNumber } from "@/shared/utils/formatters.utils";
 import { useState, useEffect, useMemo } from "react";
 import { App, Row, Col, Card, Button, Empty, Input, Space, Modal, Form, InputNumber, Select, Typography } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
@@ -10,7 +10,7 @@ import type { Category } from "../../models/budget.models";
 import { CHART_COLORS } from "@/theme/chartColors";
 import { useTheme } from "@/theme/ThemeProvider";
 import { useTranslation } from "react-i18next";
-import { CategoriesService } from "@/features/budget/api/categoriesApi";
+import { CategoriesService, type BudgetCategory } from "@/features/budget/api/categoriesApi";
 
 const { Search } = Input;
 const { Text } = Typography;

@@ -33,7 +33,7 @@ const DEFAULT_VIEW = "events-list";
 
 function getViewFromPath(): string {
   if (typeof window === "undefined") return DEFAULT_VIEW;
-  const path = (globalThis as any).location.pathname.replace(/^\//, "");
+  const path = globalThis.location.pathname.replace(/^\//, "");
   return VALID_VIEWS.has(path) ? path : DEFAULT_VIEW;
 }
 
@@ -46,14 +46,14 @@ export default function Home() {
     setCurrentView(getViewFromPath());
 
     const onPop = () => setCurrentView(getViewFromPath());
-    (globalThis as any).addEventListener("popstate", onPop);
-    return () => (globalThis as any).removeEventListener("popstate", onPop);
+    globalThis.addEventListener("popstate", onPop);
+    return () => globalThis.removeEventListener("popstate", onPop);
   }, []);
 
   const navigate = (view: string) => {
     if (view === currentView) return;
     setCurrentView(view);
-    (globalThis as any).history.pushState({ view }, "", `/${view}`);
+    globalThis.history.pushState({ view }, "", `/${view}`);
   };
 
   const renderContent = () => {

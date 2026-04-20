@@ -5,7 +5,7 @@ import { Card, Timeline, Typography, Tag, Space, Select, DatePicker, Empty, Avat
 import { PlusCircleOutlined, EditOutlined, DeleteOutlined, DollarOutlined, UserOutlined, CheckCircleOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { useBudget } from "../../contexts/BudgetContext";
-import { formatCurrency } from "@/utils/formatters.utils";
+import { formatCurrency } from "@/shared/utils/formatters.utils";
 import activityStyles from "./ActivityLog.module.css";
 
 const { Text } = Typography;

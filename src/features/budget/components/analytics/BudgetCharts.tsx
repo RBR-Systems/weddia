@@ -5,7 +5,7 @@ import Card from "@/shared/components/Card/Card";
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line, AreaChart, Area } from "recharts";
 import { useTranslation } from "react-i18next";
 import { useBudget } from "../../contexts/BudgetContext";
-import { formatCurrency } from "@/utils/formatters.utils";
+import { formatCurrency } from "@/shared/utils/formatters.utils";
 import type { Category, Expense } from "../../models/budget.models";
 import { CHART_COLORS, COMPARISON_COLORS, SEMANTIC_CHART_COLORS, resolveChartColor } from "@/theme/chartColors";
 import { useTheme } from "@/theme/ThemeProvider";

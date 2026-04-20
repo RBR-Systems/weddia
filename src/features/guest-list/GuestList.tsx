@@ -4,7 +4,7 @@ import { ReloadOutlined, FileExcelOutlined, UploadOutlined, PlusOutlined } from 
 import { App, Row, Col, Button, Modal, Upload, Form, Input, InputNumber, Select, Tag, Space } from "antd";
 import { Guest, RsvpStatus, formatStatusLabel, statusColor, GuestFilters, GuestFormValues } from "./models/guestList.models";
 import { applyGuestFilters, escapeCsv } from "./utils/guestList.utils";
-import { formatPhone } from "@/utils/formatters.utils";
+import { formatPhone } from "@/shared/utils/formatters.utils";
 import Header from "@/shared/components/Header/Header";
 import { useTranslation } from "react-i18next";
 import { useEvent } from "@/shared/contexts/EventContext";

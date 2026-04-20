@@ -5,7 +5,7 @@ import { PlusOutlined, EditOutlined, DeleteOutlined, SaveOutlined, CloseOutlined
 import type { Category, BudgetItem } from "../../models/budget.models";
 import { BudgetService } from "../../api/budgetApi";
 import { ApiError } from "@/shared/api/apiClient";
-import { formatCurrency, formatInputNumber, parseInputNumber } from "@/utils/formatters.utils";
+import { formatCurrency, formatInputNumber, parseInputNumber } from "@/shared/utils/formatters.utils";
 import { useTranslation } from "react-i18next";
 import styles from "./CategoryDrawer.module.css";
 

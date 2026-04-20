@@ -4,7 +4,7 @@ import { Card, Table, Tag, Progress, Space, Button, Input, Select, Row, Col, Typ
 import { PlusOutlined, EyeOutlined, TeamOutlined, CalendarOutlined } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
-import { formatCurrency } from "@/utils/formatters.utils";
+import { formatCurrency } from "@/shared/utils/formatters.utils";
 import { useTranslation } from "react-i18next";
 import { CHART_COLORS, SEMANTIC_CHART_COLORS } from "@/theme/chartColors";
 import { useTheme } from "@/theme/ThemeProvider";
@@ -253,7 +253,7 @@ export default function MultiClientView({
             <Statistic
               title={t("multiClientView.totalManaged")}
               value={totalManagedBudget}
-              formatter={(value) => formatCurrency(Number(value), "USD")}
+              formatter={(value: number | string) => formatCurrency(Number(value), "USD")}
             />
           </Card>
         </Col>

@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { MailOutlined, MessageOutlined, SearchOutlined, DeleteOutlined } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import { Guest, formatStatusLabel, statusColor, STATUS_LABELS } from "../../models/guestList.models";
-import { formatPhone } from "@/utils/formatters.utils";
+import { formatPhone } from "@/shared/utils/formatters.utils";
 import { useTheme } from "@/theme/ThemeProvider";
 import { light as lightTokens, dark as darkTokens } from "@/theme/tokens";
 import Link from "antd/es/typography/Link";

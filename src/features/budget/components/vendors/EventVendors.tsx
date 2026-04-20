@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { App, Table, Button, Switch, Input, Tag, Avatar, Space, Typography, Row, Col } from "antd";
 import { ShopOutlined, EyeOutlined } from "@ant-design/icons";
 import { useBudget } from "../../contexts/BudgetContext";
-import { formatCurrency } from "@/utils/formatters.utils";
+import { formatCurrency } from "@/shared/utils/formatters.utils";
 import Card from "@/shared/components/Card/Card";
 import Statistic from "@/shared/components/AnimatedStatistic/AnimatedStatistic";
 import type { Vendor } from "../../models/budget.models";
@@ -143,7 +143,7 @@ export default function EventVendors({ onViewVendor }: EventVendorsProps) {
             <Statistic
               title={t("eventVendors.eventSpending")}
               value={totalEventSpending}
-              formatter={(v) => formatCurrency(Number(v), state.currency)}
+              formatter={(v: number | string) => formatCurrency(Number(v), state.currency)}
             />
           </Card>
         </Col>

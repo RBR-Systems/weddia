@@ -4,7 +4,7 @@ import { Row, Col, Tooltip, InputNumber } from "antd";
 import { EditOutlined, CheckOutlined, CloseOutlined, WalletOutlined, PieChartOutlined, ArrowDownOutlined, SafetyOutlined, PercentageOutlined, FileTextOutlined, BarChartOutlined, TrophyOutlined } from "@ant-design/icons";
 import AnimatedStatistic from "@/shared/components/AnimatedStatistic/AnimatedStatistic";
 import { useBudget } from "../contexts/BudgetContext";
-import { formatCurrency, formatInputNumber, parseInputNumber } from "@/utils/formatters.utils";
+import { formatCurrency, formatInputNumber, parseInputNumber } from "@/shared/utils/formatters.utils";
 import { useTranslation } from "react-i18next";
 
 import type { Category } from "../models/budget.models";

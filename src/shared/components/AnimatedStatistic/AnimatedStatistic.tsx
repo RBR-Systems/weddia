@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useMemo, useRef, useCallback } from "react";
+import { type ComponentProps, type ReactNode, useEffect, useMemo, useRef, useCallback } from "react";
 import { Statistic as AntdStatistic } from "antd";
 import CountUp from "react-countup";
 import { extractNumber, detectDecimals } from "./utils/number.utils";

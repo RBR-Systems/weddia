@@ -6,7 +6,7 @@ import type { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
 import { useBudget } from "../../contexts/BudgetContext";
-import { formatCurrency, formatDate } from "@/utils/formatters.utils";
+import { formatCurrency, formatDate } from "@/shared/utils/formatters.utils";
 import type { Category, Expense } from "../../models/budget.models";
 import reportStyles from "./ReportsPage.module.css";
 
@@ -105,7 +105,7 @@ export default function ReportsPage() {
   };
 
   const handlePrint = () => {
-    (globalThis as any).print();
+    globalThis.print();
     message.success(t("reports.printDialogOpened"));
   };
 
@@ -226,7 +226,7 @@ export default function ReportsPage() {
                     <Statistic
                       title={item.label}
                       value={item.isPercent ? item.value : Number(item.value)}
-                      formatter={(value) =>
+                      formatter={(value: number | string) =>
                         item.isPercent
                           ? String(value)
                           : formatCurrency(Number(value), state.currency)
@@ -297,7 +297,7 @@ export default function ReportsPage() {
                     (sum: number, e: Expense) => sum + e.amount,
                     0,
                   )}
-                  formatter={(value) =>
+                  formatter={(value: number | string) =>
                     formatCurrency(Number(value), state.currency)
                   }
                 />
@@ -313,7 +313,7 @@ export default function ReportsPage() {
                         ) / filteredExpenses.length
                       : 0
                   }
-                  formatter={(value) =>
+                  formatter={(value: number | string) =>
                     formatCurrency(Number(value), state.currency)
                   }
                 />

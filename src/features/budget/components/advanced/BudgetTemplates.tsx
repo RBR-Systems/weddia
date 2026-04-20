@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { App, Card, Row, Col, Button, Modal, Form, Input, Flex, Typography, Tag, Space, Popconfirm } from "antd";
 import { SaveOutlined, DownloadOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useBudget } from "../../contexts/BudgetContext";
-import { formatCurrency } from "@/utils/formatters.utils";
+import { formatCurrency } from "@/shared/utils/formatters.utils";
 import type { Category } from "../../models/budget.models";
 import CategoryTag from "../shared/CategoryTag";
 import { CHART_COLORS, resolveChartColor } from "@/theme/chartColors";

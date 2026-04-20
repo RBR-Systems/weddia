@@ -1,4 +1,5 @@
 import type { BudgetDataAPI } from "../models/api.models";
+import type { BudgetStatus } from "../models/budget.models";
 import { apiGet, apiPost, apiPut, apiDelete } from "@/shared/api/apiClient";
 
 // Palette used for category colors (cycles if more than array length)
@@ -137,7 +138,7 @@ export class BudgetService {
     }));
 
     const pctSpent = totalBudget > 0 ? (totalSpent / totalBudget) * 100 : 0;
-    let status: string;
+    let status: BudgetStatus;
     if (pctSpent >= 100) {
       status = "over_budget";
     } else if (pctSpent >= 80) {

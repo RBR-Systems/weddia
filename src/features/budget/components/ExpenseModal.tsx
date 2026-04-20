@@ -2,7 +2,7 @@
 import React, { useEffect } from "react";
 import { Modal, Form, Input, InputNumber, Select, DatePicker } from "antd";
 import { CreditCardOutlined, BankOutlined, DollarOutlined, FileTextOutlined, EllipsisOutlined, CheckCircleOutlined, ClockCircleOutlined, ExclamationCircleOutlined, SyncOutlined } from "@ant-design/icons";
-import { formatInputNumber, parseInputNumber } from "@/utils/formatters.utils";
+import { formatInputNumber, parseInputNumber } from "@/shared/utils/formatters.utils";
 import type { Expense } from "../models/budget.models";
 import { useBudget } from "../contexts/BudgetContext";
 import dayjs from "dayjs";

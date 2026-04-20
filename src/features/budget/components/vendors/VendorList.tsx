@@ -10,7 +10,7 @@ import Statistic from "@/shared/components/AnimatedStatistic/AnimatedStatistic";
 import styles from "./vendor-list.module.css";
 import type { ColumnsType } from "antd/es/table";
 import { useBudget } from "../../contexts/BudgetContext";
-import { formatCurrency } from "@/utils/formatters.utils";
+import { formatCurrency } from "@/shared/utils/formatters.utils";
 import type { Vendor } from "../../models/budget.models";
 
 const { Search } = Input;
@@ -177,7 +177,7 @@ export default function VendorList({ onViewVendor }: VendorListProps) {
             <Statistic
               title={t("vendorList.totalVendorSpending")}
               value={totalVendorSpending}
-              formatter={(value) =>
+              formatter={(value: number | string) =>
                 formatCurrency(Number(value), state.currency)
               }
             />

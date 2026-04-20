@@ -16,7 +16,7 @@ function _nextFallbackRandom32(): number {
 }
 
 export function getRandomId(prefix = 'id-') {
-  const cryptoObj = (globalThis as any).crypto;
+  const cryptoObj = globalThis.crypto;
   if (cryptoObj?.randomUUID) {
     try {
       return `${prefix}${cryptoObj.randomUUID()}`;
@@ -44,7 +44,7 @@ export function getRandomId(prefix = 'id-') {
 export function randomInt(max: number): number {
   const m = Math.floor(Math.abs(max) || 0);
   if (m <= 0) return 0;
-  const cryptoObj = (globalThis as any).crypto;
+  const cryptoObj = globalThis.crypto;
   if (cryptoObj?.getRandomValues) {
     // Use rejection sampling to avoid modulo bias.
     const arr = new Uint32Array(1);

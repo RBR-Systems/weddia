@@ -1,7 +1,7 @@
 "use client";
 
 import { Progress, Tooltip } from "antd";
-import { formatCurrency } from "@/utils/formatters.utils";
+import { formatCurrency } from "@/shared/utils/formatters.utils";
 import { SEMANTIC_CHART_COLORS } from "@/theme/chartColors";
 import { useTheme } from "@/theme/ThemeProvider";
 

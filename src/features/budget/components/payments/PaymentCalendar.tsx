@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Card, Calendar, Badge, Tooltip, Typography, Flex, Tag, Empty } from "antd";
 import dayjs, { type Dayjs } from "dayjs";
 import { useBudget } from "../../contexts/BudgetContext";
-import { formatCurrency } from "@/utils/formatters.utils";
+import { formatCurrency } from "@/shared/utils/formatters.utils";
 import { getPaymentStatus } from "../../constants/budget.constants";
 import type { Expense, PaymentStatus } from "../../models/budget.models";
 import calStyles from "./PaymentCalendar.module.css";

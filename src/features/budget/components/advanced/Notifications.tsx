@@ -5,7 +5,7 @@ import { Card, Switch, Typography, Space, Tag, Badge, Button, Empty, Divider, Ro
 import { BellOutlined, ExclamationCircleOutlined, WarningOutlined, ClockCircleOutlined, DeleteOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { useBudget } from "../../contexts/BudgetContext";
-import { formatCurrency } from "@/utils/formatters.utils";
+import { formatCurrency } from "@/shared/utils/formatters.utils";
 import notifStyles from "./Notifications.module.css";
 
 const { Text } = Typography;

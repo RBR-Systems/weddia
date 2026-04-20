@@ -5,7 +5,7 @@ import Statistic from "@/shared/components/AnimatedStatistic/AnimatedStatistic";
 import { useTranslation } from "react-i18next";
 import { EditOutlined } from "@ant-design/icons";
 import { useBudget } from "../../contexts/BudgetContext";
-import { formatCurrency, formatInputNumber, parseInputNumber } from "@/utils/formatters.utils";
+import { formatCurrency, formatInputNumber, parseInputNumber } from "@/shared/utils/formatters.utils";
 import type { Category } from "../../models/budget.models";
 import styles from "./BudgetAllocation.module.css";
 
@@ -109,7 +109,7 @@ export default function BudgetAllocation() {
             <Title level={5}>{t("budgetAllocation.allocation")}</Title>
             <Statistic
               value={totalAllocated}
-              formatter={(v) => formatCurrency(Number(v), state.currency)}
+              formatter={(v: number | string) => formatCurrency(Number(v), state.currency)}
             />
           </Card>
         </Col>
@@ -118,7 +118,7 @@ export default function BudgetAllocation() {
             <Title level={5}>{t("budgetAllocation.unallocated")}</Title>
             <Statistic
               value={unallocated}
-              formatter={(v) => formatCurrency(Number(v), state.currency)}
+              formatter={(v: number | string) => formatCurrency(Number(v), state.currency)}
                   styles={{ content: { color: unallocated < 0 ? "var(--budget-danger)" : undefined } }}
             />
           </Card>

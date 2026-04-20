@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import dayjs from "dayjs";
 import styles from "./event-list.module.css";
 import Header from "@/shared/components/Header/Header";
-import { formatInputNumber, parseInputNumber } from "@/utils/formatters.utils";
+import { formatInputNumber, parseInputNumber } from "@/shared/utils/formatters.utils";
 import { EventStatus } from "./models/enums/eventList.models";
 import { EventCardProps } from "./models/eventCardProps.models";
 import { useEvent } from "@/shared/contexts/EventContext";

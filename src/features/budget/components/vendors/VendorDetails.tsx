@@ -6,7 +6,7 @@ import { ShopOutlined, MailOutlined, PhoneOutlined } from "@ant-design/icons";
 import Card from "@/shared/components/Card/Card";
 import Statistic from "@/shared/components/AnimatedStatistic/AnimatedStatistic";
 import { useBudget } from "../../contexts/BudgetContext";
-import { formatCurrency, formatDate } from "@/utils/formatters.utils";
+import { formatCurrency, formatDate } from "@/shared/utils/formatters.utils";
 import { getPaymentStatus } from "../../constants/budget.constants";
 import type { Expense, PaymentStatus, Vendor } from "../../models/budget.models";
 import vendorStyles from "./VendorDetails.module.css";
@@ -125,7 +125,7 @@ export default function VendorDetails({
               <Statistic
                 title={t("vendorDetails.totalSpent")}
                 value={vendor.total_spent}
-                formatter={(value) =>
+                formatter={(value: number | string) =>
                   formatCurrency(Number(value), state.currency)
                 }
               />
@@ -137,7 +137,7 @@ export default function VendorDetails({
                 title={t("vendorDetails.paid")}
                 value={paidAmount}
                 className={vendorStyles.paidValue}
-                formatter={(value) =>
+                formatter={(value: number | string) =>
                   formatCurrency(Number(value), state.currency)
                 }
               />
@@ -149,7 +149,7 @@ export default function VendorDetails({
                 title={t("vendorDetails.pending")}
                 value={pendingAmount}
                 className={vendorStyles.pendingValue}
-                formatter={(value) =>
+                formatter={(value: number | string) =>
                   formatCurrency(Number(value), state.currency)
                 }
               />
