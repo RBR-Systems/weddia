@@ -100,12 +100,13 @@ export default function BulkOperations() {
     accept: ".csv",
     showUploadList: false,
     beforeUpload: (file) => {
-      const reader = new FileReader();
-      reader.onload = () =>
-        simulateImportProgress(setImportProgress, () =>
-          message.success(t("bulkOperations.importCompleted")),
-        );
-      reader.readAsText(file);
+      file.text()
+        .then(() =>
+          simulateImportProgress(setImportProgress, () =>
+            message.success(t("bulkOperations.importCompleted")),
+          ),
+        )
+        .catch(() => message.error(t("bulkOperations.importFailed")));
       return false;
     },
   };

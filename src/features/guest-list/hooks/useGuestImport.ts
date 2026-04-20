@@ -19,26 +19,26 @@ export const useGuestImport = ({ onImported, onClose }: UseGuestImportOptions): 
 
   const handleFile = (file: File): false => {
     setImporting(true);
-    const reader = new FileReader();
-    reader.onload = () => {
-      try {
-        const text = String(reader.result ?? "");
-        const guests = parseCsvToGuests(text);
-        onImported(guests);
-        message.success(`Imported ${guests.length} guests`);
-      } catch (err) {
+    file.text()
+      .then((text) => {
+        try {
+          const guests = parseCsvToGuests(String(text ?? ""));
+          onImported(guests);
+          message.success(`Imported ${guests.length} guests`);
+        } catch (err) {
+          console.error(err);
+          message.error("Failed to import CSV");
+        } finally {
+          setImporting(false);
+          onClose();
+        }
+      })
+      .catch((err) => {
         console.error(err);
-        message.error("Failed to import CSV");
-      } finally {
+        message.error("Failed to read file");
         setImporting(false);
         onClose();
-      }
-    };
-    reader.onerror = () => {
-      message.error("Failed to read file");
-      setImporting(false);
-    };
-    reader.readAsText(file);
+      });
     return false;
   };
 
