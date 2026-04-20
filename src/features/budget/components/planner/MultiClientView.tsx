@@ -87,7 +87,7 @@ const STATUS_CONFIG = {
 };
 
 interface MultiClientViewProps {
-  onSelectClient?: (clientId: string) => void;
+  readonly onSelectClient?: (clientId: string) => void;
 }
 
 export default function MultiClientView({

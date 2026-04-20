@@ -10,6 +10,38 @@ import type { Category, Expense } from "../../models/budget.models";
 import { CHART_COLORS, COMPARISON_COLORS, SEMANTIC_CHART_COLORS, resolveChartColor } from "@/theme/chartColors";
 import { useTheme } from "@/theme/ThemeProvider";
 
+type CustomTooltipProps = {
+  active?: boolean;
+  payload?: any[];
+  label?: string | number;
+  currency: string;
+};
+
+export const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload, label, currency }) => {
+  if (active && payload?.length) {
+    return (
+      <div
+        style={{
+          backgroundColor: "var(--card-background)",
+          color: "var(--text-color)",
+          padding: "10px",
+          border: "1px solid var(--card-border)",
+          borderRadius: "4px",
+        }}
+      >
+        <p style={{ margin: 0, fontWeight: "bold" }}>{label}</p>
+        {payload.map((entry: any) => (
+          <p key={entry.name} style={{ margin: 0, color: entry.color }}>
+            {entry.name}: {formatCurrency(entry.value, currency)}
+          </p>
+        ))}
+      </div>
+    );
+  }
+  return null;
+};
+
+
 
 export default function BudgetCharts() {
   const { state } = useBudget();
@@ -79,29 +111,7 @@ export default function BudgetCharts() {
     });
   }, [state.expenses, state.summary?.total_budget]);
 
-  const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
-      return (
-        <div
-          style={{
-            backgroundColor: "var(--card-background)",
-            color: "var(--text-color)",
-            padding: "10px",
-            border: "1px solid var(--card-border)",
-            borderRadius: "4px",
-          }}
-        >
-          <p style={{ margin: 0, fontWeight: "bold" }}>{label}</p>
-          {payload.map((entry: any) => (
-            <p key={entry.name} style={{ margin: 0, color: entry.color }}>
-              {entry.name}: {formatCurrency(entry.value, state.currency)}
-            </p>
-          ))}
-        </div>
-      );
-    }
-    return null;
-  };
+
 
   if (state.categories.length === 0 && state.expenses.length === 0) {
     return (
@@ -167,7 +177,7 @@ export default function BudgetCharts() {
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
                 <YAxis />
-                <Tooltip content={<CustomTooltip />} />
+                <Tooltip content={<CustomTooltip currency={state.currency} />} />
                 <Legend />
                 <Bar dataKey="allocated" fill={comparison.primary} name={t("budgetCharts.allocated")} />
                 <Bar dataKey="spent" fill={comparison.secondary} name={t("budgetCharts.spent")} />

@@ -9,8 +9,8 @@ import { ThemeToggle } from "@/theme/ThemeToggle";
 import styles from "./nav-bar.module.css";
 
 interface ActionsGroupProps {
-  onNewEvent: () => void;
-  newEventLabel?: React.ReactNode;
+  readonly onNewEvent: () => void;
+  readonly newEventLabel?: React.ReactNode;
 }
 
 const ActionsGroup: React.FC<ActionsGroupProps> = ({ onNewEvent, newEventLabel }) => (

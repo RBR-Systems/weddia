@@ -8,9 +8,9 @@ import { CheckInStats, CheckInStatusFilter } from "../../models/checkIn.models";
 import styles from "./CheckIn.module.css";
 
 interface CheckInStatsBarProps {
-  stats: CheckInStats;
-  activeStatuses?: string[];
-  onStatusClick?: (status: CheckInStatusFilter) => void;
+  readonly stats: CheckInStats;
+  readonly activeStatuses?: string[];
+  readonly onStatusClick?: (status: CheckInStatusFilter) => void;
 }
 
 const CheckInStatsBar: React.FC<CheckInStatsBarProps> = ({

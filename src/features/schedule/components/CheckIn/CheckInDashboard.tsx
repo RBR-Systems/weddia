@@ -12,7 +12,7 @@ import CheckInModal from "./CheckInModal";
 import styles from "./CheckIn.module.css";
 
 interface CheckInDashboardProps {
-  onNavigateToTable?: (tableId: string) => void;
+  readonly onNavigateToTable?: (tableId: string) => void;
 }
 
 const STATUS_FILTER_LABELS: Record<string, string> = {

@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useMemo, useReducer, useRef } from "reac
 import { useSensor, useSensors, PointerSensor } from "@dnd-kit/core";
 import { App } from "antd";
 import { INITIAL_METERS_TO_PIXELS, DEFAULT_VENUE_WIDTH_METERS, DEFAULT_VENUE_HEIGHT_METERS } from "../constants/tableAssignment.constants";
-import type { TableLayout, Guest as TAGuest } from "../models/tableAssignment.models";
+import type { TableLayout, Guest as TAGuest, TableAssignment } from "../models/tableAssignment.models";
 import { fullName } from "../utils/table.utils";
 import { apiGet, apiPost, apiPut, apiDelete, isAbortError } from "@/shared/api/apiClient";
 import { fetchGuests, fetchRelations } from "../../guest-list/api/guestApi";
@@ -11,6 +11,11 @@ import type { Guest as GuestListGuest } from "../../guest-list/models/guestList.
 import { useEvent } from "@/shared/contexts/EventContext";
 import { reducer, createInitialState } from "./tableAssignmentReducer";
 import { useDragHandlers } from "../hooks/useDragHandlers";
+
+function deleteAssignment(a: TableAssignment): void {
+  apiDelete(`/api/tableassignments/${a.table_id}/${a.guest_id}`)
+    .catch((e) => console.error("[unassignAll] delete failed:", e));
+}
 
 function mapGuestListToTA(g: GuestListGuest): TAGuest {
   return {
@@ -21,7 +26,7 @@ function mapGuestListToTA(g: GuestListGuest): TAGuest {
     email: g.email ?? null,
     phone: g.phone ?? null,
     relation_id: g.relation_id ?? "",
-    plus_one: g.plus_one != null ? Boolean(g.plus_one) : false,
+    plus_one: g.plus_one == null ? false : Boolean(g.plus_one),
     rsvp_status: g.rsvp_status,
     party_size: g.party_size,
     dietary_restrictions: Array.isArray(g.dietary_restrictions)
@@ -451,10 +456,7 @@ export function TableAssignmentProvider({
       unassignAll: () => {
         const currentAssignments = stateRef.current.assignments;
         dispatch({ type: "UNASSIGN_ALL" });
-        currentAssignments.forEach((a: any) => {
-          apiDelete(`/api/tableassignments/${a.table_id}/${a.guest_id}`)
-            .catch((e) => console.error("[unassignAll] delete failed:", e));
-        });
+        currentAssignments.forEach(deleteAssignment);
       },
       unassignGuest: (guestId: string) => {
         const prev = stateRef.current.assignments.find((a: any) => a.guest_id === guestId);

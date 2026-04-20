@@ -70,7 +70,7 @@ export default function BudgetAllocation() {
           <Card
             size="small"
             style={{ cursor: "pointer" }}
-            onClick={!editingBudget ? handleEditBudget : undefined}
+            onClick={editingBudget ? undefined : handleEditBudget}
           >
             {editingBudget ? (
               <Space orientation="vertical" style={{ width: "100%" }}>

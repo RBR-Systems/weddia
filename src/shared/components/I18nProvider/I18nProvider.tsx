@@ -6,7 +6,7 @@ import i18n from "@/i18n";
 import { useInitializeI18n } from "@/shared/i18n/useInitializeI18n";
 
 interface I18nProviderProps {
-  children: React.ReactNode;
+  readonly children: React.ReactNode;
 }
 
 export default function I18nProvider({ children }: I18nProviderProps) {

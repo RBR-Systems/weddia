@@ -6,11 +6,11 @@ import { formatCurrency } from "@/utils/formatters.utils";
 const { Text } = Typography;
 
 interface CurrencyDisplayProps {
-  amount: number;
-  currency?: string;
-  size?: "small" | "default" | "large";
-  type?: "success" | "warning" | "danger" | "secondary";
-  strong?: boolean;
+  readonly amount: number;
+  readonly currency?: string;
+  readonly size?: "small" | "default" | "large";
+  readonly type?: "success" | "warning" | "danger" | "secondary";
+  readonly strong?: boolean;
 }
 
 export default function CurrencyDisplay({

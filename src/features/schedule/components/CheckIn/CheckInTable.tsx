@@ -16,13 +16,13 @@ export interface CheckInFilters {
 }
 
 interface CheckInTableProps {
-  guests: CheckInGuest[];
-  relations: { relation_id: string; name: string }[];
-  filters: CheckInFilters;
-  onFiltersChange: (filters: Partial<CheckInFilters>) => void;
-  onCheckIn: (guest: CheckInGuest) => void;
-  onUndoCheckIn: (guest: CheckInGuest) => void;
-  onNavigateToTable?: (tableId: string) => void;
+  readonly guests: CheckInGuest[];
+  readonly relations: { relation_id: string; name: string }[];
+  readonly filters: CheckInFilters;
+  readonly onFiltersChange: (filters: Partial<CheckInFilters>) => void;
+  readonly onCheckIn: (guest: CheckInGuest) => void;
+  readonly onUndoCheckIn: (guest: CheckInGuest) => void;
+  readonly onNavigateToTable?: (tableId: string) => void;
 }
 
 const CheckInTable: React.FC<CheckInTableProps> = ({

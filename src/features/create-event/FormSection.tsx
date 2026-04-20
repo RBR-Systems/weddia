@@ -2,8 +2,8 @@ import { Divider } from "antd";
 import styles from "./create-event-modal.module.css";
 
 interface FormSectionProps {
-  title: string;
-  children: React.ReactNode;
+  readonly title: string;
+  readonly children: React.ReactNode;
 }
 
 const FormSection = ({ title, children }: FormSectionProps) => (

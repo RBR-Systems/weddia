@@ -16,6 +16,49 @@ import Statistic from "@/shared/components/AnimatedStatistic/AnimatedStatistic";
 
 type ReportType = "summary" | "category" | "expense" | "vendor";
 
+interface CategoriesSummaryProps {
+  categories: Category[];
+  currency: string;
+  totalRemaining: number;
+  totalLabel: string;
+}
+
+const CategoriesSummary = ({
+  categories,
+  currency,
+  totalRemaining,
+  totalLabel,
+}: CategoriesSummaryProps) => (
+  <Table.Summary>
+    <Table.Summary.Row>
+      <Table.Summary.Cell index={0}>
+        <Text strong>{totalLabel}</Text>
+      </Table.Summary.Cell>
+      <Table.Summary.Cell index={1} align="right">
+        <Text strong>
+          {formatCurrency(
+            categories.reduce((sum: number, c: Category) => sum + c.allocated, 0),
+            currency,
+          )}
+        </Text>
+      </Table.Summary.Cell>
+      <Table.Summary.Cell index={2} align="right">
+        <Text strong>
+          {formatCurrency(
+            categories.reduce((sum: number, c: Category) => sum + c.spent, 0),
+            currency,
+          )}
+        </Text>
+      </Table.Summary.Cell>
+      <Table.Summary.Cell index={3} align="right">
+        <Text strong>{formatCurrency(totalRemaining, currency)}</Text>
+      </Table.Summary.Cell>
+      <Table.Summary.Cell index={4} />
+    </Table.Summary.Row>
+  </Table.Summary>
+);
+
+
 export default function ReportsPage() {
   const { message } = App.useApp();
   const { state } = useBudget();
@@ -62,7 +105,7 @@ export default function ReportsPage() {
   };
 
   const handlePrint = () => {
-    window.print();
+    (globalThis as any).print();
     message.success(t("reports.printDialogOpened"));
   };
 
@@ -204,44 +247,12 @@ export default function ReportsPage() {
               pagination={false}
               size="small"
               summary={() => (
-                <Table.Summary>
-                  <Table.Summary.Row>
-                    <Table.Summary.Cell index={0}>
-                      <Text strong>{t("common.total")}</Text>
-                    </Table.Summary.Cell>
-                    <Table.Summary.Cell index={1} align="right">
-                      <Text strong>
-                        {formatCurrency(
-                          state.categories.reduce(
-                            (sum: number, c: Category) => sum + c.allocated,
-                            0,
-                          ),
-                          state.currency,
-                        )}
-                      </Text>
-                    </Table.Summary.Cell>
-                    <Table.Summary.Cell index={2} align="right">
-                      <Text strong>
-                        {formatCurrency(
-                          state.categories.reduce(
-                            (sum: number, c: Category) => sum + c.spent,
-                            0,
-                          ),
-                          state.currency,
-                        )}
-                      </Text>
-                    </Table.Summary.Cell>
-                    <Table.Summary.Cell index={3} align="right">
-                      <Text strong>
-                        {formatCurrency(
-                          state.summary?.total_remaining || 0,
-                          state.currency,
-                        )}
-                      </Text>
-                    </Table.Summary.Cell>
-                    <Table.Summary.Cell index={4} />
-                  </Table.Summary.Row>
-                </Table.Summary>
+                <CategoriesSummary
+                  categories={state.categories}
+                  currency={state.currency}
+                  totalRemaining={state.summary?.total_remaining || 0}
+                  totalLabel={t("common.total")}
+                />
               )}
             />
           </>

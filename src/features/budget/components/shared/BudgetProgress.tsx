@@ -6,11 +6,11 @@ import { SEMANTIC_CHART_COLORS } from "@/theme/chartColors";
 import { useTheme } from "@/theme/ThemeProvider";
 
 interface BudgetProgressProps {
-  spent: number;
-  allocated: number;
-  currency?: string;
-  showInfo?: boolean;
-  size?: "small" | "default";
+  readonly spent: number;
+  readonly allocated: number;
+  readonly currency?: string;
+  readonly showInfo?: boolean;
+  readonly size?: "small" | "default";
 }
 
 export default function BudgetProgress({

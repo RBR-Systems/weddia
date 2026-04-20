@@ -2,10 +2,10 @@ import { Divider } from "antd";
 import styles from "./header.module.css";
 
 interface HeaderProps {
-  name: string;
-  subheader?: string;
-  items?: string[];
-  align?: "left" | "center";
+  readonly name: string;
+  readonly subheader?: string;
+  readonly items?: string[];
+  readonly align?: "left" | "center";
 }
 
 export default function Header({

@@ -15,7 +15,7 @@ const { Search } = Input;
 const { Text } = Typography;
 
 interface EventVendorsProps {
-  onViewVendor?: (vendor: Vendor) => void;
+  readonly onViewVendor?: (vendor: Vendor) => void;
 }
 
 export default function EventVendors({ onViewVendor }: EventVendorsProps) {

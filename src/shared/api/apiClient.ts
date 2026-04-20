@@ -60,7 +60,7 @@ async function request<T>(
     method,
     headers: authHeaders(),
     signal: options.signal,
-    ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
+    ...(body === undefined ? {} : { body: JSON.stringify(body) }),
   });
 
   if (!res.ok) {

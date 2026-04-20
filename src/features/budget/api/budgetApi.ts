@@ -7,6 +7,16 @@ const CATEGORY_COLORS = [
   "#50E3C2", "#B8E986", "#BD10E0", "#417505", "#F8E71C",
 ];
 
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+function toOptionalStringId(value: number | null | undefined): string | undefined {
+  return value == null ? undefined : String(value);
+}
+
+function toOptionalNumberId(value: string | null | undefined): number | undefined {
+  return value == null ? undefined : Number(value);
+}
+
 // ─── Raw API shapes ──────────────────────────────────────────────────────────
 
 interface ApiCategory { categoryId: number; name: string; description?: string }
@@ -266,7 +276,7 @@ export class BudgetService {
     return items.map((i) => ({
       item_id: String(i.budgetItemId),
       budget_id: String(i.budgetId),
-      category_id: (i.categoryId !== undefined && i.categoryId !== null) ? String(i.categoryId) : undefined,
+      category_id: toOptionalStringId(i.categoryId),
       description: i.description,
       amount: i.amount,
       notes: i.notes ?? "",
@@ -283,7 +293,7 @@ export class BudgetService {
     }
     const item = await apiPost<ApiBudgetItem>(`/api/budgetitems?adminId=1`, {
       budgetId: Number(budgetId),
-      categoryId: (data.category_id !== undefined && data.category_id !== null) ? Number(data.category_id) : undefined,
+      categoryId: toOptionalNumberId(data.category_id),
       description: data.description,
       amount: data.amount,
       notes: data.notes ?? "",
@@ -291,7 +301,7 @@ export class BudgetService {
     return {
       item_id: String(item.budgetItemId),
       budget_id: String(item.budgetId),
-      category_id: (item.categoryId !== undefined && item.categoryId !== null) ? String(item.categoryId) : undefined,
+      category_id: toOptionalStringId(item.categoryId),
       description: item.description,
       amount: item.amount,
       notes: item.notes ?? "",
@@ -304,7 +314,7 @@ export class BudgetService {
   ): Promise<void> {
     await apiPut(`/api/budgetitems/${itemId}?adminId=1`, {
       ...data,
-      categoryId: (data.category_id !== undefined && data.category_id !== null) ? Number(data.category_id) : undefined,
+      categoryId: toOptionalNumberId(data.category_id),
       category_id: undefined,
     }, { silent401: true });
   }

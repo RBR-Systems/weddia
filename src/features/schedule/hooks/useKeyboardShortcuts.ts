@@ -65,8 +65,8 @@ export function useKeyboardShortcuts(
       }
     }
 
-    window.addEventListener("keydown", handleKeyPress);
-    return () => window.removeEventListener("keydown", handleKeyPress);
+    (globalThis as any).addEventListener("keydown", handleKeyPress);
+    return () => (globalThis as any).removeEventListener("keydown", handleKeyPress);
   }, [itemId, handlers, enabled]);
 }
 

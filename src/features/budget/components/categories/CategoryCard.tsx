@@ -7,9 +7,9 @@ import styles from "./CategoryCard.module.css";
 import { useTranslation } from "react-i18next";
 
 interface CategoryCardProps {
-  category: Category;
-  currency?: string;
-  onClick?: (category: Category) => void;
+  readonly category: Category;
+  readonly currency?: string;
+  readonly onClick?: (category: Category) => void;
 }
 
 export default function CategoryCard({

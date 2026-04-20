@@ -45,7 +45,7 @@ export function formatInputNumber(v: string | number | undefined): string {
     grouped += absDigits[i];
   }
   const intFormatted = (negative ? "-" : "") + grouped;
-  return decPart !== undefined ? `${intFormatted}.${decPart}` : intFormatted;
+  return decPart === undefined ? intFormatted : `${intFormatted}.${decPart}`;
 }
 
 /**

@@ -298,11 +298,11 @@ function TableAssignmentContent() {
       </div>
 
       <DragOverlay>
-        {dragOverlayContent != null ? (
+        {dragOverlayContent == null ? null : (
           <div className={styles.dragOverlay}>
             <Typography.Text strong>{dragOverlayContent}</Typography.Text>
           </div>
-        ) : null}
+        )}
       </DragOverlay>
 
       {/* Add Table modal */}

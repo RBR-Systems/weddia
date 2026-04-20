@@ -178,7 +178,7 @@ const ScheduleList: React.FC<Props> = ({
   // Expose the nowItemRef to parent via a data attribute for scrolling
   useEffect(() => {
     if (nowItemRef.current) {
-      (window as any).__timelineNowRef = nowItemRef;
+      (globalThis as any).__timelineNowRef = nowItemRef;
     }
   }, [nowItemRef.current]);
 

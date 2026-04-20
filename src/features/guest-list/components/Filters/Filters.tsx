@@ -11,13 +11,13 @@ interface Relation {
 }
 
 interface FiltersProps {
-  relations: Relation[];
-  value?: {
+  readonly relations: Relation[];
+  readonly value?: {
     query?: string;
     relation_id?: string | null;
     status?: StatusOption;
   };
-  onChange?: (v: {
+  readonly onChange?: (v: {
     query?: string;
     relation_id?: string | null;
     status?: StatusOption;

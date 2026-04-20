@@ -1,3 +1,4 @@
+import { MIN_PARTY_SIZE } from "../constants/tableAssignment.constants";
 import type { SeatingAssignment } from "../models/huggingface.models";
 import type { Guest, Table, TableAssignment } from "../models/tableAssignment.models";
 import { getGuestPartySize, getNextAvailableSeatNumber } from "./table.utils";
@@ -53,6 +54,77 @@ export function applyAiSeating(
   return [...retained, ...newAssignments];
 }
 
+type GetSize = (a: TableAssignment) => number;
+
+function partitionByOverlap(
+  assignments: TableAssignment[],
+  rangeStart: number,
+  rangeEnd: number,
+  getSize: GetSize,
+): { displaced: TableAssignment[]; untouched: TableAssignment[] } {
+  const displaced: TableAssignment[] = [];
+  const untouched: TableAssignment[] = [];
+  for (const a of assignments) {
+    const end = a.seat_number + getSize(a) - 1;
+    if (a.seat_number <= rangeEnd && end >= rangeStart) {
+      displaced.push(a);
+    } else {
+      untouched.push(a);
+    }
+  }
+  return { displaced, untouched };
+}
+
+function buildOccupied(
+  fixed: TableAssignment[],
+  moverStart: number,
+  moverEnd: number,
+  getSize: GetSize,
+): Set<number> {
+  const occupied = new Set<number>();
+  for (const a of fixed) {
+    for (let s = a.seat_number; s < a.seat_number + getSize(a); s += 1) {
+      occupied.add(s);
+    }
+  }
+  for (let s = moverStart; s <= moverEnd; s += 1) {
+    occupied.add(s);
+  }
+  return occupied;
+}
+
+function repackGuests(
+  displaced: TableAssignment[],
+  occupied: Set<number>,
+  capacity: number,
+  getSize: GetSize,
+): TableAssignment[] | null {
+  const sorted = [...displaced].sort((a, b) => a.seat_number - b.seat_number);
+  const repacked: TableAssignment[] = [];
+  let cursor = MIN_PARTY_SIZE;
+  for (const a of sorted) {
+    const size = getSize(a);
+    while (cursor <= capacity - size + 1) {
+      let fits = true;
+      for (let s = cursor; s < cursor + size; s += 1) {
+        if (occupied.has(s)) {
+          fits = false;
+          break;
+        }
+      }
+      if (fits) break;
+      cursor += 1;
+    }
+    if (cursor + size - 1 > capacity) return null;
+    repacked.push({ ...a, seat_number: cursor });
+    for (let s = cursor; s < cursor + size; s += 1) {
+      occupied.add(s);
+    }
+    cursor += size;
+  }
+  return repacked;
+}
+
 /**
  * Moves a guest to a new seat, handling same-table displacement and cross-table moves.
  * Returns the new assignments array, or null if the move is invalid/rejected.
@@ -66,99 +138,46 @@ export function moveGuestSeat(
   const { guestId, tableId, seatNumber: newStart } = payload;
   const guestMap = buildGuestMap(guests);
   const oldAssign = assignments.find((a) => a.guest_id === guestId);
-  const movingSize = guestMap.get(guestId)?.party_size ?? 1;
+  const movingSize = guestMap.get(guestId)?.party_size ?? MIN_PARTY_SIZE;
 
-  const createSimpleMove = (): TableAssignment[] => [
-    ...assignments.filter((a) => a.guest_id !== guestId),
-    { table_id: tableId, guest_id: guestId, seat_number: newStart },
-  ];
-
-  // New or cross-table assignment
+  // New guest or cross-table move — no displacement needed
   if (!oldAssign || oldAssign.table_id !== tableId) {
-    return createSimpleMove();
-  }
-
-  // Same-table move
-  const oldStart = oldAssign.seat_number;
-  if (newStart === oldStart) return null;
-
-  const newEnd = newStart + movingSize - 1;
-  const capacity =
-    tables.find((t) => t.table_id === tableId)?.total_number ?? 0;
-
-  if (newEnd > capacity || newStart < 1) return null;
-
-  const getSizeForGuest = (a: { guest_id: string }) =>
-    guestMap.get(a.guest_id)?.party_size ?? 1;
-
-  const tableAssignments = assignments
-    .filter((a) => a.table_id === tableId)
-    .sort((a, b) => a.seat_number - b.seat_number);
-
-  const otherTableAssignments = assignments.filter(
-    (a) => a.table_id !== tableId,
-  );
-  const rest = tableAssignments.filter((a) => a.guest_id !== guestId);
-
-  // Split into displaced (overlapping mover's new range) and untouched
-  const displaced: TableAssignment[] = [];
-  const untouched: TableAssignment[] = [];
-  for (const a of rest) {
-    const aEnd = a.seat_number + getSizeForGuest(a) - 1;
-    if (a.seat_number <= newEnd && aEnd >= newStart) {
-      displaced.push(a);
-    } else {
-      untouched.push(a);
-    }
-  }
-
-  if (displaced.length === 0) {
     return [
-      ...otherTableAssignments,
-      ...rest,
+      ...assignments.filter((a) => a.guest_id !== guestId),
       { table_id: tableId, guest_id: guestId, seat_number: newStart },
     ];
   }
 
-  // Build occupied-seat set from untouched guests + mover at new position
-  const occupied = new Set<number>();
-  for (const a of untouched) {
-    const aSize = getSizeForGuest(a);
-    for (let s = a.seat_number; s < a.seat_number + aSize; s += 1) {
-      occupied.add(s);
-    }
-  }
-  for (let s = newStart; s <= newEnd; s += 1) {
-    occupied.add(s);
+  if (newStart === oldAssign.seat_number) return null;
+
+  const newEnd = newStart + movingSize - 1;
+  const capacity = tables.find((t) => t.table_id === tableId)?.total_number ?? 0;
+
+  if (newStart < MIN_PARTY_SIZE || newEnd > capacity) return null;
+
+  const getSize: GetSize = (a) => guestMap.get(a.guest_id)?.party_size ?? MIN_PARTY_SIZE;
+
+  const otherTables = assignments.filter((a) => a.table_id !== tableId);
+  const sameTable = assignments
+    .filter((a) => a.table_id === tableId && a.guest_id !== guestId)
+    .sort((a, b) => a.seat_number - b.seat_number);
+
+  const { displaced, untouched } = partitionByOverlap(sameTable, newStart, newEnd, getSize);
+
+  if (displaced.length === 0) {
+    return [
+      ...otherTables,
+      ...sameTable,
+      { table_id: tableId, guest_id: guestId, seat_number: newStart },
+    ];
   }
 
-  // Repack displaced guests into free seats, preserving relative order
-  displaced.sort((a, b) => a.seat_number - b.seat_number);
-  const repacked: TableAssignment[] = [];
-  let cursor = 1;
-  for (const a of displaced) {
-    const aSize = getSizeForGuest(a);
-    while (cursor <= capacity - aSize + 1) {
-      let fits = true;
-      for (let s = cursor; s < cursor + aSize; s += 1) {
-        if (occupied.has(s)) {
-          fits = false;
-          break;
-        }
-      }
-      if (fits) break;
-      cursor += 1;
-    }
-    if (cursor + aSize - 1 > capacity) return null;
-    repacked.push({ ...a, seat_number: cursor });
-    for (let s = cursor; s < cursor + aSize; s += 1) {
-      occupied.add(s);
-    }
-    cursor += aSize;
-  }
+  const occupied = buildOccupied(untouched, newStart, newEnd, getSize);
+  const repacked = repackGuests(displaced, occupied, capacity, getSize);
+  if (repacked === null) return null;
 
   return [
-    ...otherTableAssignments,
+    ...otherTables,
     ...untouched,
     { table_id: tableId, guest_id: guestId, seat_number: newStart },
     ...repacked,

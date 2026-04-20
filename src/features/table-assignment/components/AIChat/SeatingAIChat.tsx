@@ -11,9 +11,9 @@ import { formatTime } from "./utils/seatingAI.utils";
 import { useTranslation } from "react-i18next";
 
 interface SeatingAIChatProps {
-  guests: HFGuest[];
-  tables: HFTable[];
-  onApplySeating: (assignments: SeatingResponse["assignments"]) => void;
+  readonly guests: HFGuest[];
+  readonly tables: HFTable[];
+  readonly onApplySeating: (assignments: SeatingResponse["assignments"]) => void;
 }
 
 const SeatingAIChat: React.FC<SeatingAIChatProps> = ({

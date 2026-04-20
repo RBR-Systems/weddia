@@ -14,8 +14,8 @@ import { useTranslation } from "react-i18next";
 const { Search } = Input;
 
 interface ExpenseListProps {
-  onAddExpense?: () => void;
-  onViewExpense?: (expense: Expense) => void;
+  readonly onAddExpense?: () => void;
+  readonly onViewExpense?: (expense: Expense) => void;
 }
 
 export default function ExpenseList({

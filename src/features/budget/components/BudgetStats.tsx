@@ -177,7 +177,7 @@ export default function BudgetStats() {
       : `${Number.parseFloat((Math.abs(summary.total_remaining / (summary.total_budget || 1)) * 100).toFixed(2))}% ${t("budgetStats.remaining")}`;
   const topCategoryName = topCategory?.budget_name || topCategory?.name || "—";
   const topCategoryTooltip =
-    topCategory != null ? formatCurrency(topCategory.spent ?? 0, currency) : undefined;
+    topCategory == null ? undefined : formatCurrency(topCategory.spent ?? 0, currency);
 
   const handleEditBudget = () => {
     setBudgetInput(summary.total_budget);

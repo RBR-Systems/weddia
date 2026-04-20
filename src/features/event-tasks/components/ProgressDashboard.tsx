@@ -9,9 +9,9 @@ import dayjs from "dayjs";
 const { Text } = Typography;
 
 interface ProgressDashboardProps {
-  tasks: Task[];
-  summary: TaskSummary;
-  categories: TaskCategory[];
+  readonly tasks: Task[];
+  readonly summary: TaskSummary;
+  readonly categories: TaskCategory[];
 }
 
 const avatarColors = [

@@ -9,11 +9,11 @@ import { formatInputNumber } from "@/utils/formatters.utils";
 const { TextArea } = Input;
 
 interface TaskFormModalProps {
-  open: boolean;
-  task?: Task | null;
-  categories: TaskCategory[];
-  onClose: () => void;
-  onSubmit: (values: TaskFormValues) => void;
+  readonly open: boolean;
+  readonly task?: Task | null;
+  readonly categories: TaskCategory[];
+  readonly onClose: () => void;
+  readonly onSubmit: (values: TaskFormValues) => void;
 }
 
 const TaskFormModal: React.FC<TaskFormModalProps> = ({

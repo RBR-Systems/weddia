@@ -13,11 +13,11 @@ import { useTranslation } from "react-i18next";
 const { Title } = Typography;
 
 interface ExpenseDetailsProps {
-  expense: Expense | null;
-  open: boolean;
-  onClose: () => void;
-  onEdit?: (expense: Expense) => void;
-  onDelete?: (expenseId: string) => void;
+  readonly expense: Expense | null;
+  readonly open: boolean;
+  readonly onClose: () => void;
+  readonly onEdit?: (expense: Expense) => void;
+  readonly onDelete?: (expenseId: string) => void;
 }
 
 export default function ExpenseDetails({

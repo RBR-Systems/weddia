@@ -7,8 +7,8 @@ import type { LoginCredentials } from "../models/auth.models";
 import styles from "../LoginPage.module.css";
 
 interface LoginFormProps {
-  onSubmit: (values: LoginCredentials) => Promise<void> | void;
-  loading?: boolean;
+  readonly onSubmit: (values: LoginCredentials) => Promise<void> | void;
+  readonly loading?: boolean;
 }
 
 export const LoginForm: React.FC<LoginFormProps> = ({

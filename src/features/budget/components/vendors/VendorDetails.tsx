@@ -14,9 +14,9 @@ import vendorStyles from "./VendorDetails.module.css";
 const { Title } = Typography;
 
 interface VendorDetailsProps {
-  vendor: Vendor | null;
-  open: boolean;
-  onClose: () => void;
+  readonly vendor: Vendor | null;
+  readonly open: boolean;
+  readonly onClose: () => void;
 }
 
 export default function VendorDetails({

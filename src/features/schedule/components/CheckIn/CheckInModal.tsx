@@ -10,12 +10,12 @@ import styles from "./CheckIn.module.css";
 const { Text, Title } = Typography;
 
 interface CheckInModalProps {
-  open: boolean;
-  guest: CheckInGuest | null;
-  actualPartySize: number;
-  onActualPartySizeChange: (value: number) => void;
-  onConfirm: () => void;
-  onCancel: () => void;
+  readonly open: boolean;
+  readonly guest: CheckInGuest | null;
+  readonly actualPartySize: number;
+  readonly onActualPartySizeChange: (value: number) => void;
+  readonly onConfirm: () => void;
+  readonly onCancel: () => void;
 }
 
 const CheckInModal: React.FC<CheckInModalProps> = ({

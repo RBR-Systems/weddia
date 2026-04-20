@@ -15,10 +15,10 @@ interface NavItem {
 }
 
 interface SidebarProps {
-  collapsed: boolean;
-  currentView: View;
-  onNavigate: (view: View) => void;
-  onToggle: () => void;
+  readonly collapsed: boolean;
+  readonly currentView: View;
+  readonly onNavigate: (view: View) => void;
+  readonly onToggle: () => void;
 }
 
 export default function Sidebar({

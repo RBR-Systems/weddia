@@ -54,26 +54,21 @@ function extractTextFromChoices(choices: unknown[]): string | null {
   return null;
 }
 
-export function extractTextFromResponse(data: unknown): string {
-  if (Array.isArray(data) && data.length > 0) {
-    for (const item of data) {
-      const text = extractTextFromCandidate(item);
-      if (text) return text;
-    }
-  }
-
-  if (isRecord(data) && Array.isArray(data.choices)) {
-    const text = extractTextFromChoices(data.choices as unknown[]);
+function tryExtractFromArray(data: unknown): string | null {
+  if (!Array.isArray(data) || data.length === 0) return null;
+  for (const item of data) {
+    const text = extractTextFromCandidate(item);
     if (text) return text;
   }
+  return null;
+}
 
-  if (isRecord(data)) {
-    const text = extractTextFromCandidate(data);
-    if (text) return text;
-  }
+function tryExtractFromChoices(data: unknown): string | null {
+  if (!isRecord(data) || !Array.isArray(data.choices)) return null;
+  return extractTextFromChoices(data.choices as unknown[]);
+}
 
-  if (typeof data === "string" && data) return data;
-
+function serializeToString(data: unknown): string {
   try {
     return JSON.stringify(data);
   } catch {
@@ -81,57 +76,57 @@ export function extractTextFromResponse(data: unknown): string {
   }
 }
 
+export function extractTextFromResponse(data: unknown): string {
+  if (typeof data === "string" && data) return data;
+
+  return (
+    tryExtractFromArray(data) ??
+    tryExtractFromChoices(data) ??
+    extractTextFromCandidate(data) ??
+    serializeToString(data)
+  );
+}
+
+/** Returns the index of the closing quote, skipping over escape sequences. */
+function findStringEnd(str: string, openIndex: number, quote: string): number {
+  for (let i = openIndex + 1; i < str.length; i++) {
+    if (str[i] === "\\") {
+      i++; // skip escaped character
+      continue;
+    }
+    if (str[i] === quote) return i;
+  }
+  return str.length - 1; // unterminated string: advance to end
+}
+
 /**
  * Linear-time scan that is aware of JSON strings to safely find
  * the first top-level JSON object in arbitrary text.
  */
 export function extractJsonObject(str: string): string | null {
-  let inString = false;
-  let stringChar = "";
-  let escape = false;
   let depth = 0;
   let start = -1;
 
   for (let i = 0; i < str.length; i++) {
     const ch = str[i];
 
-    if (!inString) {
-      if (ch === '"' || ch === "'") {
-        inString = true;
-        stringChar = ch;
-        continue;
-      }
+    if (ch === '"' || ch === "'") {
+      i = findStringEnd(str, i, ch);
+      continue;
+    }
 
-      if (ch === "{") {
-        if (depth === 0) start = i;
-        depth++;
-        continue;
-      }
+    if (ch === "{") {
+      if (depth === 0) start = i;
+      depth++;
+      continue;
+    }
 
-      if (ch === "}") {
-        if (depth > 0) {
-          depth--;
-          if (depth === 0 && start !== -1) {
-            return str.slice(start, i + 1);
-          }
-        }
-        continue;
-      }
-    } else {
-      if (escape) {
-        escape = false;
-        continue;
-      }
-      if (ch === "\\") {
-        escape = true;
-        continue;
-      }
-      if (ch === stringChar) {
-        inString = false;
-        stringChar = "";
-      }
+    if (ch === "}" && depth > 0) {
+      depth--;
+      if (depth === 0 && start !== -1) return str.slice(start, i + 1);
     }
   }
+
   return null;
 }
 

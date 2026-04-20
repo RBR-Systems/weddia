@@ -26,8 +26,8 @@ const PAYMENT_STATUS_CONFIG: Record<
 };
 
 interface StatusBadgeProps {
-  status: BudgetStatus | PaymentStatus;
-  type?: "budget" | "payment";
+  readonly status: BudgetStatus | PaymentStatus;
+  readonly type?: "budget" | "payment";
 }
 
 export default function StatusBadge({

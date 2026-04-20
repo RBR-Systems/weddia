@@ -12,12 +12,12 @@ import styles from "./CategoryDrawer.module.css";
 const { Text } = Typography;
 
 interface CategoryDrawerProps {
-  open: boolean;
-  category: Category | null;
-  currency: string;
-  onClose: () => void;
-  onSave: (id: string, data: { budget_name?: string; budget_notes?: string; allocated?: number }) => Promise<void>;
-  onDelete: (id: string) => void;
+  readonly open: boolean;
+  readonly category: Category | null;
+  readonly currency: string;
+  readonly onClose: () => void;
+  readonly onSave: (id: string, data: { budget_name?: string; budget_notes?: string; allocated?: number }) => Promise<void>;
+  readonly onDelete: (id: string) => void;
 }
 
 // Separate state type for the editing row — no Form needed

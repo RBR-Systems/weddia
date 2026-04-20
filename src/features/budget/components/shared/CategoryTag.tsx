@@ -4,8 +4,8 @@ import { Tag, type TagProps } from "antd";
 import { useTheme } from "@/theme/ThemeProvider";
 
 interface CategoryTagProps extends Omit<TagProps, "color"> {
-  color?: string;
-  children: React.ReactNode;
+  readonly color?: string;
+  readonly children: React.ReactNode;
 }
 
 /**

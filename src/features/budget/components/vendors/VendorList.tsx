@@ -17,7 +17,7 @@ const { Search } = Input;
 const { Text } = Typography;
 
 interface VendorListProps {
-  onViewVendor?: (vendor: Vendor) => void;
+  readonly onViewVendor?: (vendor: Vendor) => void;
 }
 
 export default function VendorList({ onViewVendor }: VendorListProps) {

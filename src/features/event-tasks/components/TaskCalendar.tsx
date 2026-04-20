@@ -10,11 +10,11 @@ import { useTranslation } from "react-i18next";
 const { Text, Title } = Typography;
 
 interface TaskCalendarProps {
-  tasks: Task[];
-  categories: TaskCategory[];
-  onTaskClick: (task: Task) => void;
-  onQuickComplete: (task: Task) => void;
-  onNewTask: () => void;
+  readonly tasks: Task[];
+  readonly categories: TaskCategory[];
+  readonly onTaskClick: (task: Task) => void;
+  readonly onQuickComplete: (task: Task) => void;
+  readonly onNewTask: () => void;
 }
 
 const priorityColors: Record<string, string> = {

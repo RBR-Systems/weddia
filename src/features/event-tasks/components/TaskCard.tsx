@@ -7,10 +7,10 @@ import { useTranslation } from "react-i18next";
 import dayjs from "dayjs";
 
 interface TaskCardProps {
-  task: Task;
-  onClick: (task: Task) => void;
-  onQuickComplete: (task: Task) => void;
-  isOverdue?: boolean;
+  readonly task: Task;
+  readonly onClick: (task: Task) => void;
+  readonly onQuickComplete: (task: Task) => void;
+  readonly isOverdue?: boolean;
 }
 
 const priorityColors: Record<string, string> = {

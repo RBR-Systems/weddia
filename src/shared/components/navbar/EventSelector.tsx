@@ -6,10 +6,10 @@ import styles from "./nav-bar.module.css";
 import type { EventCardProps } from "@/features/events-list/models/eventCardProps.models";
 
 interface EventSelectorProps {
-  selectedEvent: EventCardProps | null;
-  allEvents: EventCardProps[];
-  onMenuClick: MenuProps["onClick"];
-  placeholder?: string;
+  readonly selectedEvent: EventCardProps | null;
+  readonly allEvents: EventCardProps[];
+  readonly onMenuClick: MenuProps["onClick"];
+  readonly placeholder?: string;
 }
 
 const EventSelector: React.FC<EventSelectorProps> = ({

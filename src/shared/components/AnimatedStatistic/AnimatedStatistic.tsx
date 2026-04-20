@@ -5,9 +5,9 @@ import CountUp from "react-countup";
 import { extractNumber, detectDecimals } from "./utils/number.utils";
 
 export type AnimatedStatisticProps = ComponentProps<typeof AntdStatistic> & {
-  durationMs?: number;
-  countUpProps?: Partial<ComponentProps<typeof CountUp>>;
-  disableAnimation?: boolean;
+  readonly durationMs?: number;
+  readonly countUpProps?: Partial<ComponentProps<typeof CountUp>>;
+  readonly disableAnimation?: boolean;
 };
 
 export default function AnimatedStatistic({

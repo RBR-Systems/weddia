@@ -11,7 +11,7 @@ import dayjs from "dayjs";
 const { Title, Text, Paragraph } = Typography;
 
 interface TemplateSelectorProps {
-  onApply: (
+  readonly onApply: (
     template: WeddingTemplate,
     weddingDate: Date,
     includeOptional: boolean,

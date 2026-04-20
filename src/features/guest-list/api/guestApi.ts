@@ -49,7 +49,7 @@ function mapApiGuest(g: ApiGuest): Guest {
     relation_id: String(g.relationId),
     email: g.email ?? undefined,
     phone: g.mobilePhone ?? g.phone ?? undefined,
-    plus_one: g.plusOne != null ? String(g.plusOne) : null,
+    plus_one: g.plusOne == null ? null : String(g.plusOne),
     rsvp_status: status,
     party_size: partySize,
     dietary_restrictions: dietary,
@@ -114,7 +114,7 @@ export async function createGuest(
     relationId: data.relation_id ? Number(data.relation_id) : undefined,
     email: data.email ?? null,
     mobilePhone: data.phone ?? null,
-    plusOne: data.plus_one != null ? Number(data.plus_one) : null,
+    plusOne: data.plus_one == null ? null : Number(data.plus_one),
     rsvpStatus:
       data.rsvp_status === "attending"
         ? "confirmed"

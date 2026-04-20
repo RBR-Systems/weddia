@@ -5,9 +5,9 @@ import styles from "./create-event-modal.module.css";
 import { useTranslation } from "react-i18next";
 
 interface ClientInfoFormProps {
-  title: string;
-  emailPlaceholder: string;
-  phonePlaceholder: string;
+  readonly title: string;
+  readonly emailPlaceholder: string;
+  readonly phonePlaceholder: string;
 }
 
 const ClientInfoForm = ({

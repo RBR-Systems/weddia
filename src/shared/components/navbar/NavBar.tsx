@@ -10,7 +10,7 @@ import { useTranslation } from "react-i18next";
 import { useTheme } from "@/theme/ThemeProvider";
 import type { View } from "@/shared/components/AppShell/models/appShell.models";
 
-type NavBarProps = { currentView?: View };
+type NavBarProps = { readonly currentView?: View };
 
 const NavBarComponent: React.FC<NavBarProps> = () => {
   const { t } = useTranslation();
