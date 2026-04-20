@@ -1,5 +1,5 @@
 "use client";
-import { useState, useCallback } from "react";
+import { useState, useCallback, type Dispatch, type SetStateAction } from "react";
 import {
   getBudgetItems,
   createBudgetItem,
@@ -24,7 +24,7 @@ export interface UseCategoryItemsResult {
   editingItemId: string | null;
   editValues: CategoryItemEditValues;
   isAddingItem: boolean;
-  setEditValues: React.Dispatch<React.SetStateAction<CategoryItemEditValues>>;
+  setEditValues: Dispatch<SetStateAction<CategoryItemEditValues>>;
   setIsAddingItem: (value: boolean) => void;
   fetchItems: (budgetId: string) => Promise<void>;
   startEdit: (item: BudgetItem) => void;

@@ -8,7 +8,7 @@ import type { Vendor } from "@/features/budget/models/budget.models";
 import type { ColumnsType } from "antd/es/table";
 import Card from "@/shared/components/Card/Card";
 import Statistic from "@/shared/components/AnimatedStatistic/AnimatedStatistic";
-import expenseStyles from "@/features/budget/components/ExpenseModal.module.css";
+import expenseStyles from "@/features/budget/components/expenses/ExpenseModal/ExpenseModal.module.css";
 import styles from "@/features/budget/components/vendors/vendor-list.module.css";
 
 const { Search } = Input;

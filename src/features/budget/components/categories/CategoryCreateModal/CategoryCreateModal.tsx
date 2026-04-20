@@ -28,6 +28,8 @@ const CatalogOption = ({ label, description }: CatalogOptionProps) => (
   </Space>
 );
 
+const CATEGORY_CREATE_FORM_STYLE = { marginTop: 8 } as const;
+
 export interface CategoryCreateModalProps {
   readonly open: boolean;
   readonly onClose: () => void;
@@ -105,7 +107,7 @@ export function CategoryCreateModal({
       destroyOnHidden={false}
       forceRender
     >
-      <Form form={form} layout="vertical" style={{ marginTop: 8 }}>
+      <Form form={form} layout="vertical" style={CATEGORY_CREATE_FORM_STYLE}>
         <Form.Item
           name="catalog_category_id"
           label={t("categoryList.catalogCategory")}

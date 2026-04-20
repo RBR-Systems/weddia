@@ -12,11 +12,6 @@ export type PaymentStatus =
   | "partial"
   | "cancelled";
 
-export interface Timestamps {
-  created_at?: string;
-  updated_at?: string;
-}
-
 export interface BudgetSummary {
   total_budget: number;
   total_allocated: number;
@@ -151,11 +146,38 @@ export interface BudgetTemplate {
   created_at: string;
 }
 
+// ── Planner ──────────────────────────────────────────────────────────────────
+
+export type BulkActionModal = 'status' | 'category' | 'delete' | null;
+
+export type ClientStatus = 'on_track' | 'at_risk' | 'over_budget' | 'completed';
+
+export interface ClientBudget {
+  id: string;
+  clientName: string;
+  partnerName?: string;
+  weddingDate: string;
+  totalBudget: number;
+  totalSpent: number;
+  status: ClientStatus;
+  lastUpdated: string;
+  expenseCount: number;
+}
+
 // Catalog (global lookup) category — distinct from a budget Category which has allocation data
 export interface CatalogCategory {
   category_id: string;
   name: string;
   description: string;
+}
+
+export interface CatalogCategoryListProps {
+  readonly loading: boolean;
+  readonly categories: CatalogCategory[];
+  readonly search: string;
+  readonly onCreateClick: () => void;
+  readonly onEditClick: (cat: CatalogCategory) => void;
+  readonly onDeleteConfirm: (cat: CatalogCategory) => void;
 }
 
 export interface BudgetState {
@@ -167,6 +189,51 @@ export interface BudgetState {
   vendors: Vendor[];
   eventVendorIds: string[];
   currency: Currency;
+}
+
+// ── Context ───────────────────────────────────────────────────────────────────
+
+export interface TemplateCategoryRaw {
+  name: string;
+  percentage?: number;
+  allocated?: number;
+  spent?: number;
+  color?: string;
+}
+
+export type CategoryPatchSource = {
+  total_budget?: number;
+  categories?: TemplateCategoryRaw[];
+};
+
+export type BudgetAction =
+  | { type: "SET_LOADING"; payload: boolean }
+  | { type: "SET_ERROR"; payload: string | null }
+  | { type: "SET_DATA"; payload: Partial<BudgetState> }
+  | { type: "ADD_EXPENSE"; payload: Expense }
+  | { type: "UPDATE_EXPENSE"; payload: { id: string; data: Partial<Expense> } }
+  | { type: "DELETE_EXPENSE"; payload: string }
+  | { type: "ADD_CATEGORY"; payload: Category }
+  | { type: "UPDATE_CATEGORY"; payload: { id: string; data: Partial<Category> } }
+  | { type: "DELETE_CATEGORY"; payload: string }
+  | { type: "UPDATE_BUDGET"; payload: number }
+  | { type: "SET_EVENT_VENDOR_IDS"; payload: string[] };
+
+export interface BudgetContextValue {
+  state: BudgetState;
+  loadBudgetData: (eid: number, signal?: AbortSignal) => Promise<void>;
+  refreshData: () => Promise<void>;
+  addExpense: (payload: Omit<Expense, "expense_id">) => void;
+  updateExpense: (id: string, data: Partial<Expense>) => void;
+  deleteExpense: (expenseId: string) => void;
+  addCategory: (category: Category) => void;
+  updateCategory: (id: string, data: Partial<Category>) => Promise<void>;
+  deleteCategory: (categoryId: string) => void;
+  updateBudget: (totalBudget: number) => void;
+  loadTemplate: (template: CategoryPatchSource) => void;
+  loadEstimate: (estimate: CategoryPatchSource) => void;
+  assignVendor: (vendorId: string) => void;
+  unassignVendor: (vendorId: string) => void;
 }
 
 // ── Analytics ────────────────────────────────────────────────────────────────

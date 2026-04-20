@@ -1,2 +1,2 @@
-export { default as ExpenseList } from "./ExpenseList";
-export { default as ExpenseDetails } from "./ExpenseDetails";
+export { ExpenseList } from "./ExpenseList/ExpenseList";
+export { ExpenseDetails } from "./ExpenseDetails/ExpenseDetails";

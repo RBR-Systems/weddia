@@ -1,0 +1,25 @@
+.statsRow {
+  margin-bottom: 16px;
+}
+
+.budgetCell {
+  min-width: 200px;
+}
+
+.budgetAmounts {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.secondaryText {
+  font-size: 12px;
+}
+
+.searchInput {
+  width: 200px;
+}
+
+.statusFilter {
+  width: 150px;
+}

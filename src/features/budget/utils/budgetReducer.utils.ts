@@ -1,4 +1,4 @@
-import type { BudgetState, BudgetSummary, Category, Expense } from '../models/budget.models';
+import type { BudgetAction, BudgetState, BudgetSummary, Category, Expense } from '../models/budget.models';
 import { computeSpentSummary, computeAllocatedTotal } from './budget.utils';
 
 const withSpentUpdate = (state: BudgetState, totalSpent: number): BudgetState => ({
@@ -113,4 +113,21 @@ export const handleUpdateBudget = (state: BudgetState, totalBudget: number): Bud
     ...computeSpentSummary(totalBudget, state.summary?.total_spent ?? 0),
   },
 });
+
+export const budgetReducer = (state: BudgetState, action: BudgetAction): BudgetState => {
+  switch (action.type) {
+    case "SET_LOADING":          return { ...state, isLoading: action.payload };
+    case "SET_ERROR":            return { ...state, error: action.payload };
+    case "SET_DATA":             return { ...state, ...action.payload };
+    case "ADD_EXPENSE":          return handleAddExpense(state, action.payload);
+    case "DELETE_EXPENSE":       return handleDeleteExpense(state, action.payload);
+    case "UPDATE_EXPENSE":       return handleUpdateExpense(state, action.payload.id, action.payload.data);
+    case "ADD_CATEGORY":         return handleAddCategory(state, action.payload);
+    case "UPDATE_CATEGORY":      return handleUpdateCategory(state, action.payload.id, action.payload.data);
+    case "DELETE_CATEGORY":      return handleDeleteCategory(state, action.payload);
+    case "UPDATE_BUDGET":        return handleUpdateBudget(state, action.payload);
+    case "SET_EVENT_VENDOR_IDS": return { ...state, eventVendorIds: action.payload };
+    default:                     return state;
+  }
+};
 

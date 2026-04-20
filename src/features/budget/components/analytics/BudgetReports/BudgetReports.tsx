@@ -8,6 +8,8 @@ import { useTranslation } from "react-i18next";
 import { useBudget } from "../../../contexts/BudgetContext";
 import { formatCurrency, formatDate } from "@/shared/utils/formatters.utils";
 import type { Category, Expense, ReportType, CategoriesSummaryProps } from "../../../models/budget.models";
+import { REPORT_TABLE_PAGE_SIZE, REPORT_DATE_FORMAT, REPORT_CATEGORY_CSV_HEADERS } from "../../../constants/budget.constants";
+import { CSV_HEADERS, CSV_MIME_TYPE } from "../../../constants/planner.constants";
 import reportStyles from "./BudgetReports.module.css";
 import Statistic from "@/shared/components/AnimatedStatistic/AnimatedStatistic";
 
@@ -94,7 +96,7 @@ export default function ReportsPage() {
     let csvContent = "";
 
     if (reportType === "expense") {
-      csvContent = "Description,Amount,Category,Vendor,Date,Status\n";
+      csvContent = `${CSV_HEADERS.join(',')}\n`;
       filteredExpenses.forEach((e: Expense) => {
         const cat = state.categories.find(
           (c: Category) => c.id === e.category_id,
@@ -102,17 +104,17 @@ export default function ReportsPage() {
         csvContent += `"${e.description}",${e.amount},"${cat?.name || ""}","${e.vendor_name || ""}","${e.expense_date}","${e.payment_status}"\n`;
       });
     } else if (reportType === "category") {
-      csvContent = "Category,Allocated,Spent,Remaining,Expenses\n";
+      csvContent = `${REPORT_CATEGORY_CSV_HEADERS}\n`;
       state.categories.forEach((c: Category) => {
         csvContent += `"${c.name}",${c.allocated},${c.spent},${c.allocated - c.spent},${c.expense_count || 0}\n`;
       });
     }
 
-    const blob = new Blob([csvContent], { type: "text/csv" });
+    const blob = new Blob([csvContent], { type: CSV_MIME_TYPE });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `budget-report-${reportType}-${dayjs().format("YYYY-MM-DD")}.csv`;
+    a.download = `budget-report-${reportType}-${dayjs().format(REPORT_DATE_FORMAT)}.csv`;
     a.click();
     URL.revokeObjectURL(url);
     message.success(t("reports.exportedCSV"));
@@ -275,7 +277,7 @@ export default function ReportsPage() {
               columns={categoryColumns}
               dataSource={state.categories}
               rowKey="id"
-              pagination={{ pageSize: 10 }}
+              pagination={{ pageSize: REPORT_TABLE_PAGE_SIZE }}
             />
           </>
         )}
@@ -328,7 +330,7 @@ export default function ReportsPage() {
               columns={expenseColumns}
               dataSource={filteredExpenses}
               rowKey="expense_id"
-              pagination={{ pageSize: 10 }}
+              pagination={{ pageSize: REPORT_TABLE_PAGE_SIZE }}
             />
           </>
         )}

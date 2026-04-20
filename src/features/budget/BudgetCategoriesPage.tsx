@@ -1,144 +1,35 @@
 "use client";
-import { useEffect, useState, useMemo } from "react";
-import { Button, Input, Modal, Form, Tooltip, Empty, Spin, App, Popconfirm } from "antd";
-import { PlusOutlined, EditOutlined, DeleteOutlined, TagsOutlined } from "@ant-design/icons";
-import { CategoriesService, type BudgetCategory } from "./api/categoriesApi";
+
+import { useState, useMemo } from "react";
+import { Button, Input, Modal, Form, App } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
+import { useCatalogCategories } from "./hooks/useCatalogCategories";
+import { CatalogCategoryList } from "./components/categories/CatalogCategoryList/CatalogCategoryList";
+import type { CatalogCategory } from "./models/budget.models";
 import styles from "./BudgetCategoriesPage.module.css";
 
-interface CategoryListContentProps {
-  loading: boolean;
-  filtered: BudgetCategory[];
-  search: string;
-  onCreateClick: () => void;
-  onEditClick: (cat: BudgetCategory) => void;
-  onDeleteConfirm: (cat: BudgetCategory) => void;
-}
-
-function CategoryListContent({
-  loading,
-  filtered,
-  search,
-  onCreateClick,
-  onEditClick,
-  onDeleteConfirm,
-}: CategoryListContentProps) {
-  const { t } = useTranslation();
-
-  if (loading) {
-    return (
-      <div className={styles.emptyWrap}>
-        <Spin />
-      </div>
-    );
-  }
-
-  if (filtered.length === 0) {
-    return (
-      <div className={styles.emptyWrap}>
-        <Empty
-          image={Empty.PRESENTED_IMAGE_SIMPLE}
-          description={search ? t("budgetCategories.noResults") : t("budgetCategories.empty")}
-        >
-          {!search && (
-            <Button type="primary" icon={<PlusOutlined />} onClick={onCreateClick}>
-              {t("budgetCategories.newCategory")}
-            </Button>
-          )}
-        </Empty>
-      </div>
-    );
-  }
-
-  return (
-    <div className={styles.list}>
-      {filtered.map((cat) => (
-        <div key={cat.category_id} className={styles.categoryCard}>
-          <div className={styles.categoryIcon}>
-            <TagsOutlined />
-          </div>
-          <div className={styles.categoryInfo}>
-            <span className={styles.categoryName}>{cat.name}</span>
-            {cat.description ? (
-              <span className={styles.categoryDesc}>{cat.description}</span>
-            ) : (
-              <span className={styles.categoryDesc} style={{ fontStyle: "italic" }}>
-                {t("budgetCategories.noDescription")}
-              </span>
-            )}
-          </div>
-          <div className={styles.categoryActions}>
-            <Tooltip title={t("common.edit")}>
-              <Button
-                type="text"
-                size="small"
-                icon={<EditOutlined />}
-                onClick={() => onEditClick(cat)}
-              />
-            </Tooltip>
-            <Popconfirm
-              title={t("budgetCategories.deleteConfirmTitle")}
-              description={t("budgetCategories.deleteConfirmDesc", { name: cat.name })}
-              onConfirm={() => onDeleteConfirm(cat)}
-              okText={t("common.delete")}
-              cancelText={t("common.cancel")}
-              okButtonProps={{ danger: true }}
-            >
-              <Tooltip title={t("common.delete")}>
-                <Button
-                  type="text"
-                  size="small"
-                  danger
-                  icon={<DeleteOutlined />}
-                />
-              </Tooltip>
-            </Popconfirm>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
+const CATEGORY_FORM_STYLE = { marginTop: 8 } as const;
 
 export default function BudgetCategoriesPage() {
   const { t } = useTranslation();
   const { message } = App.useApp();
+  const { catalogCategories, isLoading, createCategory, updateCategory, deleteCategory } =
+    useCatalogCategories();
 
-  const [categories, setCategories] = useState<BudgetCategory[]>([]);
-  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-
-  // Modal state
   const [modalOpen, setModalOpen] = useState(false);
-  const [editing, setEditing] = useState<BudgetCategory | null>(null);
+  const [editing, setEditing] = useState<CatalogCategory | null>(null);
   const [saving, setSaving] = useState(false);
   const [form] = Form.useForm();
 
-  useEffect(() => {
-    load();
-  }, []);
-
-  async function load() {
-    setLoading(true);
-    try {
-      const data = await CategoriesService.getAll();
-      setCategories(data);
-    } catch {
-      message.error(t("budgetCategories.loadError"));
-    } finally {
-      setLoading(false);
-    }
-  }
-
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-    if (!q) return categories;
-    return categories.filter(
-      (c) =>
-        c.name.toLowerCase().includes(q) ||
-        c.description.toLowerCase().includes(q),
+    if (!q) return catalogCategories;
+    return catalogCategories.filter(
+      (c) => c.name.toLowerCase().includes(q) || c.description.toLowerCase().includes(q),
     );
-  }, [categories, search]);
+  }, [catalogCategories, search]);
 
   function openCreate() {
     setEditing(null);
@@ -146,7 +37,7 @@ export default function BudgetCategoriesPage() {
     setModalOpen(true);
   }
 
-  function openEdit(cat: BudgetCategory) {
+  function openEdit(cat: CatalogCategory) {
     setEditing(cat);
     form.setFieldsValue({ name: cat.name, description: cat.description });
     setModalOpen(true);
@@ -157,18 +48,10 @@ export default function BudgetCategoriesPage() {
       const values = await form.validateFields();
       setSaving(true);
       if (editing) {
-        await CategoriesService.update(editing.category_id, values.name, values.description ?? "");
-        setCategories((prev) =>
-          prev.map((c) =>
-            c.category_id === editing.category_id
-              ? { ...c, name: values.name, description: values.description ?? "" }
-              : c,
-          ),
-        );
+        await updateCategory(editing.category_id, values.name, values.description ?? "");
         message.success(t("budgetCategories.updatedSuccess"));
       } else {
-        const created = await CategoriesService.create(values.name, values.description ?? "");
-        setCategories((prev) => [...prev, created]);
+        await createCategory(values.name, values.description ?? "");
         message.success(t("budgetCategories.createdSuccess"));
       }
       setModalOpen(false);
@@ -180,25 +63,22 @@ export default function BudgetCategoriesPage() {
     }
   }
 
-  async function handleDelete(cat: BudgetCategory) {
+  async function handleDelete(cat: CatalogCategory) {
     try {
-      await CategoriesService.remove(cat.category_id);
-      setCategories((prev) => prev.filter((c) => c.category_id !== cat.category_id));
+      await deleteCategory(cat.category_id);
       message.success(t("budgetCategories.deletedSuccess"));
     } catch {
       message.error(t("budgetCategories.deleteError"));
     }
   }
 
-
   return (
     <div className={styles.page}>
-      {/* Header */}
       <div className={styles.header}>
         <div className={styles.titleBlock}>
           <h1 className={styles.title}>{t("budgetCategories.title")}</h1>
           <span className={styles.subtitle}>
-            {t("budgetCategories.subtitle", { count: categories.length })}
+            {t("budgetCategories.subtitle", { count: catalogCategories.length })}
           </span>
         </div>
         <Button type="primary" icon={<PlusOutlined />} onClick={openCreate}>
@@ -206,7 +86,6 @@ export default function BudgetCategoriesPage() {
         </Button>
       </div>
 
-      {/* Search */}
       <div className={styles.searchRow}>
         <Input.Search
           className={styles.searchInput}
@@ -217,17 +96,15 @@ export default function BudgetCategoriesPage() {
         />
       </div>
 
-      {/* List */}
-      <CategoryListContent
-        loading={loading}
-        filtered={filtered}
+      <CatalogCategoryList
+        loading={isLoading}
+        categories={filtered}
         search={search}
         onCreateClick={openCreate}
         onEditClick={openEdit}
         onDeleteConfirm={handleDelete}
       />
 
-      {/* Create / Edit modal */}
       <Modal
         open={modalOpen}
         title={editing ? t("budgetCategories.editTitle") : t("budgetCategories.createTitle")}
@@ -238,7 +115,7 @@ export default function BudgetCategoriesPage() {
         confirmLoading={saving}
         destroyOnHidden
       >
-        <Form form={form} layout="vertical" style={{ marginTop: 8 }}>
+        <Form form={form} layout="vertical" style={CATEGORY_FORM_STYLE}>
           <Form.Item
             name="name"
             label={t("budgetCategories.fieldName")}
@@ -250,10 +127,7 @@ export default function BudgetCategoriesPage() {
               showCount
             />
           </Form.Item>
-          <Form.Item
-            name="description"
-            label={t("budgetCategories.fieldDescription")}
-          >
+          <Form.Item name="description" label={t("budgetCategories.fieldDescription")}>
             <Input.TextArea
               placeholder={t("budgetCategories.descriptionPlaceholder")}
               rows={3}

@@ -1,6 +1,6 @@
 import i18next from "i18next";
 import { CHART_COLORS } from "@/theme/chartColors";
-import type { EstimateCategory, WeddingStyle, BudgetTemplate } from '../models/budget.models';
+import type { BudgetState, Currency, EstimateCategory, PaymentStatus, WeddingStyle, BudgetTemplate } from '../models/budget.models';
 
 export const getDefaultCategories = () => [
   {
@@ -47,15 +47,45 @@ export const CURRENCIES = {
 } as const;
 
 export const DEFAULT_CURRENCY = "USD";
+export const EMPTY_VALUE_DISPLAY = "—";
 export const DATE_DISPLAY_LOCALE = "en-US" as const;
 export const ADMIN_QUERY_PARAM = "adminId=1";
 export const BUDGET_STATUS_AT_RISK_PERCENT = 80;
 export const BUDGET_STATUS_OVER_PERCENT = 100;
 
+export const PAYMENT_STATUS_DISPLAY: Record<PaymentStatus, { labelKey: string; color: string }> = {
+  paid: { labelKey: "common.paid", color: "success" },
+  pending: { labelKey: "common.pending", color: "warning" },
+  overdue: { labelKey: "common.overdue", color: "error" },
+  partial: { labelKey: "common.partial", color: "processing" },
+  cancelled: { labelKey: "common.cancelled", color: "default" },
+};
+
 export const CATEGORY_COLORS = [
   "#4A90E2", "#7ED321", "#F5A623", "#D0021B", "#9013FE",
   "#50E3C2", "#B8E986", "#BD10E0", "#417505", "#F8E71C",
 ] as const;
+
+// ── Vendors ──────────────────────────────────────────────────────────────────
+
+export const VENDOR_TABLE_PAGE_SIZE = 10;
+export const VENDOR_DETAILS_PAGE_SIZE = 5;
+export const VENDOR_DRAWER_WIDTH = 600;
+
+// ── Payment ──────────────────────────────────────────────────────────────────
+
+export const UPCOMING_PAYMENT_DAYS = 7;
+export const CALENDAR_CELL_MAX_ITEMS = 3;
+export const PAYMENT_TABLE_PAGE_SIZE = 10;
+export const ALL_STATUSES_FILTER = "all" as const;
+
+export const getPaymentMethodOptions = () => [
+  { value: "Credit Card",   label: i18next.t("expenseModal.paymentMethods.creditCard") },
+  { value: "Bank Transfer", label: i18next.t("expenseModal.paymentMethods.bankTransfer") },
+  { value: "Cash",          label: i18next.t("expenseModal.paymentMethods.cash") },
+  { value: "Check",         label: i18next.t("expenseModal.paymentMethods.check") },
+  { value: "Other",         label: i18next.t("expenseModal.paymentMethods.other") },
+];
 
 // ── Advanced Feature Thresholds ──────────────────────────────────────────────
 
@@ -138,6 +168,38 @@ export const STYLE_MULTIPLIERS: Record<
   luxury: { label: "Luxury", multiplier: 2.5, perGuest: 500 },
 };
 
+// ── Expense List ─────────────────────────────────────────────────────────────
+
+export const EXPENSE_TABLE_PAGE_SIZE = 10;
+export const EXPENSE_TABLE_SCROLL = { x: 800 } as const;
+
+// ── Expense Modal ─────────────────────────────────────────────────────────────
+
+export const EXPENSE_MODAL_WIDTH = 520;
+
+// ── Reports ───────────────────────────────────────────────────────────────────
+
+export const REPORT_TABLE_PAGE_SIZE = 10;
+export const REPORT_DATE_FORMAT = "YYYY-MM-DD" as const;
+export const REPORT_CATEGORY_CSV_HEADERS = "Category,Allocated,Spent,Remaining,Expenses" as const;
+
+// ── Charts ────────────────────────────────────────────────────────────────────
+
+export const CHART_LABEL_MAX_CHARS = 10;
+
+// ── Templates ─────────────────────────────────────────────────────────────────
+
+export const TEMPLATE_MAX_PREVIEW_CATEGORIES = 3;
+export const TEMPLATE_PREVIEW_MODAL_WIDTH = 500;
+
+// ── Budget Stats ──────────────────────────────────────────────────────────────
+
+export const REMAINING_WARNING_RATIO = 0.2;
+
+// ── Category List ─────────────────────────────────────────────────────────────
+
+export const CATEGORY_SEARCH_WIDTH = 200;
+
 // ── Budget Templates ─────────────────────────────────────────────────────────
 
 export const DEFAULT_TEMPLATES: BudgetTemplate[] = [
@@ -190,3 +252,32 @@ export const DEFAULT_TEMPLATES: BudgetTemplate[] = [
     created_at: "2026-01-01",
   },
 ];
+
+// ── Initial State ─────────────────────────────────────────────────────────────
+
+export const BUDGET_INITIAL_STATE: BudgetState = {
+  isLoading: false,
+  error: null,
+  summary: {
+    total_budget: 0,
+    total_allocated: 0,
+    total_spent: 0,
+    total_remaining: 0,
+    percentage_spent: 0,
+    status: "not_started",
+    currency: DEFAULT_CURRENCY as Currency,
+  },
+  categories: getDefaultCategories().map((c) => ({
+    id: c.id,
+    name: c.name,
+    allocated: 0,
+    spent: 0,
+    remaining: 0,
+    color: c.color,
+    expense_count: 0,
+  })),
+  expenses: [],
+  vendors: [],
+  eventVendorIds: [],
+  currency: DEFAULT_CURRENCY as Currency,
+};

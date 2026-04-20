@@ -9,6 +9,7 @@ import CategoryDrawer from "../CategoryDrawer/CategoryDrawer";
 import { CategoryCreateModal } from "../CategoryCreateModal/CategoryCreateModal";
 import type { Category } from "../../../models/budget.models";
 import { useTranslation } from "react-i18next";
+import { CATEGORY_SEARCH_WIDTH } from "../../../constants/budget.constants";
 
 const { Search } = Input;
 
@@ -83,7 +84,7 @@ export default function CategoryList() {
               allowClear
               onSearch={setSearchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              style={{ width: 200 }}
+              style={{ width: CATEGORY_SEARCH_WIDTH }}
             />
             <Button
               type="primary"

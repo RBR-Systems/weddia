@@ -6,8 +6,8 @@ import { DashboardOutlined, UnorderedListOutlined, AppstoreOutlined, TeamOutline
 import { BudgetProvider, useBudget } from "./contexts/BudgetContext";
 
 // Dashboard components
-import BudgetStats from "./components/BudgetStats";
-import ExpenseModal from "./components/ExpenseModal";
+import BudgetStats from "./components/dashboard/BudgetStats/BudgetStats";
+import ExpenseModal from "./components/expenses/ExpenseModal/ExpenseModal";
 
 // Feature components
 import { CategoryList } from "./components/categories";
@@ -18,8 +18,9 @@ import type { Vendor, Expense } from "./models/budget.models";
 import { PaymentStatus, PaymentCalendar } from "./components/payments";
 import BudgetCharts from "./components/analytics/BudgetCharts/BudgetCharts";
 import BudgetReports from "./components/analytics/BudgetReports/BudgetReports";
-import { BudgetTemplates, BudgetEstimator, ActivityLog, Notifications } from "./components/advanced";
-import { BulkOperations } from "./components/planner";
+import { BudgetTemplates, BudgetEstimator, ActivityLog } from "./components/tools";
+import Notifications from "./components/notifications/Notifications/Notifications";
+import { BulkOperations } from "./components/bulk";
 import dashboardStyles from "./BudgetPage.module.css";
 import { useTranslation } from "react-i18next";
 

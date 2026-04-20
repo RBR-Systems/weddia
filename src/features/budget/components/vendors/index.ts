@@ -1,4 +1,2 @@
-﻿export { default as VendorList } from "./VendorList";
-export { default as VendorDetails } from "./VendorDetails";
-export { default as EventVendors } from "./EventVendors";
-export type { Vendor } from "../../models/budget.models";
+export { default as VendorDetails } from "./VendorDetails/VendorDetails";
+export { default as EventVendors } from "./EventVendors/EventVendors";

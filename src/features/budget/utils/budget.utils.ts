@@ -1,9 +1,22 @@
 import { getRandomId } from '@/shared/utils/rng';
 import dayjs from 'dayjs';
 import { formatCurrency } from '@/shared/utils/formatters.utils';
-import type { ActivityItem, BudgetNotification, BudgetSummary, Category, Currency, Expense } from '../models/budget.models';
+import type { ActivityItem, BudgetNotification, BudgetSummary, Category, Currency, Expense, PaymentStatus, TemplateCategoryRaw } from '../models/budget.models';
 import { OVER_BUDGET_THRESHOLD_PERCENT, BUDGET_WARNING_THRESHOLD_PERCENT, CATEGORY_WARNING_THRESHOLD } from '../constants/budget.constants';
 import type { BudgetDataAPI } from '../models/api.models';
+
+type BadgeStatus = 'success' | 'warning' | 'error' | 'processing' | 'default';
+
+const PAYMENT_STATUS_BADGE_MAP: Record<PaymentStatus, BadgeStatus> = {
+  paid:      'success',
+  pending:   'warning',
+  overdue:   'error',
+  partial:   'processing',
+  cancelled: 'default',
+};
+
+export const getPaymentStatusBadge = (status: PaymentStatus): BadgeStatus =>
+  PAYMENT_STATUS_BADGE_MAP[status] ?? 'default';
 
 export const generateBudgetId = (): string => getRandomId('id_');
 
@@ -20,14 +33,6 @@ export const computeSpentSummary = (
 
 export const computeAllocatedTotal = (categories: Category[]): number =>
   categories.reduce((sum, c) => sum + (c.allocated ?? 0), 0);
-
-export interface TemplateCategoryRaw {
-  name: string;
-  percentage?: number;
-  allocated?: number;
-  spent?: number;
-  color?: string;
-}
 
 export const mergeTemplateCategories = (
   templateCats: TemplateCategoryRaw[],
@@ -106,6 +111,17 @@ export const mapApiDataToBudgetState = (
       expense_count: v.expense_count ?? 0,
     })),
     currency: data.budget.currency as Currency,
+  };
+};
+
+export const hexToRgb = (hex: string): { r: number; g: number; b: number } | null => {
+  const sanitized = hex.replace("#", "");
+  const match = /^([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(sanitized);
+  if (!match) return null;
+  return {
+    r: Number.parseInt(match[1], 16),
+    g: Number.parseInt(match[2], 16),
+    b: Number.parseInt(match[3], 16),
   };
 };
 

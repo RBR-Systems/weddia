@@ -10,7 +10,7 @@ import { formatCurrency } from "@/shared/utils/formatters.utils";
 import type { Category, Expense, ChartTooltipProps, ChartTooltipEntry } from "../../../models/budget.models";
 import { CHART_COLORS, COMPARISON_COLORS, SEMANTIC_CHART_COLORS, resolveChartColor } from "@/theme/chartColors";
 import { useTheme } from "@/theme/ThemeProvider";
-import { DATE_DISPLAY_LOCALE } from "../../../constants/budget.constants";
+import { DATE_DISPLAY_LOCALE, CHART_LABEL_MAX_CHARS } from "../../../constants/budget.constants";
 import styles from "./BudgetCharts.module.css";
 
 export const CustomTooltip: FC<ChartTooltipProps> = ({ active, payload, label, currency }) => {
@@ -52,7 +52,7 @@ export default function BudgetCharts() {
   );
 
   const budgetVsActualData = state.categories.map((c: Category) => ({
-    name: c.name.length > 10 ? c.name.substring(0, 10) + "..." : c.name,
+    name: c.name.length > CHART_LABEL_MAX_CHARS ? c.name.substring(0, CHART_LABEL_MAX_CHARS) + "..." : c.name,
     fullName: c.name,
     allocated: c.allocated,
     spent: c.spent,
