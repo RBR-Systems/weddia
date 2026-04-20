@@ -26,7 +26,7 @@ const NavBarComponent: React.FC<NavBarProps> = () => {
     (e: Parameters<NonNullable<MenuProps["onClick"]>>[0]) => {
       dispatch({
         type: EventActions.SET_SELECTED_EVENT,
-        payload: parseInt(e.key as string),
+        payload: Number.parseInt(e.key as string),
       });
     },
     [dispatch],

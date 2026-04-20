@@ -26,19 +26,17 @@ export default function CategoryCard({
   const displayName = budget_name || name;
   const subtitle = budget_notes || null;
 
-  const progressColor =
-    percentage >= 100
-      ? "var(--status-canceled)"
-      : percentage >= 80
-      ? "var(--status-delayed)"
-      : accent;
+  const progressColor = (() => {
+    if (percentage >= 100) return "var(--status-canceled)";
+    if (percentage >= 80) return "var(--status-delayed)";
+    return accent;
+  })();
 
-  const badgeClass =
-    percentage >= 100
-      ? styles.danger
-      : percentage >= 80
-      ? styles.warning
-      : "";
+  const badgeClass = (() => {
+    if (percentage >= 100) return styles.danger;
+    if (percentage >= 80) return styles.warning;
+    return "";
+  })();
 
   return (
     <button type="button" className={styles.card} onClick={() => onClick?.(category)}>

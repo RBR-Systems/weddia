@@ -16,9 +16,9 @@ function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
   const match = /^([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(sanitized);
   if (!match) return null;
   return {
-    r: parseInt(match[1], 16),
-    g: parseInt(match[2], 16),
-    b: parseInt(match[3], 16),
+    r: Number.parseInt(match[1], 16),
+    g: Number.parseInt(match[2], 16),
+    b: Number.parseInt(match[3], 16),
   };
 }
 
@@ -40,7 +40,7 @@ export default function CategoryTag({
   const { mode } = useTheme();
 
   // No color, or an Ant Design preset/status name (no '#') → pass through
-  if (!color || !color.startsWith("#")) {
+  if (!color?.startsWith("#")) {
     return (
       <Tag color={color} style={style} {...rest}>
         {children}

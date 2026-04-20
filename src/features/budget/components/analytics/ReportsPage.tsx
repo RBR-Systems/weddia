@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { App, Card, Row, Col, Button, Select, DatePicker, Space, Table, Divider, Typography } from "antd";
 import { PrinterOutlined, FileExcelOutlined } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
@@ -59,6 +59,8 @@ const CategoriesSummary = ({
 );
 
 
+const percentFormatter = (value: number | string): string => String(value);
+
 export default function ReportsPage() {
   const { message } = App.useApp();
   const { state } = useBudget();
@@ -66,6 +68,23 @@ export default function ReportsPage() {
   const [reportType, setReportType] = useState<ReportType>("summary");
   const [dateRange, setDateRange] = useState<[dayjs.Dayjs, dayjs.Dayjs] | null>(
     null,
+  );
+
+  const currencyFormatter = useCallback(
+    (value: number | string) => formatCurrency(Number(value), state.currency),
+    [state.currency],
+  );
+
+  const categoriesSummary = useCallback(
+    () => (
+      <CategoriesSummary
+        categories={state.categories}
+        currency={state.currency}
+        totalRemaining={state.summary?.total_remaining || 0}
+        totalLabel={t("common.total")}
+      />
+    ),
+    [state.categories, state.currency, state.summary?.total_remaining, t],
   );
 
   const filteredExpenses = dateRange
@@ -226,11 +245,7 @@ export default function ReportsPage() {
                     <Statistic
                       title={item.label}
                       value={item.isPercent ? item.value : Number(item.value)}
-                      formatter={(value: number | string) =>
-                        item.isPercent
-                          ? String(value)
-                          : formatCurrency(Number(value), state.currency)
-                      }
+                      formatter={item.isPercent ? percentFormatter : currencyFormatter}
                     />
                   </Card>
                 </Col>
@@ -246,14 +261,7 @@ export default function ReportsPage() {
               rowKey="id"
               pagination={false}
               size="small"
-              summary={() => (
-                <CategoriesSummary
-                  categories={state.categories}
-                  currency={state.currency}
-                  totalRemaining={state.summary?.total_remaining || 0}
-                  totalLabel={t("common.total")}
-                />
-              )}
+              summary={categoriesSummary}
             />
           </>
         )}
@@ -297,9 +305,7 @@ export default function ReportsPage() {
                     (sum: number, e: Expense) => sum + e.amount,
                     0,
                   )}
-                  formatter={(value: number | string) =>
-                    formatCurrency(Number(value), state.currency)
-                  }
+                  formatter={currencyFormatter}
                 />
               </Col>
               <Col span={8}>
@@ -313,9 +319,7 @@ export default function ReportsPage() {
                         ) / filteredExpenses.length
                       : 0
                   }
-                  formatter={(value: number | string) =>
-                    formatCurrency(Number(value), state.currency)
-                  }
+                  formatter={currencyFormatter}
                 />
               </Col>
             </Row>

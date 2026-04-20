@@ -65,11 +65,14 @@ export default function EventVendors({ onViewVendor }: EventVendorsProps) {
     {
       title: t("vendorList.columns.status"),
       key: "status",
-      render: (_, record) => (
-        <Tag color={record.is_active !== false ? "green" : "default"}>
-          {record.is_active !== false ? t("vendorList.active") : t("vendorList.inactive")}
-        </Tag>
-      ),
+      render: (_, record) => {
+        const isActive = record.is_active ?? true;
+        return (
+          <Tag color={isActive ? "green" : "default"}>
+            {isActive ? t("vendorList.active") : t("vendorList.inactive")}
+          </Tag>
+        );
+      },
     },
     {
       title: t("vendorList.columns.expenses"),
@@ -92,16 +95,20 @@ export default function EventVendors({ onViewVendor }: EventVendorsProps) {
         <Switch
           checked={state.eventVendorIds.includes(record.vendor_id)}
           onChange={(checked) => {
-            if (!checked) {
-              const hasExpenses = state.expenses.some(
-                (e: { vendor_name?: string }) => e.vendor_name === record.name,
-              );
-              if (hasExpenses) {
-                message.warning(t("eventVendors.cannotUnassign"));
-                return;
-              }
+            if (checked) {
+              assignVendor(record.vendor_id);
+              return;
             }
-            if (checked) { assignVendor(record.vendor_id); } else { unassignVendor(record.vendor_id); }
+
+            const hasExpenses = state.expenses.some(
+              (e: { vendor_name?: string }) => e.vendor_name === record.name,
+            );
+            if (hasExpenses) {
+              message.warning(t("eventVendors.cannotUnassign"));
+              return;
+            }
+
+            unassignVendor(record.vendor_id);
           }}
         />
       ),

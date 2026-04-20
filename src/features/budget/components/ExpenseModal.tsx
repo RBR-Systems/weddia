@@ -34,11 +34,11 @@ function ChipGroup({
   options,
   value,
   onChange,
-}: {
-  options: { value: string; icon: React.ReactNode; cls?: string; labelKey: string }[];
+}: Readonly<{
+  options: ReadonlyArray<{ value: string; icon: React.ReactNode; cls?: string; labelKey: string }>;
   value?: string;
   onChange?: (v: string) => void;
-}) {
+}>) {
   const { t } = useTranslation();
   return (
     <div className={styles.chipGroup}>

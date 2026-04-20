@@ -83,7 +83,7 @@ function reducer(state: BudgetState, action: Action): BudgetState {
 
 const BudgetContext = createContext<any>(null);
 
-export function BudgetProvider({ children }: { children: React.ReactNode }) {
+export function BudgetProvider({ children }: Readonly<{ children: React.ReactNode }>) {
   const [state, dispatch] = useReducer(reducer, initialState);
   const { state: { events: { selectedEvent } }, dispatch: eventDispatch } = useEvent();
   const eventId = (selectedEvent as any)?.id ?? 1;

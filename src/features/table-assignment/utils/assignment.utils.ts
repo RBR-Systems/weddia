@@ -93,6 +93,25 @@ function buildOccupied(
   return occupied;
 }
 
+function seatsAreFree(start: number, size: number, occupied: ReadonlySet<number>): boolean {
+  for (let s = start; s < start + size; s += 1) {
+    if (occupied.has(s)) return false;
+  }
+  return true;
+}
+
+function findFirstFit(
+  startCursor: number,
+  size: number,
+  occupied: ReadonlySet<number>,
+  capacity: number,
+): number | null {
+  for (let cursor = startCursor; cursor <= capacity - size + 1; cursor += 1) {
+    if (seatsAreFree(cursor, size, occupied)) return cursor;
+  }
+  return null;
+}
+
 function repackGuests(
   displaced: TableAssignment[],
   occupied: Set<number>,
@@ -102,26 +121,19 @@ function repackGuests(
   const sorted = [...displaced].sort((a, b) => a.seat_number - b.seat_number);
   const repacked: TableAssignment[] = [];
   let cursor = MIN_PARTY_SIZE;
+
   for (const a of sorted) {
     const size = getSize(a);
-    while (cursor <= capacity - size + 1) {
-      let fits = true;
-      for (let s = cursor; s < cursor + size; s += 1) {
-        if (occupied.has(s)) {
-          fits = false;
-          break;
-        }
-      }
-      if (fits) break;
-      cursor += 1;
-    }
-    if (cursor + size - 1 > capacity) return null;
-    repacked.push({ ...a, seat_number: cursor });
-    for (let s = cursor; s < cursor + size; s += 1) {
+    const seat = findFirstFit(cursor, size, occupied, capacity);
+    if (seat === null) return null;
+
+    repacked.push({ ...a, seat_number: seat });
+    for (let s = seat; s < seat + size; s += 1) {
       occupied.add(s);
     }
-    cursor += size;
+    cursor = seat + size;
   }
+
   return repacked;
 }
 

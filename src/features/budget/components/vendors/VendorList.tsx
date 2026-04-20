@@ -91,17 +91,22 @@ export default function VendorList({ onViewVendor }: VendorListProps) {
       key: "contact",
       render: (_, record) => (
         <Space orientation="vertical" size={0}>
-          {record.email && (
-            <Text className={styles["smallText"]}>
-              <MailOutlined /> {record.email}
-            </Text>
+          {(record.email || record.phone) ? (
+            <>
+              {record.email && (
+                <Text className={styles["smallText"]}>
+                  <MailOutlined /> {record.email}
+                </Text>
+              )}
+              {record.phone && (
+                <Text className={styles["smallText"]}>
+                  <PhoneOutlined /> {record.phone}
+                </Text>
+              )}
+            </>
+          ) : (
+            <Text type="secondary">—</Text>
           )}
-          {record.phone && (
-            <Text className={styles["smallText"]}>
-              <PhoneOutlined /> {record.phone}
-            </Text>
-          )}
-          {!record.email && !record.phone && <Text type="secondary">—</Text>}
         </Space>
       ),
     },
@@ -124,11 +129,14 @@ export default function VendorList({ onViewVendor }: VendorListProps) {
       title: t("vendorList.columns.status"),
       dataIndex: "status",
       key: "status",
-      render: (_: unknown, record: Vendor) => (
-        <Tag color={record.is_active !== false ? "green" : "default"}>
-          {record.is_active !== false ? t("vendorList.active") : t("vendorList.inactive")}
-        </Tag>
-      ),
+      render: (_: unknown, record: Vendor) => {
+        const isActive = record.is_active ?? true;
+        return (
+          <Tag color={isActive ? "green" : "default"}>
+            {isActive ? t("vendorList.active") : t("vendorList.inactive")}
+          </Tag>
+        );
+      },
     },
     {
       title: t("vendorList.columns.actions"),
@@ -187,7 +195,7 @@ export default function VendorList({ onViewVendor }: VendorListProps) {
           <Card size="small">
             <Statistic
               title={t("vendorList.activeVendors")}
-              value={vendors.filter((v) => v.is_active !== false).length}
+              value={vendors.filter((v) => v.is_active ?? true).length}
             />
           </Card>
         </Col>

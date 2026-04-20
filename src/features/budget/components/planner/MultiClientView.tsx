@@ -140,43 +140,47 @@ export default function MultiClientView({
     {
       title: t("common.budget"),
       key: "budget",
-      render: (_, record) => (
-        <div style={{ minWidth: 200 }}>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              marginBottom: 4,
-            }}
-          >
-            <Text>{formatCurrency(record.totalSpent, "USD")}</Text>
-            <Text type="secondary">
-              / {formatCurrency(record.totalBudget, "USD")}
-            </Text>
+      render: (_, record) => {
+        const percent = Math.min(
+          Math.round((record.totalSpent / record.totalBudget) * 100),
+          100,
+        );
+
+        const progressStatus = (() => {
+          if (record.status === "over_budget") return "exception";
+          if (record.status === "at_risk") return "normal";
+          return "success";
+        })();
+
+        const strokeColor = (() => {
+          if (record.status === "over_budget") return semantic.error;
+          if (record.status === "at_risk") return semantic.warning;
+          return semantic.success;
+        })();
+
+        return (
+          <div style={{ minWidth: 200 }}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                marginBottom: 4,
+              }}
+            >
+              <Text>{formatCurrency(record.totalSpent, "USD")}</Text>
+              <Text type="secondary">
+                / {formatCurrency(record.totalBudget, "USD")}
+              </Text>
+            </div>
+            <Progress
+              percent={percent}
+              status={progressStatus}
+              size="small"
+              strokeColor={strokeColor}
+            />
           </div>
-          <Progress
-            percent={Math.min(
-              Math.round((record.totalSpent / record.totalBudget) * 100),
-              100,
-            )}
-            status={
-              record.status === "over_budget"
-                ? "exception"
-                : record.status === "at_risk"
-                  ? "normal"
-                  : "success"
-            }
-            size="small"
-            strokeColor={
-              record.status === "over_budget"
-                ? semantic.error
-                : record.status === "at_risk"
-                  ? semantic.warning
-                  : semantic.success
-            }
-          />
-        </div>
-      ),
+        );
+      },
     },
     {
       title: t("common.status"),

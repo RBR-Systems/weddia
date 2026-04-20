@@ -1,6 +1,6 @@
 "use client";
 import { formatInputNumber, parseInputNumber } from "@/shared/utils/formatters.utils";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, ReactNode } from "react";
 import { App, Row, Col, Card, Button, Empty, Input, Space, Modal, Form, InputNumber, Select, Typography } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { useBudget } from "../../contexts/BudgetContext";
@@ -14,6 +14,19 @@ import { CategoriesService, type BudgetCategory } from "@/features/budget/api/ca
 
 const { Search } = Input;
 const { Text } = Typography;
+
+interface CatalogOptionProps { label?: ReactNode; description?: string; }
+
+const CatalogOption = ({ label, description }: CatalogOptionProps) => (
+  <Space orientation="vertical" size={0}>
+    <span>{label}</span>
+    {description && (
+      <Text type="secondary" style={{ fontSize: 12 }}>
+        {description}
+      </Text>
+    )}
+  </Space>
+);
 
 export default function CategoryList() {
   const { message } = App.useApp();
@@ -184,16 +197,7 @@ export default function CategoryList() {
               placeholder={t("categoryList.selectCategoryPlaceholder")}
               loading={catalogLoading}
               options={availableCatalogOptions}
-              optionRender={(option) => (
-                <Space orientation="vertical" size={0}>
-                  <span>{option.label}</span>
-                  {option.data.description && (
-                    <Text type="secondary" style={{ fontSize: 12 }}>
-                      {option.data.description}
-                    </Text>
-                  )}
-                </Space>
-              )}
+              optionRender={(option) => <CatalogOption label={option.label} description={option.data?.description} /> }
               notFoundContent={t("categoryList.allCategoriesBudgeted")}
               showSearch
               filterOption={(input, option) =>

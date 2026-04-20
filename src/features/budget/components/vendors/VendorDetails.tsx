@@ -42,6 +42,8 @@ export default function VendorDetails({
     .filter((e: Expense) => e.payment_status === "pending")
     .reduce((sum: number, e: Expense) => sum + e.amount, 0);
 
+  const isActive = vendor.is_active ?? true;
+
   const expenseColumns = [
     {
       title: t("vendorDetails.columns.description"),
@@ -92,8 +94,8 @@ export default function VendorDetails({
             <Title level={4} className={vendorStyles.vendorName}>
               {vendor.name}
             </Title>
-            <Tag color={vendor.is_active !== false ? "green" : "default"}>
-              {vendor.is_active !== false ? t("vendorList.active") : t("vendorList.inactive")}
+            <Tag color={isActive ? "green" : "default"}>
+              {isActive ? t("vendorList.active") : t("vendorList.inactive")}
             </Tag>
           </div>
         </Space>
