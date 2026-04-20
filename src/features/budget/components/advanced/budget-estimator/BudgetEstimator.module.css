@@ -28,3 +28,7 @@
 .marginTop {
   margin-top: var(--spacing-sm);
 }
+
+.categoryRow {
+  padding: var(--spacing-xs) 0;
+}

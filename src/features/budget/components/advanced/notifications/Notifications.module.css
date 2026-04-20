@@ -1,40 +1,33 @@
 .fullWidth {
   width: 100%;
 }
-
 .notificationItemUnread {
   background-color: var(--status-completed-bg);
   padding: var(--spacing-md);
   border-radius: var(--radius-sm);
   margin-bottom: var(--spacing-sm);
 }
-
 .notificationItemRead {
   background-color: transparent;
   padding: var(--spacing-ms) var(--spacing-md);
   border-radius: var(--radius-sm);
   margin-bottom: var(--spacing-sm);
 }
-
 .notificationIcon {
   font-size: var(--fs-xl);
   margin: var(--spacing-sm);
 }
-
 .notificationTimestamp {
   font-size: var(--fs-2xs);
 }
-
 .settingRow {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
-
 .settingDescription {
   font-size: var(--fs-2xs);
 }
-
 .settingDivider {
   margin: var(--spacing-sm) 0;
 }

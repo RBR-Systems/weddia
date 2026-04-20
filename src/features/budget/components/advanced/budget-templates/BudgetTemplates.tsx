@@ -3,78 +3,17 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { App, Card, Row, Col, Button, Modal, Form, Input, Flex, Typography, Tag, Space, Popconfirm } from "antd";
 import { SaveOutlined, DownloadOutlined, DeleteOutlined } from "@ant-design/icons";
-import { useBudget } from "../../contexts/BudgetContext";
+import { useBudget } from "../../../contexts/BudgetContext";
 import { formatCurrency } from "@/shared/utils/formatters.utils";
-import type { Category } from "../../models/budget.models";
-import CategoryTag from "../shared/CategoryTag";
+import type { Category } from "../../../models/budget.models";
+import type { BudgetTemplate } from "../../../models/budget.models";
+import CategoryTag from "../../shared/CategoryTag";
 import { CHART_COLORS, resolveChartColor } from "@/theme/chartColors";
 import { useTheme } from "@/theme/ThemeProvider";
+import { DEFAULT_TEMPLATES } from "../../../constants/budget.constants";
+import templateStyles from "./BudgetTemplates.module.css";
 
 const { Title, Text, Paragraph } = Typography;
-
-interface BudgetTemplate {
-  id: string;
-  name: string;
-  description: string;
-  total_budget: number;
-  categories: Array<{
-    name: string;
-    percentage: number;
-    color: string;
-  }>;
-  created_at: string;
-}
-
-const DEFAULT_TEMPLATES: BudgetTemplate[] = [
-  {
-    id: "classic",
-    name: "Classic Wedding",
-    description: "Traditional wedding budget allocation",
-    total_budget: 30000,
-    categories: [
-      { name: "Venue", percentage: 40, color: CHART_COLORS.light[0] },
-      { name: "Catering", percentage: 25, color: CHART_COLORS.light[1] },
-      { name: "Photography", percentage: 10, color: CHART_COLORS.light[4] },
-      { name: "Flowers", percentage: 8, color: CHART_COLORS.light[7] },
-      { name: "Music", percentage: 7, color: CHART_COLORS.light[6] },
-      { name: "Attire", percentage: 5, color: CHART_COLORS.light[5] },
-      { name: "Other", percentage: 5, color: CHART_COLORS.light[11] },
-    ],
-    created_at: "2026-01-01",
-  },
-  {
-    id: "intimate",
-    name: "Intimate Celebration",
-    description: "Smaller guest list, higher quality focus",
-    total_budget: 15000,
-    categories: [
-      { name: "Venue & Catering", percentage: 50, color: CHART_COLORS.light[0] },
-      { name: "Photography", percentage: 15, color: CHART_COLORS.light[4] },
-      { name: "Flowers & Decor", percentage: 15, color: CHART_COLORS.light[7] },
-      { name: "Attire", percentage: 10, color: CHART_COLORS.light[5] },
-      { name: "Music", percentage: 10, color: CHART_COLORS.light[6] },
-    ],
-    created_at: "2026-01-01",
-  },
-  {
-    id: "luxury",
-    name: "Luxury Wedding",
-    description: "Premium vendors and full-service planning",
-    total_budget: 100000,
-    categories: [
-      { name: "Venue", percentage: 30, color: CHART_COLORS.light[0] },
-      { name: "Catering & Bar", percentage: 20, color: CHART_COLORS.light[1] },
-      { name: "Photography & Video", percentage: 12, color: CHART_COLORS.light[4] },
-      { name: "Flowers & Decor", percentage: 12, color: CHART_COLORS.light[7] },
-      { name: "Entertainment", percentage: 10, color: CHART_COLORS.light[6] },
-      { name: "Attire & Beauty", percentage: 8, color: CHART_COLORS.light[5] },
-      { name: "Stationery", percentage: 3, color: CHART_COLORS.light[2] },
-      { name: "Transportation", percentage: 3, color: CHART_COLORS.light[9] },
-      { name: "Miscellaneous", percentage: 2, color: CHART_COLORS.light[11] },
-    ],
-    created_at: "2026-01-01",
-  },
-];
 
 export default function BudgetTemplates() {
   const { message } = App.useApp();
@@ -124,11 +63,11 @@ export default function BudgetTemplates() {
   };
 
   const handleDeleteTemplate = (templateId: string) => {
-    if (DEFAULT_TEMPLATES.some((t) => t.id === templateId)) {
+    if (DEFAULT_TEMPLATES.some((tmpl) => tmpl.id === templateId)) {
       message.error(t("budgetTemplates.cannotDeleteDefault"));
       return;
     }
-    setTemplates(templates.filter((t) => t.id !== templateId));
+    setTemplates(templates.filter((tmpl) => tmpl.id !== templateId));
     message.success(t("budgetTemplates.templateDeleted"));
   };
 
@@ -169,7 +108,7 @@ export default function BudgetTemplates() {
                   >
                     {t("common.apply")}
                   </Button>,
-                  !DEFAULT_TEMPLATES.some((t) => t.id === template.id) && (
+                  !DEFAULT_TEMPLATES.some((tmpl) => tmpl.id === template.id) && (
                     <Popconfirm
                       key="delete"
                       title={t("budgetTemplates.deleteConfirm")}
@@ -187,33 +126,26 @@ export default function BudgetTemplates() {
                   ),
                 ].filter(Boolean)}
               >
-                <Title level={5} style={{ marginBottom: 4 }}>
+                <Title level={5} className={templateStyles.templateName}>
                   {template.name}
                 </Title>
-                <Text type="secondary" style={{ fontSize: 12 }}>
+                <Text type="secondary" className={templateStyles.templateDescription}>
                   {template.description}
                 </Text>
-                <div style={{ marginTop: 12 }}>
+                <div className={templateStyles.templateBudgetRow}>
                   <Text strong>
                     {formatCurrency(template.total_budget, state.currency)}
                   </Text>
-                  <Text type="secondary" style={{ marginLeft: 8 }}>
+                  <Text type="secondary" className={templateStyles.categoryCount}>
                     • {t("budgetTemplates.categories", { count: template.categories.length })}
                   </Text>
                 </div>
-                <div
-                  style={{
-                    marginTop: 8,
-                    gap: 6,
-                    display: "flex",
-                    flexWrap: "wrap",
-                  }}
-                >
-                  {template.categories.slice(0, 3).map((cat, idx) => (
+                <div className={templateStyles.templateTags}>
+                  {template.categories.slice(0, 3).map((cat) => (
                     <CategoryTag
                       key={cat.name}
                       color={resolveChartColor(cat.color, mode)}
-                      style={{ marginBottom: 4 }}
+                      className={templateStyles.tagSpacing}
                     >
                       {cat.name} ({cat.percentage}%)
                     </CategoryTag>
@@ -252,7 +184,7 @@ export default function BudgetTemplates() {
           </Form.Item>
         </Form>
 
-        <div style={{ marginTop: 16 }}>
+        <div className={templateStyles.templateIncludesSection}>
           <Text type="secondary">{t("budgetTemplates.willInclude")}</Text>
           <Flex vertical gap={4}>
             {state.categories.map((cat: Category) => (
@@ -280,7 +212,7 @@ export default function BudgetTemplates() {
         width={500}
       >
         {previewTemplate && (
-          <Space orientation="vertical" style={{ width: "100%" }}>
+          <Space orientation="vertical" className={templateStyles.fullWidth}>
             <Paragraph>{previewTemplate.description}</Paragraph>
             <div>
               <Text strong>{t("budgetTemplates.suggestedBudget")}</Text>
@@ -295,7 +227,7 @@ export default function BudgetTemplates() {
                   <CategoryTag color={resolveChartColor(cat.color, mode)}>{cat.name}</CategoryTag>
                   <span>
                     <Text>{cat.percentage}%</Text>
-                    <Text type="secondary" style={{ marginLeft: 8 }}>
+                    <Text type="secondary" className={templateStyles.previewCategoryAmount}>
                       ({formatCurrency((previewTemplate.total_budget * cat.percentage) / 100, state.currency)})
                     </Text>
                   </span>

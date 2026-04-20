@@ -597,8 +597,12 @@ src/
 ├── features/                     # Feature-based organization (Vertical Slices)
 │   ├── authentication/
 │   │   ├── components/
-│   │   │   ├── LoginForm.tsx
-│   │   │   └── RegisterForm.tsx
+│   │   │   ├── LoginForm/
+│   │   │   │   ├── LoginForm.tsx
+│   │   │   │   └── LoginForm.module.css
+│   │   │   └── RegisterForm/
+│   │   │       ├── RegisterForm.tsx
+│   │   │       └── RegisterForm.module.css
 │   │   ├── hooks/
 │   │   │   ├── useAuth.ts
 │   │   │   └── useSession.ts
@@ -611,9 +615,15 @@ src/
 │   │
 │   ├── products/
 │   │   ├── components/
-│   │   │   ├── ProductCard.tsx
-│   │   │   ├── ProductList.tsx
-│   │   │   └── ProductFilters.tsx
+│   │   │   ├── ProductCard/
+│   │   │   │   ├── ProductCard.tsx
+│   │   │   │   └── ProductCard.module.css
+│   │   │   ├── ProductList/
+│   │   │   │   ├── ProductList.tsx
+│   │   │   │   └── ProductList.module.css
+│   │   │   └── ProductFilters/
+│   │   │       ├── ProductFilters.tsx
+│   │   │       └── ProductFilters.module.css
 │   │   ├── hooks/
 │   │   │   ├── useProducts.ts
 │   │   │   └── useProductFilters.ts

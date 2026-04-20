@@ -1,5 +1,5 @@
 import { Divider } from "antd";
-import styles from "./create-event-modal.module.css";
+import styles from "../create-event-modal.module.css";
 
 interface FormSectionProps {
   readonly title: string;

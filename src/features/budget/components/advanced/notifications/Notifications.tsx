@@ -4,31 +4,13 @@ import { useTranslation } from "react-i18next";
 import { Card, Switch, Typography, Space, Tag, Badge, Button, Empty, Divider, Row, Col } from "antd";
 import { BellOutlined, ExclamationCircleOutlined, WarningOutlined, ClockCircleOutlined, DeleteOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
-import { useBudget } from "../../contexts/BudgetContext";
+import { useBudget } from "../../../contexts/BudgetContext";
 import { formatCurrency } from "@/shared/utils/formatters.utils";
 import notifStyles from "./Notifications.module.css";
+import type { BudgetNotification, Category, Expense, NotificationSettings, NotificationType } from "../../../models/budget.models";
+import { OVER_BUDGET_THRESHOLD_PERCENT, BUDGET_WARNING_THRESHOLD_PERCENT, CATEGORY_WARNING_THRESHOLD } from "../../../constants/budget.constants";
 
 const { Text } = Typography;
-
-type NotificationType = "warning" | "alert" | "reminder" | "info";
-
-interface Notification {
-  id: string;
-  type: NotificationType;
-  title: string;
-  message: string;
-  timestamp: string;
-  read: boolean;
-  actionUrl?: string;
-}
-
-interface NotificationSettings {
-  budgetAlerts: boolean;
-  paymentReminders: boolean;
-  categoryWarnings: boolean;
-  weeklyDigest: boolean;
-  emailNotifications: boolean;
-}
 
 const NOTIFICATION_CONFIG: Record<
   NotificationType,
@@ -44,12 +26,10 @@ export default function NotificationsPanel() {
   const { state } = useBudget();
   const { t } = useTranslation();
 
-  // Generate notifications based on budget state
-  const [notifications, setNotifications] = useState<Notification[]>(() => {
-    const notifs: Notification[] = [];
+  const [notifications, setNotifications] = useState<BudgetNotification[]>(() => {
+    const notifs: BudgetNotification[] = [];
 
-    // Check for over-budget categories
-    state.categories.forEach((cat: any) => {
+    state.categories.forEach((cat: Category) => {
       if (cat.spent > cat.allocated && cat.allocated > 0) {
         notifs.push({
           id: `over_${cat.id}`,
@@ -59,7 +39,7 @@ export default function NotificationsPanel() {
           timestamp: dayjs().toISOString(),
           read: false,
         });
-      } else if (cat.allocated > 0 && cat.spent / cat.allocated > 0.8) {
+      } else if (cat.allocated > 0 && cat.spent / cat.allocated > CATEGORY_WARNING_THRESHOLD) {
         notifs.push({
           id: `warn_${cat.id}`,
           type: "warning",
@@ -71,9 +51,8 @@ export default function NotificationsPanel() {
       }
     });
 
-    // Check for pending payments
     const pendingExpenses = state.expenses.filter(
-      (e: any) => e.payment_status === "pending",
+      (e: Expense) => e.payment_status === "pending",
     );
     if (pendingExpenses.length > 0) {
       notifs.push({
@@ -81,7 +60,7 @@ export default function NotificationsPanel() {
         type: "reminder",
         title: t("notifications.pendingPayments"),
         message: t("notifications.pendingPaymentsMsg", { count: pendingExpenses.length, amount: formatCurrency(
-          pendingExpenses.reduce((sum: number, e: any) => sum + e.amount, 0),
+          pendingExpenses.reduce((sum: number, e: Expense) => sum + e.amount, 0),
           state.currency,
         ) }),
         timestamp: dayjs().toISOString(),
@@ -89,9 +68,8 @@ export default function NotificationsPanel() {
       });
     }
 
-    // Overall budget check
     const percentSpent = state.summary?.percentage_spent || 0;
-    if (percentSpent > 90) {
+    if (percentSpent > OVER_BUDGET_THRESHOLD_PERCENT) {
       notifs.push({
         id: "budget_critical",
         type: "alert",
@@ -103,7 +81,7 @@ export default function NotificationsPanel() {
         timestamp: dayjs().toISOString(),
         read: false,
       });
-    } else if (percentSpent > 75) {
+    } else if (percentSpent > BUDGET_WARNING_THRESHOLD_PERCENT) {
       notifs.push({
         id: "budget_warning",
         type: "warning",
@@ -114,7 +92,6 @@ export default function NotificationsPanel() {
       });
     }
 
-    // Add some info notifications
     notifs.push({
       id: "welcome",
       type: "info",
@@ -311,5 +288,3 @@ export default function NotificationsPanel() {
     </Row>
   );
 }
-
-

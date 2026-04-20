@@ -1,7 +1,7 @@
 import { MailOutlined, PhoneOutlined } from "@ant-design/icons";
 import { Form, Input } from "antd";
 import { useState } from "react";
-import styles from "./create-event-modal.module.css";
+import styles from "../create-event-modal.module.css";
 import { useTranslation } from "react-i18next";
 
 interface ClientInfoFormProps {

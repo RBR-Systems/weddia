@@ -1,0 +1,78 @@
+import { apiGet, apiPost, apiPut, apiDelete } from "@/shared/api/apiClient";
+import type { Vendor } from "../models/budget.models";
+import type { ApiVendor } from "../models/apiRaw.models";
+import { ADMIN_QUERY_PARAM } from "../constants/budget.constants";
+
+function mapVendor(v: ApiVendor): Vendor {
+  return {
+    vendor_id:     String(v.vendorId),
+    name:          v.vendorName,
+    category:      v.category,
+    contact_name:  v.contactPerson ?? "",
+    email:         v.email ?? "",
+    phone:         v.mobilePhone ?? v.phone ?? "",
+    address:       v.address ?? "",
+    notes:         v.notes ?? "",
+    rating:        v.rating,
+    is_active:     v.isActive,
+    total_spent:   0,
+    expense_count: 0,
+  };
+}
+
+export async function getVendors(): Promise<Vendor[]> {
+  const vendors = await apiGet<ApiVendor[]>("/api/vendors");
+  return vendors.map(mapVendor);
+}
+
+export async function createVendor(data: {
+  vendorName: string;
+  category: string;
+  contactPerson?: string;
+  email?: string;
+  mobilePhone?: string;
+  address?: string;
+  notes?: string;
+  rating?: number;
+}): Promise<Vendor> {
+  const created = await apiPost<ApiVendor>(`/api/vendors?${ADMIN_QUERY_PARAM}`, {
+    vendorName:    data.vendorName,
+    category:      data.category,
+    contactPerson: data.contactPerson ?? null,
+    email:         data.email ?? null,
+    mobilePhone:   data.mobilePhone ?? null,
+    address:       data.address ?? null,
+    notes:         data.notes ?? null,
+    rating:        data.rating ?? 0,
+    isActive:      true,
+  });
+  return { vendor_id: String(created.vendorId), name: created.vendorName };
+}
+
+export async function updateVendor(vendorId: string, data: {
+  vendorName: string;
+  category: string;
+  contactPerson?: string;
+  email?: string;
+  mobilePhone?: string;
+  address?: string;
+  notes?: string;
+  rating?: number;
+  isActive?: boolean;
+}): Promise<void> {
+  await apiPut(`/api/vendors/${vendorId}?${ADMIN_QUERY_PARAM}`, {
+    vendorName:    data.vendorName,
+    category:      data.category,
+    contactPerson: data.contactPerson ?? null,
+    email:         data.email ?? null,
+    mobilePhone:   data.mobilePhone ?? null,
+    address:       data.address ?? null,
+    notes:         data.notes ?? null,
+    rating:        data.rating ?? 0,
+    isActive:      data.isActive ?? true,
+  });
+}
+
+export async function deleteVendor(vendorId: string): Promise<void> {
+  await apiDelete(`/api/vendors/${vendorId}`);
+}

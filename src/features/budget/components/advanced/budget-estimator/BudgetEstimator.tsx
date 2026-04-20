@@ -3,96 +3,23 @@ import { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Card, Row, Col, InputNumber, Slider, Typography, Space, Select, Divider, Flex, Button, Alert, App } from "antd";
 import { BulbOutlined, CalculatorOutlined } from "@ant-design/icons";
-import { useBudget } from "../../contexts/BudgetContext";
+import { useBudget } from "../../../contexts/BudgetContext";
 import { formatCurrency, formatInputNumber, parseInputNumber } from "@/shared/utils/formatters.utils";
 import Statistic from "@/shared/components/AnimatedStatistic/AnimatedStatistic";
-import CategoryTag from "../shared/CategoryTag";
-import { CHART_COLORS, SEMANTIC_CHART_COLORS, resolveChartColor } from "@/theme/chartColors";
+import CategoryTag from "../../shared/CategoryTag";
+import { SEMANTIC_CHART_COLORS, resolveChartColor } from "@/theme/chartColors";
 import { useTheme } from "@/theme/ThemeProvider";
+import { ESTIMATE_CATEGORIES, STYLE_MULTIPLIERS } from "../../../constants/budget.constants";
+import type { WeddingStyle } from "../../../models/budget.models";
+import estimatorStyles from "./BudgetEstimator.module.css";
 
 const { Text } = Typography;
 
-interface EstimateCategory {
-  name: string;
-  percentage: number;
-  color: string;
-  description: string;
-}
+const AMOUNT_FORMATTER = (value: string | number | undefined): string =>
+  `$ ${formatInputNumber(value)}`;
 
-const ESTIMATE_CATEGORIES: EstimateCategory[] = [
-  {
-    name: "Venue",
-    percentage: 30,
-    color: CHART_COLORS.light[0], // Blue
-    description: "Reception hall, ceremony site, rentals",
-  },
-  {
-    name: "Catering & Bar",
-    percentage: 25,
-    color: CHART_COLORS.light[1], // Green
-    description: "Food, drinks, cake, service staff",
-  },
-  {
-    name: "Photography & Video",
-    percentage: 12,
-    color: CHART_COLORS.light[4], // Purple
-    description: "Photographer, videographer, albums",
-  },
-  {
-    name: "Flowers & Decor",
-    percentage: 8,
-    color: CHART_COLORS.light[7], // Pink
-    description: "Bouquets, centerpieces, decorations",
-  },
-  {
-    name: "Music & Entertainment",
-    percentage: 7,
-    color: CHART_COLORS.light[6], // Orange
-    description: "DJ, band, lighting, games",
-  },
-  {
-    name: "Attire & Beauty",
-    percentage: 6,
-    color: CHART_COLORS.light[5], // Cyan
-    description: "Dress, suit, hair, makeup",
-  },
-  {
-    name: "Stationery",
-    percentage: 3,
-    color: CHART_COLORS.light[2], // Amber
-    description: "Invitations, programs, signage",
-  },
-  {
-    name: "Transportation",
-    percentage: 3,
-    color: CHART_COLORS.light[9], // Indigo
-    description: "Limo, shuttle, valet",
-  },
-  {
-    name: "Favors & Gifts",
-    percentage: 2,
-    color: CHART_COLORS.light[10], // Lime
-    description: "Guest gifts, wedding party gifts",
-  },
-  {
-    name: "Miscellaneous",
-    percentage: 4,
-    color: CHART_COLORS.light[11], // Violet
-    description: "Tips, insurance, unexpected costs",
-  },
-];
-
-type WeddingStyle = "budget" | "moderate" | "upscale" | "luxury";
-
-const STYLE_MULTIPLIERS: Record<
-  WeddingStyle,
-  { label: string; multiplier: number; perGuest: number }
-> = {
-  budget: { label: "Budget-Friendly", multiplier: 0.7, perGuest: 100 },
-  moderate: { label: "Moderate", multiplier: 1, perGuest: 200 },
-  upscale: { label: "Upscale", multiplier: 1.5, perGuest: 350 },
-  luxury: { label: "Luxury", multiplier: 2.5, perGuest: 500 },
-};
+const AMOUNT_PARSER = (value: string | undefined): number =>
+  parseInputNumber(value);
 
 export default function BudgetEstimator() {
   const { state, loadEstimate } = useBudget();
@@ -184,10 +111,10 @@ export default function BudgetEstimator() {
             </>
           }
         >
-          <Space orientation="vertical" style={{ width: "100%" }} size="large">
+          <Space orientation="vertical" className={estimatorStyles.fullWidth} size="large">
             <div>
               <Text strong>{t("budgetEstimator.numberOfGuests")}</Text>
-              <Row gutter={16} align="middle" style={{ marginTop: 8 }}>
+              <Row gutter={16} align="middle" className={estimatorStyles.marginTop}>
                 <Col flex="auto">
                   <Slider
                     min={20}
@@ -208,7 +135,7 @@ export default function BudgetEstimator() {
                     max={1000}
                     value={guestCount}
                     onChange={(v) => v && setGuestCount(v)}
-                    style={{ width: "100%" }}
+                    className={estimatorStyles.fullWidth}
                   />
                 </Col>
               </Row>
@@ -219,7 +146,7 @@ export default function BudgetEstimator() {
               <Select
                 value={weddingStyle}
                 onChange={setWeddingStyle}
-                style={{ width: "100%", marginTop: 8 }}
+                className={`${estimatorStyles.fullWidth} ${estimatorStyles.marginTop}`}
                 options={Object.entries(STYLE_MULTIPLIERS).map(
                   ([key, config]) => ({
                     value: key,
@@ -242,17 +169,13 @@ export default function BudgetEstimator() {
             <div>
               <Text strong>{t("budgetEstimator.orEnterCustom")}</Text>
               <InputNumber
-                style={{ width: "100%", marginTop: 8 }}
+                className={`${estimatorStyles.fullWidth} ${estimatorStyles.marginTop}`}
                 min={0}
                 value={customBudget}
                 onChange={(v) => setCustomBudget(v)}
                 placeholder={t("budgetEstimator.enterCustomAmount")}
-                formatter={(value) =>
-                  `$ ${formatInputNumber(value)}`
-                }
-                parser={(value) =>
-                  parseInputNumber(value)
-                }
+                formatter={AMOUNT_FORMATTER}
+                parser={AMOUNT_PARSER}
               />
               {customBudget && (
                 <Button
@@ -267,12 +190,7 @@ export default function BudgetEstimator() {
 
             <Card
               size="small"
-              style={{
-                backgroundColor:
-                  mode === "dark" ? "rgba(34, 197, 94, 0.08)" : "#F0FDF4",
-                borderColor:
-                  mode === "dark" ? "rgba(34, 197, 94, 0.25)" : "#BBF7D0",
-              }}
+              className={estimatorStyles.estimateCard}
             >
               <Statistic
                 title={t("budgetEstimator.estimatedTotal")}
@@ -310,14 +228,14 @@ export default function BudgetEstimator() {
             description={t("budgetEstimator.industryStandardDesc")}
             type="info"
             showIcon
-            style={{ marginBottom: 16 }}
+            className={estimatorStyles.alertSpacing}
           />
 
           <Flex vertical>
             {categoryEstimates.map((cat) => (
-              <Flex key={cat.name} align="center" justify="space-between" style={{ padding: "8px 0" }}>
+              <Flex key={cat.name} align="center" justify="space-between" className={estimatorStyles.categoryRow}>
                 <Flex align="center" gap={12}>
-                  <CategoryTag color={cat.color} style={{ minWidth: 100, textAlign: "center" }}>
+                  <CategoryTag color={cat.color} className={estimatorStyles.tagCentered}>
                     {cat.percentage}%
                   </CategoryTag>
                   <Flex vertical>
@@ -337,7 +255,7 @@ export default function BudgetEstimator() {
               <Text strong>{t("common.total")}</Text>
             </Col>
             <Col>
-              <Text strong style={{ fontSize: 18 }}>
+              <Text strong className={estimatorStyles.totalText}>
                 {formatCurrency(estimatedBudget, state.currency)}
               </Text>
             </Col>

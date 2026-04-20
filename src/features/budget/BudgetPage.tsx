@@ -16,10 +16,11 @@ import { BudgetAllocation } from "./components/allocation";
 import { EventVendors, VendorDetails } from "./components/vendors";
 import type { Vendor, Expense } from "./models/budget.models";
 import { PaymentStatus, PaymentCalendar } from "./components/payments";
-import { BudgetCharts, ReportsPage } from "./components/analytics";
+import BudgetCharts from "./components/analytics/BudgetCharts/BudgetCharts";
+import BudgetReports from "./components/analytics/BudgetReports/BudgetReports";
 import { BudgetTemplates, BudgetEstimator, ActivityLog, Notifications } from "./components/advanced";
 import { BulkOperations } from "./components/planner";
-import dashboardStyles from "./BudgetDashboard.module.css";
+import dashboardStyles from "./BudgetPage.module.css";
 import { useTranslation } from "react-i18next";
 
 const { Title } = Typography;
@@ -100,7 +101,7 @@ function DashboardContent() {
         return (
           <Tabs defaultActiveKey="charts" items={[
             { key: "charts",  label: t("budgetDashboard.subTabs.charts"),  children: <BudgetCharts /> },
-            { key: "reports", label: t("budgetDashboard.subTabs.reports"), children: <ReportsPage /> },
+            { key: "reports", label: t("budgetDashboard.subTabs.reports"), children: <BudgetReports /> },
           ]} />
         );
       case "tools":
@@ -169,7 +170,7 @@ function DashboardContent() {
   );
 }
 
-export default function BudgetDashboardPageWrapper() {
+export default function BudgetPage() {
   return (
     <BudgetProvider>
       <DashboardContent />

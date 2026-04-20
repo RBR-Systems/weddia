@@ -2,7 +2,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { Button, Input, Modal, Form, Tooltip, Empty, Spin, App, Popconfirm } from "antd";
 import { PlusOutlined, EditOutlined, DeleteOutlined, TagsOutlined } from "@ant-design/icons";
-import { CategoriesService, type BudgetCategory } from "../../api/categoriesApi";
+import { CategoriesService, type BudgetCategory } from "./api/categoriesApi";
 import { useTranslation } from "react-i18next";
 import styles from "./BudgetCategoriesPage.module.css";
 
@@ -172,8 +172,8 @@ export default function BudgetCategoriesPage() {
         message.success(t("budgetCategories.createdSuccess"));
       }
       setModalOpen(false);
-    } catch (err: any) {
-      if (err?.errorFields) return; // validation error, form handles it
+    } catch (err: unknown) {
+      if (err != null && typeof err === "object" && "errorFields" in err) return;
       message.error(t("budgetCategories.saveError"));
     } finally {
       setSaving(false);

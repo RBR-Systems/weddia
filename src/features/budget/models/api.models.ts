@@ -40,8 +40,11 @@ export interface ExpenseAPI extends Timestamps {
 
 export interface CategoryAPI extends Timestamps {
   category_id: string;
+  catalog_category_id?: string;
   name: string;
   description: string;
+  budget_name?: string;
+  budget_notes?: string;
   allocated: number;
   spent: number;
   remaining: number;

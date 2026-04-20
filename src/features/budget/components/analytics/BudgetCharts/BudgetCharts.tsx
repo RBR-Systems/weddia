@@ -1,44 +1,30 @@
 "use client";
-import React from "react";
+import { useMemo } from "react";
+import type { FC } from "react";
 import { Row, Col, Empty } from "antd";
 import Card from "@/shared/components/Card/Card";
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line, AreaChart, Area } from "recharts";
 import { useTranslation } from "react-i18next";
-import { useBudget } from "../../contexts/BudgetContext";
+import { useBudget } from "../../../contexts/BudgetContext";
 import { formatCurrency } from "@/shared/utils/formatters.utils";
-import type { Category, Expense } from "../../models/budget.models";
+import type { Category, Expense, ChartTooltipProps, ChartTooltipEntry } from "../../../models/budget.models";
 import { CHART_COLORS, COMPARISON_COLORS, SEMANTIC_CHART_COLORS, resolveChartColor } from "@/theme/chartColors";
 import { useTheme } from "@/theme/ThemeProvider";
+import { DATE_DISPLAY_LOCALE } from "../../../constants/budget.constants";
+import styles from "./BudgetCharts.module.css";
 
-type CustomTooltipProps = {
-  active?: boolean;
-  payload?: any[];
-  label?: string | number;
-  currency: string;
-};
-
-export const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload, label, currency }) => {
-  if (active && payload?.length) {
-    return (
-      <div
-        style={{
-          backgroundColor: "var(--card-background)",
-          color: "var(--text-color)",
-          padding: "10px",
-          border: "1px solid var(--card-border)",
-          borderRadius: "4px",
-        }}
-      >
-        <p style={{ margin: 0, fontWeight: "bold" }}>{label}</p>
-        {payload.map((entry: any) => (
-          <p key={entry.name} style={{ margin: 0, color: entry.color }}>
-            {entry.name}: {formatCurrency(entry.value, currency)}
-          </p>
-        ))}
-      </div>
-    );
-  }
-  return null;
+export const CustomTooltip: FC<ChartTooltipProps> = ({ active, payload, label, currency }) => {
+  if (!active || !payload?.length) return null;
+  return (
+    <div className={styles.customTooltip}>
+      <p className={styles.tooltipLabel}>{label}</p>
+      {payload.map((entry: ChartTooltipEntry) => (
+        <p key={entry.name} className={styles.tooltipEntry} style={{ color: entry.color }}>
+          {entry.name}: {formatCurrency(entry.value, currency)}
+        </p>
+      ))}
+    </div>
+  );
 };
 
 
@@ -53,16 +39,18 @@ export default function BudgetCharts() {
   const comparison = COMPARISON_COLORS[mode];
   const semantic = SEMANTIC_CHART_COLORS[mode];
 
-  // Pie chart data - Category spending breakdown
-  const categoryPieData = state.categories
-    .filter((c: Category) => c.spent > 0)
-    .map((c: Category, index: number) => ({
-      name: c.name,
-      value: c.spent,
-      color: resolveChartColor(c.color || colors[index % colors.length], mode),
-    }));
+  const categoryPieData = useMemo(
+    () =>
+      state.categories
+        .filter((c: Category) => c.spent > 0)
+        .map((c: Category, index: number) => ({
+          name: c.name,
+          value: c.spent,
+          color: resolveChartColor(c.color || colors[index % colors.length], mode),
+        })),
+    [state.categories, colors, mode],
+  );
 
-  // Bar chart data - Budget vs Actual per category
   const budgetVsActualData = state.categories.map((c: Category) => ({
     name: c.name.length > 10 ? c.name.substring(0, 10) + "..." : c.name,
     fullName: c.name,
@@ -71,12 +59,11 @@ export default function BudgetCharts() {
     remaining: c.allocated - c.spent,
   }));
 
-  // Line chart data - Monthly spending trend (simulated from expenses)
-  const monthlySpendingData = React.useMemo(() => {
+  const monthlySpendingData = useMemo(() => {
     const months: Record<string, number> = {};
 
     state.expenses.forEach((e: Expense) => {
-      const month = new Date(e.expense_date).toLocaleDateString("en-US", {
+      const month = new Date(e.expense_date).toLocaleDateString(DATE_DISPLAY_LOCALE, {
         year: "numeric",
         month: "short",
       });
@@ -90,8 +77,7 @@ export default function BudgetCharts() {
       );
   }, [state.expenses]);
 
-  // Area chart data - Cumulative spending over time
-  const cumulativeSpendingData = React.useMemo(() => {
+  const cumulativeSpendingData = useMemo(() => {
     const sorted = [...state.expenses].sort(
       (a: Expense, b: Expense) =>
         new Date(a.expense_date).getTime() - new Date(b.expense_date).getTime(),
@@ -101,7 +87,7 @@ export default function BudgetCharts() {
     return sorted.map((e: Expense) => {
       cumulative += e.amount;
       return {
-        date: new Date(e.expense_date).toLocaleDateString("en-US", {
+        date: new Date(e.expense_date).toLocaleDateString(DATE_DISPLAY_LOCALE, {
           month: "short",
           day: "numeric",
         }),
@@ -145,14 +131,9 @@ export default function BudgetCharts() {
                   fill="#8884d8"
                   dataKey="value"
                 >
-                  {categoryPieData.map(
-                    (
-                      entry: { name: string; value: number; color: string },
-                      index: number,
-                    ) => (
-                      <Cell key={`cell-${entry.name}`} fill={entry.color} />
-                    ),
-                  )}
+                  {categoryPieData.map((entry: ChartTooltipEntry) => (
+                    <Cell key={`cell-${entry.name}`} fill={entry.color} />
+                  ))}
                 </Pie>
                 <Tooltip
                   formatter={(value: unknown) =>
@@ -259,4 +240,3 @@ export default function BudgetCharts() {
     </Row>
   );
 }
-

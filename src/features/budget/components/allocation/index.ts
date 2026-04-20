@@ -1,1 +1,2 @@
-export { default as BudgetAllocation } from "./BudgetAllocation";
+export { BudgetAllocation } from "./BudgetAllocation/BudgetAllocation";
+

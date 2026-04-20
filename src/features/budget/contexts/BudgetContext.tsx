@@ -2,9 +2,21 @@
 import React, { createContext, useContext, useReducer, useEffect, useCallback } from "react";
 import type { BudgetState, Category, Expense, BudgetSummary, Currency } from "../models/budget.models";
 import { getDefaultCategories, DEFAULT_CURRENCY } from "../constants/budget.constants";
-import { BudgetService } from "../api/budgetApi";
+import {
+  getBudgetData,
+  createCategory as apiCreateCategory,
+  updateCategory as apiUpdateCategory,
+  deleteCategory as apiDeleteCategory,
+  updateBudget as apiUpdateBudget,
+} from "../api/budgetApi";
+import {
+  createExpense as apiCreateExpense,
+  updateExpense as apiUpdateExpense,
+  deleteExpense as apiDeleteExpense,
+} from "../api/expensesApi";
 import { ApiError, isAbortError } from "@/shared/api/apiClient";
 import { useEvent } from "@/shared/contexts/EventContext";
+import type { EventCardProps } from "@/features/events-list/models/eventCardProps.models";
 import { EventActions } from "@/shared/contexts/eventActions";
 import {
   generateBudgetId,
@@ -36,6 +48,25 @@ type Action =
   | { type: "DELETE_CATEGORY"; payload: string }
   | { type: "UPDATE_BUDGET"; payload: number }
   | { type: "SET_EVENT_VENDOR_IDS"; payload: string[] };
+
+type CategoryPatchSource = { total_budget?: number; categories?: TemplateCategoryRaw[] };
+
+interface BudgetContextValue {
+  state: BudgetState;
+  loadBudgetData: (eid: number, signal?: AbortSignal) => Promise<void>;
+  refreshData: () => Promise<void>;
+  addExpense: (payload: Omit<Expense, "expense_id">) => void;
+  updateExpense: (id: string, data: Partial<Expense>) => void;
+  deleteExpense: (expenseId: string) => void;
+  addCategory: (category: Category) => void;
+  updateCategory: (id: string, data: Partial<Category>) => Promise<void>;
+  deleteCategory: (categoryId: string) => void;
+  updateBudget: (totalBudget: number) => void;
+  loadTemplate: (template: CategoryPatchSource) => void;
+  loadEstimate: (estimate: CategoryPatchSource) => void;
+  assignVendor: (vendorId: string) => void;
+  unassignVendor: (vendorId: string) => void;
+}
 
 const initialState: BudgetState = {
   isLoading: false,
@@ -81,25 +112,25 @@ function reducer(state: BudgetState, action: Action): BudgetState {
   }
 }
 
-const BudgetContext = createContext<any>(null);
+const BudgetContext = createContext<BudgetContextValue | null>(null);
 
 export function BudgetProvider({ children }: Readonly<{ children: React.ReactNode }>) {
   const [state, dispatch] = useReducer(reducer, initialState);
   const { state: { events: { selectedEvent } }, dispatch: eventDispatch } = useEvent();
-  const eventId = (selectedEvent as any)?.id ?? 1;
-  const eventBudget = (selectedEvent as any)?.budget as number | undefined;
+  const eventId = selectedEvent?.id ?? 1;
+  const eventBudget = selectedEvent?.budget;
 
   const loadBudgetData = useCallback(async (eid: number, signal?: AbortSignal) => {
     dispatch({ type: "SET_LOADING", payload: true });
     try {
-      const data = await BudgetService.getBudgetData(eid, signal);
+      const data = await getBudgetData(eid, signal);
       dispatch({ type: "SET_DATA", payload: mapApiDataToBudgetState(data, eventBudget) });
       dispatch({ type: "SET_ERROR", payload: null });
-    } catch (err: any) {
+    } catch (err: unknown) {
       if (isAbortError(err)) return;
       if (err instanceof ApiError && err.status === 401) return;
       console.error("Failed to load budget data:", err);
-      dispatch({ type: "SET_ERROR", payload: err?.message ?? "Failed to load budget data" });
+      dispatch({ type: "SET_ERROR", payload: err instanceof Error ? err.message : "Failed to load budget data" });
     } finally {
       dispatch({ type: "SET_LOADING", payload: false });
     }
@@ -130,7 +161,7 @@ export function BudgetProvider({ children }: Readonly<{ children: React.ReactNod
   const addExpense = (payload: Omit<Expense, "expense_id">) => {
     dispatch({ type: "ADD_EXPENSE", payload: { ...payload, expense_id: generateBudgetId() } });
     const cat = state.categories.find((c) => c.id === payload.category_id);
-    BudgetService.createExpense(eventId, {
+    apiCreateExpense(eventId, {
       ...payload,
       ...(cat?.catalog_id ? { category_id: cat.catalog_id } : {}),
       vendor_id: resolveVendorId(payload.vendor_name),
@@ -145,21 +176,21 @@ export function BudgetProvider({ children }: Readonly<{ children: React.ReactNod
       if (cat?.catalog_id) apiData.category_id = cat.catalog_id;
     }
     if (data.vendor_name !== undefined) apiData.vendor_id = resolveVendorId(data.vendor_name);
-    BudgetService.updateExpense(eventId, id, apiData).catch((err) =>
+    apiUpdateExpense(eventId, id, apiData).catch((err) =>
       console.error("updateExpense failed:", err),
     );
   };
 
   const deleteExpense = (expenseId: string) => {
     dispatch({ type: "DELETE_EXPENSE", payload: expenseId });
-    BudgetService.deleteExpense(eventId, expenseId).catch((err) =>
+    apiDeleteExpense(eventId, expenseId).catch((err) =>
       console.error("deleteExpense failed:", err),
     );
   };
 
   const addCategory = (category: Category) => {
     dispatch({ type: "ADD_CATEGORY", payload: category });
-    BudgetService.createCategory(eventId, {
+    apiCreateCategory(eventId, {
       catalogCategoryId: category.catalog_id!,
       budget_name: category.budget_name ?? "",
       budget_notes: category.budget_notes,
@@ -175,7 +206,7 @@ export function BudgetProvider({ children }: Readonly<{ children: React.ReactNod
     const current = state.categories.find((c) => c.id === id);
     if (!current) return;
     dispatch({ type: "UPDATE_CATEGORY", payload: { id, data } });
-    await BudgetService.updateCategory(id, {
+    await apiUpdateCategory(id, {
       eventId,
       categoryId: Number(current.catalog_id),
       description: data.budget_name ?? current.budget_name ?? current.name,
@@ -188,7 +219,7 @@ export function BudgetProvider({ children }: Readonly<{ children: React.ReactNod
 
   const deleteCategory = (categoryId: string) => {
     dispatch({ type: "DELETE_CATEGORY", payload: categoryId });
-    BudgetService.deleteCategory(categoryId).catch((err) =>
+    apiDeleteCategory(categoryId).catch((err) =>
       console.error("deleteCategory failed:", err),
     );
   };
@@ -211,10 +242,10 @@ export function BudgetProvider({ children }: Readonly<{ children: React.ReactNod
     if (selectedEvent) {
       eventDispatch({
         type: EventActions.UPDATE_EVENT,
-        payload: { ...(selectedEvent as any), budget: totalBudget },
+        payload: { ...(selectedEvent as EventCardProps), budget: totalBudget },
       });
     }
-    BudgetService.updateBudget(eventId, { total_budget: totalBudget }).catch((err) =>
+    apiUpdateBudget(eventId, { total_budget: totalBudget }).catch((err) =>
       console.error("updateBudget failed:", err),
     );
   };
@@ -262,14 +293,14 @@ export function BudgetProvider({ children }: Readonly<{ children: React.ReactNod
     });
   };
 
-  const loadTemplate = (template: any) =>
+  const loadTemplate = (template: CategoryPatchSource) =>
     applyCategoryPatch(
       template,
       (c, totalBudget) => Math.round(((c.percentage ?? 0) * totalBudget) / 100),
       (c) => c.percentage ?? 0,
     );
 
-  const loadEstimate = (estimate: any) =>
+  const loadEstimate = (estimate: CategoryPatchSource) =>
     applyCategoryPatch(
       estimate,
       (c, totalBudget) =>

@@ -9,10 +9,10 @@ import EventList from "@/features/events-list/EventList";
 import TableAssignmentPage from "@/features/table-assignment/TableAssignmentPage";
 import CreateEventModal from "@/features/create-event/CreateEventModal";
 import { DayOfEvent } from "@/features/schedule";
-import BudgetDashboard from "@/features/budget/BudgetDashboard";
+import BudgetPage from "@/features/budget/BudgetPage";
 import MultiClientPage from "@/features/multi-client/MultiClientPage";
 import GuestList from "@/features/guest-list/GuestList";
-import BudgetCategoriesPage from "@/features/budget/components/budget-categories/BudgetCategoriesPage";
+import BudgetCategoriesPage from "@/features/budget/BudgetCategoriesPage";
 import EventTasksDashboard from "@/features/event-tasks/EventTasksDashboard";
 import VendorCatalog from "@/features/vendors/VendorCatalog";
 
@@ -71,7 +71,7 @@ export default function Home() {
       case "schedule":
         return <DayOfEvent />;
       case "budget":
-        return <BudgetDashboard />;
+        return <BudgetPage />;
       case "budget-categories":
         return <BudgetCategoriesPage />;
       case "vendor-catalog":

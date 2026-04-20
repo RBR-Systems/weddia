@@ -1,27 +1,18 @@
 "use client";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { App, Card, Row, Col, Button, Select, DatePicker, Space, Table, Divider, Typography } from "antd";
 import { PrinterOutlined, FileExcelOutlined } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
-import { useBudget } from "../../contexts/BudgetContext";
+import { useBudget } from "../../../contexts/BudgetContext";
 import { formatCurrency, formatDate } from "@/shared/utils/formatters.utils";
-import type { Category, Expense } from "../../models/budget.models";
-import reportStyles from "./ReportsPage.module.css";
+import type { Category, Expense, ReportType, CategoriesSummaryProps } from "../../../models/budget.models";
+import reportStyles from "./BudgetReports.module.css";
+import Statistic from "@/shared/components/AnimatedStatistic/AnimatedStatistic";
 
 const { RangePicker } = DatePicker;
 const { Title, Text } = Typography;
-import Statistic from "@/shared/components/AnimatedStatistic/AnimatedStatistic";
-
-type ReportType = "summary" | "category" | "expense" | "vendor";
-
-interface CategoriesSummaryProps {
-  categories: Category[];
-  currency: string;
-  totalRemaining: number;
-  totalLabel: string;
-}
 
 const CategoriesSummary = ({
   categories,
@@ -87,12 +78,16 @@ export default function ReportsPage() {
     [state.categories, state.currency, state.summary?.total_remaining, t],
   );
 
-  const filteredExpenses = dateRange
-    ? state.expenses.filter((e: Expense) => {
-        const date = dayjs(e.expense_date);
-        return date.isAfter(dateRange[0]) && date.isBefore(dateRange[1]);
-      })
-    : state.expenses;
+  const filteredExpenses = useMemo(
+    () =>
+      dateRange
+        ? state.expenses.filter((e: Expense) => {
+            const date = dayjs(e.expense_date);
+            return date.isAfter(dateRange[0]) && date.isBefore(dateRange[1]);
+          })
+        : state.expenses,
+    [dateRange, state.expenses],
+  );
 
   const handleExportCSV = () => {
     // Create CSV content
@@ -139,70 +134,76 @@ export default function ReportsPage() {
     },
   ];
 
-  const categoryColumns: ColumnsType<Category> = [
-    { title: t("common.category"), dataIndex: "name", key: "name" },
-    {
-      title: t("budgetCharts.allocated"),
-      dataIndex: "allocated",
-      key: "allocated",
-      render: (v: number) => formatCurrency(v, state.currency),
-      align: "right",
-    },
-    {
-      title: t("budgetCharts.spent"),
-      dataIndex: "spent",
-      key: "spent",
-      render: (v: number) => formatCurrency(v, state.currency),
-      align: "right",
-    },
-    {
-      title: t("budgetStats.remaining"),
-      key: "remaining",
-      render: (_, record) =>
-        formatCurrency(record.allocated - record.spent, state.currency),
-      align: "right",
-    },
-    {
-      title: t("reports.usagePercent"),
-      key: "usage",
-      render: (_, record) =>
-        record.allocated > 0
-          ? `${Number.parseFloat(((record.spent / record.allocated) * 100).toFixed(2))}%`
-          : "0%",
-      align: "center",
-    },
-  ];
+  const categoryColumns: ColumnsType<Category> = useMemo(
+    () => [
+      { title: t("common.category"), dataIndex: "name", key: "name" },
+      {
+        title: t("budgetCharts.allocated"),
+        dataIndex: "allocated",
+        key: "allocated",
+        render: (v: number) => formatCurrency(v, state.currency),
+        align: "right",
+      },
+      {
+        title: t("budgetCharts.spent"),
+        dataIndex: "spent",
+        key: "spent",
+        render: (v: number) => formatCurrency(v, state.currency),
+        align: "right",
+      },
+      {
+        title: t("budgetStats.remaining"),
+        key: "remaining",
+        render: (_: unknown, record: Category) =>
+          formatCurrency(record.allocated - record.spent, state.currency),
+        align: "right",
+      },
+      {
+        title: t("reports.usagePercent"),
+        key: "usage",
+        render: (_: unknown, record: Category) =>
+          record.allocated > 0
+            ? `${Number.parseFloat(((record.spent / record.allocated) * 100).toFixed(2))}%`
+            : "0%",
+        align: "center",
+      },
+    ],
+    [t, state.currency],
+  );
 
-  const expenseColumns: ColumnsType<Expense> = [
-    { title: t("common.description"), dataIndex: "description", key: "description" },
-    {
-      title: t("common.amount"),
-      dataIndex: "amount",
-      key: "amount",
-      render: (v: number) => formatCurrency(v, state.currency),
-      align: "right",
-    },
-    {
-      title: t("common.category"),
-      dataIndex: "category_id",
-      key: "category_id",
-      render: (id: string) =>
-        state.categories.find((c: Category) => c.id === id)?.name || id,
-    },
-    {
-      title: t("common.vendor"),
-      dataIndex: "vendor_name",
-      key: "vendor_name",
-      render: (v: string) => v || "—",
-    },
-    {
-      title: t("common.date"),
-      dataIndex: "expense_date",
-      key: "expense_date",
-      render: (v: string) => formatDate(v),
-    },
-    { title: t("common.status"), dataIndex: "payment_status", key: "payment_status" },
-  ];
+  const expenseColumns: ColumnsType<Expense> = useMemo(
+    () => [
+      { title: t("common.description"), dataIndex: "description", key: "description" },
+      {
+        title: t("common.amount"),
+        dataIndex: "amount",
+        key: "amount",
+        render: (v: number) => formatCurrency(v, state.currency),
+        align: "right",
+      },
+      {
+        title: t("common.category"),
+        dataIndex: "category_id",
+        key: "category_id",
+        render: (id: string) =>
+          state.categories.find((c: Category) => c.id === id)?.name || id,
+      },
+      {
+        title: t("common.vendor"),
+        dataIndex: "vendor_name",
+        key: "vendor_name",
+        render: (v: string) => v || "—",
+      },
+      {
+        title: t("common.date"),
+        dataIndex: "expense_date",
+        key: "expense_date",
+        render: (v: string) => formatDate(v),
+      },
+      { title: t("common.status"), dataIndex: "payment_status", key: "payment_status" },
+    ],
+    [t, state.currency, state.categories],
+  );
 
   return (
     <div className="reports-page">
@@ -335,6 +336,3 @@ export default function ReportsPage() {
     </div>
   );
 }
-
-
-

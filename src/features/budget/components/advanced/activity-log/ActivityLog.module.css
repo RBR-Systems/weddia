@@ -5,3 +5,11 @@
 .activityTimestamp {
   font-size: var(--fs-2xs);
 }
+
+.filterSearch {
+  width: 200px;
+}
+
+.filterSelect {
+  width: 150px;
+}

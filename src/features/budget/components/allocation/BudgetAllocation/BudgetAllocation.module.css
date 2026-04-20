@@ -1,0 +1,7 @@
+.overAllocatedAlert {
+  margin-top: var(--spacing-md);
+}
+
+.fullWidth {
+  width: 100%;
+}

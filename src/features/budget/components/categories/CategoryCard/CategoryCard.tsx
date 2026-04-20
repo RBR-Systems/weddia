@@ -2,7 +2,11 @@
 
 import { Progress } from "antd";
 import { formatCurrency } from "@/shared/utils/formatters.utils";
-import type { Category } from "../../models/budget.models";
+import type { Category } from "../../../models/budget.models";
+import {
+  BUDGET_STATUS_AT_RISK_PERCENT,
+  BUDGET_STATUS_OVER_PERCENT,
+} from "../../../constants/budget.constants";
 import styles from "./CategoryCard.module.css";
 import { useTranslation } from "react-i18next";
 
@@ -26,17 +30,15 @@ export default function CategoryCard({
   const displayName = budget_name || name;
   const subtitle = budget_notes || null;
 
-  const progressColor = (() => {
-    if (percentage >= 100) return "var(--status-canceled)";
-    if (percentage >= 80) return "var(--status-delayed)";
-    return accent;
-  })();
+  const progressColor =
+    percentage >= BUDGET_STATUS_OVER_PERCENT ? "var(--status-canceled)" :
+    percentage >= BUDGET_STATUS_AT_RISK_PERCENT ? "var(--status-delayed)" :
+    accent;
 
-  const badgeClass = (() => {
-    if (percentage >= 100) return styles.danger;
-    if (percentage >= 80) return styles.warning;
-    return "";
-  })();
+  const badgeClass =
+    percentage >= BUDGET_STATUS_OVER_PERCENT ? styles.danger :
+    percentage >= BUDGET_STATUS_AT_RISK_PERCENT ? styles.warning :
+    "";
 
   return (
     <button type="button" className={styles.card} onClick={() => onClick?.(category)}>
@@ -52,7 +54,7 @@ export default function CategoryCard({
             {subtitle ? (
               <div className={styles.categoryDescription}>{subtitle}</div>
             ) : (
-              <div className={styles.categoryDescription} style={{ fontStyle: "italic" }}>
+              <div className={`${styles.categoryDescription} ${styles.descriptionItalic}`}>
                 {expense_count ?? 0} {t("categoryCard.expenses", { count: expense_count ?? 0 })}
               </div>
             )}
@@ -102,5 +104,3 @@ export default function CategoryCard({
     </button>
   );
 }
-
-

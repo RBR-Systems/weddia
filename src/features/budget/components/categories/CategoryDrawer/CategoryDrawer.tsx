@@ -2,9 +2,8 @@
 import { useState, useEffect } from "react";
 import { App, Drawer, Form, Input, InputNumber, Button, Space, Divider, Table, Popconfirm, Typography, Spin, Tag } from "antd";
 import { PlusOutlined, EditOutlined, DeleteOutlined, SaveOutlined, CloseOutlined } from "@ant-design/icons";
-import type { Category, BudgetItem } from "../../models/budget.models";
-import { BudgetService } from "../../api/budgetApi";
-import { ApiError } from "@/shared/api/apiClient";
+import type { Category, BudgetItem } from "../../../models/budget.models";
+import { useCategoryItems } from "../../../hooks/useCategoryItems";
 import { formatCurrency, formatInputNumber, parseInputNumber } from "@/shared/utils/formatters.utils";
 import { useTranslation } from "react-i18next";
 import styles from "./CategoryDrawer.module.css";
@@ -20,9 +19,6 @@ interface CategoryDrawerProps {
   readonly onDelete: (id: string) => void;
 }
 
-// Separate state type for the editing row — no Form needed
-interface EditValues { description: string; amount: number | null; notes: string }
-
 export default function CategoryDrawer({
   open,
   category,
@@ -35,20 +31,25 @@ export default function CategoryDrawer({
   const { t } = useTranslation();
   const [metaForm] = Form.useForm();
   const [addForm] = Form.useForm();
-
-  const [items, setItems] = useState<BudgetItem[]>([]);
-  const [itemsLoading, setItemsLoading] = useState(false);
   const [savingMeta, setSavingMeta] = useState(false);
-  const [savingItem, setSavingItem] = useState(false);
 
-  // Which row is in inline-edit mode
-  const [editingItemId, setEditingItemId] = useState<string | null>(null);
-  const [editValues, setEditValues] = useState<EditValues>({ description: "", amount: null, notes: "" });
+  const {
+    items,
+    isLoading: itemsLoading,
+    isSaving: savingItem,
+    editingItemId,
+    editValues,
+    isAddingItem,
+    setEditValues,
+    setIsAddingItem,
+    fetchItems,
+    startEdit,
+    cancelEdit,
+    saveEdit,
+    addItem,
+    deleteItem,
+  } = useCategoryItems();
 
-  // Whether the "add new item" row is visible
-  const [addingItem, setAddingItem] = useState(false);
-
-  // Load form + items when the drawer opens / category changes
   useEffect(() => {
     if (!open || !category) return;
     metaForm.setFieldsValue({
@@ -56,23 +57,11 @@ export default function CategoryDrawer({
       budget_notes: category.budget_notes ?? "",
       allocated: category.allocated,
     });
-    setAddingItem(false);
-    setEditingItemId(null);
+    setIsAddingItem(false);
+    cancelEdit();
     fetchItems(category.id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, category?.id]);
-
-  async function fetchItems(budgetId: string) {
-    setItemsLoading(true);
-    try {
-      const data = await BudgetService.getBudgetItems(budgetId);
-      setItems(data);
-    } catch (err) {
-      if (err instanceof ApiError && err.status === 401) return;
-      // silently fail — items section shows empty
-    } finally {
-      setItemsLoading(false);
-    }
-  }
 
   // ── Save budget metadata ───────────────────────────────────────────────────
 
@@ -82,7 +71,7 @@ export default function CategoryDrawer({
     try {
       values = await metaForm.validateFields();
     } catch {
-      return; // validation error — inline messages show on fields
+      return;
     }
     setSavingMeta(true);
     try {
@@ -103,63 +92,29 @@ export default function CategoryDrawer({
     try {
       values = await addForm.validateFields();
     } catch {
-      return; // inline validation messages will show
+      return;
     }
-    setSavingItem(true);
     try {
-      const created = await BudgetService.createBudgetItem(category.id, {
-        ...values,
-        category_id: category.catalog_id,
-      });
-      setItems((prev) => [...prev, created]);
+      await addItem(category.id, category.catalog_id, values);
       addForm.resetFields();
-      setAddingItem(false);
       message.success(t("budgetItems.itemAdded"));
-    } catch (err) {
-      if (err instanceof ApiError && err.status === 401) return;
+    } catch {
       message.error(t("budgetItems.saveError"));
-    } finally {
-      setSavingItem(false);
     }
   };
 
   // ── Inline-edit existing item ──────────────────────────────────────────────
 
-  const startEdit = (item: BudgetItem) => {
-    setEditingItemId(item.item_id);
-    setEditValues({ description: item.description, amount: item.amount, notes: item.notes ?? "" });
-    setAddingItem(false);
-  };
-
-  const cancelEdit = () => {
-    setEditingItemId(null);
-    setEditValues({ description: "", amount: null, notes: "" });
-  };
-
   const handleSaveEdit = async () => {
-    if (!editingItemId || editValues.amount === null) return;
     if (!editValues.description.trim()) {
       message.warning(t("budgetItems.descriptionRequired"));
       return;
     }
-    setSavingItem(true);
     try {
-      const editingItem = items.find((i) => i.item_id === editingItemId);
-      const payload = {
-        description: editValues.description,
-        amount: editValues.amount,
-        notes: editValues.notes,
-        category_id: editingItem?.category_id ?? category?.catalog_id,
-      };
-      await BudgetService.updateBudgetItem(editingItemId, payload);
-      setItems((prev) => prev.map((i) => i.item_id === editingItemId ? { ...i, ...payload } : i));
-      setEditingItemId(null);
+      await saveEdit(category);
       message.success(t("budgetItems.itemUpdated"));
-    } catch (err) {
-      if (err instanceof ApiError && err.status === 401) return;
+    } catch {
       message.error(t("budgetItems.updateError"));
-    } finally {
-      setSavingItem(false);
     }
   };
 
@@ -167,11 +122,9 @@ export default function CategoryDrawer({
 
   const handleDeleteItem = async (itemId: string) => {
     try {
-      await BudgetService.deleteBudgetItem(itemId);
-      setItems((prev) => prev.filter((i) => i.item_id !== itemId));
+      await deleteItem(itemId);
       message.success(t("budgetItems.itemDeleted"));
-    } catch (err) {
-      if (err instanceof ApiError && err.status === 401) return;
+    } catch {
       message.error(t("budgetItems.deleteError"));
     }
   };
@@ -256,7 +209,7 @@ export default function CategoryDrawer({
               size="small"
               icon={<EditOutlined />}
               onClick={() => startEdit(record)}
-              disabled={addingItem}
+              disabled={isAddingItem}
             />
             <Popconfirm
               title={t("budgetItems.deleteConfirm")}
@@ -366,7 +319,7 @@ export default function CategoryDrawer({
           />
 
           {/* ── Add item row (ONE Form, one binding) ── */}
-          {addingItem ? (
+          {isAddingItem ? (
             <div className={styles.addRow}>
               <Form
                 form={addForm}
@@ -412,7 +365,7 @@ export default function CategoryDrawer({
                 <Button
                   size="small"
                   icon={<CloseOutlined />}
-                  onClick={() => setAddingItem(false)}
+                  onClick={() => setIsAddingItem(false)}
                 />
               </Space>
             </div>
@@ -420,7 +373,7 @@ export default function CategoryDrawer({
             <Button
               type="dashed"
               icon={<PlusOutlined />}
-              onClick={() => { setAddingItem(true); cancelEdit(); }}
+              onClick={() => { setIsAddingItem(true); cancelEdit(); }}
               style={{ width: "100%", marginTop: 8 }}
             >
               {t("budgetItems.addItem")}

@@ -3,7 +3,7 @@ import { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { App, Table, Button, Input, Space, Tag, Avatar, Typography, Row, Col, Modal, Form, Select } from "antd";
 import { PlusOutlined, ShopOutlined, PhoneOutlined, MailOutlined, EyeOutlined, UserOutlined, EnvironmentOutlined } from "@ant-design/icons";
-import { BudgetService } from "../../api/budgetApi";
+import { createVendor } from "../../api/vendorsApi";
 import expenseStyles from "../ExpenseModal.module.css";
 import Card from "@/shared/components/Card/Card";
 import Statistic from "@/shared/components/AnimatedStatistic/AnimatedStatistic";
@@ -154,7 +154,7 @@ export default function VendorList({ onViewVendor }: VendorListProps) {
   const handleAddVendor = async () => {
     try {
       const values = await form.validateFields();
-      await BudgetService.createVendor({
+      await createVendor({
         vendorName:    values.name,
         category:      values.category ?? "",
         contactPerson: values.contact_name,
@@ -166,8 +166,8 @@ export default function VendorList({ onViewVendor }: VendorListProps) {
       message.success(t("vendorList.form.vendorCreated"));
       setModalOpen(false);
       form.resetFields();
-    } catch (err: any) {
-      if (err?.errorFields) return; // validation error, stay open
+    } catch (err: unknown) {
+      if (err != null && typeof err === "object" && "errorFields" in err) return;
       message.error(t("vendorList.form.vendorCreateFailed"));
     }
   };

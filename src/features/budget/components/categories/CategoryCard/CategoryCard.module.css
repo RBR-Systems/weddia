@@ -101,6 +101,10 @@
   color: var(--status-canceled);
 }
 
+.descriptionItalic {
+  font-style: italic;
+}
+
 /* ── Stats row ────────────────────────────────────────────── */
 .statsRow {
   display: grid;

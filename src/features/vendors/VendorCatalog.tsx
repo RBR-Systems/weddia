@@ -3,7 +3,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { App, Table, Button, Input, Tag, Avatar, Space, Typography, Row, Col, Modal, Form, Select, Popconfirm, Switch } from "antd";
 import { PlusOutlined, ShopOutlined, PhoneOutlined, MailOutlined, EditOutlined, DeleteOutlined, UserOutlined, EnvironmentOutlined } from "@ant-design/icons";
-import { BudgetService } from "@/features/budget/api/budgetApi";
+import { getVendors, updateVendor, createVendor, deleteVendor } from "@/features/budget/api/vendorsApi";
 import type { Vendor } from "@/features/budget/models/budget.models";
 import type { ColumnsType } from "antd/es/table";
 import Card from "@/shared/components/Card/Card";
@@ -33,7 +33,7 @@ export default function VendorCatalog() {
   const loadVendors = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await BudgetService.getVendors();
+      const data = await getVendors();
       setVendors(data);
     } catch {
       message.error(t("vendorCatalog.loadFailed", "Failed to load vendors"));
@@ -76,7 +76,7 @@ export default function VendorCatalog() {
     try {
       const values = await form.validateFields();
       if (editingVendor) {
-        await BudgetService.updateVendor(editingVendor.vendor_id, {
+        await updateVendor(editingVendor.vendor_id, {
           vendorName:    values.name,
           category:      values.category ?? "",
           contactPerson: values.contact_name,
@@ -88,7 +88,7 @@ export default function VendorCatalog() {
         });
         message.success(t("vendorCatalog.updateSuccess"));
       } else {
-        await BudgetService.createVendor({
+        await createVendor({
           vendorName:    values.name,
           category:      values.category ?? "",
           contactPerson: values.contact_name,
@@ -111,7 +111,7 @@ export default function VendorCatalog() {
 
   const handleDelete = async (vendor: Vendor) => {
     try {
-      await BudgetService.deleteVendor(vendor.vendor_id);
+      await deleteVendor(vendor.vendor_id);
       message.success(t("vendorCatalog.deleteSuccess"));
       loadVendors();
     } catch {

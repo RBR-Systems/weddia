@@ -1,18 +1,12 @@
 import { apiGet, apiPost, apiPut, apiDelete, ApiError } from "@/shared/api/apiClient";
+import type { CatalogCategory } from "../models/budget.models";
+import type { ApiCategory } from "../models/apiRaw.models";
+import { ADMIN_QUERY_PARAM } from "../constants/budget.constants";
 
-export interface BudgetCategory {
-  category_id: string;
-  name: string;
-  description: string;
-}
+// Re-export under the legacy name so existing consumers don't need to change
+export type { CatalogCategory as BudgetCategory };
 
-interface ApiCategory {
-  categoryId: number;
-  name: string;
-  description?: string | null;
-}
-
-function mapCategory(c: ApiCategory): BudgetCategory {
+function mapCategory(c: ApiCategory): CatalogCategory {
   return {
     category_id: String(c.categoryId),
     name: c.name,
@@ -21,7 +15,7 @@ function mapCategory(c: ApiCategory): BudgetCategory {
 }
 
 export const CategoriesService = {
-  async getAll(): Promise<BudgetCategory[]> {
+  async getAll(): Promise<CatalogCategory[]> {
     try {
       const raw = await apiGet<ApiCategory[]>("/api/categoriesexpensebudget");
       return Array.isArray(raw) ? raw.map(mapCategory) : [];
@@ -31,16 +25,16 @@ export const CategoriesService = {
     }
   },
 
-  async create(name: string, description: string): Promise<BudgetCategory> {
+  async create(name: string, description: string): Promise<CatalogCategory> {
     const raw = await apiPost<ApiCategory>(
-      "/api/categoriesexpensebudget?adminId=1",
+      `/api/categoriesexpensebudget?${ADMIN_QUERY_PARAM}`,
       { name, description },
     );
     return mapCategory(raw);
   },
 
   async update(id: string, name: string, description: string): Promise<void> {
-    await apiPut(`/api/categoriesexpensebudget/${id}?adminId=1`, {
+    await apiPut(`/api/categoriesexpensebudget/${id}?${ADMIN_QUERY_PARAM}`, {
       name,
       description,
     });
@@ -50,3 +44,4 @@ export const CategoriesService = {
     await apiDelete(`/api/categoriesexpensebudget/${id}`);
   },
 };
+

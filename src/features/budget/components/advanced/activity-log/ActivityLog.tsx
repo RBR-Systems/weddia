@@ -1,135 +1,44 @@
 "use client";
-import React, { useState, useMemo } from "react";
+import { useState, useMemo } from "react";
+import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { Card, Timeline, Typography, Tag, Space, Select, DatePicker, Empty, Avatar, Input } from "antd";
 import { PlusCircleOutlined, EditOutlined, DeleteOutlined, DollarOutlined, UserOutlined, CheckCircleOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
-import { useBudget } from "../../contexts/BudgetContext";
+import { useBudget } from "../../../contexts/BudgetContext";
 import { formatCurrency } from "@/shared/utils/formatters.utils";
+import { generateMockActivities } from "../../../utils/budget.utils";
+import type { ActivityType, ActivityItem } from "../../../models/budget.models";
 import activityStyles from "./ActivityLog.module.css";
 
 const { Text } = Typography;
 const { RangePicker } = DatePicker;
 const { Search } = Input;
 
-type ActivityType =
-  | "expense_added"
-  | "expense_edited"
-  | "expense_deleted"
-  | "payment_made"
-  | "category_updated"
-  | "budget_updated";
-
-interface ActivityItem {
-  id: string;
-  type: ActivityType;
-  description: string;
-  amount?: number;
-  user?: string;
-  timestamp: string;
-  metadata?: Record<string, any>;
-}
-
-const ACTIVITY_CONFIG: Record<
-  ActivityType,
-  { icon: React.ReactNode; color: string; label: string }
-> = {
-  expense_added: {
-    icon: <PlusCircleOutlined />,
-    color: "green",
-    label: "Expense Added",
-  },
-  expense_edited: {
-    icon: <EditOutlined />,
-    color: "blue",
-    label: "Expense Edited",
-  },
-  expense_deleted: {
-    icon: <DeleteOutlined />,
-    color: "red",
-    label: "Expense Deleted",
-  },
-  payment_made: {
-    icon: <CheckCircleOutlined />,
-    color: "green",
-    label: "Payment Made",
-  },
-  category_updated: {
-    icon: <EditOutlined />,
-    color: "purple",
-    label: "Category Updated",
-  },
-  budget_updated: {
-    icon: <DollarOutlined />,
-    color: "gold",
-    label: "Budget Updated",
-  },
-};
-
-// Simulated activity data - in real app, this would come from backend
-const generateMockActivities = (): ActivityItem[] => {
-  return [
-    {
-      id: "1",
-      type: "expense_added",
-      description: "Added expense: Venue Deposit",
-      amount: 5000,
-      user: "John Doe",
-      timestamp: dayjs().subtract(1, "hour").toISOString(),
-    },
-    {
-      id: "2",
-      type: "payment_made",
-      description: "Marked payment as paid: Photography Package",
-      amount: 3500,
-      user: "Jane Smith",
-      timestamp: dayjs().subtract(3, "hours").toISOString(),
-    },
-    {
-      id: "3",
-      type: "category_updated",
-      description: "Updated allocation for Catering & Bar",
-      user: "John Doe",
-      timestamp: dayjs().subtract(1, "day").toISOString(),
-    },
-    {
-      id: "4",
-      type: "expense_edited",
-      description: "Modified expense: DJ Services",
-      amount: 1200,
-      user: "Jane Smith",
-      timestamp: dayjs().subtract(2, "days").toISOString(),
-    },
-    {
-      id: "5",
-      type: "budget_updated",
-      description: "Total budget increased from $45,000 to $50,000",
-      user: "John Doe",
-      timestamp: dayjs().subtract(3, "days").toISOString(),
-    },
-    {
-      id: "6",
-      type: "expense_deleted",
-      description: "Removed expense: Initial Florist Quote",
-      amount: 2000,
-      user: "Jane Smith",
-      timestamp: dayjs().subtract(5, "days").toISOString(),
-    },
-  ];
+const ACTIVITY_CONFIG: Record<ActivityType, { icon: ReactNode; color: string }> = {
+  expense_added: { icon: <PlusCircleOutlined />, color: "green" },
+  expense_edited: { icon: <EditOutlined />, color: "blue" },
+  expense_deleted: { icon: <DeleteOutlined />, color: "red" },
+  payment_made: { icon: <CheckCircleOutlined />, color: "green" },
+  category_updated: { icon: <EditOutlined />, color: "purple" },
+  budget_updated: { icon: <DollarOutlined />, color: "gold" },
 };
 
 export default function ActivityLog() {
   const { state } = useBudget();
   const { t } = useTranslation();
 
-  const activityTypeLabels: Record<ActivityType, string> = {
-    expense_added: t("activityLog.types.expenseAdded"),
-    expense_edited: t("activityLog.types.expenseEdited"),
-    expense_deleted: t("activityLog.types.expenseDeleted"),
-    payment_made: t("activityLog.types.paymentMade"),
-    category_updated: t("activityLog.types.categoryUpdated"),
-    budget_updated: t("activityLog.types.budgetUpdated"),
-  };
+  const activityTypeLabels = useMemo<Record<ActivityType, string>>(
+    () => ({
+      expense_added: t("activityLog.types.expenseAdded"),
+      expense_edited: t("activityLog.types.expenseEdited"),
+      expense_deleted: t("activityLog.types.expenseDeleted"),
+      payment_made: t("activityLog.types.paymentMade"),
+      category_updated: t("activityLog.types.categoryUpdated"),
+      budget_updated: t("activityLog.types.budgetUpdated"),
+    }),
+    [t],
+  );
 
   const [activities] = useState<ActivityItem[]>(generateMockActivities);
   const [filterType, setFilterType] = useState<ActivityType | "all">("all");
@@ -151,10 +60,6 @@ export default function ActivityLog() {
       return matchesType && matchesSearch && matchesDate;
     });
   }, [activities, filterType, searchTerm, dateRange]);
-
-  const getTimelineColor = (type: ActivityType) => {
-    return ACTIVITY_CONFIG[type]?.color || "gray";
-  };
 
   const formatTimestamp = (timestamp: string) => {
     const date = dayjs(timestamp);
@@ -181,12 +86,12 @@ export default function ActivityLog() {
             allowClear
             onSearch={setSearchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            style={{ width: 200 }}
+            className={activityStyles.filterSearch}
           />
           <Select
             value={filterType}
             onChange={setFilterType}
-            style={{ width: 150 }}
+            className={activityStyles.filterSelect}
             options={[
               { value: "all", label: t("activityLog.allActivities") },
               ...Object.entries(ACTIVITY_CONFIG).map(([key]) => ({
@@ -210,7 +115,7 @@ export default function ActivityLog() {
           items={filteredActivities.map((activity) => {
             const config = ACTIVITY_CONFIG[activity.type];
             return {
-              color: getTimelineColor(activity.type),
+              color: config.color,
               icon: config.icon,
               children: (
                 <div>
