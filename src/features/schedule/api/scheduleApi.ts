@@ -1,5 +1,6 @@
-import { TimelineItem, Status } from "../models/schedule.models";
+import { type TimelineItem, type Status } from "../models/schedule.models";
 import { apiGet, apiPost, apiPut, apiDelete, ApiError } from "@/shared/api/apiClient";
+import { createTimelineItem as buildTimelineItem } from "../utils/timeline.factory";
 
 interface ApiTimelineItem {
   timelineItemId: number;
@@ -28,23 +29,21 @@ function mapStatus(n: number): Status {
 }
 
 function mapApiItem(item: ApiTimelineItem): TimelineItem {
-  return {
+  return buildTimelineItem({
     timeline_item_id: String(item.timelineItemId),
     event_id: String(item.eventId),
     title: item.title,
     type: item.itemType,
-    location_name: item.locationName ?? null,
-    location_address: item.locationAddress ?? null,
-    description: item.description ?? null,
-    notes: item.notes ?? null,
-    guests_description: item.guestsDescription ?? null,
+    location_name: item.locationName,
+    location_address: item.locationAddress,
+    description: item.description,
+    notes: item.notes,
+    guests_description: item.guestsDescription,
     start_time: item.startTime,
     end_time: item.endTime,
-    setup_time: item.setupTime ?? null,
+    setup_time: item.setupTime,
     status: mapStatus(item.status),
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  };
+  });
 }
 
 export async function fetchTimelineItems(eventId: number): Promise<TimelineItem[]> {
@@ -104,27 +103,33 @@ export async function updateTimelineItem(
 
   // Some APIs return 204/empty on PUT — fall back to the data we sent
   if (response?.timelineItemId) return mapApiItem(response);
-  return {
+  return buildTimelineItem({
     timeline_item_id: id,
-    event_id: item.event_id ?? "",
-    title: item.title ?? "",
-    type: item.type ?? "",
-    location_name: item.location_name ?? null,
-    location_address: item.location_address ?? null,
-    description: item.description ?? null,
-    notes: item.notes ?? null,
-    guests_description: item.guests_description ?? null,
-    start_time: item.start_time ?? "",
-    end_time: item.end_time ?? "",
-    setup_time: item.setup_time ?? null,
-    status: item.status ?? "pending",
-    created_at: item.created_at ?? new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  };
+    event_id: item.event_id,
+    title: item.title,
+    type: item.type,
+    location_name: item.location_name,
+    location_address: item.location_address,
+    description: item.description,
+    notes: item.notes,
+    guests_description: item.guests_description,
+    start_time: item.start_time,
+    end_time: item.end_time,
+    setup_time: item.setup_time,
+    status: item.status,
+    created_at: item.created_at,
+  });
 }
 
 export async function deleteTimelineItem(id: string): Promise<void> {
   await apiDelete(`/api/eventtimelineitems/${id}`);
 }
 
-export default { fetchTimelineItems, createTimelineItem, updateTimelineItem, deleteTimelineItem };
+const scheduleApi = {
+  fetchTimelineItems,
+  createTimelineItem,
+  updateTimelineItem,
+  deleteTimelineItem,
+};
+
+export default scheduleApi;

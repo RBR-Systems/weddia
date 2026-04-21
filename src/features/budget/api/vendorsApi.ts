@@ -3,6 +3,32 @@ import type { Vendor } from "../models/budget.models";
 import type { ApiVendor } from "../models/apiRaw.models";
 import { ADMIN_QUERY_PARAM } from "../constants/budget.constants";
 
+interface VendorInput {
+  vendorName: string;
+  category: string;
+  contactPerson?: string;
+  email?: string;
+  mobilePhone?: string;
+  address?: string;
+  notes?: string;
+  rating?: number;
+  isActive?: boolean;
+}
+
+function toVendorPayload(data: VendorInput) {
+  return {
+    vendorName:    data.vendorName,
+    category:      data.category,
+    contactPerson: data.contactPerson ?? null,
+    email:         data.email ?? null,
+    mobilePhone:   data.mobilePhone ?? null,
+    address:       data.address ?? null,
+    notes:         data.notes ?? null,
+    rating:        data.rating ?? 0,
+    isActive:      data.isActive ?? true,
+  };
+}
+
 function mapVendor(v: ApiVendor): Vendor {
   return {
     vendor_id:     String(v.vendorId),
@@ -25,52 +51,13 @@ export async function getVendors(): Promise<Vendor[]> {
   return vendors.map(mapVendor);
 }
 
-export async function createVendor(data: {
-  vendorName: string;
-  category: string;
-  contactPerson?: string;
-  email?: string;
-  mobilePhone?: string;
-  address?: string;
-  notes?: string;
-  rating?: number;
-}): Promise<Vendor> {
-  const created = await apiPost<ApiVendor>(`/api/vendors?${ADMIN_QUERY_PARAM}`, {
-    vendorName:    data.vendorName,
-    category:      data.category,
-    contactPerson: data.contactPerson ?? null,
-    email:         data.email ?? null,
-    mobilePhone:   data.mobilePhone ?? null,
-    address:       data.address ?? null,
-    notes:         data.notes ?? null,
-    rating:        data.rating ?? 0,
-    isActive:      true,
-  });
+export async function createVendor(data: Omit<VendorInput, "isActive">): Promise<Vendor> {
+  const created = await apiPost<ApiVendor>(`/api/vendors?${ADMIN_QUERY_PARAM}`, toVendorPayload(data));
   return { vendor_id: String(created.vendorId), name: created.vendorName };
 }
 
-export async function updateVendor(vendorId: string, data: {
-  vendorName: string;
-  category: string;
-  contactPerson?: string;
-  email?: string;
-  mobilePhone?: string;
-  address?: string;
-  notes?: string;
-  rating?: number;
-  isActive?: boolean;
-}): Promise<void> {
-  await apiPut(`/api/vendors/${vendorId}?${ADMIN_QUERY_PARAM}`, {
-    vendorName:    data.vendorName,
-    category:      data.category,
-    contactPerson: data.contactPerson ?? null,
-    email:         data.email ?? null,
-    mobilePhone:   data.mobilePhone ?? null,
-    address:       data.address ?? null,
-    notes:         data.notes ?? null,
-    rating:        data.rating ?? 0,
-    isActive:      data.isActive ?? true,
-  });
+export async function updateVendor(vendorId: string, data: VendorInput): Promise<void> {
+  await apiPut(`/api/vendors/${vendorId}?${ADMIN_QUERY_PARAM}`, toVendorPayload(data));
 }
 
 export async function deleteVendor(vendorId: string): Promise<void> {

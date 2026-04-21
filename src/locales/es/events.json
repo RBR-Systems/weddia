@@ -4,7 +4,29 @@
     "startedOn": "Comenzó el {{date}}",
     "weddingDay": "Día de la boda el {{date}}",
     "statusInProgress": "Estado en progreso",
-    "event": "Evento {{number}}"
+    "status": "Estado: {{status}}",
+    "emptyState": "Selecciona un evento para ver su centro",
+    "event": "Evento {{number}}",
+    "sections": {
+      "statistics": "Estadísticas",
+      "upcomingTasks": "Próximas tareas",
+      "reminders": "Recordatorios",
+      "commonActions": "Acciones comunes"
+    },
+    "statistics": {
+      "date": "Fecha",
+      "location": "Ubicación",
+      "budget": "Presupuesto",
+      "tasks": "Tareas"
+    },
+    "upcomingTasks": {
+      "empty": "Aún no hay tareas registradas",
+      "count_one": "1 tarea registrada para este evento",
+      "count_other": "{{count}} tareas registradas para este evento"
+    },
+    "reminders": {
+      "empty": "Aún no hay recordatorios"
+    }
   },
   "eventList": {
     "title": "Eventos",

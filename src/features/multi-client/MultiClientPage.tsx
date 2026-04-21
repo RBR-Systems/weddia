@@ -3,7 +3,7 @@
 import { Typography } from "antd";
 import Card from "@/shared/components/Card/Card";
 import styles from "./multi-client.module.css";
-import { MultiClientView } from "@/features/budget/components/bulk";
+import { MultiClientView } from "./components/MultiClientView/MultiClientView";
 import { useTranslation } from "react-i18next";
 
 const { Title } = Typography;

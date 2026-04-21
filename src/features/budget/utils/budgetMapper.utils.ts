@@ -31,6 +31,11 @@ function determineBudgetStatus(pctSpent: number, totalSpent: number): BudgetStat
   return "on_track";
 }
 
+function nowTimestamps() {
+  const now = new Date().toISOString();
+  return { created_at: now, updated_at: now };
+}
+
 // Single-pass aggregation over expenses — O(n) instead of O(V×E) nested filters
 function buildExpenseAggregates(expenses: ApiExpense[]) {
   const spentPerCategory = new Map<number, number>();
@@ -78,8 +83,7 @@ function mapCategories(
       percentage_of_spent: b.allocatedAmount > 0 ? (spent / b.allocatedAmount) * 100 : 0,
       expense_count: countPerCategory.get(b.categoryId) ?? 0,
       color: CATEGORY_COLORS[i % CATEGORY_COLORS.length],
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
+      ...nowTimestamps(),
     };
   });
 }
@@ -107,8 +111,7 @@ function mapExpenses(
       currency: e.currency ?? currency,
       notes: e.notes ?? "",
       receipt_url: e.receiptUrl ?? null,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
+      ...nowTimestamps(),
     };
   });
 }
@@ -131,8 +134,7 @@ function mapVendors(
     is_active: v.isActive,
     total_spent: spentPerVendor.get(v.vendorId) ?? 0,
     expense_count: countPerVendor.get(v.vendorId) ?? 0,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    ...nowTimestamps(),
   }));
 }
 

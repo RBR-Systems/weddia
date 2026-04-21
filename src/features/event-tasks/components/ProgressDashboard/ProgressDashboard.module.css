@@ -1,0 +1,119 @@
+.fullWidth {
+  width: 100%;
+}
+
+.completeIcon {
+  color: #22c55e;
+}
+
+.infoIcon {
+  color: #3b82f6;
+}
+
+.pendingIcon {
+  color: #f59e0b;
+}
+
+.milestoneIcon {
+  color: #f59e0b;
+}
+
+.teamIcon {
+  color: #5b6bc1;
+}
+
+.milestoneIconLarge {
+  color: #f59e0b;
+  font-size: 18px;
+}
+
+.helperTextSmall {
+  font-size: 12px;
+}
+
+.helperTextMedium {
+  font-size: 13px;
+}
+
+.overdueStatisticCard :global(.ant-statistic-content) {
+  color: #ef4444;
+}
+
+.categoryProgressList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.categoryRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.categoryName {
+  min-width: 140px;
+  font-size: var(--fs-sm);
+  font-weight: var(--semi-bold-font);
+}
+
+.categoryBar {
+  flex: 1;
+}
+
+.categoryFraction {
+  min-width: 60px;
+  font-size: var(--fs-xs);
+  text-align: right;
+  opacity: 0.7;
+}
+
+.priorityRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.workloadRow {
+  padding: 6px 0;
+}
+
+.milestoneRow {
+  padding: 8px 0;
+}
+
+.avatar {
+  font-size: 12px;
+}
+
+.avatarColor0 {
+  background-color: #c9a38c;
+}
+
+.avatarColor1 {
+  background-color: #5b6bc1;
+}
+
+.avatarColor2 {
+  background-color: #5cb68a;
+}
+
+.avatarColor3 {
+  background-color: #d4a29a;
+}
+
+.avatarColor4 {
+  background-color: #f59e0b;
+}
+
+.avatarColor5 {
+  background-color: #8b5cf6;
+}
+
+.memberName {
+  font-size: 13px;
+}
+
+.memberMeta {
+  font-size: 11px;
+}

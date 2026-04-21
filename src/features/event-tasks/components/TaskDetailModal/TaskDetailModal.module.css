@@ -1,0 +1,116 @@
+.modalTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.statusBar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.milestoneIcon {
+  color: #f59e0b;
+}
+
+.subtasksText {
+  font-size: 12px;
+}
+
+.detailSection {
+  margin-bottom: var(--spacing-lg);
+}
+
+.detailSectionTitle {
+  margin-bottom: var(--spacing-sm);
+  font-size: var(--fs-base);
+  font-weight: var(--semi-bold-font);
+}
+
+.detailGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-sm) var(--spacing-lg);
+}
+
+.detailLabel {
+  margin-bottom: 2px;
+  font-size: var(--fs-xs);
+  opacity: 0.6;
+}
+
+.detailValue {
+  font-size: var(--fs-sm);
+  font-weight: var(--medium-font);
+}
+
+.assigneeList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.assigneeItem {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.assigneeAvatar {
+  font-size: 12px;
+}
+
+.avatarColor0 {
+  background-color: #c9a38c;
+}
+
+.avatarColor1 {
+  background-color: #5b6bc1;
+}
+
+.avatarColor2 {
+  background-color: #5cb68a;
+}
+
+.avatarColor3 {
+  background-color: #d4a29a;
+}
+
+.avatarColor4 {
+  background-color: #f59e0b;
+}
+
+.avatarColor5 {
+  background-color: #8b5cf6;
+}
+
+.assigneeInfo {
+  flex: 1;
+}
+
+.assigneeName {
+  font-size: var(--fs-sm);
+  font-weight: var(--semi-bold-font);
+}
+
+.assigneeEmail {
+  font-size: var(--fs-xs);
+  opacity: 0.6;
+}
+
+.attachmentRow {
+  font-size: 13px;
+}
+
+.metadata {
+  font-size: 12px;
+  opacity: 0.5;
+}
+
+@media (max-width: 768px) {
+  .detailGrid {
+    grid-template-columns: 1fr;
+  }
+}

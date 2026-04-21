@@ -1,104 +1,28 @@
 "use client";
-import { EventActions } from "@/shared/contexts/eventActions";
-import { useEvent } from "@/shared/contexts/EventContext";
-import { apiPost } from "@/shared/api/apiClient";
-import { DatePicker, Form, Input, InputNumber, InputNumberProps, Modal, Select, message } from "antd";
-import { formatInputNumber, parseInputNumber } from "@/shared/utils/formatters.utils";
-import { useState } from "react";
-import dayjs from "dayjs";
+import { DatePicker, Form, Input, InputNumber, Modal, Select } from "antd";
 import TextArea from "antd/es/input/TextArea";
+import { DollarOutlined, EditOutlined, PushpinOutlined } from "@ant-design/icons";
+import { useTranslation } from "react-i18next";
 import { getWeddingThemes } from "@/shared/constants/weddingThemes.constants";
 import { useLocale } from "@/shared/hooks/useLocale";
+import { useCreateEvent } from "./hooks/useCreateEvent";
+import { budgetFormatter, budgetParser } from "./utils/createEvent.utils";
 import FormSection from "./components/FormSection";
 import ClientInfoForm from "./components/ClientInfoForm";
-import { DollarOutlined, EditOutlined, PushpinOutlined } from "@ant-design/icons";
 import styles from "./create-event-modal.module.css";
-import { useTranslation } from "react-i18next";
-import { EventStatus } from "@/features/events-list/models/enums/eventList.models";
-
-type RequiredMark = boolean | "optional";
 
 const CreateEventModal = () => {
   const { t } = useTranslation();
-  const [form] = Form.useForm();
-  const [requiredMark, setRequiredMarkType] = useState<RequiredMark>("optional");
-  const [saving, setSaving] = useState(false);
   const userLocale = useLocale();
-
-  const formatter: InputNumberProps<number>["formatter"] = (value) => {
-    if (!value) return "";
-    return `$ ${formatInputNumber(value)}`;
-  };
-
-  const onRequiredTypeChange = (_: unknown, values: { requiredMarkValue?: RequiredMark }) => {
-    if (values?.requiredMarkValue !== undefined) {
-      setRequiredMarkType(values.requiredMarkValue);
-    }
-  };
-
   const {
-    state: { events: { openCreateOpenModal } },
-    dispatch,
-  } = useEvent();
-
-  const closeModal = () => {
-    dispatch({ type: EventActions.SET_OPEN_CREATE_EVENT_MODAL, payload: false });
-  };
-
-  const handleOk = async () => {
-    try {
-      const values = await form.validateFields();
-      setSaving(true);
-      const isoDate: string = values.eventDate
-        ? (values.eventDate as dayjs.Dayjs).toISOString()
-        : new Date().toISOString();
-
-      const body = {
-        eventName: values.eventName,
-        title: values.eventName,
-        description: values.description ?? "",
-        eventDate: isoDate,
-        eventAddress: values.eventAddress ?? "",
-        budget: values.budget ?? 0,
-        status: "not_started",
-      };
-
-      const created = await apiPost<{ eventId: number }>("/api/events?adminId=1", body);
-
-      const d = new Date(isoDate);
-      const formattedDate = d.toLocaleDateString("en-US", {
-        day: "numeric", month: "long", year: "numeric",
-      });
-      dispatch({
-        type: EventActions.ADD_EVENT,
-        payload: {
-          id: created?.eventId,
-          eventName: values.eventName,
-          status: EventStatus.NOT_STARTED,
-          date: formattedDate,
-          rawDate: isoDate,
-          description: values.description ?? "",
-          clients: "",
-          location: values.eventAddress ?? "",
-          invites: 0,
-          rsvp: 0,
-          tasks: 0,
-          sits: 0,
-          budget: values.budget ?? 0,
-          spent: 0,
-        },
-      });
-
-      message.success(t("createEvent.title") + " ✓");
-      form.resetFields();
-      closeModal();
-    } catch (err: unknown) {
-      if (err && typeof err === "object" && "errorFields" in err) return; // validation error
-      message.error("Failed to create event");
-    } finally {
-      setSaving(false);
-    }
-  };
+    form,
+    saving,
+    requiredMark,
+    isOpen,
+    handleOk,
+    handleCancel,
+    onValuesChange,
+  } = useCreateEvent();
 
   return (
     <Modal
@@ -108,16 +32,16 @@ const CreateEventModal = () => {
       cancelText={t("common.cancel")}
       okButtonProps={{ className: styles.okButton, loading: saving }}
       okText={t("common.save")}
-      open={openCreateOpenModal}
+      open={isOpen}
       onOk={handleOk}
-      onCancel={closeModal}
+      onCancel={handleCancel}
     >
       <div className={styles.createEventModal}>
         <Form
           form={form}
           layout="vertical"
           initialValues={{ requiredMarkValue: requiredMark }}
-          onValuesChange={onRequiredTypeChange}
+          onValuesChange={onValuesChange}
           requiredMark={requiredMark}
         >
           <FormSection title={t("createEvent.sections.eventInfo")}>
@@ -192,11 +116,9 @@ const CreateEventModal = () => {
                 rules={[{ required: true, message: "Budget is required" }]}
               >
                 <InputNumber
-                  formatter={formatter}
+                  formatter={budgetFormatter}
+                  parser={budgetParser}
                   prefix={<DollarOutlined className={styles.iconSecondary} />}
-                  parser={(value) =>
-                    parseInputNumber(value) as unknown as number
-                  }
                   className={styles.budgetInput}
                 />
               </Form.Item>

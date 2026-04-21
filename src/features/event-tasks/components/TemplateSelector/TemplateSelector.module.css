@@ -1,0 +1,124 @@
+.loadingState {
+  padding: 60px;
+  text-align: center;
+}
+
+.fullWidth {
+  width: 100%;
+}
+
+.cardTitle {
+  margin-bottom: 4px;
+}
+
+.cardDescription {
+  font-size: 12px;
+}
+
+.cardMetaRow {
+  margin-top: 12px;
+}
+
+.cardMetaSecondary {
+  margin-left: 8px;
+}
+
+.cardTagRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.comingSoonCard {
+  height: 100%;
+  border-style: dashed;
+  opacity: 0.5;
+}
+
+.comingSoonContent {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 180px;
+}
+
+.previewTotalsMeta {
+  margin-left: 12px;
+}
+
+.templateSections {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--spacing-sm);
+  margin: var(--spacing-md) 0;
+}
+
+.templateSectionCard {
+  padding: var(--spacing-sm);
+  text-align: center;
+}
+
+.templateSectionName {
+  font-size: var(--fs-sm);
+  font-weight: var(--semi-bold-font);
+}
+
+.templateSectionCount {
+  font-size: var(--fs-xs);
+  opacity: 0.6;
+}
+
+.templateFeatures {
+  margin: var(--spacing-md) 0;
+}
+
+.templateFeatureItem {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-xs) 0;
+  font-size: var(--fs-sm);
+}
+
+.completeIcon {
+  color: #22c55e;
+}
+
+.previewTaskList {
+  padding-left: 20px;
+  font-size: 13px;
+}
+
+.previewTaskItem {
+  margin-bottom: 4px;
+}
+
+.optionalTag {
+  margin-left: 4px;
+  font-size: 10px;
+}
+
+.previewOverflowItem {
+  opacity: 0.5;
+}
+
+.helperText {
+  font-size: 12px;
+}
+
+.optionalToggleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.optionalSummary {
+  margin-top: 8px;
+}
+
+@media (max-width: 768px) {
+  .templateSections {
+    grid-template-columns: 1fr 1fr;
+  }
+}

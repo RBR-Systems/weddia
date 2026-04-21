@@ -150,20 +150,6 @@ export interface BudgetTemplate {
 
 export type BulkActionModal = 'status' | 'category' | 'delete' | null;
 
-export type ClientStatus = 'on_track' | 'at_risk' | 'over_budget' | 'completed';
-
-export interface ClientBudget {
-  id: string;
-  clientName: string;
-  partnerName?: string;
-  weddingDate: string;
-  totalBudget: number;
-  totalSpent: number;
-  status: ClientStatus;
-  lastUpdated: string;
-  expenseCount: number;
-}
-
 // Catalog (global lookup) category — distinct from a budget Category which has allocation data
 export interface CatalogCategory {
   category_id: string;

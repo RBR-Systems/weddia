@@ -4,7 +4,29 @@
     "startedOn": "Started on {{date}}",
     "weddingDay": "Wedding day on {{date}}",
     "statusInProgress": "Status in progress",
-    "event": "Event {{number}}"
+    "status": "Status: {{status}}",
+    "emptyState": "Select an event to see its hub",
+    "event": "Event {{number}}",
+    "sections": {
+      "statistics": "Statistics",
+      "upcomingTasks": "Upcoming Tasks",
+      "reminders": "Reminders",
+      "commonActions": "Common Actions"
+    },
+    "statistics": {
+      "date": "Date",
+      "location": "Location",
+      "budget": "Budget",
+      "tasks": "Tasks"
+    },
+    "upcomingTasks": {
+      "empty": "No tracked tasks yet",
+      "count_one": "1 tracked task for this event",
+      "count_other": "{{count}} tracked tasks for this event"
+    },
+    "reminders": {
+      "empty": "No reminders yet"
+    }
   },
   "eventList": {
     "title": "Events",

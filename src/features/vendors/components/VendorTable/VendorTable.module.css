@@ -1,0 +1,11 @@
+.avatarBlue {
+  background-color: var(--status-in-progress);
+}
+
+.smallText {
+  font-size: var(--fs-2xs);
+}
+
+.searchWidth {
+  width: 200px;
+}

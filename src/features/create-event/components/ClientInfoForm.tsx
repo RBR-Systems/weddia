@@ -3,6 +3,8 @@ import { Form, Input } from "antd";
 import { useState } from "react";
 import styles from "../create-event-modal.module.css";
 import { useTranslation } from "react-i18next";
+import { formatPhoneNumber } from "../utils/createEvent.utils";
+import { PHONE_FORMAT_REGEX } from "../constants/createEvent.constants";
 
 interface ClientInfoFormProps {
   readonly title: string;
@@ -18,26 +20,8 @@ const ClientInfoForm = ({
   const { t } = useTranslation();
   const [phoneValue, setPhoneValue] = useState("");
 
-  // Phone number formatting function
-  const formatPhoneNumber = (value: string) => {
-    const phoneNumber = value.replaceAll(/\D/g, "");
-
-    if (phoneNumber.length === 0) return "";
-    if (phoneNumber.length <= 2) {
-      return `(${phoneNumber}`;
-    } else if (phoneNumber.length <= 6) {
-      return `(${phoneNumber.slice(0, 2)}) ${phoneNumber.slice(2)}`;
-    } else {
-      return `(${phoneNumber.slice(0, 2)}) ${phoneNumber.slice(
-        2,
-        6
-      )}-${phoneNumber.slice(6, 10)}`;
-    }
-  };
-
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const formatted = formatPhoneNumber(e.target.value);
-    setPhoneValue(formatted);
+    setPhoneValue(formatPhoneNumber(e.target.value));
   };
 
   return (
@@ -65,7 +49,7 @@ const ClientInfoForm = ({
           rules={[
             { required: true, message: t("createEvent.clients.phoneRequired") },
             {
-              pattern: /^\(\d{3}\) \d{3}-\d{4}$/,
+              pattern: PHONE_FORMAT_REGEX,
               message: t("createEvent.clients.phoneInvalid"),
             },
           ]}

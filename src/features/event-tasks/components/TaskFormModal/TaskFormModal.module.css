@@ -1,0 +1,36 @@
+.fullWidth {
+  width: 100%;
+}
+
+.fullWidthField {
+  width: 100%;
+}
+
+.formField {
+  flex: 1 1 180px;
+}
+
+.fieldMin120 {
+  min-width: 120px;
+}
+
+.fieldMin140 {
+  min-width: 140px;
+}
+
+.fieldMin160 {
+  min-width: 160px;
+}
+
+.fieldMin180 {
+  min-width: 180px;
+}
+
+.memberAvatar {
+  background-color: #c9a38c;
+  font-size: 10px;
+}
+
+.memberRoleTag {
+  font-size: 10px;
+}
