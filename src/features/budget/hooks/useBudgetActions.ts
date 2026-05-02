@@ -82,18 +82,36 @@ export const useBudgetActions = ({
 
   const updateExpense = (id: string, data: Partial<Expense>) => {
     dispatch({ type: "UPDATE_EXPENSE", payload: { id, data } });
-    // Guard: temp IDs (id_xxx) haven't been synced to the server yet — skip API call.
     if (id.startsWith("id_")) return;
-    // Merge with current expense so the PUT always sends a complete payload.
-    // Without this, sending only { paymentStatus } overwrites all other fields to null on the backend.
-    const current = state.expenses.find((e) => e.expense_id === id) ?? {};
-    const apiData: Partial<Expense> & { vendor_id?: string } = { ...current, ...data };
-    const resolvedCategoryId = data.category_id ?? (current as Expense).category_id;
+
+    const current = state.expenses.find((e) => e.expense_id === id);
+
+    // Only merge the fields the PUT body actually handles — and only if they have a real value.
+    // Merging null fields explicitly would tell the backend to clear them (PUT = full replace).
+    const PUT_FIELDS = [
+      "description", "amount", "category_id", "vendor_id",
+      "expense_date", "notes", "currency", "payment_status",
+      "methodOfPayment", "receipt_url",
+    ] as const;
+    const apiData: Partial<Expense> & { vendor_id?: string } = { ...data };
+    if (current) {
+      const src = current as unknown as Record<string, unknown>;
+      for (const field of PUT_FIELDS) {
+        if (apiData[field as keyof typeof apiData] === undefined && src[field] != null) {
+          (apiData as Record<string, unknown>)[field] = src[field];
+        }
+      }
+    }
+
+    // Resolve category to catalog ID
+    const resolvedCategoryId = data.category_id ?? current?.category_id;
     if (resolvedCategoryId) {
       const cat = state.categories.find((c) => c.id === resolvedCategoryId);
       if (cat?.catalog_id) apiData.category_id = cat.catalog_id;
     }
+
     if (data.vendor_name !== undefined) apiData.vendor_id = resolveVendorId(data.vendor_name);
+
     apiUpdateExpense(eventId, id, apiData).catch((err) =>
       console.error("updateExpense failed:", err),
     );
