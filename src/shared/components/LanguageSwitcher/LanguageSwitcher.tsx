@@ -36,7 +36,7 @@ export default function LanguageSwitcher() {
       suffixIcon={<GlobalOutlined />}
       style={SELECT_STYLE}
       aria-label="Language selector"
-      bordered={false}
+      variant="borderless"
     />
   );
 }
