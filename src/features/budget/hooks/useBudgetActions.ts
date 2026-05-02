@@ -88,17 +88,26 @@ export const useBudgetActions = ({
 
     // Only merge the fields the PUT body actually handles — and only if they have a real value.
     // Merging null fields explicitly would tell the backend to clear them (PUT = full replace).
+    // Fields where we merge non-null values only
     const PUT_FIELDS = [
-      "description", "amount", "category_id", "vendor_id",
+      "description", "amount", "category_id",
       "expense_date", "notes", "currency", "payment_status",
       "methodOfPayment", "receipt_url",
     ] as const;
-    const apiData: Partial<Expense> & { vendor_id?: string } = { ...data };
+    // Fields that must always be sent even if null (backend requires them in PUT)
+    const ALWAYS_FIELDS = ["vendor_id", "event_id"] as const;
+
+    const apiData: Partial<Expense> & { vendor_id?: string | null; event_id?: string } = { ...data };
     if (current) {
       const src = current as unknown as Record<string, unknown>;
       for (const field of PUT_FIELDS) {
         if (apiData[field as keyof typeof apiData] === undefined && src[field] != null) {
           (apiData as Record<string, unknown>)[field] = src[field];
+        }
+      }
+      for (const field of ALWAYS_FIELDS) {
+        if ((apiData as Record<string, unknown>)[field] === undefined) {
+          (apiData as Record<string, unknown>)[field] = src[field] ?? null;
         }
       }
     }

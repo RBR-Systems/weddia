@@ -27,25 +27,21 @@ export async function createExpense(
 export async function updateExpense(
   _eventId: number,
   expenseId: string,
-  updates: Partial<Expense> & { vendor_id?: string },
+  updates: Partial<Expense> & { vendor_id?: string | null; event_id?: string },
 ): Promise<void> {
   const body: Record<string, unknown> = {};
   if (updates.description !== undefined) body.description = updates.description;
   if (updates.amount !== undefined) body.amount = updates.amount;
-  if (updates.category_id !== undefined)
-    body.categoryId = Number(updates.category_id);
-  if (updates.vendor_id !== undefined)
-    body.vendorId = updates.vendor_id ? Number(updates.vendor_id) : null;
-  if (updates.expense_date !== undefined)
-    body.expenseDate = updates.expense_date;
+  if (updates.category_id !== undefined) body.categoryId = Number(updates.category_id);
+  if (updates.expense_date !== undefined) body.expenseDate = updates.expense_date;
   if (updates.notes !== undefined) body.notes = updates.notes;
   if (updates.currency !== undefined) body.currency = updates.currency;
-  if (updates.payment_status !== undefined)
-    body.paymentStatus = updates.payment_status;
-  if (updates.methodOfPayment !== undefined)
-    body.methodOfPayment = updates.methodOfPayment;
-  if (updates.receipt_url !== undefined)
-    body.receiptUrl = updates.receipt_url ?? null;
+  if (updates.payment_status !== undefined) body.paymentStatus = updates.payment_status;
+  if (updates.methodOfPayment !== undefined) body.methodOfPayment = updates.methodOfPayment;
+  if (updates.receipt_url !== undefined) body.receiptUrl = updates.receipt_url ?? null;
+  // Always send vendorId and eventId — backend needs them even when null
+  body.vendorId = updates.vendor_id != null ? Number(updates.vendor_id) : null;
+  body.eventId = updates.event_id != null ? Number(updates.event_id) : null;
   await apiPut(`/api/expenses/${expenseId}?${ADMIN_QUERY_PARAM}`, body);
 }
 
