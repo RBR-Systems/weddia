@@ -51,14 +51,11 @@ export const PaymentStatusManager = () => {
 
   // Sync form values when the modal target expense changes
   useEffect(() => {
-    if (markPaidModal) {
-      form.setFieldsValue({
-        methodOfPayment: markPaidModal.methodOfPayment || undefined,
-        receipt_url:     markPaidModal.receipt_url ?? "",
-      });
-    } else {
-      form.resetFields();
-    }
+    if (!markPaidModal) return;
+    form.setFieldsValue({
+      methodOfPayment: markPaidModal.methodOfPayment || undefined,
+      receipt_url:     markPaidModal.receipt_url ?? "",
+    });
   }, [markPaidModal, form]);
 
   const handleMarkPaid = async () => {
@@ -82,7 +79,6 @@ export const PaymentStatusManager = () => {
 
   const handleCancelModal = () => {
     setMarkPaidModal(null);
-    form.resetFields();
   };
 
   const handleStatusChange = (expense: Expense, newStatus: PaymentStatus) => {
