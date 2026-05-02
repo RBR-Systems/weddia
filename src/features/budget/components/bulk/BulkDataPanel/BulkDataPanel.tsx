@@ -30,7 +30,7 @@ export const BulkDataPanel = ({
     <Row gutter={[16, 16]}>
       <Col xs={24} lg={12}>
         <Card title={t('bulkOperations.importData')}>
-          <Space direction="vertical" className={styles.fullWidth}>
+          <Space orientation="vertical" className={styles.fullWidth}>
             <Alert
               message={t('bulkOperations.csvImport')}
               description={t('bulkOperations.csvDescription')}
@@ -58,7 +58,7 @@ export const BulkDataPanel = ({
 
       <Col xs={24} lg={12}>
         <Card title={t('bulkOperations.exportData')}>
-          <Space direction="vertical" className={styles.fullWidth}>
+          <Space orientation="vertical" className={styles.fullWidth}>
             <Button icon={<DownloadOutlined />} onClick={onExportAll} block>
               {t('bulkOperations.exportAll', { count: expenseCount })}
             </Button>

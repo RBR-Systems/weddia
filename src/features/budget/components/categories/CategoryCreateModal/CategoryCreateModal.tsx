@@ -18,7 +18,7 @@ interface CatalogOptionProps {
 }
 
 const CatalogOption = ({ label, description }: CatalogOptionProps) => (
-  <Space direction="vertical" size={0}>
+  <Space orientation="vertical" size={0}>
     <span>{label}</span>
     {description && (
       <Text type="secondary" style={{ fontSize: 12 }}>

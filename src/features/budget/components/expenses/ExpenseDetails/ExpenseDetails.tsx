@@ -101,7 +101,7 @@ export function ExpenseDetails({
         <Divider>{t("expenseDetails.receipts")}</Divider>
 
         {expense.receipt_url ? (
-          <Space direction="vertical" className={styles.fullWidth}>
+          <Space orientation="vertical" className={styles.fullWidth}>
             <a
               href={expense.receipt_url}
               target="_blank"

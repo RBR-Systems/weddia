@@ -160,7 +160,7 @@ export function BudgetAllocation() {
 
       {unallocated < 0 && (
         <Alert
-          message={t("budgetAllocation.overAllocatedTitle")}
+          title={t("budgetAllocation.overAllocatedTitle")}
           description={t("budgetAllocation.overAllocatedDesc", {
             amount: formatCurrency(Math.abs(unallocated), state.currency),
           })}

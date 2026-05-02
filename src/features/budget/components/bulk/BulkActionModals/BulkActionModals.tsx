@@ -50,7 +50,7 @@ export const BulkActionModals = ({
         onOk={onConfirmStatus}
         onCancel={onCancel}
       >
-        <Space direction="vertical" className={styles.fullWidth}>
+        <Space orientation="vertical" className={styles.fullWidth}>
           <Typography.Text>
             {t('bulkOperations.updateExpensesTo', { count: selectedCount })}
           </Typography.Text>
@@ -69,7 +69,7 @@ export const BulkActionModals = ({
         onOk={onConfirmCategory}
         onCancel={onCancel}
       >
-        <Space direction="vertical" className={styles.fullWidth}>
+        <Space orientation="vertical" className={styles.fullWidth}>
           <Typography.Text>
             {t('bulkOperations.moveExpensesTo', { count: selectedCount })}
           </Typography.Text>

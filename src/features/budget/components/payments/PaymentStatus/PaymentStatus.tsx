@@ -245,7 +245,7 @@ export const PaymentStatusManager = () => {
         okText={t("paymentStatus.confirmPayment")}
       >
         {markPaidModal && (
-          <Space direction="vertical" style={{ width: "100%" }}>
+          <Space orientation="vertical" style={{ width: "100%" }}>
             <div>
               <Text type="secondary">{t("paymentStatus.expense")}</Text>
               <div><Text strong>{markPaidModal.description}</Text></div>
