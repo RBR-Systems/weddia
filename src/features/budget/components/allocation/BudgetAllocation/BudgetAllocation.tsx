@@ -1,9 +1,9 @@
 "use client";
 import { useState, useCallback } from "react";
-import { Card, Row, Col, InputNumber, Typography, Space, Button, Divider, Alert, Tooltip } from "antd";
+import { Card, Row, Col, InputNumber, Typography, Space, Button, Divider, Alert } from "antd";
 import Statistic from "@/shared/components/AnimatedStatistic/AnimatedStatistic";
 import { useTranslation } from "react-i18next";
-import { EditOutlined } from "@ant-design/icons";
+import { EditOutlined, CheckOutlined } from "@ant-design/icons";
 import { useBudget } from "../../../contexts/BudgetContext";
 import { formatCurrency, formatInputNumber, parseInputNumber } from "@/shared/utils/formatters.utils";
 import { computeAllocatedTotal } from "../../../utils/budget.utils";
@@ -11,10 +11,8 @@ import { AllocationCategoryRow } from "../AllocationCategoryRow/AllocationCatego
 import type { Category } from "../../../models/budget.models";
 import styles from "./BudgetAllocation.module.css";
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
-const CURSOR_POINTER_STYLE = { cursor: "pointer" } as const;
-const EDIT_ICON_STYLE = { color: "var(--text-secondary)", fontSize: 14 } as const;
 const formatBudgetInput = (value?: number | string) => `$ ${formatInputNumber(value)}`;
 const parseBudgetInput = (value?: string) => Number(parseInputNumber(value));
 
@@ -67,21 +65,23 @@ export function BudgetAllocation() {
     <Card
       title={t("budgetAllocation.title")}
       extra={
-        <Space>
-          <Button onClick={distributeEvenly}>{t("budgetAllocation.distributeEvenly")}</Button>
-        </Space>
+        <Button size="small" onClick={distributeEvenly}>
+          {t("budgetAllocation.distributeEvenly")}
+        </Button>
       }
     >
-      <Row gutter={[16, 16]}>
-        <Col xs={24} md={6}>
+      <Row gutter={[12, 12]}>
+        {/* Total Budget — editable */}
+        <Col xs={12} sm={12} md={6}>
           <Card
             size="small"
-            style={CURSOR_POINTER_STYLE}
+            className={styles.statCard}
+            style={{ "--accent-color": "var(--primary)" } as React.CSSProperties}
+            styles={{ body: { cursor: editingBudget ? "default" : "pointer" } }}
             onClick={editingBudget ? undefined : handleEditBudget}
           >
             {editingBudget ? (
-              <Space orientation="vertical" className={styles.fullWidth}>
-                <Text type="secondary">{t("budgetAllocation.totalBudget")}</Text>
+              <Space.Compact style={{ width: "100%" }}>
                 <InputNumber
                   autoFocus
                   min={0}
@@ -92,43 +92,64 @@ export function BudgetAllocation() {
                   onBlur={handleSaveBudget}
                   formatter={formatBudgetInput}
                   parser={parseBudgetInput}
-                  className={styles.fullWidth}
-                  size="large"
+                  style={{ width: "100%" }}
                 />
-              </Space>
+                <Button icon={<CheckOutlined />} onClick={handleSaveBudget} type="primary" />
+              </Space.Compact>
             ) : (
-              <Tooltip title={t("budgetStats.clickToEdit")}>
-                <Space>
-                  <Statistic
-                    title={t("budgetAllocation.totalBudget")}
-                    value={formatCurrency(totalBudget, state.currency)}
-                  />
-                  <EditOutlined style={EDIT_ICON_STYLE} />
-                </Space>
-              </Tooltip>
+              <Statistic
+                title={
+                  <span>
+                    {t("budgetAllocation.totalBudget")}{" "}
+                    <EditOutlined style={{ fontSize: 11, opacity: 0.4 }} />
+                  </span>
+                }
+                value={formatCurrency(totalBudget, state.currency)}
+              />
             )}
           </Card>
         </Col>
-        <Col xs={24} md={6}>
-          <Card size="small">
-            <Title level={5}>{t("budgetAllocation.allocation")}</Title>
-            <Statistic value={totalAllocated} formatter={formatAsCurrency} />
+
+        {/* Total Allocated */}
+        <Col xs={12} sm={12} md={6}>
+          <Card
+            size="small"
+            className={styles.statCard}
+            style={{ "--accent-color": "var(--status-in-progress)" } as React.CSSProperties}
+          >
+            <Statistic
+              title={t("budgetAllocation.allocation")}
+              value={totalAllocated}
+              formatter={formatAsCurrency}
+            />
           </Card>
         </Col>
-        <Col xs={24} md={6}>
-          <Card size="small">
-            <Title level={5}>{t("budgetAllocation.unallocated")}</Title>
+
+        {/* Unallocated */}
+        <Col xs={12} sm={12} md={6}>
+          <Card
+            size="small"
+            className={styles.statCard}
+            style={{ "--accent-color": unallocated < 0 ? "var(--budget-danger)" : "var(--status-completed)" } as React.CSSProperties}
+          >
             <Statistic
+              title={t("budgetAllocation.unallocated")}
               value={unallocated}
               formatter={formatAsCurrency}
               styles={{ content: { color: unallocated < 0 ? "var(--budget-danger)" : undefined } }}
             />
           </Card>
         </Col>
-        <Col xs={24} md={6}>
-          <Card size="small">
-            <Title level={5}>{t("budgetAllocation.allocationPercent")}</Title>
+
+        {/* Allocation % */}
+        <Col xs={12} sm={12} md={6}>
+          <Card
+            size="small"
+            className={styles.statCard}
+            style={{ "--accent-color": allocationPercentage > 100 ? "var(--budget-danger)" : "var(--primary)" } as React.CSSProperties}
+          >
             <Statistic
+              title={t("budgetAllocation.allocationPercent")}
               value={allocationPercentage}
               suffix="%"
               styles={{ content: { color: allocationPercentage > 100 ? "var(--budget-danger)" : undefined } }}
@@ -139,7 +160,7 @@ export function BudgetAllocation() {
 
       {unallocated < 0 && (
         <Alert
-          title={t("budgetAllocation.overAllocatedTitle")}
+          message={t("budgetAllocation.overAllocatedTitle")}
           description={t("budgetAllocation.overAllocatedDesc", {
             amount: formatCurrency(Math.abs(unallocated), state.currency),
           })}
@@ -151,19 +172,22 @@ export function BudgetAllocation() {
 
       <Divider />
 
-      <Space orientation="vertical" className={styles.fullWidth} size="large">
-        {state.categories.map((category: Category) => (
-          <AllocationCategoryRow
-            key={category.id}
-            category={category}
-            totalBudget={totalBudget}
-            currency={state.currency}
-            onSliderChange={handleSliderChange}
-            onInputChange={handleInputChange}
-          />
-        ))}
-      </Space>
+      {state.categories.length === 0 ? (
+        <Text type="secondary">{t("budgetAllocation.noCategories")}</Text>
+      ) : (
+        <div className={styles.categoryList}>
+          {state.categories.map((category: Category) => (
+            <AllocationCategoryRow
+              key={category.id}
+              category={category}
+              totalBudget={totalBudget}
+              currency={state.currency}
+              onSliderChange={handleSliderChange}
+              onInputChange={handleInputChange}
+            />
+          ))}
+        </div>
+      )}
     </Card>
   );
 }
-

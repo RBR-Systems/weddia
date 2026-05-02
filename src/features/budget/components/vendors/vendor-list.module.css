@@ -1,15 +1,53 @@
-.rowSpacing {
+.statsRow {
   margin-bottom: var(--spacing-md);
+}
+
+.statCard {
+  height: 100%;
+  border-left: 3px solid var(--accent-color, var(--primary));
+  transition: box-shadow 0.2s ease;
+}
+
+.statCard:hover {
+  box-shadow: var(--shadow-warm-sm);
 }
 
 .avatarBlue {
   background-color: var(--status-in-progress);
+  flex-shrink: 0;
+}
+
+.vendorInfo {
+  min-width: 0;
+}
+
+.vendorName {
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .smallText {
   font-size: var(--fs-2xs);
+  color: var(--text-color-secondary);
 }
 
 .searchWidth {
   width: 200px;
+}
+
+@media (max-width: 576px) {
+  .searchWidth {
+    width: 140px;
+  }
+}
+
+.tableWrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.rowSpacing {
+  margin-bottom: var(--spacing-md);
 }

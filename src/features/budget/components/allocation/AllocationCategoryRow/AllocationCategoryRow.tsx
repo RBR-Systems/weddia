@@ -1,8 +1,7 @@
 "use client";
 import React, { useCallback } from "react";
-import { Row, Col, Slider, InputNumber, Typography, Space } from "antd";
+import { Slider, InputNumber, Typography } from "antd";
 import { useTranslation } from "react-i18next";
-import Statistic from "@/shared/components/AnimatedStatistic/AnimatedStatistic";
 import { formatCurrency, formatInputNumber, parseInputNumber } from "@/shared/utils/formatters.utils";
 import type { Category, Currency } from "../../../models/budget.models";
 import styles from "./AllocationCategoryRow.module.css";
@@ -31,11 +30,10 @@ export const AllocationCategoryRow = React.memo(function AllocationCategoryRow({
 
   const allocated = category.allocated ?? 0;
   const percentage =
-    totalBudget > 0 ? Number.parseFloat(((allocated / totalBudget) * 100).toFixed(2)) : 0;
-  // category.remaining is kept current by the reducer on every updateCategory call
+    totalBudget > 0 ? Number.parseFloat(((allocated / totalBudget) * 100).toFixed(1)) : 0;
   const remainingValue = category.remaining ?? 0;
   const remainingLabel =
-    (remainingValue >= 0 ? "+" : "-") + formatCurrency(Math.abs(remainingValue), currency);
+    (remainingValue >= 0 ? "+" : "–") + formatCurrency(Math.abs(remainingValue), currency);
   const categoryColor = category.color ?? "var(--status-in-progress)";
 
   const handleSliderChange = useCallback(
@@ -49,21 +47,23 @@ export const AllocationCategoryRow = React.memo(function AllocationCategoryRow({
   );
 
   return (
-    <div>
+    <div
+      className={styles.rowCard}
+      style={{ "--category-color": categoryColor } as React.CSSProperties}
+    >
       <div className={styles.categoryRow}>
-        <Space>
+        <div className={styles.categoryLeft}>
           <span className={styles.categoryDot} style={{ backgroundColor: categoryColor }} />
           <Text strong>{category.name}</Text>
-        </Space>
-        <div>
-          <Text type="secondary" className={styles.smallText}>
-            <Statistic value={percentage} suffix={`% ${t("budgetAllocation.ofBudget")}`} />
-            {t("budgetAllocation.remaining", { amount: remainingLabel })}
-          </Text>
+        </div>
+        <div className={styles.categoryRight}>
+          <span className={styles.pctBadge}>{percentage}%</span>
+          <Text className={styles.remaining}>{t("budgetAllocation.remaining", { amount: remainingLabel })}</Text>
         </div>
       </div>
-      <Row gutter={16} align="middle">
-        <Col flex="auto">
+
+      <div className={styles.sliderRow}>
+        <div className={styles.sliderWrap}>
           <Slider
             min={0}
             max={totalBudget}
@@ -73,8 +73,8 @@ export const AllocationCategoryRow = React.memo(function AllocationCategoryRow({
             trackStyle={{ backgroundColor: categoryColor }}
             handleStyle={{ borderColor: categoryColor }}
           />
-        </Col>
-        <Col flex="150px">
+        </div>
+        <div className={styles.inputWrap}>
           <InputNumber
             min={0}
             max={totalBudget * 2}
@@ -83,14 +83,13 @@ export const AllocationCategoryRow = React.memo(function AllocationCategoryRow({
             onChange={handleInputChange}
             formatter={formatAllocationInput}
             parser={parseAllocationInput}
-            className="u-full-width"
+            style={{ width: "100%" }}
           />
-        </Col>
-      </Row>
-      <div className={styles.categoryFooter}>
-        <Text type="secondary" className={styles.smallText}>
-          {t("budgetAllocation.allocated", { amount: formatCurrency(allocated, currency) })}
-        </Text>
+        </div>
+      </div>
+
+      <div className={styles.allocatedFooter}>
+        {t("budgetAllocation.allocated", { amount: formatCurrency(allocated, currency) })}
       </div>
     </div>
   );

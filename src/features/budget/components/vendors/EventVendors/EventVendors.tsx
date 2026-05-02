@@ -2,7 +2,7 @@
 import { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { App, Table, Button, Switch, Input, Tag, Avatar, Space, Typography, Row, Col } from "antd";
-import { ShopOutlined, EyeOutlined } from "@ant-design/icons";
+import { ShopOutlined, EyeOutlined, TeamOutlined, LinkOutlined, DollarOutlined } from "@ant-design/icons";
 import { useBudget } from "../../../contexts/BudgetContext";
 import { formatCurrency } from "@/shared/utils/formatters.utils";
 import Card from "@/shared/components/Card/Card";
@@ -28,10 +28,7 @@ export default function EventVendors({ onViewVendor }: EventVendorsProps) {
   const [searchTerm, setSearchTerm] = useState("");
 
   const filtered = useMemo(
-    () =>
-      state.vendors.filter((v: Vendor) =>
-        v.name.toLowerCase().includes(searchTerm.toLowerCase()),
-      ),
+    () => state.vendors.filter((v: Vendor) => v.name.toLowerCase().includes(searchTerm.toLowerCase())),
     [state.vendors, searchTerm],
   );
 
@@ -52,15 +49,13 @@ export default function EventVendors({ onViewVendor }: EventVendorsProps) {
     {
       title: t("vendorList.columns.vendor"),
       key: "vendor",
+      minWidth: 180,
       render: (_, record) => (
         <Space>
-          <Avatar className={styles.avatarBlue} icon={<ShopOutlined />} />
-          <div>
-            <Text strong>{record.name}</Text>
-            <br />
-            <Text type="secondary" className={styles.smallText}>
-              {record.category}
-            </Text>
+          <Avatar className={styles.avatarBlue} icon={<ShopOutlined />} size={36} />
+          <div className={styles.vendorInfo}>
+            <div className={styles.vendorName}>{record.name}</div>
+            <div className={styles.smallText}>{record.category || "—"}</div>
           </div>
         </Space>
       ),
@@ -68,10 +63,11 @@ export default function EventVendors({ onViewVendor }: EventVendorsProps) {
     {
       title: t("vendorList.columns.status"),
       key: "status",
+      width: 100,
       render: (_, record) => {
         const isActive = record.is_active ?? true;
         return (
-          <Tag color={isActive ? "green" : "default"}>
+          <Tag color={isActive ? "success" : "default"} style={{ margin: 0 }}>
             {isActive ? t("vendorList.active") : t("vendorList.inactive")}
           </Tag>
         );
@@ -81,47 +77,49 @@ export default function EventVendors({ onViewVendor }: EventVendorsProps) {
       title: t("vendorList.columns.expenses"),
       key: "expense_count",
       align: "center",
-      render: (_, record) => record.expense_count ?? 0,
+      width: 90,
+      render: (_, record) => (
+        <Text type="secondary">{record.expense_count ?? 0}</Text>
+      ),
     },
     {
       title: t("vendorList.columns.totalSpent"),
       key: "total_spent",
       align: "right",
-      render: (_, record) =>
-        formatCurrency(record.total_spent ?? 0, state.currency),
+      width: 120,
+      render: (_, record) => (
+        <Text strong>{formatCurrency(record.total_spent ?? 0, state.currency)}</Text>
+      ),
+      sorter: (a, b) => (a.total_spent ?? 0) - (b.total_spent ?? 0),
     },
     {
       title: t("eventVendors.assigned"),
       key: "assigned",
       align: "center",
+      width: 90,
       render: (_, record) => (
         <Switch
           checked={state.eventVendorIds.includes(record.vendor_id)}
+          size="small"
           onChange={(checked) => {
-            if (checked) {
-              assignVendor(record.vendor_id);
-              return;
-            }
-
+            if (checked) { assignVendor(record.vendor_id); return; }
             const hasExpenses = state.expenses.some(
               (e: { vendor_name?: string }) => e.vendor_name === record.name,
             );
-            if (hasExpenses) {
-              message.warning(t("eventVendors.cannotUnassign"));
-              return;
-            }
-
+            if (hasExpenses) { message.warning(t("eventVendors.cannotUnassign")); return; }
             unassignVendor(record.vendor_id);
           }}
         />
       ),
     },
     {
-      title: t("vendorList.columns.actions"),
+      title: "",
       key: "actions",
+      width: 50,
       render: (_, record) => (
         <Button
           type="text"
+          size="small"
           icon={<EyeOutlined />}
           onClick={() => onViewVendor?.(record)}
         />
@@ -131,28 +129,31 @@ export default function EventVendors({ onViewVendor }: EventVendorsProps) {
 
   return (
     <>
-      <Row gutter={16} className={styles.rowSpacing}>
+      <Row gutter={[12, 12]} className={styles.statsRow}>
         <Col xs={24} sm={8}>
-          <Card size="small">
+          <Card size="small" className={styles.statCard} style={{ "--accent-color": "var(--primary)" } as React.CSSProperties}>
             <Statistic
               title={t("eventVendors.totalCatalog")}
               value={state.vendors.length}
+              prefix={<ShopOutlined style={{ fontSize: 13, marginRight: 4, color: "var(--primary)" }} />}
             />
           </Card>
         </Col>
         <Col xs={24} sm={8}>
-          <Card size="small">
+          <Card size="small" className={styles.statCard} style={{ "--accent-color": "var(--status-in-progress)" } as React.CSSProperties}>
             <Statistic
               title={t("eventVendors.assignedToEvent")}
               value={assignedCount}
+              prefix={<LinkOutlined style={{ fontSize: 13, marginRight: 4, color: "var(--status-in-progress)" }} />}
             />
           </Card>
         </Col>
         <Col xs={24} sm={8}>
-          <Card size="small">
+          <Card size="small" className={styles.statCard} style={{ "--accent-color": "var(--status-completed)" } as React.CSSProperties}>
             <Statistic
               title={t("eventVendors.eventSpending")}
               value={totalEventSpending}
+              prefix={<DollarOutlined style={{ fontSize: 13, marginRight: 4, color: "var(--status-completed)" }} />}
               formatter={(v: number | string) => formatCurrency(Number(v), state.currency)}
             />
           </Card>
@@ -168,6 +169,7 @@ export default function EventVendors({ onViewVendor }: EventVendorsProps) {
             onSearch={setSearchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className={styles.searchWidth}
+            size="small"
           />
         }
       >
@@ -176,7 +178,9 @@ export default function EventVendors({ onViewVendor }: EventVendorsProps) {
           dataSource={filtered}
           rowKey="vendor_id"
           pagination={VENDOR_TABLE_PAGINATION}
+          scroll={{ x: 600 }}
           locale={{ emptyText: t("eventVendors.emptyText") }}
+          size="middle"
         />
       </Card>
     </>

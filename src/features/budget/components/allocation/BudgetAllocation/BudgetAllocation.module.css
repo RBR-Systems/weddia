@@ -5,3 +5,19 @@
 .fullWidth {
   width: 100%;
 }
+
+.statCard {
+  height: 100%;
+  border-left: 3px solid var(--accent-color, var(--primary));
+  transition: box-shadow 0.2s ease;
+}
+
+.statCard:hover {
+  box-shadow: var(--shadow-warm-sm);
+}
+
+.categoryList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
