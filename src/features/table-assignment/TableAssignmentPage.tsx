@@ -4,7 +4,7 @@ import { App, Card, Empty, Space, Typography, Button, FloatButton, InputNumber, 
 import { DEFAULT_VENUE_WIDTH_METERS } from "./constants/tableAssignment.constants";
 import { DndContext, DragOverlay, pointerWithin } from "@dnd-kit/core";
 import { TeamOutlined, MessageOutlined, UndoOutlined, PlusOutlined, ZoomOutOutlined, ZoomInOutlined, PlusSquareOutlined } from "@ant-design/icons";
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import TableCanvas from "./components/Tables/TableCanvas/TableCanvas";
 import SeatingAIChat from "./components/AIChat/SeatingAIChat";
 import { useTableAssignmentContext, TableAssignmentProvider } from "./context/TableAssignmentContext";
@@ -76,8 +76,20 @@ function TableAssignmentContent() {
     addTable,
   } = useTableAssignmentContext();
 
-  const canvasWrapperRef = React.useRef<HTMLDivElement | null>(null);
+  const canvasWrapperRef = useRef<HTMLDivElement | null>(null);
+  const hasFittedRef = useRef(false);
   const [addTableOpen, setAddTableOpen] = useState(false);
+
+  useEffect(() => {
+    if (hasFittedRef.current || tablesForActiveLayout.length === 0) return;
+    const frame = requestAnimationFrame(() => {
+      const w = canvasWrapperRef.current?.clientWidth ?? 800;
+      const h = canvasWrapperRef.current?.clientHeight ?? 600;
+      handleZoomFit(w, h);
+      hasFittedRef.current = true;
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [tablesForActiveLayout.length, handleZoomFit]);
   const [addTableForm] = Form.useForm();
 
   if (!activeLayout) {

@@ -237,27 +237,25 @@ export default function BudgetStats() {
               </div>
             </div>
           ) : (
-            <Tooltip title={t("budgetStats.clickToEdit")}>
-              <StatCard
-                icon={<WalletOutlined />}
-                label={t("budgetStats.totalBudget")}
-                content={
-                  <AnimatedStatistic
-                    value={formatCurrency(summary.total_budget, currency)}
-                    styles={{
-                      content: {
-                        fontSize: 26,
-                        fontWeight: 700,
-                        lineHeight: 1.1,
-                      },
-                    }}
-                  />
-                }
-                accentColor="var(--primary)"
-                onClick={handleEditBudget}
-                showEditHint
-              />
-            </Tooltip>
+            <StatCard
+              icon={<WalletOutlined />}
+              label={t("budgetStats.totalBudget")}
+              content={
+                <AnimatedStatistic
+                  value={formatCurrency(summary.total_budget, currency)}
+                  styles={{
+                    content: {
+                      fontSize: 26,
+                      fontWeight: 700,
+                      lineHeight: 1.1,
+                    },
+                  }}
+                />
+              }
+              accentColor="var(--primary)"
+              onClick={handleEditBudget}
+              showEditHint
+            />
           )}
         </Col>
 
