@@ -76,9 +76,13 @@ export const useBudgetActions = ({
 
   const updateExpense = (id: string, data: Partial<Expense>) => {
     dispatch({ type: "UPDATE_EXPENSE", payload: { id, data } });
-    const apiData: Partial<Expense> & { vendor_id?: string } = { ...data };
-    if (data.category_id) {
-      const cat = state.categories.find((c) => c.id === data.category_id);
+    // Merge with current expense so the PUT always sends a complete payload.
+    // Without this, sending only { paymentStatus } overwrites all other fields to null on the backend.
+    const current = state.expenses.find((e) => e.expense_id === id) ?? {};
+    const apiData: Partial<Expense> & { vendor_id?: string } = { ...current, ...data };
+    const resolvedCategoryId = data.category_id ?? (current as Expense).category_id;
+    if (resolvedCategoryId) {
+      const cat = state.categories.find((c) => c.id === resolvedCategoryId);
       if (cat?.catalog_id) apiData.category_id = cat.catalog_id;
     }
     if (data.vendor_name !== undefined) apiData.vendor_id = resolveVendorId(data.vendor_name);
