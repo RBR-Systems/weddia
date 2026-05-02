@@ -118,7 +118,7 @@ export function MultiClientView({ onSelectClient }: MultiClientViewProps) {
       title: t('multiClientView.columns.expenses'),
       dataIndex: 'expenseCount',
       key: 'expenseCount',
-      sorter: (a, b) => a.expenseCount - b.expenseCount,
+      sorter: (a, b) => (a.expenseCount ?? 0) - (b.expenseCount ?? 0),
     },
     {
       title: t('multiClientView.columns.daysUntil'),

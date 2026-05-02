@@ -9,7 +9,7 @@ export interface ClientBudget {
   totalSpent: number;
   status: ClientStatus;
   lastUpdated: string;
-  expenseCount: number;
+  expenseCount?: number;
 }
 
 export interface UseMultiClientViewResult {
