@@ -1,3 +1,6 @@
+import type { Vendor } from "@/shared/models/vendor.models";
+export type { Vendor };
+
 export type Currency = "USD" | "EUR" | "GBP" | "MXN" | "CAD";
 
 export type BudgetStatus =
@@ -52,20 +55,6 @@ export interface Expense {
   currency?: string;
 }
 
-export interface Vendor {
-  vendor_id: string;
-  name: string;
-  category?: string;
-  contact_name?: string;
-  email?: string;
-  phone?: string;
-  address?: string;
-  notes?: string;
-  rating?: number;
-  is_active?: boolean;
-  total_spent?: number;
-  expense_count?: number;
-}
 
 export interface BudgetItem {
   item_id: string;

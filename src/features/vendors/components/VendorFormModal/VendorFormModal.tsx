@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Modal, Form, Input, Select, Switch } from "antd";
 import { PhoneOutlined, MailOutlined, UserOutlined, EnvironmentOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
-import type { Vendor } from "@/features/budget/models/budget.models";
+import type { Vendor } from "@/shared/models/vendor.models";
 import type { VendorFormValues } from "../../models/vendor.models";
 import { VENDOR_CATEGORIES } from "../../constants/vendor.constants";
 import styles from "./VendorFormModal.module.css";

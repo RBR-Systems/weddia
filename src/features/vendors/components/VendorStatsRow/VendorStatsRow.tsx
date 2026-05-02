@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useMemo } from "react";
 import Card from "@/shared/components/Card/Card";
 import Statistic from "@/shared/components/AnimatedStatistic/AnimatedStatistic";
-import type { Vendor } from "@/features/budget/models/budget.models";
+import type { Vendor } from "@/shared/models/vendor.models";
 import styles from "./VendorStatsRow.module.css";
 
 interface VendorStatsRowProps {

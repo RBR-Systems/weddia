@@ -7,7 +7,7 @@ import { formatCurrency } from '@/shared/utils/formatters.utils';
 import { useTranslation } from 'react-i18next';
 import { CHART_COLORS, SEMANTIC_CHART_COLORS } from '@/theme/chartColors';
 import { useTheme } from '@/theme/ThemeProvider';
-import { DEFAULT_CURRENCY } from '@/features/budget/constants/budget.constants';
+import { DEFAULT_CURRENCY } from '@/shared/constants/app.constants';
 import type { ClientBudget } from '../../models/multi-client.models';
 import {
   CLIENT_STATUS_CONFIG,

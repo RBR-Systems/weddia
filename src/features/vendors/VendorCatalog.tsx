@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Typography } from "antd";
 import { useTranslation } from "react-i18next";
-import type { Vendor } from "@/features/budget/models/budget.models";
+import type { Vendor } from "@/shared/models/vendor.models";
 import { useVendors } from "./hooks/useVendors";
 import { VendorStatsRow } from "./components/VendorStatsRow/VendorStatsRow";
 import { VendorTable } from "./components/VendorTable/VendorTable";

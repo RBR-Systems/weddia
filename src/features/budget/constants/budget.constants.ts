@@ -1,5 +1,7 @@
 import i18next from "i18next";
 import { CHART_COLORS } from "@/theme/chartColors";
+import { DEFAULT_CURRENCY } from "@/shared/constants/app.constants";
+import { ADMIN_QUERY_PARAM } from "@/shared/constants/api.constants";
 import type { BudgetState, Currency, EstimateCategory, PaymentStatus, WeddingStyle, BudgetTemplate } from '../models/budget.models';
 
 export const getDefaultCategories = () => [
@@ -46,10 +48,9 @@ export const CURRENCIES = {
   MXN: { code: "MXN", symbol: "$", name: "Mexican Peso", locale: "es-MX" },
 } as const;
 
-export const DEFAULT_CURRENCY = "USD";
+export { DEFAULT_CURRENCY, ADMIN_QUERY_PARAM };
 export const EMPTY_VALUE_DISPLAY = "—";
 export const DATE_DISPLAY_LOCALE = "en-US" as const;
-export const ADMIN_QUERY_PARAM = "adminId=1";
 export const BUDGET_STATUS_AT_RISK_PERCENT = 80;
 export const BUDGET_STATUS_OVER_PERCENT = 100;
 

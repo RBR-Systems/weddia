@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import type { MessageInstance } from "antd/es/message/interface";
 import { getSeatingRecommendation, testHuggingFaceConnection } from "../../../api/huggingfaceApi";
 import type { HFGuest, HFTable, SeatingResponse } from "../../../models/huggingface.models";
 import { MessageItem } from "../models/seatingAI.models";
@@ -9,7 +10,7 @@ interface UseSeatingAIParams {
   guests: HFGuest[];
   tables: HFTable[];
   onApplySeating: (assignments: SeatingResponse["assignments"]) => void;
-  messageApi?: any;
+  messageApi?: MessageInstance;
 }
 
 export const useSeatingAI = ({

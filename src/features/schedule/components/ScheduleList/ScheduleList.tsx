@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useMemo, useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { Timeline } from "antd";
+import { Timeline, type TimelineItemProps } from "antd";
 import { ClockCircleOutlined } from "@ant-design/icons";
 import { TimelineItem, Status } from "../../models/schedule.models";
 import ScheduleItem from "../ScheduleItem/ScheduleItem";
@@ -116,7 +116,7 @@ const ScheduleList: React.FC<Props> = ({
       ),
       color,
       icon,
-    } as any;
+    } satisfies TimelineItemProps;
   });
 
   // Insert NOW indicator at the correct position

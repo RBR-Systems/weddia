@@ -2,8 +2,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { App } from "antd";
 import { useTranslation } from "react-i18next";
-import { getVendors, createVendor, updateVendor, deleteVendor } from "@/features/budget/api/vendorsApi";
-import type { Vendor } from "@/features/budget/models/budget.models";
+import { getVendors, createVendor, updateVendor, deleteVendor } from "../api/vendorsApi";
+import type { Vendor } from "@/shared/models/vendor.models";
 import type { VendorFormValues } from "../models/vendor.models";
 
 interface UseVendorsResult {

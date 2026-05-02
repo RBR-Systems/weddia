@@ -4,7 +4,7 @@ import { PlusOutlined, ShopOutlined, PhoneOutlined, MailOutlined, EditOutlined, 
 import { Popconfirm } from "antd";
 import { useTranslation } from "react-i18next";
 import type { ColumnsType } from "antd/es/table";
-import type { Vendor } from "@/features/budget/models/budget.models";
+import type { Vendor } from "@/shared/models/vendor.models";
 import Card from "@/shared/components/Card/Card";
 import { VENDOR_CATALOG_PAGE_SIZE } from "../../constants/vendor.constants";
 import styles from "./VendorTable.module.css";

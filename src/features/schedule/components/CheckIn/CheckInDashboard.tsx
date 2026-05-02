@@ -31,7 +31,7 @@ const CheckInDashboard: React.FC<CheckInDashboardProps> = ({ onNavigateToTable }
   const { t } = useTranslation();
   const { message } = App.useApp();
   const { state: { events: { selectedEvent } } } = useEvent();
-  const eventId = (selectedEvent as any)?.id ?? 1;
+  const eventId = (selectedEvent)?.id ?? 1;
 
   const [guests, setGuests] = useState<CheckInGuest[]>([]);
   const [relations, setRelations] = useState<

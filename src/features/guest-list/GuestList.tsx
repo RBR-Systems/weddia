@@ -23,7 +23,7 @@ export default function GuestList() {
       events: { selectedEvent },
     },
   } = useEvent();
-  const eventId = (selectedEvent as any)?.id ?? 1;
+  const eventId = (selectedEvent)?.id ?? 1;
   const [guests, setGuests] = useState<Guest[]>([]);
   const [importOpen, setImportOpen] = useState(false);
   const [selected, setSelected] = useState<Guest | null>(null);
@@ -169,7 +169,7 @@ export default function GuestList() {
 
   const handleExport= () => {
     const list = guests;
-    const headers = [
+    const headers: (keyof Guest)[] = [
       "guest_id",
       "first_name",
       "last_name",
@@ -188,7 +188,7 @@ export default function GuestList() {
       const row = headers.map((h) => {
         if (h === "dietary_restrictions")
           return escapeCsv((g.dietary_restrictions || []).join(","));
-        return escapeCsv((g as any)[h]);
+        return escapeCsv(String(g[h] ?? ""));
       });
       csv += row.join(",") + "\n";
     });
@@ -432,7 +432,7 @@ export default function GuestList() {
             >
               {Object.keys(countryCodes).map((iso) => (
                 <Select.Option key={iso} value={iso}>
-                  {iso} (+{(countryCodes as any)[iso]})
+                  {iso} (+{countryCodes[iso]})
                 </Select.Option>
               ))}
             </Select>

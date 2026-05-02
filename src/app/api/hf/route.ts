@@ -9,6 +9,15 @@ type HfPostBody = {
   stream?: boolean;
 };
 
+type HfChatPayload = {
+  model: string;
+  messages: { role: string; content: string }[];
+  max_tokens: number;
+  temperature: number;
+  top_p: number;
+  stream: boolean;
+};
+
 export async function POST(req: NextRequest) {
   try {
     const body = (await req.json()) as HfPostBody;
@@ -30,7 +39,7 @@ export async function POST(req: NextRequest) {
 
     const url = "https://router.huggingface.co/v1/chat/completions";
 
-    const payload: any = {
+    const payload: HfChatPayload = {
       model: MODEL,
       messages: [
         {

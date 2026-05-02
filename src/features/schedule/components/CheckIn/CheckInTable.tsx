@@ -2,7 +2,7 @@
 import React, { useMemo } from "react";
 import { Table, Tag, Button, Space, Input, Tooltip, Avatar, Badge } from "antd";
 import { CheckCircleOutlined, ClockCircleOutlined, StarFilled, EnvironmentOutlined, UndoOutlined, LoginOutlined, MedicineBoxOutlined, AlertOutlined, FileTextOutlined, SearchOutlined } from "@ant-design/icons";
-import type { ColumnsType } from "antd/es/table";
+import type { ColumnsType, FilterValue } from "antd/es/table/interface";
 import { useTranslation } from "react-i18next";
 import { CheckInGuest } from "../../models/checkIn.models";
 import styles from "./CheckIn.module.css";
@@ -116,7 +116,7 @@ const CheckInTable: React.FC<CheckInTableProps> = ({
       title: t("checkIn.table.status"),
       key: "status",
       width: 110,
-      render: (_: any, r: CheckInGuest) => {
+      render: (_: unknown, r: CheckInGuest) => {
         if (r.checked_in)
           return (
             <Tag color="success" icon={<CheckCircleOutlined />}>
@@ -213,7 +213,7 @@ const CheckInTable: React.FC<CheckInTableProps> = ({
         `${r.first_name} ${r.last_name}`
           .toLowerCase()
           .includes(String(value).toLowerCase()),
-      render: (_: any, r: CheckInGuest) => (
+      render: (_: unknown, r: CheckInGuest) => (
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <Avatar
             size={28}
@@ -262,7 +262,7 @@ const CheckInTable: React.FC<CheckInTableProps> = ({
       key: "relation",
       width: 130,
       ellipsis: true,
-      render: (_: any, r: CheckInGuest) =>
+      render: (_: unknown, r: CheckInGuest) =>
         r.relation_name ? (
           <Tag color="gold" style={{ margin: 0 }}>
             {r.relation_name}
@@ -287,7 +287,7 @@ const CheckInTable: React.FC<CheckInTableProps> = ({
       key: "party",
       width: 70,
       align: "center" as const,
-      render: (_: any, r: CheckInGuest) => {
+      render: (_: unknown, r: CheckInGuest) => {
         const size =
           r.checked_in && r.actual_party_size !== null
             ? r.actual_party_size
@@ -310,7 +310,7 @@ const CheckInTable: React.FC<CheckInTableProps> = ({
       title: t("checkIn.table.tableAssignment"),
       key: "table",
       width: 120,
-      render: (_: any, r: CheckInGuest) => {
+      render: (_: unknown, r: CheckInGuest) => {
         if (!r.table_id)
           return <span style={{ color: "var(--text-color-muted)" }}>—</span>;
         const kb = getKeyboardActivationProps(
@@ -361,7 +361,7 @@ const CheckInTable: React.FC<CheckInTableProps> = ({
       onFilter: (value, r: CheckInGuest) =>
         (r.dietary_restrictions || []).includes(String(value)) ||
         r.accesability_needs === String(value),
-      render: (_: any, r: CheckInGuest) => {
+      render: (_: unknown, r: CheckInGuest) => {
         const icons = [];
         if ((r.dietary_restrictions?.length ?? 0) > 0) {
           icons.push(
@@ -406,7 +406,7 @@ const CheckInTable: React.FC<CheckInTableProps> = ({
       key: "checkInTime",
       width: 90,
       align: "center" as const,
-      render: (_: any, r: CheckInGuest) => (
+      render: (_: unknown, r: CheckInGuest) => (
         <span
           style={{
             fontSize: 12,
@@ -436,7 +436,7 @@ const CheckInTable: React.FC<CheckInTableProps> = ({
       key: "actions",
       width: 60,
       fixed: "right" as const,
-      render: (_: any, r: CheckInGuest) =>
+      render: (_: unknown, r: CheckInGuest) =>
         r.checked_in ? (
           <Tooltip title={t("checkIn.actions.undoCheckIn")}>
             <Button
@@ -458,8 +458,8 @@ const CheckInTable: React.FC<CheckInTableProps> = ({
     },
   ];
 
-  const handleTableChange = (_: any, tableFilters: Record<string, any>) => {
-    const extract = (keys: any) => {
+  const handleTableChange = (_: unknown, tableFilters: Record<string, FilterValue | null>) => {
+    const extract = (keys: FilterValue | null) => {
       if (Array.isArray(keys) && keys.length) return keys.map(String);
       if (keys && typeof keys === "string") return keys;
       return undefined;

@@ -1,9 +1,9 @@
 "use client";
-
+import React from "react";
 import { Table, Tag, Space, Typography, Button, Input, Popconfirm } from "antd";
 import { useTranslation } from "react-i18next";
 import { MailOutlined, MessageOutlined, SearchOutlined, DeleteOutlined } from "@ant-design/icons";
-import type { ColumnsType } from "antd/es/table";
+import type { ColumnsType, FilterValue } from "antd/es/table/interface";
 import { Guest, formatStatusLabel, statusColor, STATUS_LABELS } from "../../models/guestList.models";
 import { formatPhone } from "@/shared/utils/formatters.utils";
 import { useTheme } from "@/theme/ThemeProvider";
@@ -67,7 +67,7 @@ export default function GuestTable({
       key: "guest",
       width: 160,
       ellipsis: true,
-      render: (_: any, record: Guest) => (
+      render: (_: unknown, record: Guest) => (
         <div>
           <Text strong>
             <Link
@@ -130,7 +130,7 @@ export default function GuestTable({
       filterIcon: (filtered: boolean) => (
         <SearchOutlined style={{ color: filtered ? "#1890ff" : undefined }} />
       ),
-      onFilter: (value: any, record: Guest) =>
+      onFilter: (value: boolean | React.Key, record: Guest) =>
         `${record.first_name} ${record.last_name}`
           .toLowerCase()
           .includes(String(value).toLowerCase()),
@@ -207,7 +207,7 @@ export default function GuestTable({
       dataIndex: "dietary_restrictions",
       key: "specials",
       width: 170,
-      render: (_: any, record: Guest) => (
+      render: (_: unknown, record: Guest) => (
         <Space>
           {(record.dietary_restrictions || []).map((d) => (
             <Tag key={`diet-${d}`} color="green">
@@ -236,7 +236,7 @@ export default function GuestTable({
       key: "contact",
       width: 180,
       ellipsis: true,
-      render: (_: any, record: Guest) => {
+      render: (_: unknown, record: Guest) => {
         const p = record.phone || "";
         const inferredCountry =
           record.country ||
@@ -308,7 +308,7 @@ export default function GuestTable({
       dataIndex: "actions",
       key: "actions",
       width: 170,
-      render: (_: any, record: Guest) => {
+      render: (_: unknown, record: Guest) => {
         const mailHref = record.email
           ? `mailto:${record.email}?subject=Invitation&body=Hi%20${encodeURIComponent(record.first_name)}`
           : undefined;
@@ -360,7 +360,7 @@ export default function GuestTable({
       key: "remove",
       width: 50,
       fixed: "right" as const,
-      render: (_: any, record: Guest) => (
+      render: (_: unknown, record: Guest) => (
         <Popconfirm
           title={t("guestList.confirmRemove", "Remove guest?")}
           okText={t("guestList.remove", "Remove")}
@@ -386,10 +386,10 @@ export default function GuestTable({
       ),
     },
   ];
-  const handleTableChange = (_: any, tableFilters: Record<string, any>) => {
+  const handleTableChange = (_: unknown, tableFilters: Record<string, FilterValue | null>) => {
     if (!onFiltersChange) return;
 
-    const extract = (keys: any): string | string[] | undefined => {
+    const extract = (keys: FilterValue | null): string | string[] | undefined => {
       if (Array.isArray(keys) && keys.length) return keys.map(String);
       if (keys && typeof keys === "string") return keys;
       return undefined;

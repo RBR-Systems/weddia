@@ -2,11 +2,36 @@
 import React, { useCallback, useEffect, useMemo, useReducer, useRef } from "react";
 import { useSensor, useSensors, PointerSensor } from "@dnd-kit/core";
 import { App } from "antd";
+import type { MessageInstance } from "antd/es/message/interface";
 import { INITIAL_METERS_TO_PIXELS, DEFAULT_VENUE_WIDTH_METERS, DEFAULT_VENUE_HEIGHT_METERS } from "../constants/tableAssignment.constants";
-import type { TableLayout, Guest as TAGuest, TableAssignment } from "../models/tableAssignment.models";
+import type { TableLayout, Table, Relation, Guest as TAGuest, TableAssignment } from "../models/tableAssignment.models";
+import type { SeatingAssignment } from "../models/huggingface.models";
 import { fullName } from "../utils/table.utils";
 import { apiGet, apiPost, apiPut, apiDelete, isAbortError } from "@/shared/api/apiClient";
-import { fetchGuests, fetchRelations } from "../../guest-list/api/guestApi";
+import { fetchGuests, fetchRelations } from "@/shared/api/guestApi";
+
+interface ApiLayout {
+  layoutId: number;
+  name: string;
+  description?: string;
+  isActive: boolean;
+  xGridSize: number;
+  yGridSize: number;
+}
+interface ApiTable {
+  tableId: number;
+  layoutId: number;
+  tableNumber: number;
+  numberOfSeats: number;
+  shape: string;
+  xGrid: number;
+  yGrid: number;
+}
+interface ApiAssignment {
+  tableId: number;
+  guestId: number;
+  seatNumber: number;
+}
 import type { Guest as GuestListGuest } from "../../guest-list/models/guestList.models";
 import { useEvent } from "@/shared/contexts/EventContext";
 import { reducer, createInitialState } from "./tableAssignmentReducer";
@@ -45,12 +70,12 @@ export function TableAssignmentProvider({
   initialSelectedTableId,
 }: {
   children: React.ReactNode;
-  messageApi?: any;
+  messageApi?: MessageInstance;
   initialSelectedTableId?: string | null;
 }) {
   const { message } = App.useApp();
   const { state: { events: { selectedEvent } } } = useEvent();
-  const eventId = (selectedEvent as any)?.id ?? 1;
+  const eventId = (selectedEvent)?.id ?? 1;
 
   const emptyState = useMemo(
     () => createInitialState([], [], [], [], [], INITIAL_METERS_TO_PIXELS),
@@ -67,13 +92,13 @@ export function TableAssignmentProvider({
     async function loadData() {
       try {
         const [layouts, rawGuests, relations] = await Promise.all([
-          apiGet<any[]>("/api/tablelayouts/active", { signal }),
+          apiGet<ApiLayout[]>("/api/tablelayouts/active", { signal }),
           fetchGuests(eventId),
           fetchRelations(),
         ]);
         const guests = rawGuests.map(mapGuestListToTA);
 
-        const mappedLayouts: TableLayout[] = (Array.isArray(layouts) ? layouts : []).map((l: any) => ({
+        const mappedLayouts: TableLayout[] = (Array.isArray(layouts) ? layouts : []).map((l: ApiLayout) => ({
           layout_id: String(l.layoutId),
           event_id: String(eventId),
           name: l.name,
@@ -85,16 +110,16 @@ export function TableAssignmentProvider({
 
         const activeLayout = mappedLayouts.find((l) => l.is_active) ?? mappedLayouts[0];
 
-        let tablesRaw: any[] = [];
-        let assignmentsRaw: any[] = [];
+        let tablesRaw: Table[] = [];
+        let assignmentsRaw: TableAssignment[] = [];
 
         if (activeLayout) {
           const layoutId = activeLayout.layout_id;
           const [tables, assignments] = await Promise.all([
-            apiGet<any[]>(`/api/eventtables/layout/${layoutId}`, { signal }),
-            apiGet<any[]>(`/api/tableassignments/layout/${layoutId}`, { signal }),
+            apiGet<ApiTable[]>(`/api/eventtables/layout/${layoutId}`, { signal }),
+            apiGet<ApiAssignment[]>(`/api/tableassignments/layout/${layoutId}`, { signal }),
           ]);
-          tablesRaw = (Array.isArray(tables) ? tables : []).map((t: any) => ({
+          tablesRaw = (Array.isArray(tables) ? tables : []).map((t: ApiTable) => ({
             table_id: String(t.tableId),
             layout_id: String(t.layoutId),
             table_number: t.tableNumber,
@@ -103,7 +128,7 @@ export function TableAssignmentProvider({
             x_grid: t.xGrid,
             y_grid: t.yGrid,
           }));
-          assignmentsRaw = (Array.isArray(assignments) ? assignments : []).map((a: any) => ({
+          assignmentsRaw = (Array.isArray(assignments) ? assignments : []).map((a: ApiAssignment) => ({
             table_id: String(a.tableId),
             guest_id: String(a.guestId),
             seat_number: a.seatNumber,
@@ -146,17 +171,17 @@ export function TableAssignmentProvider({
   }, [initialSelectedTableId]);
 
   const relationsById = useMemo(
-    () => new Map(state.relations.map((r: any) => [r.relation_id, r])),
+    () => new Map(state.relations.map((r: Relation) => [r.relation_id, r])),
     [state.relations],
   );
   const guestsById = useMemo(
-    () => new Map(state.guests.map((g: any) => [g.guest_id, g])),
+    () => new Map(state.guests.map((g: TAGuest) => [g.guest_id, g])),
     [state.guests],
   );
 
   const activeLayout = useMemo(
     () =>
-      state.layouts.find((l: any) => l.is_active) ??
+      state.layouts.find((l: TableLayout) => l.is_active) ??
       (state.layouts.length ? state.layouts[0] : null),
     [state.layouts],
   );
@@ -164,9 +189,9 @@ export function TableAssignmentProvider({
   const tablesForActiveLayout = useMemo(() => {
     if (!activeLayout) return [];
     return state.tables
-      .filter((t: any) => t.layout_id === activeLayout.layout_id)
+      .filter((t: Table) => t.layout_id === activeLayout.layout_id)
       .slice()
-      .sort((a: any, b: any) => a.table_id.localeCompare(b.table_id));
+      .sort((a: Table, b: Table) => a.table_id.localeCompare(b.table_id));
   }, [state.tables, activeLayout]);
 
   const seatsFitAt = useCallback(
@@ -178,7 +203,7 @@ export function TableAssignmentProvider({
       movingGuestId?: string,
     ) {
       const tbl = tablesForActiveLayout.find(
-        (t: any) => t.table_id === tableId,
+        (t: Table) => t.table_id === tableId,
       );
       if (!tbl) return false;
       const capacity = tbl.total_number ?? 0;
@@ -201,11 +226,11 @@ export function TableAssignmentProvider({
   );
 
   const tableOrder = useMemo(
-    () => tablesForActiveLayout.map((t: any) => t.table_id),
+    () => tablesForActiveLayout.map((t: Table) => t.table_id),
     [tablesForActiveLayout],
   );
   const tablesForActiveLayoutById = useMemo(
-    () => new Map(tablesForActiveLayout.map((t: any) => [t.table_id, t])),
+    () => new Map(tablesForActiveLayout.map((t: Table) => [t.table_id, t])),
     [tablesForActiveLayout],
   );
 
@@ -224,7 +249,7 @@ export function TableAssignmentProvider({
       map.set(a.table_id, arr);
     }
     for (const [tableId, arr] of map.entries()) {
-      arr.sort((a: any, b: any) => a.seat_number - b.seat_number);
+      arr.sort((a: TableAssignment, b: TableAssignment) => a.seat_number - b.seat_number);
       map.set(tableId, arr);
     }
     return map;
@@ -244,7 +269,7 @@ export function TableAssignmentProvider({
         return;
       }
 
-      const prev = stateRef.current.assignments.find((a: any) => a.guest_id === guestId);
+      const prev = stateRef.current.assignments.find((a: TableAssignment) => a.guest_id === guestId);
 
       const handleError = (label: string) => (e: unknown) => {
         console.error(`[persistAssignment] ${label} failed:`, e);
@@ -384,59 +409,59 @@ export function TableAssignmentProvider({
       aiChatOpen: state.aiChatOpen,
       setAIChatOpen: (v: boolean) =>
         dispatch({ type: "SET_AI_CHAT_OPEN", payload: v }),
-      hfGuests: state.guests.map((g: any) => ({
+      hfGuests: state.guests.map((g: TAGuest) => ({
         id: g.guest_id,
         name: fullName(g),
         tags: [relationsById.get(g.relation_id)?.name ?? "unknown"],
         tableId:
-          state.assignments.find((a: any) => a.guest_id === g.guest_id)
+          state.assignments.find((a: TableAssignment) => a.guest_id === g.guest_id)
             ?.table_id ?? null,
         partySize: g.party_size ?? 1,
       })),
-      hfTables: tablesForActiveLayout.map((t: any) => ({
+      hfTables: tablesForActiveLayout.map((t: Table) => ({
         id: t.table_id,
         name: t.table_id,
         shape: t.shape,
         capacity: t.total_number,
         position: { x: t.x_grid, y: t.y_grid },
       })),
-      handleApplyAISeating: (assignmentsFromAI: any) =>
+      handleApplyAISeating: (assignmentsFromAI: SeatingAssignment[]) =>
         dispatch({ type: "APPLY_AI_SEATING", payload: assignmentsFromAI }),
       selectedTable:
-        state.tables.find((t: any) => t.table_id === state.selectedTableId) ??
+        state.tables.find((t: Table) => t.table_id === state.selectedTableId) ??
         null,
       selectedTableAssignments:
         assignmentsByTable.get(state.selectedTableId ?? "") ?? [],
       selectedTablePeopleCount: (
         assignmentsByTable.get(state.selectedTableId ?? "") ?? []
       ).reduce(
-        (sum: number, a: any) =>
+        (sum: number, a: TableAssignment) =>
           sum + (guestsById.get(a.guest_id)?.party_size ?? 1),
         0,
       ),
       relationsById,
-      assignedGuestIds: new Set(state.assignments.map((a: any) => a.guest_id)),
+      assignedGuestIds: new Set(state.assignments.map((a: TableAssignment) => a.guest_id)),
       filteredGuests: state.guests
-        .filter((g: any) =>
+        .filter((g: TAGuest) =>
           state.relationFilter ? g.relation_id === state.relationFilter : true,
         )
-        .filter((g: any) => {
+        .filter((g: TAGuest) => {
           const q = state.guestSearch.trim().toLowerCase();
           if (!q) return true;
           const name = fullName(g).toLowerCase();
           const email = (g.email ?? "").toLowerCase();
           return name.includes(q) || email.includes(q);
         })
-        .filter((g: any) => {
+        .filter((g: TAGuest) => {
           if (!state.assignedFilter || state.assignedFilter === "all")
             return true;
           const isAssigned = state.assignments.some(
-            (a: any) => a.guest_id === g.guest_id,
+            (a: TableAssignment) => a.guest_id === g.guest_id,
           );
           return state.assignedFilter === "assigned" ? isAssigned : !isAssigned;
         })
         .slice()
-        .sort((a: any, b: any) => fullName(a).localeCompare(fullName(b))),
+        .sort((a: TAGuest, b: TAGuest) => fullName(a).localeCompare(fullName(b))),
       guestSearch: state.guestSearch,
       setGuestSearch: (s: string) =>
         dispatch({ type: "SET_GUEST_SEARCH", payload: s }),
@@ -446,7 +471,7 @@ export function TableAssignmentProvider({
       assignedFilter: state.assignedFilter,
       setAssignedFilter: (v: "all" | "assigned" | "unassigned") =>
         dispatch({ type: "SET_ASSIGNED_FILTER", payload: v }),
-      relationOptions: state.relations.map((r: any) => ({
+      relationOptions: state.relations.map((r: Relation) => ({
         value: r.relation_id,
         label: r.name,
       })),
@@ -459,7 +484,7 @@ export function TableAssignmentProvider({
         currentAssignments.forEach(deleteAssignment);
       },
       unassignGuest: (guestId: string) => {
-        const prev = stateRef.current.assignments.find((a: any) => a.guest_id === guestId);
+        const prev = stateRef.current.assignments.find((a: TableAssignment) => a.guest_id === guestId);
         dispatch({ type: "UNASSIGN_GUEST", payload: { guestId } });
         if (prev) {
           apiDelete(`/api/tableassignments/${prev.table_id}/${guestId}`)
@@ -472,7 +497,7 @@ export function TableAssignmentProvider({
         const g = guestsById.get(guestId);
         const movingSize = g?.party_size ?? (g?.plus_one ? 2 : 1);
         const table = tablesForActiveLayout.find(
-          (t: any) => t.table_id === tableId,
+          (t: Table) => t.table_id === tableId,
         );
         const capacity = table?.total_number ?? 0;
 
@@ -480,7 +505,7 @@ export function TableAssignmentProvider({
         const currentAssignments = stateRef.current.assignments;
 
         const oldAssign = currentAssignments.find(
-          (a: any) => a.guest_id === guestId,
+          (a: TableAssignment) => a.guest_id === guestId,
         );
         if (!oldAssign) {
           // unassigned -> try to find first contiguous block starting at seatNumber
@@ -581,7 +606,7 @@ export function TableAssignmentProvider({
         };
         dispatch({ type: "ADD_TABLE", payload: newTable });
         try {
-          const created = await apiPost<any>(`/api/eventtables?adminId=1`, {
+          const created = await apiPost<ApiTable>(`/api/eventtables?adminId=1`, {
             layoutId: Number(activeLayout.layout_id),
             tableNumber,
             numberOfSeats: opts.seats,
@@ -592,7 +617,7 @@ export function TableAssignmentProvider({
           // Replace temp id with real one from API
           dispatch({
             type: "SET_TABLES",
-            payload: stateRef.current.tables.map((t: any) =>
+            payload: stateRef.current.tables.map((t: Table) =>
               t.table_id === tempId
                 ? { ...t, table_id: String(created.tableId) }
                 : t,

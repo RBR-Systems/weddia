@@ -73,12 +73,12 @@ function TableAssignmentContent() {
     setRelationFilter,
     relationOptions,
     dispatch,
+    addTable,
   } = useTableAssignmentContext();
 
   const canvasWrapperRef = React.useRef<HTMLDivElement | null>(null);
   const [addTableOpen, setAddTableOpen] = useState(false);
   const [addTableForm] = Form.useForm();
-  const { addTable } = useTableAssignmentContext() as any;
 
   if (!activeLayout) {
     return (

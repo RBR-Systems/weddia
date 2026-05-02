@@ -1,5 +1,5 @@
 ﻿import { CheckInGuest, CheckInStats } from "../models/checkIn.models";
-import { fetchGuests, fetchRelations } from "../../guest-list/api/guestApi";
+import { fetchGuests, fetchRelations } from "@/shared/api/guestApi";
 
 const VIP_PATTERN = /maid of honor|best man|officiant|dama de honor|padrino/i;
 

@@ -2,7 +2,7 @@ import { memo, useMemo, type CSSProperties } from "react";
 import { useDraggable } from "@dnd-kit/core";
 import { Tag, Typography, Select, Button } from "antd";
 import styles from "./DraggableGuestRow.module.css";
-import type { Guest } from "../../models/tableAssignment.models";
+import type { Guest, Table, TableAssignment } from "../../models/tableAssignment.models";
 import { fullName, getNextAvailableSeatNumber, getTableLabel } from "../../utils/table.utils";
 import { WarningOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useTableAssignmentContext } from "../../context/TableAssignmentContext";
@@ -27,35 +27,35 @@ export default memo(function DraggableGuestRow({
   } = useTableAssignmentContext();
   const { t } = useTranslation();
 
+  const assignmentsMap = assignmentsByTable as Map<string, TableAssignment[]>;
+
   const assignedTableId = useMemo(() => {
-    const assignmentsMap = assignmentsByTable as Map<string, any[]>;
     for (const [tableId, arr] of Array.from(assignmentsMap.entries())) {
-      if (arr.some((a: any) => a.guest_id === guest.guest_id)) return tableId;
+      if (arr.some((a: TableAssignment) => a.guest_id === guest.guest_id)) return tableId;
     }
     return null;
-  }, [assignmentsByTable, guest.guest_id]);
+  }, [assignmentsMap, guest.guest_id]);
 
   const assignedAssignment = useMemo(() => {
-    const assignmentsMap = assignmentsByTable as Map<string, any[]>;
     for (const [, arr] of Array.from(assignmentsMap.entries())) {
-      const a = arr.find((x: any) => x.guest_id === guest.guest_id);
+      const a = arr.find((x: TableAssignment) => x.guest_id === guest.guest_id);
       if (a) return a;
     }
     return null;
-  }, [assignmentsByTable, guest.guest_id]);
+  }, [assignmentsMap, guest.guest_id]);
 
   const partySize = guest.party_size ?? (guest.plus_one ? 2 : 1);
 
   const tableOptions = useMemo(() => {
     return tablesForActiveLayout
-      .map((t: any) => {
+      .map((t: Table) => {
         const assignments = assignmentsByTable.get(t.table_id) ?? [];
-        const usedOccupancy = assignments.reduce((sum: number, a: any) => {
+        const usedOccupancy = assignments.reduce((sum: number, a: TableAssignment) => {
           const g = guestsById.get(a.guest_id);
           return sum + (g?.party_size ?? (g?.plus_one ? 2 : 1));
         }, 0);
         const isAssignedHere = assignments.some(
-          (a: any) => a.guest_id === guest.guest_id,
+          (a: TableAssignment) => a.guest_id === guest.guest_id,
         );
         const selfOccupancy = isAssignedHere ? partySize : 0;
         const available = Math.max(
@@ -146,7 +146,7 @@ export default memo(function DraggableGuestRow({
             onMouseDown={(e) => e.stopPropagation()}
             onChange={(tableId: string) => {
               const targetTable = tablesForActiveLayout.find(
-                (t: any) => t.table_id === tableId,
+                (t: Table) => t.table_id === tableId,
               );
               if (!targetTable) return;
               if (tableId === assignedTableId) return;
