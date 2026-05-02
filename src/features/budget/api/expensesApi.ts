@@ -8,8 +8,8 @@ import {
 export async function createExpense(
   eventId: number,
   expenseData: Partial<Expense> & { currency?: string; vendor_id?: string },
-): Promise<void> {
-  await apiPost(`/api/expenses?${ADMIN_QUERY_PARAM}`, {
+): Promise<{ expenseId: number }> {
+  return apiPost<{ expenseId: number }>(`/api/expenses?${ADMIN_QUERY_PARAM}`, {
     eventId,
     vendorId: expenseData.vendor_id ? Number(expenseData.vendor_id) : null,
     categoryId: Number(expenseData.category_id),

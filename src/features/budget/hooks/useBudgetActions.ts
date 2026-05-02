@@ -65,17 +65,25 @@ export const useBudgetActions = ({
       : undefined;
 
   const addExpense = (payload: Omit<Expense, "expense_id">) => {
-    dispatch({ type: "ADD_EXPENSE", payload: { ...payload, expense_id: generateBudgetId() } });
+    const tempId = generateBudgetId();
+    dispatch({ type: "ADD_EXPENSE", payload: { ...payload, expense_id: tempId } });
     const cat = state.categories.find((c) => c.id === payload.category_id);
     apiCreateExpense(eventId, {
       ...payload,
       ...(cat?.catalog_id ? { category_id: cat.catalog_id } : {}),
       vendor_id: resolveVendorId(payload.vendor_name),
-    }).catch((err) => console.error("createExpense failed:", err));
+    })
+      .then(({ expenseId }) => {
+        // Replace the temp ID with the real server-assigned ID so future PUTs work correctly.
+        dispatch({ type: "UPDATE_EXPENSE", payload: { id: tempId, data: { expense_id: String(expenseId) } } });
+      })
+      .catch((err) => console.error("createExpense failed:", err));
   };
 
   const updateExpense = (id: string, data: Partial<Expense>) => {
     dispatch({ type: "UPDATE_EXPENSE", payload: { id, data } });
+    // Guard: temp IDs (id_xxx) haven't been synced to the server yet — skip API call.
+    if (id.startsWith("id_")) return;
     // Merge with current expense so the PUT always sends a complete payload.
     // Without this, sending only { paymentStatus } overwrites all other fields to null on the backend.
     const current = state.expenses.find((e) => e.expense_id === id) ?? {};
