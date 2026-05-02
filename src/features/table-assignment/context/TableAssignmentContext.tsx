@@ -7,62 +7,18 @@ import { INITIAL_METERS_TO_PIXELS, DEFAULT_VENUE_WIDTH_METERS, DEFAULT_VENUE_HEI
 import type { TableLayout, Table, Relation, Guest as TAGuest, TableAssignment } from "../models/tableAssignment.models";
 import type { SeatingAssignment } from "../models/huggingface.models";
 import { fullName } from "../utils/table.utils";
-import { apiGet, apiPost, apiPut, apiDelete, isAbortError } from "@/shared/api/apiClient";
-import { fetchGuests, fetchRelations } from "@/shared/api/guestApi";
-
-interface ApiLayout {
-  layoutId: number;
-  name: string;
-  description?: string;
-  isActive: boolean;
-  xGridSize: number;
-  yGridSize: number;
-}
-interface ApiTable {
-  tableId: number;
-  layoutId: number;
-  tableNumber: number;
-  numberOfSeats: number;
-  shape: string;
-  xGrid: number;
-  yGrid: number;
-}
-interface ApiAssignment {
-  tableId: number;
-  guestId: number;
-  seatNumber: number;
-}
-import type { Guest as GuestListGuest } from "../../guest-list/models/guestList.models";
+import { isAbortError } from "@/shared/api/apiClient";
+import { apiDelete } from "@/shared/api/apiClient";
 import { useEvent } from "@/shared/contexts/EventContext";
 import { reducer, createInitialState } from "./tableAssignmentReducer";
 import { useDragHandlers } from "../hooks/useDragHandlers";
+import { loadTableAssignmentData, deleteAssignment } from "../api/tableAssignmentApi";
+import { usePersistAssignment } from "../hooks/usePersistAssignment";
+import { useMoveGuestSeat } from "../hooks/useMoveGuestSeat";
+import { useAddTable } from "../hooks/useAddTable";
 
-function deleteAssignment(a: TableAssignment): void {
-  apiDelete(`/api/tableassignments/${a.table_id}/${a.guest_id}`)
-    .catch((e) => console.error("[unassignAll] delete failed:", e));
-}
-
-function mapGuestListToTA(g: GuestListGuest): TAGuest {
-  return {
-    guest_id: g.guest_id,
-    event_id: g.event_id ?? "",
-    first_name: g.first_name,
-    last_name: g.last_name,
-    email: g.email ?? null,
-    phone: g.phone ?? null,
-    relation_id: g.relation_id ?? "",
-    plus_one: g.plus_one == null ? false : Boolean(g.plus_one),
-    rsvp_status: g.rsvp_status,
-    party_size: g.party_size,
-    dietary_restrictions: Array.isArray(g.dietary_restrictions)
-      ? g.dietary_restrictions.join(", ")
-      : null,
-    accessibility_needs: g.accesability_needs ?? null,
-    notes: g.notes ?? null,
-  };
-}
-
-const TableAssignmentContext= React.createContext<any>(null);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const TableAssignmentContext = React.createContext<any>(null);
 
 export function TableAssignmentProvider({
   children,
@@ -75,95 +31,31 @@ export function TableAssignmentProvider({
 }) {
   const { message } = App.useApp();
   const { state: { events: { selectedEvent } } } = useEvent();
-  const eventId = (selectedEvent)?.id ?? 1;
+  const eventId = selectedEvent?.id ?? 1;
 
-  const emptyState = useMemo(
-    () => createInitialState([], [], [], [], [], INITIAL_METERS_TO_PIXELS),
-    [],
-  );
-
+  const emptyState = useMemo(() => createInitialState([], [], [], [], [], INITIAL_METERS_TO_PIXELS), []);
   const [state, dispatch] = useReducer(reducer, emptyState);
 
-  // Load all data from API on mount / when event changes
   useEffect(() => {
     const controller = new AbortController();
-    const { signal } = controller;
-
-    async function loadData() {
+    async function load() {
       try {
-        const [layouts, rawGuests, relations] = await Promise.all([
-          apiGet<ApiLayout[]>("/api/tablelayouts/active", { signal }),
-          fetchGuests(eventId),
-          fetchRelations(),
-        ]);
-        const guests = rawGuests.map(mapGuestListToTA);
-
-        const mappedLayouts: TableLayout[] = (Array.isArray(layouts) ? layouts : []).map((l: ApiLayout) => ({
-          layout_id: String(l.layoutId),
-          event_id: String(eventId),
-          name: l.name,
-          description: l.description ?? null,
-          is_active: l.isActive,
-          x_grid_size: l.xGridSize,
-          y_grid_size: l.yGridSize,
-        }));
-
-        const activeLayout = mappedLayouts.find((l) => l.is_active) ?? mappedLayouts[0];
-
-        let tablesRaw: Table[] = [];
-        let assignmentsRaw: TableAssignment[] = [];
-
-        if (activeLayout) {
-          const layoutId = activeLayout.layout_id;
-          const [tables, assignments] = await Promise.all([
-            apiGet<ApiTable[]>(`/api/eventtables/layout/${layoutId}`, { signal }),
-            apiGet<ApiAssignment[]>(`/api/tableassignments/layout/${layoutId}`, { signal }),
-          ]);
-          tablesRaw = (Array.isArray(tables) ? tables : []).map((t: ApiTable) => ({
-            table_id: String(t.tableId),
-            layout_id: String(t.layoutId),
-            table_number: t.tableNumber,
-            total_number: t.numberOfSeats,
-            shape: t.shape,
-            x_grid: t.xGrid,
-            y_grid: t.yGrid,
-          }));
-          assignmentsRaw = (Array.isArray(assignments) ? assignments : []).map((a: ApiAssignment) => ({
-            table_id: String(a.tableId),
-            guest_id: String(a.guestId),
-            seat_number: a.seatNumber,
-          }));
-        }
-
-        if (!signal.aborted) {
-          dispatch({
-            type: "INIT_DATA",
-            payload: {
-              relations,
-              guests,
-              layouts: mappedLayouts,
-              tables: tablesRaw,
-              assignments: assignmentsRaw,
-            },
-          });
+        const data = await loadTableAssignmentData(eventId, controller.signal);
+        if (!controller.signal.aborted) {
+          dispatch({ type: "INIT_DATA", payload: data });
         }
       } catch (err) {
         if (isAbortError(err)) return;
         console.error("TableAssignmentProvider: failed to load data", err);
       }
     }
-
-    loadData();
+    load();
     return () => controller.abort();
   }, [eventId]);
 
-  // Keep a ref to the latest state so callbacks always read fresh data
   const stateRef = useRef(state);
-  useEffect(() => {
-    stateRef.current = state;
-  });
+  useEffect(() => { stateRef.current = state; });
 
-  // When an external component requests a table to be highlighted, select it
   useEffect(() => {
     if (initialSelectedTableId) {
       dispatch({ type: "SET_SELECTED_TABLE", payload: initialSelectedTableId });
@@ -178,14 +70,10 @@ export function TableAssignmentProvider({
     () => new Map(state.guests.map((g: TAGuest) => [g.guest_id, g])),
     [state.guests],
   );
-
   const activeLayout = useMemo(
-    () =>
-      state.layouts.find((l: TableLayout) => l.is_active) ??
-      (state.layouts.length ? state.layouts[0] : null),
+    () => state.layouts.find((l: TableLayout) => l.is_active) ?? (state.layouts.length ? state.layouts[0] : null),
     [state.layouts],
   );
-
   const tablesForActiveLayout = useMemo(() => {
     if (!activeLayout) return [];
     return state.tables
@@ -195,16 +83,8 @@ export function TableAssignmentProvider({
   }, [state.tables, activeLayout]);
 
   const seatsFitAt = useCallback(
-    function seatsFitAt(
-      tableId: string,
-      startSeat: number,
-      partySize: number,
-      assignmentsList: typeof state.assignments,
-      movingGuestId?: string,
-    ) {
-      const tbl = tablesForActiveLayout.find(
-        (t: Table) => t.table_id === tableId,
-      );
+    (tableId: string, startSeat: number, partySize: number, assignmentsList: TableAssignment[], movingGuestId?: string) => {
+      const tbl = tablesForActiveLayout.find((t: Table) => t.table_id === tableId);
       if (!tbl) return false;
       const capacity = tbl.total_number ?? 0;
       if (startSeat < 1 || startSeat + partySize - 1 > capacity) return false;
@@ -214,8 +94,7 @@ export function TableAssignmentProvider({
         if (a.table_id !== tableId) continue;
         const g = guestsById.get(a.guest_id);
         const ps = g?.party_size ?? (g?.plus_one ? 2 : 1);
-        for (let s = a.seat_number; s < a.seat_number + ps; s += 1)
-          occupied.add(s);
+        for (let s = a.seat_number; s < a.seat_number + ps; s += 1) occupied.add(s);
       }
       for (let s = startSeat; s < startSeat + partySize; s += 1) {
         if (occupied.has(s)) return false;
@@ -225,26 +104,20 @@ export function TableAssignmentProvider({
     [tablesForActiveLayout, guestsById],
   );
 
-  const tableOrder = useMemo(
-    () => tablesForActiveLayout.map((t: Table) => t.table_id),
-    [tablesForActiveLayout],
-  );
+  const tableOrder = useMemo(() => tablesForActiveLayout.map((t: Table) => t.table_id), [tablesForActiveLayout]);
   const tablesForActiveLayoutById = useMemo(
     () => new Map(tablesForActiveLayout.map((t: Table) => [t.table_id, t])),
     [tablesForActiveLayout],
   );
 
   const assignmentsByTable = useMemo(() => {
-    // Deduplicate assignments by guest_id, preferring the last assignment
     const seen = new Set<string>();
-    const map = new Map<string, typeof state.assignments>();
-    // iterate from end so later assignments take precedence
+    const map = new Map<string, TableAssignment[]>();
     for (let i = state.assignments.length - 1; i >= 0; i -= 1) {
       const a = state.assignments[i];
       if (seen.has(a.guest_id)) continue;
       seen.add(a.guest_id);
       const arr = map.get(a.table_id) ?? [];
-      // unshift so final order will be seat-sorted after
       arr.unshift(a);
       map.set(a.table_id, arr);
     }
@@ -255,82 +128,15 @@ export function TableAssignmentProvider({
     return map;
   }, [state.assignments]);
 
-  // Persist a guest assignment change to the API (fire-and-forget with logging)
-  const persistAssignment = useCallback(
-    (
-      type: "assign" | "move" | "unassign",
-      guestId: string,
-      tableId: string,
-      seatNumber?: number,
-    ) => {
-      // Skip only temporary table IDs (not yet persisted to API)
-      if (tableId.startsWith("table-")) {
-        console.warn("[persistAssignment] Temp table id — skipping API call", { tableId });
-        return;
-      }
+  const getAssignments = useCallback(() => stateRef.current.assignments, []);
+  const getTables = useCallback(() => stateRef.current.tables, []);
 
-      const prev = stateRef.current.assignments.find((a: TableAssignment) => a.guest_id === guestId);
+  const notifier = useMemo(() => messageApi ?? message, [messageApi, message]);
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
 
-      const handleError = (label: string) => (e: unknown) => {
-        console.error(`[persistAssignment] ${label} failed:`, e);
-        message.error(`Error al guardar asignación: ${label}`);
-      };
-
-      if (type === "unassign") {
-        if (prev) {
-          apiDelete(`/api/tableassignments/${prev.table_id}/${guestId}`)
-            .catch(handleError("unassign"));
-        }
-      } else if (type === "assign") {
-        apiPost(`/api/tableassignments?adminId=1`, {
-          tableId: Number(tableId),
-          guestId: Number(guestId),
-          seatNumber: seatNumber ?? 1,
-        }).catch(handleError("assign"));
-      } else if (type === "move") {
-        if (prev && prev.table_id === tableId) {
-          // Same table — update seat
-          apiPut(`/api/tableassignments/${tableId}/${guestId}?adminId=1`, {
-            seatNumber: seatNumber ?? prev.seat_number,
-          }).catch(handleError("move-same-table"));
-        } else {
-          // Different table — delete old, create new
-          if (prev) {
-            apiDelete(`/api/tableassignments/${prev.table_id}/${guestId}`)
-              .then(() =>
-                apiPost(`/api/tableassignments?adminId=1`, {
-                  tableId: Number(tableId),
-                  guestId: Number(guestId),
-                  seatNumber: seatNumber ?? 1,
-                }),
-              )
-              .catch(handleError("move-cross-table"));
-          } else {
-            apiPost(`/api/tableassignments?adminId=1`, {
-              tableId: Number(tableId),
-              guestId: Number(guestId),
-              seatNumber: seatNumber ?? 1,
-            }).catch(handleError("assign-new"));
-          }
-        }
-      }
-    },
-    [message],
-  );
-
-  const segmentedOptions = [
-    { label: "Guests", value: "guests" as const },
-    { label: "table", value: "table" as const },
-  ];
-
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
-  );
-
-  const notifier = useMemo(
-    () => messageApi ?? message,
-    [messageApi, message],
-  );
+  const persistAssignment = usePersistAssignment(message, getAssignments);
+  const moveGuestSeat = useMoveGuestSeat({ notifier, guestsById, tablesForActiveLayout, seatsFitAt, persistAssignment, getAssignments, dispatch });
+  const addTable = useAddTable({ activeLayout, getTables, dispatch });
 
   const { onDragStart, onDragEnd, onDragCancel } = useDragHandlers({
     dispatch,
@@ -342,306 +148,115 @@ export function TableAssignmentProvider({
     notifier,
   });
 
-  const value = useMemo(
-    () => ({
-      state,
-      dispatch,
-      activeLayout,
-      tablesForActiveLayout,
-      assignmentsByTable,
-      selectedTableId: state.selectedTableId,
-      onSelectTable: (tableId: string) =>
-        dispatch({ type: "SET_SELECTED_TABLE", payload: tableId }),
-      guestsById,
-      metersToPixels: state.metersToPixels,
-      zoomScale: state.zoomScale,
-      sensors,
-      onDragStart,
-      onDragEnd,
-      onDragCancel,
-      dragOverlayContent:
-        state.activeDragId && state.activeDragId.startsWith("guest:")
-          ? guestsById.get(state.activeDragId.slice("guest:".length))
-            ? fullName(
-                guestsById.get(state.activeDragId.slice("guest:".length))!,
-              )
-            : "Guest"
-          : null,
-      handleZoomIn: () =>
-        dispatch({
-          type: "SET_ZOOM_SCALE",
-          payload: Math.min(state.zoomScale * 1.2, 5),
-        }),
-      handleZoomOut: () =>
-        dispatch({
-          type: "SET_ZOOM_SCALE",
-          payload: Math.max(state.zoomScale / 1.2, 0.25),
-        }),
-      handleZoomFit: (containerWidth: number, containerHeight: number) => {
-        const eventWidthMeters =
-          activeLayout?.x_grid_size ?? DEFAULT_VENUE_WIDTH_METERS;
-        const eventHeightMeters =
-          activeLayout?.y_grid_size ?? DEFAULT_VENUE_HEIGHT_METERS;
-        if (!containerWidth || !containerHeight) return;
-        const baseWidthPx = eventWidthMeters * INITIAL_METERS_TO_PIXELS;
-        const baseHeightPx = eventHeightMeters * INITIAL_METERS_TO_PIXELS;
-        const scale = Math.min(
-          containerWidth / baseWidthPx,
-          containerHeight / baseHeightPx,
-        );
-        dispatch({
-          type: "SET_ZOOM_SCALE",
-          payload: Math.max(0.25, Math.min(scale, 5)),
-        });
-      },
-      handleZoomReset: () =>
-        dispatch({
-          type: "SET_ZOOM_SCALE",
-          payload: 1,
-        }),
-      sideView: state.sideView,
-      setSideView: (v: "guests" | "table") =>
-        dispatch({ type: "SET_SIDE_VIEW", payload: v }),
-      segmentedOptions,
-      sidePanelOpen: state.sidePanelOpen,
-      setSidePanelOpen: (v: boolean) =>
-        dispatch({ type: "SET_SIDE_PANEL_OPEN", payload: v }),
-      aiChatOpen: state.aiChatOpen,
-      setAIChatOpen: (v: boolean) =>
-        dispatch({ type: "SET_AI_CHAT_OPEN", payload: v }),
-      hfGuests: state.guests.map((g: TAGuest) => ({
-        id: g.guest_id,
-        name: fullName(g),
-        tags: [relationsById.get(g.relation_id)?.name ?? "unknown"],
-        tableId:
-          state.assignments.find((a: TableAssignment) => a.guest_id === g.guest_id)
-            ?.table_id ?? null,
-        partySize: g.party_size ?? 1,
-      })),
-      hfTables: tablesForActiveLayout.map((t: Table) => ({
-        id: t.table_id,
-        name: t.table_id,
-        shape: t.shape,
-        capacity: t.total_number,
-        position: { x: t.x_grid, y: t.y_grid },
-      })),
-      handleApplyAISeating: (assignmentsFromAI: SeatingAssignment[]) =>
-        dispatch({ type: "APPLY_AI_SEATING", payload: assignmentsFromAI }),
-      selectedTable:
-        state.tables.find((t: Table) => t.table_id === state.selectedTableId) ??
-        null,
-      selectedTableAssignments:
-        assignmentsByTable.get(state.selectedTableId ?? "") ?? [],
-      selectedTablePeopleCount: (
-        assignmentsByTable.get(state.selectedTableId ?? "") ?? []
-      ).reduce(
-        (sum: number, a: TableAssignment) =>
-          sum + (guestsById.get(a.guest_id)?.party_size ?? 1),
-        0,
-      ),
-      relationsById,
-      assignedGuestIds: new Set(state.assignments.map((a: TableAssignment) => a.guest_id)),
-      filteredGuests: state.guests
-        .filter((g: TAGuest) =>
-          state.relationFilter ? g.relation_id === state.relationFilter : true,
-        )
-        .filter((g: TAGuest) => {
-          const q = state.guestSearch.trim().toLowerCase();
-          if (!q) return true;
-          const name = fullName(g).toLowerCase();
-          const email = (g.email ?? "").toLowerCase();
-          return name.includes(q) || email.includes(q);
-        })
-        .filter((g: TAGuest) => {
-          if (!state.assignedFilter || state.assignedFilter === "all")
-            return true;
-          const isAssigned = state.assignments.some(
-            (a: TableAssignment) => a.guest_id === g.guest_id,
-          );
-          return state.assignedFilter === "assigned" ? isAssigned : !isAssigned;
-        })
-        .slice()
-        .sort((a: TAGuest, b: TAGuest) => fullName(a).localeCompare(fullName(b))),
-      guestSearch: state.guestSearch,
-      setGuestSearch: (s: string) =>
-        dispatch({ type: "SET_GUEST_SEARCH", payload: s }),
-      relationFilter: state.relationFilter,
-      setRelationFilter: (r?: string) =>
-        dispatch({ type: "SET_RELATION_FILTER", payload: r }),
-      assignedFilter: state.assignedFilter,
-      setAssignedFilter: (v: "all" | "assigned" | "unassigned") =>
-        dispatch({ type: "SET_ASSIGNED_FILTER", payload: v }),
-      relationOptions: state.relations.map((r: Relation) => ({
-        value: r.relation_id,
-        label: r.name,
-      })),
-      assignments: state.assignments,
-      setAssignments: (a: typeof state.assignments) =>
-        dispatch({ type: "SET_ASSIGNMENTS", payload: a }),
-      unassignAll: () => {
-        const currentAssignments = stateRef.current.assignments;
-        dispatch({ type: "UNASSIGN_ALL" });
-        currentAssignments.forEach(deleteAssignment);
-      },
-      unassignGuest: (guestId: string) => {
-        const prev = stateRef.current.assignments.find((a: TableAssignment) => a.guest_id === guestId);
-        dispatch({ type: "UNASSIGN_GUEST", payload: { guestId } });
-        if (prev) {
-          apiDelete(`/api/tableassignments/${prev.table_id}/${guestId}`)
-            .catch((e) => console.error("[unassignGuest] failed:", e));
-        }
-      },
-      guests: state.guests,
-      moveGuestSeat: (guestId: string, tableId: string, seatNumber: number) => {
-        const notifier = messageApi ?? message;
-        const g = guestsById.get(guestId);
-        const movingSize = g?.party_size ?? (g?.plus_one ? 2 : 1);
-        const table = tablesForActiveLayout.find(
-          (t: Table) => t.table_id === tableId,
-        );
-        const capacity = table?.total_number ?? 0;
-
-        // Use stateRef for fresh assignments to avoid stale closure bugs
-        const currentAssignments = stateRef.current.assignments;
-
-        const oldAssign = currentAssignments.find(
-          (a: TableAssignment) => a.guest_id === guestId,
-        );
-        if (!oldAssign) {
-          // unassigned -> try to find first contiguous block starting at seatNumber
-          if (
-            !seatsFitAt(
-              tableId,
-              seatNumber,
-              movingSize,
-              currentAssignments,
-              guestId,
-            )
-          ) {
-            notifier.error(
-              "Not enough contiguous seats for that guest's party",
-            );
-            return false;
-          }
-          persistAssignment("assign", guestId, tableId, seatNumber);
-          dispatch({
-            type: "ASSIGN_GUEST",
-            payload: { tableId, guestId, seatNumber },
-          });
-          notifier.success(
-            g ? `${fullName(g)} assigned to ${tableId}` : "Assigned",
-          );
-          return true;
-        }
-
-        // Cross-table move: validate seats fit on target and dispatch
-        if (oldAssign.table_id !== tableId) {
-          if (
-            !seatsFitAt(
-              tableId,
-              seatNumber,
-              movingSize,
-              currentAssignments,
-              guestId,
-            )
-          ) {
-            notifier.error(
-              "Not enough contiguous seats for that guest's party on the target table",
-            );
-            return false;
-          }
-          persistAssignment("move", guestId, tableId, seatNumber);
-          dispatch({
-            type: "MOVE_GUEST_SEAT",
-            payload: { guestId, tableId, seatNumber },
-          });
-          notifier.success(g ? `${fullName(g)} moved to ${tableId}` : "Moved");
-          return true;
-        }
-
-        // Same-table move — basic boundary check
-        const targetEnd = seatNumber + movingSize - 1;
-
-        if (seatNumber < 1 || targetEnd > capacity) {
-          notifier.error(
-            "Not enough seats on table to place that party at the requested position",
-          );
-          return false;
-        }
-
-        if (seatNumber === oldAssign.seat_number) {
-          notifier.info("Already at requested seat");
-          return true;
-        }
-
-        // Dispatch to the reducer, which handles repacking displaced guests.
-        // The reducer returns unchanged state if it can't fit everyone.
-        persistAssignment("move", guestId, tableId, seatNumber);
-        dispatch({
-          type: "MOVE_GUEST_SEAT",
-          payload: { guestId, tableId, seatNumber },
-        });
-
-        // Since dispatch is synchronous with useReducer, check if state changed
-        // by scheduling the check. We optimistically assume success here;
-        // the reducer will silently abort if packing fails.
-        notifier.success(g ? `${fullName(g)} moved` : "Moved");
-        return true;
-      },
-      tableOrder,
-      tablesForActiveLayoutById,
-      messageApi: messageApi ?? message,
-      addTable: async (opts: { shape: string; seats: number; xGrid: number; yGrid: number }) => {
-        if (!activeLayout) return;
-        const tableNumber = (stateRef.current.tables.length ?? 0) + 1;
-        const tempId = `table-${Date.now()}`;
-        const newTable = {
-          table_id: tempId,
-          layout_id: activeLayout.layout_id,
-          table_number: tableNumber,
-          total_number: opts.seats,
-          shape: opts.shape,
-          x_grid: opts.xGrid,
-          y_grid: opts.yGrid,
-        };
-        dispatch({ type: "ADD_TABLE", payload: newTable });
-        try {
-          const created = await apiPost<ApiTable>(`/api/eventtables?adminId=1`, {
-            layoutId: Number(activeLayout.layout_id),
-            tableNumber,
-            numberOfSeats: opts.seats,
-            shape: opts.shape,
-            xGrid: opts.xGrid,
-            yGrid: opts.yGrid,
-          });
-          // Replace temp id with real one from API
-          dispatch({
-            type: "SET_TABLES",
-            payload: stateRef.current.tables.map((t: Table) =>
-              t.table_id === tempId
-                ? { ...t, table_id: String(created.tableId) }
-                : t,
-            ),
-          });
-        } catch (err) {
-          console.error("addTable failed:", err);
-          dispatch({ type: "REMOVE_TABLE", payload: tempId });
-        }
-      },
-    }),
-    [
-      state,
-      dispatch,
-      activeLayout,
-      tablesForActiveLayout,
-      assignmentsByTable,
-      guestsById,
-      sensors,
-      relationsById,
-      tableOrder,
-      tablesForActiveLayoutById,
+  const value = useMemo(() => ({
+    state,
+    dispatch,
+    activeLayout,
+    tablesForActiveLayout,
+    assignmentsByTable,
+    selectedTableId: state.selectedTableId,
+    onSelectTable: (tableId: string) => dispatch({ type: "SET_SELECTED_TABLE", payload: tableId }),
+    guestsById,
+    metersToPixels: state.metersToPixels,
+    zoomScale: state.zoomScale,
+    sensors,
+    onDragStart,
+    onDragEnd,
+    onDragCancel,
+    dragOverlayContent:
+      state.activeDragId && state.activeDragId.startsWith("guest:")
+        ? guestsById.get(state.activeDragId.slice("guest:".length))
+          ? fullName(guestsById.get(state.activeDragId.slice("guest:".length))!)
+          : "Guest"
+        : null,
+    handleZoomIn: () => dispatch({ type: "SET_ZOOM_SCALE", payload: Math.min(state.zoomScale * 1.2, 5) }),
+    handleZoomOut: () => dispatch({ type: "SET_ZOOM_SCALE", payload: Math.max(state.zoomScale / 1.2, 0.25) }),
+    handleZoomFit: (containerWidth: number, containerHeight: number) => {
+      const eventWidthMeters = activeLayout?.x_grid_size ?? DEFAULT_VENUE_WIDTH_METERS;
+      const eventHeightMeters = activeLayout?.y_grid_size ?? DEFAULT_VENUE_HEIGHT_METERS;
+      if (!containerWidth || !containerHeight) return;
+      const baseWidthPx = eventWidthMeters * INITIAL_METERS_TO_PIXELS;
+      const baseHeightPx = eventHeightMeters * INITIAL_METERS_TO_PIXELS;
+      const scale = Math.min(containerWidth / baseWidthPx, containerHeight / baseHeightPx);
+      dispatch({ type: "SET_ZOOM_SCALE", payload: Math.max(0.25, Math.min(scale, 5)) });
+    },
+    handleZoomReset: () => dispatch({ type: "SET_ZOOM_SCALE", payload: 1 }),
+    sideView: state.sideView,
+    setSideView: (v: "guests" | "table") => dispatch({ type: "SET_SIDE_VIEW", payload: v }),
+    segmentedOptions: [
+      { label: "Guests", value: "guests" as const },
+      { label: "table", value: "table" as const },
     ],
-  );
+    sidePanelOpen: state.sidePanelOpen,
+    setSidePanelOpen: (v: boolean) => dispatch({ type: "SET_SIDE_PANEL_OPEN", payload: v }),
+    aiChatOpen: state.aiChatOpen,
+    setAIChatOpen: (v: boolean) => dispatch({ type: "SET_AI_CHAT_OPEN", payload: v }),
+    hfGuests: state.guests.map((g: TAGuest) => ({
+      id: g.guest_id,
+      name: fullName(g),
+      tags: [relationsById.get(g.relation_id)?.name ?? "unknown"],
+      tableId: state.assignments.find((a: TableAssignment) => a.guest_id === g.guest_id)?.table_id ?? null,
+      partySize: g.party_size ?? 1,
+    })),
+    hfTables: tablesForActiveLayout.map((t: Table) => ({
+      id: t.table_id, name: t.table_id, shape: t.shape, capacity: t.total_number,
+      position: { x: t.x_grid, y: t.y_grid },
+    })),
+    handleApplyAISeating: (assignmentsFromAI: SeatingAssignment[]) =>
+      dispatch({ type: "APPLY_AI_SEATING", payload: assignmentsFromAI }),
+    selectedTable: state.tables.find((t: Table) => t.table_id === state.selectedTableId) ?? null,
+    selectedTableAssignments: assignmentsByTable.get(state.selectedTableId ?? "") ?? [],
+    selectedTablePeopleCount: (assignmentsByTable.get(state.selectedTableId ?? "") ?? [])
+      .reduce((sum: number, a: TableAssignment) => sum + (guestsById.get(a.guest_id)?.party_size ?? 1), 0),
+    relationsById,
+    assignedGuestIds: new Set(state.assignments.map((a: TableAssignment) => a.guest_id)),
+    filteredGuests: state.guests
+      .filter((g: TAGuest) => state.relationFilter ? g.relation_id === state.relationFilter : true)
+      .filter((g: TAGuest) => {
+        const q = state.guestSearch.trim().toLowerCase();
+        if (!q) return true;
+        return fullName(g).toLowerCase().includes(q) || (g.email ?? "").toLowerCase().includes(q);
+      })
+      .filter((g: TAGuest) => {
+        if (!state.assignedFilter || state.assignedFilter === "all") return true;
+        const isAssigned = state.assignments.some((a: TableAssignment) => a.guest_id === g.guest_id);
+        return state.assignedFilter === "assigned" ? isAssigned : !isAssigned;
+      })
+      .slice()
+      .sort((a: TAGuest, b: TAGuest) => fullName(a).localeCompare(fullName(b))),
+    guestSearch: state.guestSearch,
+    setGuestSearch: (s: string) => dispatch({ type: "SET_GUEST_SEARCH", payload: s }),
+    relationFilter: state.relationFilter,
+    setRelationFilter: (r?: string) => dispatch({ type: "SET_RELATION_FILTER", payload: r }),
+    assignedFilter: state.assignedFilter,
+    setAssignedFilter: (v: "all" | "assigned" | "unassigned") => dispatch({ type: "SET_ASSIGNED_FILTER", payload: v }),
+    relationOptions: state.relations.map((r: Relation) => ({ value: r.relation_id, label: r.name })),
+    assignments: state.assignments,
+    setAssignments: (a: typeof state.assignments) => dispatch({ type: "SET_ASSIGNMENTS", payload: a }),
+    unassignAll: () => {
+      const current = stateRef.current.assignments;
+      dispatch({ type: "UNASSIGN_ALL" });
+      current.forEach(deleteAssignment);
+    },
+    unassignGuest: (guestId: string) => {
+      const prev = stateRef.current.assignments.find((a: TableAssignment) => a.guest_id === guestId);
+      dispatch({ type: "UNASSIGN_GUEST", payload: { guestId } });
+      if (prev) {
+        apiDelete(`/api/tableassignments/${prev.table_id}/${guestId}`)
+          .catch((e) => console.error("[unassignGuest] failed:", e));
+      }
+    },
+    guests: state.guests,
+    moveGuestSeat,
+    tableOrder,
+    tablesForActiveLayoutById,
+    messageApi: notifier,
+    addTable,
+  }), [
+    state, dispatch, activeLayout, tablesForActiveLayout, assignmentsByTable,
+    guestsById, sensors, relationsById, tableOrder, tablesForActiveLayoutById,
+    onDragStart, onDragEnd, onDragCancel, moveGuestSeat, addTable, notifier, getAssignments,
+  ]);
 
   return (
     <TableAssignmentContext.Provider value={value}>
@@ -652,12 +267,8 @@ export function TableAssignmentProvider({
 
 export function useTableAssignmentContext() {
   const ctx = React.useContext(TableAssignmentContext);
-  if (!ctx)
-    throw new Error(
-      "useTableAssignmentContext must be used within TableAssignmentProvider",
-    );
+  if (!ctx) throw new Error("useTableAssignmentContext must be used within TableAssignmentProvider");
   return ctx;
 }
 
 export default TableAssignmentContext;
-
