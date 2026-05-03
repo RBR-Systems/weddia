@@ -7,7 +7,7 @@ import Card from "@/shared/components/Card/Card";
 import Statistic from "@/shared/components/AnimatedStatistic/AnimatedStatistic";
 import { useBudget } from "../../../contexts/BudgetContext";
 import { formatCurrency, formatDate } from "@/shared/utils/formatters.utils";
-import { getPaymentStatus, VENDOR_DRAWER_WIDTH, VENDOR_DETAILS_PAGE_SIZE } from "../../../constants/budget.constants";
+import { getPaymentStatus, VENDOR_DETAILS_PAGE_SIZE } from "../../../constants/budget.constants";
 import type { Expense, PaymentStatus, Vendor } from "../../../models/budget.models";
 import vendorStyles from "./VendorDetails.module.css";
 
@@ -81,7 +81,7 @@ export default function VendorDetails({
     <Drawer
       title={t("vendorDetails.title")}
       placement="right"
-      width={VENDOR_DRAWER_WIDTH}
+      size="large"
       open={open}
       onClose={onClose}
     >
