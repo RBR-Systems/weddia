@@ -4,7 +4,7 @@ import { Modal, Form, Input, InputNumber, Select, DatePicker } from "antd";
 import { CreditCardOutlined, BankOutlined, DollarOutlined, FileTextOutlined, EllipsisOutlined, CheckCircleOutlined, ClockCircleOutlined, ExclamationCircleOutlined, SyncOutlined } from "@ant-design/icons";
 import { formatInputNumber, parseInputNumber } from "@/shared/utils/formatters.utils";
 import type { Expense } from "../../../models/budget.models";
-import { EXPENSE_MODAL_WIDTH } from "../../../constants/budget.constants";
+import { EXPENSE_MODAL_WIDTH, CURRENCIES } from "../../../constants/budget.constants";
 import { useBudget } from "../../../contexts/BudgetContext";
 import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
@@ -81,6 +81,7 @@ export default function ExpenseModal({ visible, onClose, editingExpense }: Props
         methodOfPayment: editingExpense.methodOfPayment,
         payment_status:  editingExpense.payment_status,
         receipt_url:     editingExpense.receipt_url ?? "",
+        currency:        editingExpense.currency ?? "MXN",
       });
     } else if (visible && !editingExpense) {
       form.resetFields();
@@ -100,6 +101,7 @@ export default function ExpenseModal({ visible, onClose, editingExpense }: Props
       methodOfPayment: values.methodOfPayment || "",
       receipt_url:     receiptUrl,
       receipt_urls:    receiptUrl ? [receiptUrl] : [],
+      currency:        values.currency || "MXN",
     };
 
     if (isEditing) {
@@ -129,22 +131,36 @@ export default function ExpenseModal({ visible, onClose, editingExpense }: Props
     >
       <Form form={form} layout="vertical" style={EXPENSE_FORM_STYLE}>
 
-        {/* ── Amount hero ───────────────────────────────────────────── */}
+        {/* ── Amount + Currency ─────────────────────────────────────── */}
         <div className={styles.amountSection}>
-          <Form.Item
-            name="amount"
-            label={t("expenseModal.amount")}
-            rules={[{ required: true, message: t("expenseModal.amountRequired") }]}
-          >
-            <InputNumber
-              className={styles.amountInput}
-              controls={false}
-              min={0}
-              placeholder="0.00"
-              formatter={(v) => formatInputNumber(v)}
-              parser={parseInputNumber}
-            />
-          </Form.Item>
+          <div className={styles.twoCol}>
+            <Form.Item
+              name="amount"
+              label={t("expenseModal.amount")}
+              rules={[{ required: true, message: t("expenseModal.amountRequired") }]}
+            >
+              <InputNumber
+                className={styles.amountInput}
+                controls={false}
+                min={0}
+                placeholder="0.00"
+                formatter={(v) => formatInputNumber(v)}
+                parser={parseInputNumber}
+              />
+            </Form.Item>
+            <Form.Item
+              name="currency"
+              label={t("expenseModal.currency")}
+              initialValue="MXN"
+            >
+              <Select
+                options={Object.values(CURRENCIES).map((c) => ({
+                  value: c.code,
+                  label: `${c.code} (${c.symbol})`,
+                }))}
+              />
+            </Form.Item>
+          </div>
         </div>
 
         {/* ── Core fields ───────────────────────────────────────────── */}
