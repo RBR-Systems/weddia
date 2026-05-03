@@ -198,7 +198,7 @@ export default function ExpenseModal({ visible, onClose, editingExpense }: Props
           <p className={styles.sectionLabel}>{t("expenseModal.methodOfPayment")}</p>
           <Form.Item
             name="methodOfPayment"
-            noStyle
+            initialValue="Credit Card"
             rules={[{ required: true, message: t("expenseModal.methodOfPaymentRequired") }]}
           >
             <ChipGroup options={METHOD_OPTIONS} />
