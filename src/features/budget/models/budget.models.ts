@@ -48,7 +48,7 @@ export interface Expense {
   vendor_name?: string;
   expense_date: string;
   payment_status: PaymentStatus;
-  methodOfPayment: string;
+  methodOfPayment: string | null;
   receipt_url?: string | null;
   receipt_urls?: string[];
   notes?: string;
