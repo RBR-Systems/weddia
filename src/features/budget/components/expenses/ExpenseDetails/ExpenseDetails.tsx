@@ -74,7 +74,7 @@ export function ExpenseDetails({
             {expense.description}
           </Title>
           <Title level={2} className={styles.expenseAmount}>
-            {formatCurrency(expense.amount, state.currency)}
+            {formatCurrency(expense.amount, expense.currency ?? state.currency)}
           </Title>
         </div>
 
@@ -89,6 +89,9 @@ export function ExpenseDetails({
           </Descriptions.Item>
           <Descriptions.Item label={t("expenseModal.methodOfPayment")}>
             {expense.methodOfPayment || t("common.notSpecified")}
+          </Descriptions.Item>
+          <Descriptions.Item label={t("expenseModal.currency")}>
+            {expense.currency ?? state.currency}
           </Descriptions.Item>
           <Descriptions.Item label={t("common.date")}>
             {formatDate(expense.expense_date)}

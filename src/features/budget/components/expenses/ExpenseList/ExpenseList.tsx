@@ -62,9 +62,17 @@ export function ExpenseList({
       title: t("common.amount"),
       dataIndex: "amount",
       key: "amount",
-      render: (amount: number) => formatCurrency(amount, state.currency),
+      render: (amount: number, record: Expense) =>
+        formatCurrency(amount, record.currency ?? state.currency),
       sorter: (a, b) => a.amount - b.amount,
       align: "right",
+    },
+    {
+      title: t("expenseModal.currency"),
+      dataIndex: "currency",
+      key: "currency",
+      width: 80,
+      render: (currency: string) => currency || state.currency,
     },
     {
       title: t("common.category"),
