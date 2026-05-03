@@ -27,7 +27,7 @@ export default function BudgetCategoriesPage() {
     const q = search.trim().toLowerCase();
     if (!q) return catalogCategories;
     return catalogCategories.filter(
-      (c) => c.name.toLowerCase().includes(q) || c.description.toLowerCase().includes(q),
+      (c) => c.name.toLowerCase().includes(q) || (c.description ?? "").toLowerCase().includes(q),
     );
   }, [catalogCategories, search]);
 
