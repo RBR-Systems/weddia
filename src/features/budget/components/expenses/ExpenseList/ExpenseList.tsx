@@ -36,7 +36,7 @@ export function ExpenseList({
   const filteredExpenses = useMemo(() => {
     return state.expenses.filter((expense: Expense) => {
       const matchesSearch =
-        \(expense.description ?? ''\).toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (expense.description ?? "").toLowerCase().includes(searchTerm.toLowerCase()) ||
         expense.vendor_name?.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesCategory =
         !categoryFilter || expense.category_id === categoryFilter;
