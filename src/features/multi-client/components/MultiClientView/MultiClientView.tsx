@@ -105,7 +105,7 @@ export function MultiClientView({ onSelectClient }: MultiClientViewProps) {
       dataIndex: 'status',
       key: 'status',
       render: (status: keyof typeof CLIENT_STATUS_CONFIG) => {
-        const config = CLIENT_STATUS_CONFIG[status];
+        const config = CLIENT_STATUS_CONFIG[status] ?? CLIENT_STATUS_CONFIG.on_track;
         return <Tag color={config.color}>{t(config.labelKey)}</Tag>;
       },
       filters: Object.entries(CLIENT_STATUS_CONFIG).map(([key, value]) => ({
