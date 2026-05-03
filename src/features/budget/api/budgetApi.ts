@@ -1,18 +1,19 @@
 import type { BudgetDataAPI } from "../models/api.models";
-import type { ApiBudget, ApiExpense, ApiCategory, ApiVendor } from "../models/apiRaw.models";
+import type { ApiBudget, ApiExpense, ApiCategory, ApiVendor, ApiVendorEvent } from "../models/apiRaw.models";
 import { apiGet, apiPost, apiPut, apiDelete } from "@/shared/api/apiClient";
 import { ADMIN_QUERY_PARAM, DEFAULT_CURRENCY } from "../constants/budget.constants";
 import { mapRawToBudgetData } from "../utils/budgetMapper.utils";
 
 export async function getBudgetData(eventId: number, signal?: AbortSignal): Promise<BudgetDataAPI> {
-  const [budgets, expenses, categories, vendors] = await Promise.all([
+  const [budgets, expenses, categories, vendors, vendorEvents] = await Promise.all([
     apiGet<ApiBudget[]>(`/api/budgets/event/${eventId}`, { signal }),
     apiGet<ApiExpense[]>(`/api/expenses/event/${eventId}`, { signal }),
     apiGet<ApiCategory[]>("/api/categoriesexpensebudget", { signal }),
     apiGet<ApiVendor[]>("/api/vendors", { signal }),
+    apiGet<ApiVendorEvent[]>(`/api/vendors-events/event/${eventId}`, { signal }).catch(() => [] as ApiVendorEvent[]),
   ]);
 
-  return mapRawToBudgetData({ eventId, budgets, expenses, categories, vendors });
+  return mapRawToBudgetData({ eventId, budgets, expenses, categories, vendors, vendorEvents });
 }
 
 export async function updateBudget(eventId: number, updates: { total_budget: number }): Promise<void> {

@@ -1,3 +1,5 @@
+import type { VendorEvent } from "./budget.models";
+
 // API Response Types based on database schema
 
 export interface Timestamps {
@@ -146,6 +148,15 @@ export interface AnalyticsAPI {
   category_trends: CategoryTrendsAPI;
 }
 
+export interface VendorEventAPI {
+  vendor_id: string;
+  event_id: number;
+  contracted_amount?: number | null;
+  contracted_date?: string | null;
+  status: string;
+  notes?: string | null;
+}
+
 // Main API Response
 export interface BudgetDataAPI {
   event_id: string;
@@ -155,6 +166,7 @@ export interface BudgetDataAPI {
   categories: CategoryAPI[];
   expenses: ExpenseAPI[];
   vendors: VendorAPI[];
+  vendorEvents: VendorEvent[];
   budget_items: BudgetItemAPI[];
   payment_schedule: PaymentScheduleAPI[];
   analytics: AnalyticsAPI;

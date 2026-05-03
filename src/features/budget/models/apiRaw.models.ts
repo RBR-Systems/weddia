@@ -48,6 +48,15 @@ export interface ApiVendor {
   isActive: boolean;
 }
 
+export interface ApiVendorEvent {
+  vendorId: number;
+  eventId: number;
+  contractedAmount?: number | null;
+  contractedDate?: string | null;
+  status?: string | null;
+  notes?: string | null;
+}
+
 export interface ApiBudgetItem {
   budgetItemId: number;
   budgetId: number;

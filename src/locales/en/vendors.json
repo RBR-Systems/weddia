@@ -7,7 +7,14 @@
     "eventSpending": "Event Spending",
     "emptyText": "No vendors in catalog. Add vendors from the Vendor Catalog section.",
     "noVendorsAssigned": "No vendors assigned to this event yet",
-    "cannotUnassign": "Cannot remove vendor — it has expenses associated with this event"
+    "cannotUnassign": "Cannot remove vendor — it has expenses associated with this event",
+    "contractStatus": "Contract",
+    "contractStatusValues": {
+      "active": "Active",
+      "contracted": "Contracted",
+      "cancelled": "Cancelled",
+      "completed": "Completed"
+    }
   },
   "vendorCatalog": {
     "title": "Vendor Catalog",
@@ -62,6 +69,14 @@
   "vendorDetails": {
     "title": "Vendor Details",
     "totalSpent": "Total Spent",
+    "contractedAmount": "Contracted Amount",
+    "contractSection": "Event Contract",
+    "contractStatus": "Status",
+    "contractDate": "Contract Date",
+    "contractNotes": "Notes",
+    "saveContract": "Save Contract",
+    "contractSaved": "Contract saved",
+    "contractSaveFailed": "Failed to save contract",
     "paid": "Paid",
     "pending": "Pending",
     "expenses": "Expenses ({{count}})",

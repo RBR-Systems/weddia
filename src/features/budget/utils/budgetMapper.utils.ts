@@ -1,10 +1,11 @@
 import type { BudgetDataAPI } from "../models/api.models";
-import type { BudgetStatus, PaymentStatus } from "../models/budget.models";
+import type { BudgetStatus, PaymentStatus, VendorEvent, VendorEventStatus } from "../models/budget.models";
 import type {
   ApiCategory,
   ApiBudget,
   ApiExpense,
   ApiVendor,
+  ApiVendorEvent,
 } from "../models/apiRaw.models";
 import {
   CATEGORY_COLORS,
@@ -19,6 +20,7 @@ export interface RawBudgetPayload {
   expenses: ApiExpense[];
   categories: ApiCategory[];
   vendors: ApiVendor[];
+  vendorEvents: ApiVendorEvent[];
 }
 
 const PAID: PaymentStatus = "paid";
@@ -169,8 +171,19 @@ function buildPaymentBreakdown(expenses: ApiExpense[], totalSpent: number) {
   };
 }
 
+function mapVendorEvents(raw: ApiVendorEvent[], eventId: number): VendorEvent[] {
+  return raw.map((v) => ({
+    vendor_id: String(v.vendorId),
+    event_id: eventId,
+    contracted_amount: v.contractedAmount ?? undefined,
+    contracted_date: v.contractedDate ?? undefined,
+    status: ((v.status ?? "active") as VendorEventStatus),
+    notes: v.notes ?? undefined,
+  }));
+}
+
 export function mapRawToBudgetData(payload: RawBudgetPayload): BudgetDataAPI {
-  const { eventId, budgets, expenses, categories, vendors } = payload;
+  const { eventId, budgets, expenses, categories, vendors, vendorEvents } = payload;
 
   const categoryLookup = new Map(categories.map((c) => [c.categoryId, c]));
   const vendorLookup = new Map(vendors.map((v) => [v.vendorId, v]));
@@ -223,6 +236,7 @@ export function mapRawToBudgetData(payload: RawBudgetPayload): BudgetDataAPI {
     categories: mappedCategories,
     expenses: mappedExpenses,
     vendors: mappedVendors,
+    vendorEvents: mapVendorEvents(vendorEvents, eventId),
     budget_items: [],
     payment_schedule: [],
     analytics: {

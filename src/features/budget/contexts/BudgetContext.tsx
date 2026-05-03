@@ -37,13 +37,6 @@ export function BudgetProvider({ children }: Readonly<{ children: React.ReactNod
     if (!selectedEvent) return;
     const controller = new AbortController();
     loadBudgetData(eventId, controller.signal);
-    try {
-      const stored = localStorage.getItem(`rbr_event_vendors_${eventId}`);
-      const ids: string[] = stored ? JSON.parse(stored) : [];
-      dispatch({ type: "SET_EVENT_VENDOR_IDS", payload: ids });
-    } catch {
-      dispatch({ type: "SET_EVENT_VENDOR_IDS", payload: [] });
-    }
     return () => controller.abort();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [eventId, loadBudgetData]);

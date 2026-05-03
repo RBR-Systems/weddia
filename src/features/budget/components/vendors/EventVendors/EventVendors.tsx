@@ -2,12 +2,12 @@
 import { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { App, Table, Button, Switch, Input, Tag, Avatar, Space, Typography, Row, Col } from "antd";
-import { ShopOutlined, EyeOutlined, TeamOutlined, LinkOutlined, DollarOutlined } from "@ant-design/icons";
+import { ShopOutlined, EyeOutlined, LinkOutlined, DollarOutlined } from "@ant-design/icons";
 import { useBudget } from "../../../contexts/BudgetContext";
 import { formatCurrency } from "@/shared/utils/formatters.utils";
 import Card from "@/shared/components/Card/Card";
 import Statistic from "@/shared/components/AnimatedStatistic/AnimatedStatistic";
-import type { Vendor } from "../../../models/budget.models";
+import type { Vendor, VendorEventStatus } from "../../../models/budget.models";
 import type { ColumnsType } from "antd/es/table";
 import { VENDOR_TABLE_PAGE_SIZE } from "../../../constants/budget.constants";
 import styles from "../vendor-list.module.css";
@@ -16,6 +16,13 @@ const { Search } = Input;
 const { Text } = Typography;
 
 const VENDOR_TABLE_PAGINATION = { pageSize: VENDOR_TABLE_PAGE_SIZE } as const;
+
+const CONTRACT_STATUS_COLOR: Record<VendorEventStatus, string> = {
+  active:     "processing",
+  contracted: "success",
+  cancelled:  "error",
+  completed:  "default",
+};
 
 interface EventVendorsProps {
   readonly onViewVendor?: (vendor: Vendor) => void;
@@ -32,18 +39,19 @@ export default function EventVendors({ onViewVendor }: EventVendorsProps) {
     [state.vendors, searchTerm],
   );
 
-  const assignedCount = state.eventVendorIds.length;
+  const assignedCount = state.vendorEvents.length;
 
   const totalEventSpending = useMemo(() => {
+    const assignedIds = new Set(state.vendorEvents.map((ve) => ve.vendor_id));
     const assignedNames = new Set(
       state.vendors
-        .filter((v: Vendor) => state.eventVendorIds.includes(v.vendor_id))
+        .filter((v: Vendor) => assignedIds.has(v.vendor_id))
         .map((v: Vendor) => v.name),
     );
     return state.expenses
       .filter((e: { vendor_name?: string }) => e.vendor_name && assignedNames.has(e.vendor_name))
       .reduce((sum: number, e: { amount: number }) => sum + e.amount, 0);
-  }, [state.expenses, state.vendors, state.eventVendorIds]);
+  }, [state.expenses, state.vendors, state.vendorEvents]);
 
   const columns: ColumnsType<Vendor> = [
     {
@@ -93,13 +101,28 @@ export default function EventVendors({ onViewVendor }: EventVendorsProps) {
       sorter: (a, b) => (a.total_spent ?? 0) - (b.total_spent ?? 0),
     },
     {
+      title: t("eventVendors.contractStatus"),
+      key: "contract_status",
+      align: "center",
+      width: 110,
+      render: (_, record) => {
+        const ve = state.vendorEvents.find((v) => v.vendor_id === record.vendor_id);
+        if (!ve) return <Text type="secondary">—</Text>;
+        return (
+          <Tag color={CONTRACT_STATUS_COLOR[ve.status]} style={{ margin: 0 }}>
+            {t(`eventVendors.contractStatusValues.${ve.status}`)}
+          </Tag>
+        );
+      },
+    },
+    {
       title: t("eventVendors.assigned"),
       key: "assigned",
       align: "center",
       width: 90,
       render: (_, record) => (
         <Switch
-          checked={state.eventVendorIds.includes(record.vendor_id)}
+          checked={state.vendorEvents.some((ve) => ve.vendor_id === record.vendor_id)}
           size="small"
           onChange={(checked) => {
             if (checked) { assignVendor(record.vendor_id); return; }

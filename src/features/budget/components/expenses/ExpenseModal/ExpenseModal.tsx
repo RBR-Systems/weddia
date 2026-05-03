@@ -114,8 +114,9 @@ export default function ExpenseModal({ visible, onClose, editingExpense }: Props
     onClose();
   };
 
+  const assignedVendorIds = new Set(state.vendorEvents.map((ve) => ve.vendor_id));
   const eventVendorOptions = state.vendors
-    .filter((v: { vendor_id: string }) => state.eventVendorIds.includes(v.vendor_id))
+    .filter((v: { vendor_id: string }) => assignedVendorIds.has(v.vendor_id))
     .map((v: { vendor_id: string; name: string }) => ({ value: v.name, label: v.name }));
 
   return (

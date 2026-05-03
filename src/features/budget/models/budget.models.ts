@@ -155,6 +155,17 @@ export interface CatalogCategoryListProps {
   readonly onDeleteConfirm: (cat: CatalogCategory) => void;
 }
 
+export type VendorEventStatus = 'active' | 'contracted' | 'cancelled' | 'completed';
+
+export interface VendorEvent {
+  vendor_id: string;
+  event_id: number;
+  contracted_amount?: number;
+  contracted_date?: string;
+  status: VendorEventStatus;
+  notes?: string;
+}
+
 export interface BudgetState {
   isLoading: boolean;
   error: string | null;
@@ -162,7 +173,7 @@ export interface BudgetState {
   categories: Category[];
   expenses: Expense[];
   vendors: Vendor[];
-  eventVendorIds: string[];
+  vendorEvents: VendorEvent[];
   currency: Currency;
 }
 
@@ -192,7 +203,10 @@ export type BudgetAction =
   | { type: "UPDATE_CATEGORY"; payload: { id: string; data: Partial<Category> } }
   | { type: "DELETE_CATEGORY"; payload: string }
   | { type: "UPDATE_BUDGET"; payload: number }
-  | { type: "SET_EVENT_VENDOR_IDS"; payload: string[] };
+  | { type: "SET_VENDOR_EVENTS"; payload: VendorEvent[] }
+  | { type: "ASSIGN_VENDOR_EVENT"; payload: VendorEvent }
+  | { type: "UNASSIGN_VENDOR_EVENT"; payload: string }
+  | { type: "UPDATE_VENDOR_EVENT"; payload: { vendor_id: string; data: Partial<VendorEvent> } };
 
 export interface BudgetContextValue {
   state: BudgetState;
@@ -209,6 +223,7 @@ export interface BudgetContextValue {
   loadEstimate: (estimate: CategoryPatchSource) => void;
   assignVendor: (vendorId: string) => void;
   unassignVendor: (vendorId: string) => void;
+  updateVendorEvent: (vendorId: string, data: Partial<VendorEvent>) => Promise<void>;
 }
 
 // ── Analytics ────────────────────────────────────────────────────────────────

@@ -32,7 +32,7 @@ export const BulkDataPanel = ({
         <Card title={t('bulkOperations.importData')}>
           <Space orientation="vertical" className={styles.fullWidth}>
             <Alert
-              message={t('bulkOperations.csvImport')}
+              title={t('bulkOperations.csvImport')}
               description={t('bulkOperations.csvDescription')}
               type="info"
               showIcon

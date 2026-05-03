@@ -92,7 +92,7 @@ export const BulkActionModals = ({
         okButtonProps={{ danger: true }}
       >
         <Alert
-          message={t('bulkOperations.deleteConfirm', { count: selectedCount })}
+          title={t('bulkOperations.deleteConfirm', { count: selectedCount })}
           description={t('bulkOperations.cannotUndo')}
           type="warning"
           showIcon

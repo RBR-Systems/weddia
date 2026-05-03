@@ -7,7 +7,14 @@
     "eventSpending": "Gasto del Evento",
     "emptyText": "No hay proveedores en el catálogo. Agrega proveedores desde la sección Catálogo de Proveedores.",
     "noVendorsAssigned": "Aún no hay proveedores asignados a este evento",
-    "cannotUnassign": "No se puede quitar el proveedor — tiene gastos asociados a este evento"
+    "cannotUnassign": "No se puede quitar el proveedor — tiene gastos asociados a este evento",
+    "contractStatus": "Contrato",
+    "contractStatusValues": {
+      "active": "Activo",
+      "contracted": "Contratado",
+      "cancelled": "Cancelado",
+      "completed": "Completado"
+    }
   },
   "vendorCatalog": {
     "title": "Catálogo de Proveedores",
@@ -62,6 +69,14 @@
   "vendorDetails": {
     "title": "Detalles del Proveedor",
     "totalSpent": "Total Gastado",
+    "contractedAmount": "Monto Contratado",
+    "contractSection": "Contrato del Evento",
+    "contractStatus": "Estado",
+    "contractDate": "Fecha de Contrato",
+    "contractNotes": "Notas",
+    "saveContract": "Guardar Contrato",
+    "contractSaved": "Contrato guardado",
+    "contractSaveFailed": "Error al guardar el contrato",
     "paid": "Pagado",
     "pending": "Pendiente",
     "expenses": "Gastos ({{count}})",

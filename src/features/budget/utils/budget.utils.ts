@@ -110,6 +110,7 @@ export const mapApiDataToBudgetState = (
       total_spent: v.total_spent ?? 0,
       expense_count: v.expense_count ?? 0,
     })),
+    vendorEvents: data.vendorEvents ?? [],
     currency: data.budget.currency as Currency,
   };
 };

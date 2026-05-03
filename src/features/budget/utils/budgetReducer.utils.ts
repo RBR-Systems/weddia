@@ -126,7 +126,10 @@ export const budgetReducer = (state: BudgetState, action: BudgetAction): BudgetS
     case "UPDATE_CATEGORY":      return handleUpdateCategory(state, action.payload.id, action.payload.data);
     case "DELETE_CATEGORY":      return handleDeleteCategory(state, action.payload);
     case "UPDATE_BUDGET":        return handleUpdateBudget(state, action.payload);
-    case "SET_EVENT_VENDOR_IDS": return { ...state, eventVendorIds: action.payload };
+    case "SET_VENDOR_EVENTS":    return { ...state, vendorEvents: action.payload };
+    case "ASSIGN_VENDOR_EVENT":  return { ...state, vendorEvents: [...state.vendorEvents, action.payload] };
+    case "UNASSIGN_VENDOR_EVENT": return { ...state, vendorEvents: state.vendorEvents.filter((ve) => ve.vendor_id !== action.payload) };
+    case "UPDATE_VENDOR_EVENT":  return { ...state, vendorEvents: state.vendorEvents.map((ve) => ve.vendor_id === action.payload.vendor_id ? { ...ve, ...action.payload.data } : ve) };
     default:                     return state;
   }
 };

@@ -279,6 +279,6 @@ export const BUDGET_INITIAL_STATE: BudgetState = {
   })),
   expenses: [],
   vendors: [],
-  eventVendorIds: [],
+  vendorEvents: [],
   currency: DEFAULT_CURRENCY as Currency,
 };

@@ -8,6 +8,7 @@ import type {
   CategoryPatchSource,
   Expense,
   TemplateCategoryRaw,
+  VendorEvent,
 } from "../models/budget.models";
 import {
   createCategory as apiCreateCategory,
@@ -15,6 +16,11 @@ import {
   deleteCategory as apiDeleteCategory,
   updateBudget as apiUpdateBudget,
 } from "../api/budgetApi";
+import {
+  assignVendorToEvent,
+  unassignVendorFromEvent,
+  updateVendorEvent as apiUpdateVendorEvent,
+} from "../api/vendorEventsApi";
 import {
   createExpense as apiCreateExpense,
   updateExpense as apiUpdateExpense,
@@ -48,6 +54,7 @@ export interface UseBudgetActionsResult {
   updateBudget: (totalBudget: number) => void;
   assignVendor: (vendorId: string) => void;
   unassignVendor: (vendorId: string) => void;
+  updateVendorEvent: (vendorId: string, data: Partial<VendorEvent>) => Promise<void>;
   loadTemplate: (template: CategoryPatchSource) => void;
   loadEstimate: (estimate: CategoryPatchSource) => void;
 }
@@ -157,16 +164,29 @@ export const useBudgetActions = ({
   };
 
   const assignVendor = (vendorId: string) => {
-    if (state.eventVendorIds.includes(vendorId)) return;
-    const updated = [...state.eventVendorIds, vendorId];
-    dispatch({ type: "SET_EVENT_VENDOR_IDS", payload: updated });
-    localStorage.setItem(`rbr_event_vendors_${eventId}`, JSON.stringify(updated));
+    if (state.vendorEvents.some((ve) => ve.vendor_id === vendorId)) return;
+    const newVe: VendorEvent = { vendor_id: vendorId, event_id: eventId, status: "active" };
+    dispatch({ type: "ASSIGN_VENDOR_EVENT", payload: newVe });
+    assignVendorToEvent(eventId, vendorId).catch((err) =>
+      console.error("assignVendorToEvent failed:", err),
+    );
   };
 
   const unassignVendor = (vendorId: string) => {
-    const updated = state.eventVendorIds.filter((id) => id !== vendorId);
-    dispatch({ type: "SET_EVENT_VENDOR_IDS", payload: updated });
-    localStorage.setItem(`rbr_event_vendors_${eventId}`, JSON.stringify(updated));
+    dispatch({ type: "UNASSIGN_VENDOR_EVENT", payload: vendorId });
+    unassignVendorFromEvent(eventId, vendorId).catch((err) =>
+      console.error("unassignVendorFromEvent failed:", err),
+    );
+  };
+
+  const updateVendorEvent = async (vendorId: string, data: Partial<VendorEvent>): Promise<void> => {
+    dispatch({ type: "UPDATE_VENDOR_EVENT", payload: { vendor_id: vendorId, data } });
+    await apiUpdateVendorEvent(eventId, vendorId, {
+      contractedAmount: data.contracted_amount,
+      contractedDate: data.contracted_date,
+      status: data.status,
+      notes: data.notes,
+    });
   };
 
   const applyCategoryPatch = (
@@ -244,6 +264,7 @@ export const useBudgetActions = ({
     updateBudget,
     assignVendor,
     unassignVendor,
+    updateVendorEvent,
     loadTemplate,
     loadEstimate,
   };
