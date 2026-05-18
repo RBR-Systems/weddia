@@ -4,7 +4,7 @@ import { App, Drawer, Form, Input, InputNumber, Button, Space, Divider, Table, P
 import { PlusOutlined, EditOutlined, DeleteOutlined, SaveOutlined, CloseOutlined } from "@ant-design/icons";
 import type { Category, BudgetItem } from "../../../models/budget.models";
 import { useCategoryItems } from "../../../hooks/useCategoryItems";
-import { formatCurrency, formatInputNumber, parseInputNumber } from "@/shared/utils/formatters.utils";
+import { formatInputNumber, parseInputNumber } from "@/shared/utils/formatters.utils";
 import { useTranslation } from "react-i18next";
 import styles from "./CategoryDrawer.module.css";
 
@@ -168,7 +168,7 @@ export default function CategoryDrawer({
             status={editValues.amount === null ? "error" : undefined}
           />
         ) : (
-          <Text strong>{formatCurrency(val, currency)}</Text>
+          <Text strong>{new Intl.NumberFormat(undefined, { style: "decimal", minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(val)}</Text>
         ),
     },
     {
@@ -298,7 +298,7 @@ export default function CategoryDrawer({
         {t("budgetItems.title")}
         {items.length > 0 && (
           <Text type="secondary" style={{ fontWeight: 400, fontSize: 12, marginLeft: 8 }}>
-            {t("budgetItems.total")}: {formatCurrency(totalItems, currency)}
+            {t("budgetItems.total")}: {new Intl.NumberFormat(undefined, { style: "decimal", minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(totalItems)}
           </Text>
         )}
       </Divider>

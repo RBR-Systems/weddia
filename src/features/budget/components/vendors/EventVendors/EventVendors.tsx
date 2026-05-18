@@ -63,7 +63,7 @@ export default function EventVendors({ onViewVendor }: EventVendorsProps) {
           <Avatar className={styles.avatarBlue} icon={<ShopOutlined />} size={36} />
           <div className={styles.vendorInfo}>
             <div className={styles.vendorName}>{record.name}</div>
-            <div className={styles.smallText}>{record.category || "—"}</div>
+            <div className={styles.smallText}>{record.category_name || "—"}</div>
           </div>
         </Space>
       ),

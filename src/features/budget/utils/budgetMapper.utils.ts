@@ -126,7 +126,8 @@ function mapVendors(
   return vendors.map((v) => ({
     vendor_id: String(v.vendorId),
     name: v.vendorName,
-    category: v.category,
+    category_id: v.categoryId ?? null,
+    category_name: v.categoryName ?? "",
     contact_person: v.contactPerson ?? "",
     email: v.email ?? "",
     phone: v.mobilePhone ?? v.phone ?? "",

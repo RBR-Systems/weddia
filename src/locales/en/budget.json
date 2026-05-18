@@ -76,6 +76,7 @@
     "methodOfPayment": "Method of Payment",
     "methodOfPaymentRequired": "Please select a method of payment",
     "methodOfPaymentPlaceholder": "Select payment method",
+    "currency": "Currency",
     "receiptUrl": "Receipt URL",
     "receiptUrlPlaceholder": "https://... (paste the receipt link)",
     "paymentMethods": {

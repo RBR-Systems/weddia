@@ -1,6 +1,6 @@
 export interface VendorFormValues {
   name: string;
-  category?: string;
+  category_id?: number | null;
   contact_name?: string;
   phone?: string;
   email?: string;

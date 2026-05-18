@@ -5,7 +5,7 @@ import { ADMIN_QUERY_PARAM } from "../constants/budget.constants";
 
 interface VendorInput {
   vendorName: string;
-  category: string;
+  categoryId?: number | null;
   contactPerson?: string;
   email?: string;
   mobilePhone?: string;
@@ -18,7 +18,7 @@ interface VendorInput {
 function toVendorPayload(data: VendorInput) {
   return {
     vendorName:    data.vendorName,
-    category:      data.category,
+    categoryId:    data.categoryId ?? null,
     contactPerson: data.contactPerson ?? null,
     email:         data.email ?? null,
     mobilePhone:   data.mobilePhone ?? null,
@@ -33,7 +33,8 @@ function mapVendor(v: ApiVendor): Vendor {
   return {
     vendor_id:     String(v.vendorId),
     name:          v.vendorName,
-    category:      v.category,
+    category_id:   v.categoryId ?? null,
+    category_name: v.categoryName ?? "",
     contact_name:  v.contactPerson ?? "",
     email:         v.email ?? "",
     phone:         v.mobilePhone ?? v.phone ?? "",

@@ -1,7 +1,8 @@
 export interface Vendor {
   vendor_id: string;
   name: string;
-  category?: string;
+  category_id?: number | null;
+  category_name?: string;
   contact_name?: string;
   email?: string;
   phone?: string;

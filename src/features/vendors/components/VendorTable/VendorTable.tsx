@@ -40,7 +40,7 @@ export const VendorTable = ({ vendors, isLoading, searchTerm, onSearch, onAdd, o
             <Text strong>{record.name}</Text>
             <br />
             <Text type="secondary" className={styles.smallText}>
-              {record.category}
+              {record.category_name || "—"}
             </Text>
           </div>
         </Space>

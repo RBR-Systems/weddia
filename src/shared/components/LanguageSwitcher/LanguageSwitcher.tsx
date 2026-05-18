@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 
 const LANGUAGES = [
   { value: "en", label: "🇺🇸 EN" },
-  { value: "es", label: "🇪🇸 ES" },
+  { value: "es", label: "🇲🇽 ES" },
 ] as const;
 
 type Language = (typeof LANGUAGES)[number]["value"];

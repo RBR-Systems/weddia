@@ -13,7 +13,7 @@ const { Title } = Typography;
 
 export default function VendorCatalog() {
   const { t } = useTranslation();
-  const { vendors, isLoading, createVendorItem, updateVendorItem, deleteVendorItem } = useVendors();
+  const { vendors, categories, isLoading, createVendorItem, updateVendorItem, deleteVendorItem } = useVendors();
   const [searchTerm, setSearchTerm] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [editingVendor, setEditingVendor] = useState<Vendor | null>(null);
@@ -60,6 +60,7 @@ export default function VendorCatalog() {
       <VendorFormModal
         open={modalOpen}
         editingVendor={editingVendor}
+        categories={categories}
         onSave={handleSave}
         onCancel={handleCancel}
       />

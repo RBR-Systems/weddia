@@ -1,12 +1,5 @@
-export function formatCurrency(amount: number, currency: string = "USD") {
-  try {
-    return new Intl.NumberFormat(undefined, {
-      style: "currency",
-      currency,
-    }).format(amount);
-  } catch {
-    return `${currency} ${amount.toFixed(2)}`;
-  }
+export function formatCurrency(amount: number, _currency?: string) {
+  return `$${new Intl.NumberFormat(undefined, { style: "decimal", minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(amount)}`;
 }
 
 export function formatDate(

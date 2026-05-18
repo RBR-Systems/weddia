@@ -166,7 +166,7 @@ export default function VendorDetails({ vendor, open, onClose }: VendorDetailsPr
             </Descriptions.Item>
           )}
           <Descriptions.Item label={t("vendorDetails.category")}>
-            {vendor.category}
+            {vendor.category_name || "—"}
           </Descriptions.Item>
         </Descriptions>
 

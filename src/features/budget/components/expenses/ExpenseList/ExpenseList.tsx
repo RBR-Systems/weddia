@@ -5,7 +5,7 @@ import { App, Card, Table, Button, Input, Select, Space, Popconfirm, Row, Col } 
 import { PlusOutlined, DeleteOutlined, EyeOutlined, FilterOutlined } from "@ant-design/icons";
 import type { ColumnsType, TablePaginationConfig } from "antd/es/table";
 import { useBudget } from "../../../contexts/BudgetContext";
-import { formatCurrency, formatDate } from "@/shared/utils/formatters.utils";
+import { formatDate } from "@/shared/utils/formatters.utils";
 import { getPaymentStatus, EMPTY_VALUE_DISPLAY, EXPENSE_TABLE_PAGE_SIZE, EXPENSE_TABLE_SCROLL } from "../../../constants/budget.constants";
 import type { Expense, PaymentStatus } from "../../../models/budget.models";
 import CategoryTag from "../../common/CategoryTag/CategoryTag";
@@ -62,8 +62,8 @@ export function ExpenseList({
       title: t("common.amount"),
       dataIndex: "amount",
       key: "amount",
-      render: (amount: number, record: Expense) =>
-        formatCurrency(amount, record.currency ?? state.currency),
+      render: (amount: number) =>
+        new Intl.NumberFormat(undefined, { style: "decimal", minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(amount),
       sorter: (a, b) => a.amount - b.amount,
       align: "right",
     },

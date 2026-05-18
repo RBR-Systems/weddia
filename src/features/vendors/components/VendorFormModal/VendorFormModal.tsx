@@ -4,18 +4,19 @@ import { Modal, Form, Input, Select, Switch } from "antd";
 import { PhoneOutlined, MailOutlined, UserOutlined, EnvironmentOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import type { Vendor } from "@/shared/models/vendor.models";
+import type { CatalogCategory } from "@/features/budget/models/budget.models";
 import type { VendorFormValues } from "../../models/vendor.models";
-import { VENDOR_CATEGORIES } from "../../constants/vendor.constants";
 import styles from "./VendorFormModal.module.css";
 
 interface VendorFormModalProps {
   open: boolean;
   editingVendor: Vendor | null;
+  categories: CatalogCategory[];
   onSave: (values: VendorFormValues) => Promise<boolean>;
   onCancel: () => void;
 }
 
-export const VendorFormModal = ({ open, editingVendor, onSave, onCancel }: VendorFormModalProps) => {
+export const VendorFormModal = ({ open, editingVendor, categories, onSave, onCancel }: VendorFormModalProps) => {
   const { t } = useTranslation();
   const [form] = Form.useForm<VendorFormValues>();
   const [isSaving, setIsSaving] = useState(false);
@@ -25,7 +26,7 @@ export const VendorFormModal = ({ open, editingVendor, onSave, onCancel }: Vendo
     if (editingVendor) {
       form.setFieldsValue({
         name:         editingVendor.name,
-        category:     editingVendor.category,
+        category_id:  editingVendor.category_id ?? null,
         contact_name: editingVendor.contact_name,
         phone:        editingVendor.phone,
         email:        editingVendor.email,
@@ -59,6 +60,11 @@ export const VendorFormModal = ({ open, editingVendor, onSave, onCancel }: Vendo
     onCancel();
   };
 
+  const categoryOptions = categories.map((c) => ({
+    label: c.name,
+    value: Number(c.category_id),
+  }));
+
   return (
     <Modal
       title={editingVendor ? t("vendorCatalog.edit") : t("vendorList.addVendor")}
@@ -89,11 +95,12 @@ export const VendorFormModal = ({ open, editingVendor, onSave, onCancel }: Vendo
 
         <div className={`${styles.paymentSection} mb-12`}>
           <p className={styles.sectionLabel}>{t("vendorList.form.category")}</p>
-          <Form.Item name="category" noStyle>
+          <Form.Item name="category_id" noStyle>
             <Select
               placeholder={t("vendorList.form.categoryPlaceholder")}
               className="w-full"
-              options={VENDOR_CATEGORIES.map((c) => ({ label: c, value: c }))}
+              allowClear
+              options={categoryOptions}
             />
           </Form.Item>
         </div>

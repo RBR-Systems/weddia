@@ -37,7 +37,8 @@ export interface ApiExpense {
 export interface ApiVendor {
   vendorId: number;
   vendorName: string;
-  category: string;
+  categoryId?: number | null;
+  categoryName?: string | null;
   contactPerson?: string;
   email?: string;
   mobilePhone?: string;

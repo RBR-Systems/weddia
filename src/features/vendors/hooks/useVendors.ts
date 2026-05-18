@@ -3,11 +3,14 @@ import { useState, useEffect, useCallback } from "react";
 import { App } from "antd";
 import { useTranslation } from "react-i18next";
 import { getVendors, createVendor, updateVendor, deleteVendor } from "../api/vendorsApi";
+import { CategoriesService } from "@/features/budget/api/categoriesApi";
 import type { Vendor } from "@/shared/models/vendor.models";
+import type { CatalogCategory } from "@/features/budget/models/budget.models";
 import type { VendorFormValues } from "../models/vendor.models";
 
 interface UseVendorsResult {
   vendors: Vendor[];
+  categories: CatalogCategory[];
   isLoading: boolean;
   createVendorItem: (values: VendorFormValues) => Promise<boolean>;
   updateVendorItem: (vendorId: string, values: VendorFormValues) => Promise<boolean>;
@@ -18,13 +21,18 @@ export const useVendors = (): UseVendorsResult => {
   const { t } = useTranslation();
   const { message } = App.useApp();
   const [vendors, setVendors] = useState<Vendor[]>([]);
+  const [categories, setCategories] = useState<CatalogCategory[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const refetch = useCallback(async () => {
     setIsLoading(true);
     try {
-      const data = await getVendors();
-      setVendors(data);
+      const [vendorData, categoryData] = await Promise.all([
+        getVendors(),
+        CategoriesService.getAll(),
+      ]);
+      setVendors(vendorData);
+      setCategories(categoryData);
     } catch {
       message.error(t("vendorCatalog.loadFailed", "Failed to load vendors"));
     } finally {
@@ -40,7 +48,7 @@ export const useVendors = (): UseVendorsResult => {
     try {
       await createVendor({
         vendorName:    values.name,
-        category:      values.category ?? "",
+        categoryId:    values.category_id ?? null,
         contactPerson: values.contact_name,
         email:         values.email,
         mobilePhone:   values.phone,
@@ -60,7 +68,7 @@ export const useVendors = (): UseVendorsResult => {
     try {
       await updateVendor(vendorId, {
         vendorName:    values.name,
-        category:      values.category ?? "",
+        categoryId:    values.category_id ?? null,
         contactPerson: values.contact_name,
         email:         values.email,
         mobilePhone:   values.phone,
@@ -87,5 +95,5 @@ export const useVendors = (): UseVendorsResult => {
     }
   }, [message, t, refetch]);
 
-  return { vendors, isLoading, createVendorItem, updateVendorItem, deleteVendorItem };
+  return { vendors, categories, isLoading, createVendorItem, updateVendorItem, deleteVendorItem };
 };

@@ -12,7 +12,8 @@ export interface Timestamps {
 export interface VendorAPI extends Timestamps {
   vendor_id: string;
   name: string;
-  category: string;
+  category_id: number | null;
+  category_name: string;
   contact_person: string;
   email: string;
   phone: string;
