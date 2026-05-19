@@ -113,16 +113,16 @@
 /* ── Type chip selector ──────────────────────────────────────────────── */
 .chipGrid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 7px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
 }
 
 .chip {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;
-  padding: 7px 10px;
+  gap: 4px;
+  padding: 5px 8px;
   border-radius: var(--radius-md);
   border: 1.5px solid var(--card-border);
   background: var(--card-background);

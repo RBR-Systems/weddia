@@ -1,4 +1,4 @@
-import { TimelineItem } from "../models/schedule.models";
+import { TimelineItem, Status } from "../models/schedule.models";
 import i18next from "i18next";
 
 export const getStatusOptions = () => ({
@@ -38,6 +38,16 @@ export const getStatusOptions = () => ({
     description: i18next.t("schedule.statusDesc.cancelled"),
   },
 });
+
+export function getEffectiveStatus(item: TimelineItem, nowMs = Date.now()): Status {
+  const rawStatus = item.status ?? "pending";
+  if (rawStatus !== "pending") return rawStatus;
+  const startMs = new Date(item.start_time).getTime();
+  const endMs = new Date(item.end_time).getTime();
+  if (nowMs > endMs) return "completed";
+  if (nowMs >= startMs) return "in_progress";
+  return "pending";
+}
 
 export function calculateProgress(items: TimelineItem[]) {
   const total = items.length;

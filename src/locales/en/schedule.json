@@ -89,8 +89,8 @@
       "completed": "Completed",
       "inProgress": "In Progress",
       "pending": "Pending",
-      "delayed": "{{count}} Delayed",
-      "cancelled": "{{count}} Cancelled"
+      "delayed": "Delayed",
+      "cancelled": "Cancelled"
     },
     "status": {
       "pending": "Pending",

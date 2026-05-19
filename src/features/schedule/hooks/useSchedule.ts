@@ -3,7 +3,7 @@ import { App } from "antd";
 import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
 import { TimelineItem, Status } from "../models/schedule.models";
-import { sortTimelineItems } from "../utils/schedule.utils";
+import { sortTimelineItems, getEffectiveStatus } from "../utils/schedule.utils";
 import {
   fetchTimelineItems,
   createTimelineItem,
@@ -105,11 +105,12 @@ export function useSchedule(eventId: number) {
   function handleStatusChange(itemId: string, newStatus: Status) {
     const item = items.find((i) => i.timeline_item_id === itemId);
     if (!item) return;
-    setItems((prev) =>
-      prev.map((it) =>
-        it.timeline_item_id === itemId ? { ...it, status: newStatus, updated_at: new Date().toISOString() } : it
-      )
-    );
+    const updated = { ...item, status: newStatus, updated_at: new Date().toISOString() };
+    setItems((prev) => prev.map((it) => it.timeline_item_id === itemId ? updated : it));
+    updateTimelineItem(itemId, updated).catch((err) => {
+      console.error("handleStatusChange: failed to persist", err);
+      setItems((prev) => prev.map((it) => it.timeline_item_id === itemId ? item : it));
+    });
     if (newStatus === "completed") {
       message.success({ content: t("schedule.messages.markedCompleted", { title: item.title }), duration: 2 });
     } else if (newStatus === "delayed") {
@@ -130,8 +131,9 @@ export function useSchedule(eventId: number) {
           (item.description || "").toLowerCase().includes(q) ||
           (item.notes || "").toLowerCase().includes(q))) return false;
         if (selectedTypes.length > 0 && !selectedTypes.includes(item.type)) return false;
-        if (activeFilter !== "all" && (item.status ?? "pending") !== activeFilter) return false;
-        if (hideCompleted && (item.status ?? "pending") === "completed") return false;
+        const effectiveStatus = getEffectiveStatus(item);
+        if (activeFilter !== "all" && effectiveStatus !== activeFilter) return false;
+        if (hideCompleted && effectiveStatus === "completed") return false;
         return true;
       })
     );

@@ -6,7 +6,7 @@ import Card from "@/shared/components/Card/Card";
 import { EditOutlined, DeleteOutlined, UpOutlined, DownOutlined, EnvironmentOutlined, FieldTimeOutlined, ToolOutlined } from "@ant-design/icons";
 import { TimelineItem, Status } from "../../models/schedule.models";
 import { useTranslation } from "react-i18next";
-import { calculateDuration, calculateSetupDuration, formatTime, getStatusOptions } from "../../utils/schedule.utils";
+import { calculateDuration, calculateSetupDuration, formatTime, getEffectiveStatus, getStatusOptions } from "../../utils/schedule.utils";
 import styles from "./schedule-item.module.css";
 import getKeyboardActivationProps from "@/shared/utils/keyboardActivation";
 
@@ -67,8 +67,7 @@ export const ScheduleItem: React.FC<Props> = ({
 }) => {
   const { t } = useTranslation();
   const actualStatus: Status = (item.status ?? "pending") as Status;
-  const displayStatus: Status =
-    isNow && actualStatus === "pending" ? "in_progress" : actualStatus;
+  const displayStatus: Status = getEffectiveStatus(item);
   const statusInfo = getStatusOptions()[displayStatus];
   const kbToggle = getKeyboardActivationProps(() => onToggle(item.timeline_item_id));
   const kbStop = getKeyboardActivationProps(() => {});

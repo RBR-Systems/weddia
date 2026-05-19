@@ -5,7 +5,7 @@ import { Space, Tag, Switch, Button, Input, Select } from "antd";
 import { CheckCircleOutlined, ClockCircleOutlined, PlayCircleOutlined, WarningOutlined, CloseCircleOutlined, FilterOutlined } from "@ant-design/icons";
 import { Status, TimelineItem } from "../../models/schedule.models";
 import { useTranslation } from "react-i18next";
-import { calculateProgress } from "../../utils/schedule.utils";
+import { calculateProgress, getEffectiveStatus } from "../../utils/schedule.utils";
 import styles from "./StatusFilter.module.css";
 
 type Props = {
@@ -43,7 +43,9 @@ const StatusFilter: React.FC<Props> = ({
   filteredCount,
 }) => {
   const { t } = useTranslation();
-  const progress = calculateProgress(items);
+  const nowMs = Date.now();
+  const effectiveItems = items.map((item) => ({ ...item, status: getEffectiveStatus(item, nowMs) }));
+  const progress = calculateProgress(effectiveItems);
 
   const statusIcons = {
     completed: <CheckCircleOutlined />,
