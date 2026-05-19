@@ -1,3 +1,10 @@
+export function onlyNumericKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+  const allowed = ["Backspace", "Delete", "Tab", "Enter", "ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", ".", ","];
+  if (!allowed.includes(e.key) && !/^\d$/.test(e.key) && !e.ctrlKey && !e.metaKey) {
+    e.preventDefault();
+  }
+}
+
 export function formatCurrency(amount: number, _currency?: string) {
   return `$${new Intl.NumberFormat(undefined, { style: "decimal", minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(amount)}`;
 }

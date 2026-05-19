@@ -1,14 +1,17 @@
 "use client";
-import React, { useEffect } from "react";
-import { Modal, Form, Input, InputNumber, Select, DatePicker } from "antd";
-import { CreditCardOutlined, BankOutlined, DollarOutlined, FileTextOutlined, EllipsisOutlined, CheckCircleOutlined, ClockCircleOutlined, ExclamationCircleOutlined, SyncOutlined } from "@ant-design/icons";
-import { formatInputNumber, parseInputNumber } from "@/shared/utils/formatters.utils";
+import React, { useEffect, useRef, useState } from "react";
+import { Modal, Form, Input, InputNumber, Select, DatePicker, Button, Space, Typography, App } from "antd";
+import { CreditCardOutlined, BankOutlined, DollarOutlined, FileTextOutlined, EllipsisOutlined, CheckCircleOutlined, ClockCircleOutlined, ExclamationCircleOutlined, SyncOutlined, UploadOutlined, PaperClipOutlined, DeleteOutlined, EyeOutlined } from "@ant-design/icons";
+import { formatInputNumber, parseInputNumber, onlyNumericKeyDown } from "@/shared/utils/formatters.utils";
+import { uploadReceipt } from "@/shared/api/storageApi";
 import type { Expense } from "../../../models/budget.models";
 import { EXPENSE_MODAL_WIDTH, CURRENCIES } from "../../../constants/budget.constants";
 import { useBudget } from "../../../contexts/BudgetContext";
 import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
 import styles from "./ExpenseModal.module.css";
+
+const { Text } = Typography;
 
 type Props = Readonly<{
   visible: boolean;
@@ -32,6 +35,7 @@ const STATUS_OPTIONS = [
 ];
 
 const EXPENSE_FORM_STYLE = { marginTop: 12 } as const;
+const TEMP_ID = "new";
 
 function ChipGroup({
   options,
@@ -49,11 +53,7 @@ function ChipGroup({
         <button
           key={opt.value}
           type="button"
-          className={[
-            styles.chip,
-            opt.cls,
-            value === opt.value ? styles.chipActive : "",
-          ].join(" ")}
+          className={[styles.chip, opt.cls, value === opt.value ? styles.chipActive : ""].join(" ")}
           onClick={() => onChange?.(opt.value)}
         >
           {opt.icon}
@@ -67,8 +67,14 @@ function ChipGroup({
 export default function ExpenseModal({ visible, onClose, editingExpense }: Props) {
   const { addExpense, updateExpense, state } = useBudget();
   const { t } = useTranslation();
+  const { message } = App.useApp();
   const [form] = Form.useForm();
   const isEditing = Boolean(editingExpense);
+  const selectedCategoryId = Form.useWatch("category_id", form);
+  const [uploading, setUploading] = useState(false);
+  const [fileName, setFileName] = useState<string | null>(null);
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (visible && editingExpense) {
@@ -83,10 +89,37 @@ export default function ExpenseModal({ visible, onClose, editingExpense }: Props
         receipt_url:     editingExpense.receipt_url ?? "",
         currency:        editingExpense.currency ?? "MXN",
       });
+      setFileName(editingExpense.receipt_url ? decodeURIComponent(editingExpense.receipt_url.split("/").pop() ?? "") : null);
     } else if (visible && !editingExpense) {
       form.resetFields();
+      setFileName(null);
     }
   }, [visible, editingExpense, form]);
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!fileInputRef.current) return;
+    fileInputRef.current.value = "";
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const expenseId = editingExpense?.expense_id ?? TEMP_ID;
+      const url = await uploadReceipt(file, expenseId);
+      form.setFieldValue("receipt_url", url);
+      setFileName(file.name);
+      message.success(t("expenseModal.receiptUploaded", "Recibo subido"));
+    } catch {
+      message.error(t("expenseModal.receiptUploadFailed", "Error al subir el recibo"));
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleRemoveReceipt = () => {
+    form.setFieldValue("receipt_url", "");
+    setFileName(null);
+  };
 
   const onOk = async () => {
     const values = await form.validateFields();
@@ -111,15 +144,28 @@ export default function ExpenseModal({ visible, onClose, editingExpense }: Props
     }
 
     form.resetFields();
+    setFileName(null);
     onClose();
   };
 
   const assignedVendorIds = new Set(state.vendorEvents.map((ve) => ve.vendor_id));
+
+  const selectedCatalogId = selectedCategoryId
+    ? Number(state.categories.find((c: { id: string; catalog_id?: string }) => c.id === selectedCategoryId)?.catalog_id ?? 0)
+    : null;
+
   const eventVendorOptions = state.vendors
-    .filter((v: { vendor_id: string }) => assignedVendorIds.has(v.vendor_id))
+    .filter((v: { vendor_id: string; category_id?: number | null }) =>
+      assignedVendorIds.has(v.vendor_id) &&
+      (selectedCatalogId === null || v.category_id === selectedCatalogId)
+    )
     .map((v: { vendor_id: string; name: string }) => ({ value: v.name, label: v.name }));
 
+  const receiptUrl = form.getFieldValue("receipt_url") as string | undefined;
+  const isPdf = receiptUrl?.toLowerCase().includes(".pdf");
+
   return (
+    <>
     <Modal
       title={t(isEditing ? "expenseModal.editTitle" : "expenseModal.title")}
       open={visible}
@@ -147,13 +193,10 @@ export default function ExpenseModal({ visible, onClose, editingExpense }: Props
                 placeholder="0.00"
                 formatter={(v) => formatInputNumber(v)}
                 parser={parseInputNumber}
+                onKeyDown={onlyNumericKeyDown}
               />
             </Form.Item>
-            <Form.Item
-              name="currency"
-              label={t("expenseModal.currency")}
-              initialValue="MXN"
-            >
+            <Form.Item name="currency" label={t("expenseModal.currency")} initialValue="MXN">
               <Select
                 options={Object.values(CURRENCIES).map((c) => ({
                   value: c.code,
@@ -182,6 +225,7 @@ export default function ExpenseModal({ visible, onClose, editingExpense }: Props
             <Select
               placeholder={t("expenseModal.category")}
               options={state.categories.map((c: { id: string; name: string }) => ({ value: c.id, label: c.name }))}
+              onChange={() => form.setFieldValue("vendor_name", undefined)}
             />
           </Form.Item>
 
@@ -199,11 +243,48 @@ export default function ExpenseModal({ visible, onClose, editingExpense }: Props
           </Form.Item>
         </div>
 
-        <Form.Item name="receipt_url" label={t("expenseModal.receiptUrl")}>
-          <Input
-            placeholder={t("expenseModal.receiptUrlPlaceholder")}
-            prefix={<span style={{ opacity: 0.45, fontSize: 12 }}>URL</span>}
+        {/* ── Receipt upload ────────────────────────────────────────── */}
+        <Form.Item name="receipt_url" label={t("expenseModal.receiptUrl")} hidden>
+          <Input />
+        </Form.Item>
+
+        <Form.Item label={t("expenseModal.receiptUrl")}>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp,application/pdf"
+            style={{ display: "none" }}
+            onChange={handleFileChange}
           />
+          {fileName ? (
+            <Space>
+              <PaperClipOutlined style={{ color: "var(--primary)" }} />
+              <Text style={{ maxWidth: 220, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                {fileName}
+              </Text>
+              <Button
+                type="text"
+                size="small"
+                icon={<EyeOutlined />}
+                onClick={() => setPreviewOpen(true)}
+              />
+              <Button
+                type="text"
+                danger
+                size="small"
+                icon={<DeleteOutlined />}
+                onClick={handleRemoveReceipt}
+              />
+            </Space>
+          ) : (
+            <Button
+              icon={<UploadOutlined />}
+              loading={uploading}
+              onClick={() => fileInputRef.current?.click()}
+            >
+              {t("expenseModal.uploadReceipt", "Subir recibo")}
+            </Button>
+          )}
         </Form.Item>
 
         <Form.Item name="expense_date" label={t("expenseModal.date")} initialValue={dayjs()}>
@@ -231,6 +312,30 @@ export default function ExpenseModal({ visible, onClose, editingExpense }: Props
 
       </Form>
     </Modal>
+
+    <Modal
+      open={previewOpen}
+      onCancel={() => setPreviewOpen(false)}
+      footer={null}
+      centered
+      width={isPdf ? 860 : "auto"}
+      styles={{ body: { padding: 0, lineHeight: 0, maxHeight: "80vh", overflow: "auto" } }}
+      title={fileName}
+    >
+      {receiptUrl && (isPdf ? (
+        <iframe
+          src={receiptUrl}
+          style={{ width: "100%", height: "75vh", border: "none" }}
+          title={fileName ?? "receipt"}
+        />
+      ) : (
+        <img
+          src={receiptUrl}
+          alt={fileName ?? "receipt"}
+          style={{ width: "100%", display: "block" }}
+        />
+      ))}
+    </Modal>
+    </>
   );
 }
-

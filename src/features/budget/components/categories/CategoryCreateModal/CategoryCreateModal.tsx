@@ -5,7 +5,7 @@ import type { ReactNode } from "react";
 import { useBudget } from "../../../contexts/BudgetContext";
 import { useTheme } from "@/theme/ThemeProvider";
 import { useTranslation } from "react-i18next";
-import { formatInputNumber, parseInputNumber } from "@/shared/utils/formatters.utils";
+import { formatInputNumber, parseInputNumber, onlyNumericKeyDown } from "@/shared/utils/formatters.utils";
 import { CHART_COLORS } from "@/theme/chartColors";
 import type { Category } from "../../../models/budget.models";
 import type { BudgetCategory } from "../../../api/categoriesApi";
@@ -148,6 +148,7 @@ export function CategoryCreateModal({
             prefix="$"
             formatter={(v) => formatInputNumber(v)}
             parser={(v) => parseInputNumber(v) as unknown as 0}
+            onKeyDown={onlyNumericKeyDown}
           />
         </Form.Item>
       </Form>

@@ -1,7 +1,8 @@
 "use client";
 
-import { Drawer, Descriptions, Typography, Flex, Space, Divider, Button, Empty, Timeline } from "antd";
-import { EditOutlined, DeleteOutlined, FileImageOutlined, LinkOutlined } from "@ant-design/icons";
+import { useState } from "react";
+import { Drawer, Descriptions, Typography, Flex, Space, Divider, Button, Empty, Timeline, Modal } from "antd";
+import { EditOutlined, DeleteOutlined, FileImageOutlined, EyeOutlined } from "@ant-design/icons";
 import { formatCurrency, formatDate } from "@/shared/utils/formatters.utils";
 import { useBudget } from "../../../contexts/BudgetContext";
 import { getPaymentStatus } from "../../../constants/budget.constants";
@@ -32,13 +33,21 @@ export function ExpenseDetails({
   const { t } = useTranslation();
   const PAYMENT_STATUS = getPaymentStatus();
 
+  const [previewOpen, setPreviewOpen] = useState(false);
+
   if (!expense) return null;
 
   const category = state.categories.find(
     (c: { id: string }) => c.id === expense.category_id,
   );
 
+  const isPdf = expense.receipt_url?.toLowerCase().includes(".pdf");
+  const receiptFileName = expense.receipt_url
+    ? decodeURIComponent(expense.receipt_url.split("/").pop() ?? "receipt")
+    : "";
+
   return (
+    <>
     <Drawer
       title={
         <Flex align="center" gap={8}>
@@ -47,7 +56,7 @@ export function ExpenseDetails({
         </Flex>
       }
       placement="right"
-      width={480}
+      size="default"
       open={open}
       onClose={onClose}
       extra={
@@ -104,17 +113,14 @@ export function ExpenseDetails({
         <Divider>{t("expenseDetails.receipts")}</Divider>
 
         {expense.receipt_url ? (
-          <Space orientation="vertical" className={styles.fullWidth}>
-            <a
-              href={expense.receipt_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={styles.receiptLink}
+          <Flex justify="center">
+            <Button
+              icon={<EyeOutlined />}
+              onClick={() => setPreviewOpen(true)}
             >
-              <LinkOutlined />
-              {expense.receipt_url}
-            </a>
-          </Space>
+              {t("expenseDetails.viewReceipt", "Ver recibo")}
+            </Button>
+          </Flex>
         ) : (
           <Empty
             image={<FileImageOutlined className={styles.emptyIcon} />}
@@ -141,6 +147,31 @@ export function ExpenseDetails({
         />
       </Flex>
     </Drawer>
+
+    <Modal
+      open={previewOpen}
+      onCancel={() => setPreviewOpen(false)}
+      footer={null}
+      centered
+      width={isPdf ? 860 : "auto"}
+      styles={{ body: { padding: 0, lineHeight: 0, maxHeight: "80vh", overflow: "auto" } }}
+      title={receiptFileName}
+    >
+      {expense.receipt_url && (isPdf ? (
+        <iframe
+          src={expense.receipt_url}
+          style={{ width: "100%", height: "75vh", border: "none" }}
+          title={receiptFileName}
+        />
+      ) : (
+        <img
+          src={expense.receipt_url}
+          alt={receiptFileName}
+          style={{ width: "100%", display: "block" }}
+        />
+      ))}
+    </Modal>
+    </>
   );
 }
 

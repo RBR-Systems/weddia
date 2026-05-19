@@ -4,7 +4,7 @@ import { App, Drawer, Form, Input, InputNumber, Button, Space, Divider, Table, P
 import { PlusOutlined, EditOutlined, DeleteOutlined, SaveOutlined, CloseOutlined } from "@ant-design/icons";
 import type { Category, BudgetItem } from "../../../models/budget.models";
 import { useCategoryItems } from "../../../hooks/useCategoryItems";
-import { formatInputNumber, parseInputNumber } from "@/shared/utils/formatters.utils";
+import { formatInputNumber, parseInputNumber, onlyNumericKeyDown } from "@/shared/utils/formatters.utils";
 import { useTranslation } from "react-i18next";
 import styles from "./CategoryDrawer.module.css";
 
@@ -165,6 +165,7 @@ export default function CategoryDrawer({
             prefix="$"
             formatter={(v) => formatInputNumber(v)}
             parser={(v) => parseInputNumber(v) as unknown as 0}
+            onKeyDown={onlyNumericKeyDown}
             status={editValues.amount === null ? "error" : undefined}
           />
         ) : (
@@ -290,6 +291,7 @@ export default function CategoryDrawer({
             prefix="$"
             formatter={(v) => formatInputNumber(v)}
             parser={(v) => parseInputNumber(v) as unknown as 0}
+            onKeyDown={onlyNumericKeyDown}
           />
         </Form.Item>
       </Form>
@@ -346,6 +348,7 @@ export default function CategoryDrawer({
                     style={{ width: "100%" }}
                     formatter={(v) => formatInputNumber(v)}
                     parser={(v) => parseInputNumber(v) as unknown as 0}
+                    onKeyDown={onlyNumericKeyDown}
                   />
                 </Form.Item>
                 <Form.Item name="notes" style={{ flex: 1, minWidth: 80, marginBottom: 0 }}>

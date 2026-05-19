@@ -1,13 +1,17 @@
 "use client";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { App, Table, Tag, Button, Space, Select, Modal, Form, Input, Row, Col, Typography } from "antd";
 import {
   CheckCircleOutlined,
   ClockCircleOutlined,
   ExclamationCircleOutlined,
-  LinkOutlined,
+  UploadOutlined,
+  PaperClipOutlined,
+  DeleteOutlined,
+  EyeOutlined,
 } from "@ant-design/icons";
+import { uploadReceipt } from "@/shared/api/storageApi";
 import Card from "@/shared/components/Card/Card";
 import type { ColumnsType } from "antd/es/table";
 import { useBudget } from "../../../contexts/BudgetContext";
@@ -34,6 +38,11 @@ export const PaymentStatusManager = () => {
   );
   const [markPaidModal, setMarkPaidModal] = useState<Expense | null>(null);
   const [form] = Form.useForm();
+  const [uploading, setUploading] = useState(false);
+  const [fileName, setFileName] = useState<string | null>(null);
+  const [receiptUrl, setReceiptUrl] = useState<string>("");
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const filteredExpenses = useMemo(() => {
     if (statusFilter === ALL_STATUSES_FILTER) return state.expenses;
@@ -59,7 +68,28 @@ export const PaymentStatusManager = () => {
       methodOfPayment: markPaidModal.methodOfPayment || undefined,
       receipt_url: markPaidModal.receipt_url ?? "",
     });
+    const existing = markPaidModal.receipt_url ?? "";
+    setFileName(existing ? decodeURIComponent(existing.split("/").pop() ?? "") : null);
+    setReceiptUrl(existing);
   }, [markPaidModal, form]);
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (fileInputRef.current) fileInputRef.current.value = "";
+    if (!file || !markPaidModal) return;
+    setUploading(true);
+    try {
+      const url = await uploadReceipt(file, markPaidModal.expense_id);
+      form.setFieldValue("receipt_url", url);
+      setReceiptUrl(url);
+      setFileName(file.name);
+      message.success(t("expenseModal.receiptUploaded"));
+    } catch {
+      message.error(t("expenseModal.receiptUploadFailed"));
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const handleMarkPaid = async () => {
     if (!markPaidModal) return;
@@ -238,6 +268,22 @@ export const PaymentStatusManager = () => {
       </Card>
 
       <Modal
+        open={previewOpen}
+        onCancel={() => setPreviewOpen(false)}
+        footer={null}
+        centered
+        width={receiptUrl.toLowerCase().includes(".pdf") ? 860 : "auto"}
+        styles={{ body: { padding: 0, lineHeight: 0, maxHeight: "80vh", overflow: "auto" } }}
+        title={fileName}
+      >
+        {receiptUrl && (receiptUrl.toLowerCase().includes(".pdf") ? (
+          <iframe src={receiptUrl} style={{ width: "100%", height: "75vh", border: "none" }} title={fileName ?? "receipt"} />
+        ) : (
+          <img src={receiptUrl} alt={fileName ?? "receipt"} style={{ width: "100%", display: "block" }} />
+        ))}
+      </Modal>
+
+      <Modal
         title={t("paymentStatus.markPaymentPaid")}
         open={!!markPaidModal}
         onOk={handleMarkPaid}
@@ -266,11 +312,31 @@ export const PaymentStatusManager = () => {
               >
                 <Select options={getPaymentMethodOptions()} placeholder={t("expenseModal.methodOfPaymentPlaceholder")} />
               </Form.Item>
-              <Form.Item name="receipt_url" label={t("paymentStatus.receiptUrl")}>
-                <Input
-                  prefix={<LinkOutlined className={payStyles.linkIconOpacity} />}
-                  placeholder={t("paymentStatus.receiptUrlPlaceholder")}
+              <Form.Item name="receipt_url" hidden><Input /></Form.Item>
+              <Form.Item label={t("expenseModal.receiptUrl")}>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,application/pdf"
+                  style={{ display: "none" }}
+                  onChange={handleFileChange}
                 />
+                {fileName ? (
+                  <Space>
+                    <PaperClipOutlined style={{ color: "var(--primary)" }} />
+                    <Text style={{ maxWidth: 220, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      {fileName}
+                    </Text>
+                    <Button type="text" size="small" icon={<EyeOutlined />} onClick={() => setPreviewOpen(true)} />
+                    <Button type="text" danger size="small" icon={<DeleteOutlined />}
+                      onClick={() => { form.setFieldValue("receipt_url", ""); setReceiptUrl(""); setFileName(null); }}
+                    />
+                  </Space>
+                ) : (
+                  <Button icon={<UploadOutlined />} loading={uploading} onClick={() => fileInputRef.current?.click()}>
+                    {t("expenseModal.uploadReceipt")}
+                  </Button>
+                )}
               </Form.Item>
             </Form>
           </Space>

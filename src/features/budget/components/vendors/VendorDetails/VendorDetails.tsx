@@ -8,7 +8,7 @@ import dayjs from "dayjs";
 import Card from "@/shared/components/Card/Card";
 import Statistic from "@/shared/components/AnimatedStatistic/AnimatedStatistic";
 import { useBudget } from "../../../contexts/BudgetContext";
-import { formatCurrency, formatDate, formatInputNumber, parseInputNumber } from "@/shared/utils/formatters.utils";
+import { formatCurrency, formatDate, formatInputNumber, parseInputNumber, onlyNumericKeyDown } from "@/shared/utils/formatters.utils";
 import { getPaymentStatus, VENDOR_DETAILS_PAGE_SIZE } from "../../../constants/budget.constants";
 import type { Expense, PaymentStatus, Vendor, VendorEventStatus } from "../../../models/budget.models";
 import vendorStyles from "./VendorDetails.module.css";
@@ -235,6 +235,7 @@ export default function VendorDetails({ vendor, open, onClose }: VendorDetailsPr
                       placeholder="0.00"
                       formatter={(v) => formatInputNumber(v)}
                       parser={parseInputNumber}
+                      onKeyDown={onlyNumericKeyDown}
                       value={contractForm.contracted_amount}
                       onChange={(val) =>
                         setContractForm((prev) => ({ ...prev, contracted_amount: val ?? undefined }))

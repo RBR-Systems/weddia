@@ -2,7 +2,7 @@
 import React, { useCallback } from "react";
 import { Slider, InputNumber, Typography } from "antd";
 import { useTranslation } from "react-i18next";
-import { formatCurrency, formatInputNumber, parseInputNumber } from "@/shared/utils/formatters.utils";
+import { formatCurrency, formatInputNumber, parseInputNumber, onlyNumericKeyDown } from "@/shared/utils/formatters.utils";
 import type { Category, Currency } from "../../../models/budget.models";
 import styles from "./AllocationCategoryRow.module.css";
 
@@ -83,6 +83,7 @@ export const AllocationCategoryRow = React.memo(function AllocationCategoryRow({
             onChange={handleInputChange}
             formatter={formatAllocationInput}
             parser={parseAllocationInput}
+            onKeyDown={onlyNumericKeyDown}
             style={{ width: "100%" }}
           />
         </div>
