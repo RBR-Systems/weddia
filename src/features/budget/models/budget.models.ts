@@ -175,6 +175,7 @@ export interface BudgetState {
   vendors: Vendor[];
   vendorEvents: VendorEvent[];
   currency: Currency;
+  activities: ActivityItem[];
 }
 
 // ── Context ───────────────────────────────────────────────────────────────────
@@ -219,8 +220,8 @@ export interface BudgetContextValue {
   updateCategory: (id: string, data: Partial<Category>) => Promise<void>;
   deleteCategory: (categoryId: string) => void;
   updateBudget: (totalBudget: number) => void;
-  loadTemplate: (template: CategoryPatchSource) => void;
-  loadEstimate: (estimate: CategoryPatchSource) => void;
+  loadTemplate: (template: CategoryPatchSource) => Promise<void>;
+  loadEstimate: (estimate: CategoryPatchSource) => Promise<void>;
   assignVendor: (vendorId: string) => void;
   unassignVendor: (vendorId: string) => void;
   updateVendorEvent: (vendorId: string, data: Partial<VendorEvent>) => Promise<void>;

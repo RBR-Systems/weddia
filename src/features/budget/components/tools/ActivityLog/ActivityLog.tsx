@@ -7,8 +7,7 @@ import { PlusCircleOutlined, EditOutlined, DeleteOutlined, DollarOutlined, UserO
 import dayjs from "dayjs";
 import { useBudget } from "../../../contexts/BudgetContext";
 import { formatCurrency } from "@/shared/utils/formatters.utils";
-import { generateMockActivities } from "../../../utils/budget.utils";
-import type { ActivityType, ActivityItem } from "../../../models/budget.models";
+import type { ActivityType } from "../../../models/budget.models";
 import activityStyles from "./ActivityLog.module.css";
 
 const { Text } = Typography;
@@ -40,7 +39,7 @@ export default function ActivityLog() {
     [t],
   );
 
-  const [activities] = useState<ActivityItem[]>(generateMockActivities);
+  const activities = state.activities;
   const [filterType, setFilterType] = useState<ActivityType | "all">("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [dateRange, setDateRange] = useState<[dayjs.Dayjs, dayjs.Dayjs] | null>(

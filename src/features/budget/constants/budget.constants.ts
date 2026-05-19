@@ -281,4 +281,5 @@ export const BUDGET_INITIAL_STATE: BudgetState = {
   vendors: [],
   vendorEvents: [],
   currency: DEFAULT_CURRENCY as Currency,
+  activities: [],
 };

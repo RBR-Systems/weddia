@@ -3,6 +3,7 @@ import React, { createContext, useContext, useReducer, useEffect, useCallback } 
 import type { BudgetContextValue, BudgetAction } from "../models/budget.models";
 import { BUDGET_INITIAL_STATE } from "../constants/budget.constants";
 import { getBudgetData } from "../api/budgetApi";
+import { fetchActivities } from "../api/activityLogApi";
 import { ApiError, isAbortError } from "@/shared/api/apiClient";
 import { useEvent } from "@/shared/contexts/EventContext";
 import { mapApiDataToBudgetState } from "../utils/budget.utils";
@@ -20,8 +21,11 @@ export function BudgetProvider({ children }: Readonly<{ children: React.ReactNod
   const loadBudgetData = useCallback(async (eid: number, signal?: AbortSignal) => {
     dispatch({ type: "SET_LOADING", payload: true });
     try {
-      const data = await getBudgetData(eid, signal);
-      dispatch({ type: "SET_DATA", payload: mapApiDataToBudgetState(data, eventBudget) });
+      const [data, activities] = await Promise.all([
+        getBudgetData(eid, signal),
+        fetchActivities(eid).catch(() => []),
+      ]);
+      dispatch({ type: "SET_DATA", payload: { ...mapApiDataToBudgetState(data, eventBudget), activities } });
       dispatch({ type: "SET_ERROR", payload: null });
     } catch (err: unknown) {
       if (isAbortError(err)) return;
