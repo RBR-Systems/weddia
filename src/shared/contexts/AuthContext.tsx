@@ -4,6 +4,20 @@ import { setToken, clearToken, setUnauthorizedHandler } from "@/shared/api/apiCl
 import { login as loginApi } from "@/features/auth/api/authApi";
 import type { AuthUser } from "@/features/auth/models/auth.models";
 
+function isJwtExpired(token: string): boolean {
+  try {
+    const parts = token.split(".");
+    if (parts.length !== 3) return false;
+    const base64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+    const padded = base64.padEnd(base64.length + (4 - (base64.length % 4)) % 4, "=");
+    const payload = JSON.parse(atob(padded)) as Record<string, unknown>;
+    if (typeof payload.exp !== "number") return false;
+    return payload.exp * 1000 < Date.now();
+  } catch {
+    return false;
+  }
+}
+
 interface AuthContextValue {
   user: AuthUser | null;
   token: string | null;
@@ -25,8 +39,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const stored = localStorage.getItem("rbr_token");
     const storedUser = localStorage.getItem("rbr_user");
     if (stored && storedUser) {
-      setTokenState(stored);
-      setUser(JSON.parse(storedUser));
+      if (isJwtExpired(stored)) {
+        clearToken();
+        setSessionExpired(true);
+      } else {
+        setTokenState(stored);
+        setUser(JSON.parse(storedUser));
+      }
     }
     setIsLoading(false);
 

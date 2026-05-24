@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Form, message } from "antd";
+import { App, Form } from "antd";
 import { useTranslation } from "react-i18next";
 import { useEvent } from "@/shared/contexts/EventContext";
 import { EventActions } from "@/shared/contexts/eventActions";
@@ -26,6 +26,7 @@ interface UseCreateEventResult {
 }
 
 export const useCreateEvent = (): UseCreateEventResult => {
+  const { message } = App.useApp();
   const { t } = useTranslation();
   const [form] = Form.useForm<CreateEventFormValues>();
   const [saving, setSaving] = useState(false);

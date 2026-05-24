@@ -30,7 +30,6 @@ const EventTasksDashboard: React.FC = () => {
     detailOpen,
     formOpen,
     editTask,
-    messageContextHolder,
     handleQuickComplete,
     handleTaskClick,
     handleStatusChange,
@@ -114,8 +113,6 @@ const EventTasksDashboard: React.FC = () => {
 
   return (
     <div className={styles.taskDashboard}>
-      {messageContextHolder}
-
       <Title level={3} className={styles.dashboardTitle}>
         {t("tasks.title")}
       </Title>

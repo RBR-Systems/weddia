@@ -4,7 +4,7 @@ import { EventContextInterface } from "./InitialState";
 import { EventAction, EventActions } from "./eventActions";
 import { EventCardProps } from "@/features/events-list/models/eventCardProps.models";
 import { EventStatus } from "@/features/events-list/models/enums/eventList.models";
-import { apiGet, isAbortError } from "@/shared/api/apiClient";
+import { apiGet, isAbortError, ApiError } from "@/shared/api/apiClient";
 import { useAuth } from "./AuthContext";
 
 interface ApiEvent {
@@ -155,6 +155,7 @@ export function EventProvider({ children }: { children: ReactNode }) {
       })
       .catch((err) => {
         if (isAbortError(err)) return;
+        if (err instanceof ApiError && err.status === 401) return;
         console.error("Failed to load events:", err);
       });
     return () => controller.abort();

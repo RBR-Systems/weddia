@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
-import { message } from "antd";
+import { App } from "antd";
 import { useTranslation } from "react-i18next";
 import type {
   Task,
@@ -15,8 +15,6 @@ import {
   generateTasksFromTemplate,
   createTaskFromForm,
 } from "../utils/task.utils";
-import type React from "react";
-
 const INITIAL_SUMMARY: TaskSummary = {
   total_tasks: 0,
   completed: 0,
@@ -36,7 +34,6 @@ export interface UseEventTasksResult {
   detailOpen: boolean;
   formOpen: boolean;
   editTask: Task | null;
-  messageContextHolder: React.ReactNode;
   handleQuickComplete: (task: Task) => void;
   handleTaskClick: (task: Task) => void;
   handleStatusChange: (taskId: string, status: Task["status"]) => void;
@@ -54,6 +51,7 @@ export interface UseEventTasksResult {
 }
 
 export const useEventTasks = (): UseEventTasksResult => {
+  const { message } = App.useApp();
   const { t } = useTranslation();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [summary, setSummary] = useState<TaskSummary>(INITIAL_SUMMARY);
@@ -63,8 +61,6 @@ export const useEventTasks = (): UseEventTasksResult => {
   const [detailOpen, setDetailOpen] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
   const [editTask, setEditTask] = useState<Task | null>(null);
-
-  const [messageApi, messageContextHolder] = message.useMessage();
 
   const recalcSummary = useCallback((allTasks: Task[]) => {
     setSummary(computeTaskSummary(allTasks));
@@ -103,11 +99,11 @@ export const useEventTasks = (): UseEventTasksResult => {
         recalcSummary(updated);
         return updated;
       });
-      messageApi.success(
+      message.success(
         t("tasks.messages.taskCompleted", { title: task.title }),
       );
     },
-    [messageApi, recalcSummary, t],
+    [message, recalcSummary, t],
   );
 
   const handleTaskClick = useCallback((task: Task) => {
@@ -145,9 +141,9 @@ export const useEventTasks = (): UseEventTasksResult => {
         return updated;
       });
       setDetailOpen(false);
-      messageApi.success(t("tasks.messages.taskDeleted"));
+      message.success(t("tasks.messages.taskDeleted"));
     },
-    [messageApi, recalcSummary, t],
+    [message, recalcSummary, t],
   );
 
   const handleEditFromDetail = useCallback((task: Task) => {
@@ -168,7 +164,7 @@ export const useEventTasks = (): UseEventTasksResult => {
           recalcSummary(updated);
           return updated;
         });
-        messageApi.success(t("tasks.messages.taskUpdated"));
+        message.success(t("tasks.messages.taskUpdated"));
       } else {
         const newTask = createTaskFromForm(values, "event-123");
         setTasks((prev) => {
@@ -176,12 +172,12 @@ export const useEventTasks = (): UseEventTasksResult => {
           recalcSummary(updated);
           return updated;
         });
-        messageApi.success(t("tasks.messages.taskCreated"));
+        message.success(t("tasks.messages.taskCreated"));
       }
       setFormOpen(false);
       setEditTask(null);
     },
-    [editTask, messageApi, recalcSummary, t],
+    [editTask, message, recalcSummary, t],
   );
 
   const handleTemplateApply = useCallback(
@@ -201,11 +197,11 @@ export const useEventTasks = (): UseEventTasksResult => {
         recalcSummary(updated);
         return updated;
       });
-      messageApi.success(
+      message.success(
         t("tasks.messages.templateApplied", { count: generated.length }),
       );
     },
-    [messageApi, recalcSummary, t],
+    [message, recalcSummary, t],
   );
 
   const openNewTaskForm = useCallback(() => {
@@ -229,7 +225,6 @@ export const useEventTasks = (): UseEventTasksResult => {
     detailOpen,
     formOpen,
     editTask,
-    messageContextHolder,
     handleQuickComplete,
     handleTaskClick,
     handleStatusChange,

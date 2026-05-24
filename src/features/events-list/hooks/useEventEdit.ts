@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Form, message } from 'antd';
+import { App, Form } from 'antd';
 import type { FormInstance } from 'antd';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
@@ -20,6 +20,7 @@ interface UseEventEditResult {
 }
 
 export const useEventEdit = (): UseEventEditResult => {
+  const { message } = App.useApp();
   const { t } = useTranslation();
   const { dispatch } = useEvent();
   const [form] = Form.useForm<EventEditFormValues>();
