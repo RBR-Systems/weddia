@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Avatar,
   DatePicker,
@@ -32,6 +32,21 @@ const TaskFormModal: React.FC<TaskFormModalProps> = ({
   const { t } = useTranslation();
   const [form] = Form.useForm();
   const isEdit = Boolean(task);
+
+  useEffect(() => {
+    if (open) {
+      if (task) {
+        form.setFieldsValue({
+          ...task,
+          due_date: dayjs(task.due_date),
+          start_date: task.start_date ? dayjs(task.start_date) : undefined,
+          assignee_ids: task.assignees.map((a) => a.user_id),
+        });
+      } else {
+        form.resetFields();
+      }
+    }
+  }, [form, open, task]);
 
   const handleOk = async () => {
     try {
