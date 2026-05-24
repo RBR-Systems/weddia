@@ -221,6 +221,54 @@ export async function deleteCommentApi(commentId: number): Promise<void> {
   await apiDelete(`/api/taskcomments/${commentId}`);
 }
 
+// ── Task Assignments ──
+
+interface ApiAssignment {
+  assignmentId: number;
+  taskId: number | null;
+  userId: number | null;
+  role: string;
+  assignedAt: string;
+  userName: string | null;
+  userEmail: string | null;
+}
+
+export interface TaskAssignee {
+  assignment_id: number;
+  task_id: number | null;
+  user_id: number;
+  role: string;
+  assigned_at: string;
+  user_name: string;
+  user_email: string;
+}
+
+function mapApiAssignment(a: ApiAssignment): TaskAssignee {
+  return {
+    assignment_id: a.assignmentId,
+    task_id: a.taskId,
+    user_id: a.userId ?? 0,
+    role: a.role,
+    assigned_at: a.assignedAt,
+    user_name: a.userName ?? "",
+    user_email: a.userEmail ?? "",
+  };
+}
+
+export async function fetchAssignmentsByEvent(eventId: number): Promise<TaskAssignee[]> {
+  const raw = await apiGet<ApiAssignment[]>(`/api/taskassignments/event/${eventId}`);
+  return (Array.isArray(raw) ? raw : []).map(mapApiAssignment);
+}
+
+export async function addAssignmentApi(taskId: number, userId: number): Promise<TaskAssignee> {
+  const raw = await apiPost<ApiAssignment>("/api/taskassignments", { taskId, userId });
+  return mapApiAssignment(raw);
+}
+
+export async function removeAssignmentApi(assignmentId: number): Promise<void> {
+  await apiDelete(`/api/taskassignments/${assignmentId}`);
+}
+
 // ── Users ──
 
 interface ApiUser {

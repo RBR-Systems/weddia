@@ -13,14 +13,17 @@ import type {
 import {
   fetchTasksByEvent,
   fetchTaskCategories,
+  fetchAssignmentsByEvent,
   fetchUsers,
   createTaskApi,
   updateTaskApi,
   patchTaskStatusApi,
   deleteTaskApi,
+  addAssignmentApi,
+  removeAssignmentApi,
 } from "../api/taskApi";
+import type { TaskAssignee } from "../api/taskApi";
 import {
-  buildCategories,
   computeTaskSummary,
   generateTasksFromTemplate,
 } from "../utils/task.utils";
@@ -94,18 +97,44 @@ export const useEventTasks = (): UseEventTasksResult => {
     try {
       const [rawCats, users] = await Promise.all([fetchTaskCategories(), fetchUsers()]);
       const catMap = new Map(rawCats.map((c) => [Number(c.id), { categoryId: Number(c.id), name: c.name, colorCode: c.color }]));
-      const data = await fetchTasksByEvent(eventId, catMap);
+      const [data, assignments] = await Promise.all([
+        fetchTasksByEvent(eventId, catMap),
+        fetchAssignmentsByEvent(eventId),
+      ]);
 
-      // populate count/completedCount on categories
-      const enriched = rawCats.map((cat) => ({
-        ...cat,
-        count: data.tasks.filter((t) => t.category_id === cat.id).length,
-        completedCount: data.tasks.filter((t) => t.category_id === cat.id && t.status === "completed").length,
+      // group assignments by task_id
+      const assignmentsByTask = new Map<number, TaskAssignee[]>();
+      for (const a of assignments) {
+        if (a.task_id == null) continue;
+        const list = assignmentsByTask.get(a.task_id) ?? [];
+        list.push(a);
+        assignmentsByTask.set(a.task_id, list);
+      }
+
+      // enrich tasks with assignees
+      const enrichedTasks = data.tasks.map((t) => ({
+        ...t,
+        assignees: (assignmentsByTask.get(Number(t.task_id)) ?? []).map((a) => ({
+          assignment_id: String(a.assignment_id),
+          user_id: String(a.user_id),
+          user_name: a.user_name,
+          user_email: a.user_email,
+          user_avatar: "",
+          role: (a.role ?? "assignee") as import("../models/task.models").AssigneeRole,
+          status: "accepted" as const,
+          assigned_at: a.assigned_at,
+        })),
       }));
 
-      setTasks(data.tasks);
-      setSummary(data.summary);
-      setCategories(enriched);
+      const enrichedCats = rawCats.map((cat) => ({
+        ...cat,
+        count: enrichedTasks.filter((t) => t.category_id === cat.id).length,
+        completedCount: enrichedTasks.filter((t) => t.category_id === cat.id && t.status === "completed").length,
+      }));
+
+      setTasks(enrichedTasks);
+      setSummary(computeTaskSummary(enrichedTasks));
+      setCategories(enrichedCats);
       setMembers(users);
     } catch {
       setTasks([]);
@@ -196,6 +225,17 @@ export const useEventTasks = (): UseEventTasksResult => {
     setFormOpen(true);
   }, []);
 
+  const syncAssignments = useCallback(async (taskId: number, selectedUserIds: string[], currentTask?: Task) => {
+    const currentIds = new Set((currentTask?.assignees ?? []).map((a) => a.user_id));
+    const newIds = new Set(selectedUserIds);
+    const toAdd = selectedUserIds.filter((id) => !currentIds.has(id));
+    const toRemove = (currentTask?.assignees ?? []).filter((a) => !newIds.has(a.user_id));
+    await Promise.all([
+      ...toAdd.map((uid) => addAssignmentApi(taskId, Number(uid))),
+      ...toRemove.map((a) => removeAssignmentApi(Number(a.assignment_id))),
+    ]);
+  }, []);
+
   const handleFormSubmit = useCallback(
     async (values: TaskFormValues) => {
       const categoryId = values.category_id ? Number(values.category_id) : null;
@@ -226,6 +266,8 @@ export const useEventTasks = (): UseEventTasksResult => {
         });
         try {
           await updateTaskApi(taskId, body);
+          await syncAssignments(taskId, values.assignee_ids ?? [], editTask);
+          await loadTasks();
         } catch {
           loadTasks();
         }
@@ -233,6 +275,7 @@ export const useEventTasks = (): UseEventTasksResult => {
       } else {
         try {
           const newTask = await createTaskApi(body);
+          await syncAssignments(Number(newTask.task_id), values.assignee_ids ?? []);
           setTasks((prev) => {
             const updated = [...prev, newTask];
             recalcSummary(updated);
