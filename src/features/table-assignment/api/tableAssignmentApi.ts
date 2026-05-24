@@ -57,13 +57,13 @@ export function deleteAssignment(a: TableAssignment): void {
 
 export async function loadTableAssignmentData(eventId: number, signal: AbortSignal) {
   const [layouts, rawGuests, relations] = await Promise.all([
-    apiGet<ApiLayout[]>(`/api/tablelayouts/event/${eventId}`, { signal }),
+    apiGet<ApiLayout[]>("/api/tablelayouts/active", { signal }),
     fetchGuests(eventId),
     fetchRelations(),
   ]);
   const guests = rawGuests.map(mapGuestListToTA);
 
-  const allLayouts: TableLayout[] = (Array.isArray(layouts) ? layouts : []).map((l: ApiLayout) => ({
+  const mappedLayouts: TableLayout[] = (Array.isArray(layouts) ? layouts : []).map((l: ApiLayout) => ({
     layout_id: String(l.layoutId),
     event_id: l.eventId != null ? String(l.eventId) : String(eventId),
     name: l.name,
@@ -72,9 +72,6 @@ export async function loadTableAssignmentData(eventId: number, signal: AbortSign
     x_grid_size: l.xGridSize,
     y_grid_size: l.yGridSize,
   }));
-
-  // Guard: only keep layouts that belong to this event
-  const mappedLayouts = allLayouts.filter((l) => l.event_id === String(eventId));
 
   const activeLayout = mappedLayouts.find((l) => l.is_active) ?? mappedLayouts[0];
 
