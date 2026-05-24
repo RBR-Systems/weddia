@@ -1,7 +1,7 @@
 "use client";
 import { useMemo, type ReactNode } from "react";
 import { Tooltip, Avatar } from "antd";
-import { TeamOutlined, AppstoreOutlined, DollarOutlined, TagsOutlined, UnorderedListOutlined, MenuFoldOutlined, MenuUnfoldOutlined, LogoutOutlined, CalendarOutlined, ShopOutlined } from "@ant-design/icons";
+import { TeamOutlined, AppstoreOutlined, DollarOutlined, TagsOutlined, UnorderedListOutlined, MenuFoldOutlined, MenuUnfoldOutlined, LogoutOutlined, CalendarOutlined, ShopOutlined, CheckSquareOutlined } from "@ant-design/icons";
 import { useAuth } from "@/shared/contexts/AuthContext";
 import { useTranslation } from "react-i18next";
 import styles from "./Sidebar.module.css";
@@ -54,6 +54,11 @@ export default function Sidebar({
         key: "vendor-catalog",
         icon: <ShopOutlined />,
         label: t("nav.vendorCatalog"),
+      },
+      {
+        key: "tasks",
+        icon: <CheckSquareOutlined />,
+        label: t("nav.tasks"),
       },
     ],
     [t],
