@@ -45,7 +45,6 @@ const Schedule: React.FC = () => {
   }
 
   if (schedule.loading) return <Spin />;
-  if (!schedule.items.length) return <Empty description={t("schedule.emptyState")} />;
 
   return (
     <div>
@@ -81,9 +80,13 @@ const Schedule: React.FC = () => {
 
       {schedule.filteredItems.length === 0 ? (
         <Empty
-          description={t("schedule.noFilteredItems", {
-            status: schedule.activeFilter !== "all" ? schedule.activeFilter.replace("_", " ") : "",
-          })}
+          description={
+            schedule.items.length === 0
+              ? t("schedule.emptyState")
+              : t("schedule.noFilteredItems", {
+                  status: schedule.activeFilter !== "all" ? schedule.activeFilter.replace("_", " ") : "",
+                })
+          }
           className={pageStyles.emptyMarginTop}
         />
       ) : (
