@@ -135,6 +135,30 @@
   color: #22c55e;
 }
 
+.visPrivate {
+  color: #ef4444;
+  font-size: var(--fs-xs);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.visPublic {
+  color: #10b981;
+  font-size: var(--fs-xs);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.visShared {
+  color: var(--text-color-secondary);
+  font-size: var(--fs-xs);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
 @media (max-width: 768px) {
   .taskGrid {
     grid-template-columns: 1fr;

@@ -11,6 +11,8 @@ import {
   CalendarOutlined,
   CheckCircleOutlined,
   FlagOutlined,
+  GlobalOutlined,
+  LockOutlined,
   MessageOutlined,
   PaperClipOutlined,
 } from "@ant-design/icons";
@@ -81,9 +83,21 @@ const TaskCard: React.FC<TaskCardProps> = ({
 
       <div className={styles.taskCardHeader}>
         <span className={styles.taskTitle}>{task.title}</span>
-        <Tag color={PRIORITY_COLORS[task.priority]}>
-          {t(`tasks.priority.${task.priority}`)}
-        </Tag>
+        <div className={styles.taskCardBadges}>
+          {task.visibility === "private" && (
+            <Tooltip title={t("tasks.visibility.private")}>
+              <LockOutlined className={styles.visibilityPrivate} />
+            </Tooltip>
+          )}
+          {task.visibility === "public" && (
+            <Tooltip title={t("tasks.visibility.public")}>
+              <GlobalOutlined className={styles.visibilityPublic} />
+            </Tooltip>
+          )}
+          <Tag color={PRIORITY_COLORS[task.priority]}>
+            {t(`tasks.priority.${task.priority}`)}
+          </Tag>
+        </div>
       </div>
 
       {task.description && (

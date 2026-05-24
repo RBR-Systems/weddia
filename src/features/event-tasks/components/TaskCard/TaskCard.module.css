@@ -30,6 +30,23 @@
   font-weight: var(--semi-bold-font);
 }
 
+.taskCardBadges {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.visibilityPrivate {
+  color: #ef4444;
+  font-size: 12px;
+}
+
+.visibilityPublic {
+  color: #10b981;
+  font-size: 12px;
+}
+
 .taskDescription {
   display: -webkit-box;
   margin-bottom: var(--spacing-sm);

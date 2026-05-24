@@ -23,8 +23,11 @@ import {
   ExclamationCircleOutlined,
   FilterOutlined,
   ForwardOutlined,
+  GlobalOutlined,
+  LockOutlined,
   PlusOutlined,
   SearchOutlined,
+  TeamOutlined,
   UnorderedListOutlined,
 } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
@@ -83,6 +86,7 @@ const TaskList: React.FC<TaskListProps> = ({
     status: "all",
     priority: "all",
     category: "all",
+    visibility: "all",
     search: "",
     sortBy: "due_date",
     sortOrder: "asc",
@@ -111,6 +115,10 @@ const TaskList: React.FC<TaskListProps> = ({
 
     if (filters.category !== "all") {
       result = result.filter((task) => task.category_id === filters.category);
+    }
+
+    if (filters.visibility !== "all") {
+      result = result.filter((task) => task.visibility === filters.visibility);
     }
 
     result.sort((left, right) => {
@@ -160,6 +168,7 @@ const TaskList: React.FC<TaskListProps> = ({
     (filters.status !== "all" ? 1 : 0) +
     (filters.priority !== "all" ? 1 : 0) +
     (filters.category !== "all" ? 1 : 0) +
+    (filters.visibility !== "all" ? 1 : 0) +
     (filters.search ? 1 : 0);
 
   const tableColumns: ColumnsType<Task> = [
@@ -221,6 +230,17 @@ const TaskList: React.FC<TaskListProps> = ({
       render: (_value: unknown, record: Task) => (
         <Tag color={record.category_color}>{record.category_name}</Tag>
       ),
+    },
+    {
+      title: t("tasks.detail.visibility"),
+      dataIndex: "visibility",
+      key: "visibility",
+      width: 110,
+      render: (vis: string) => {
+        if (vis === "private") return <span className={styles.visPrivate}><LockOutlined /> {t("tasks.visibility.private")}</span>;
+        if (vis === "public") return <span className={styles.visPublic}><GlobalOutlined /> {t("tasks.visibility.public")}</span>;
+        return <span className={styles.visShared}><TeamOutlined /> {t("tasks.visibility.shared")}</span>;
+      },
     },
     {
       title: t("tasks.detail.assignedTo"),
@@ -407,6 +427,20 @@ const TaskList: React.FC<TaskListProps> = ({
             placeholder={t("common.category")}
           />
           <Select
+            value={filters.visibility}
+            onChange={(value) =>
+              setFilters((current) => ({ ...current, visibility: value }))
+            }
+            className={styles.minWidth140}
+            options={[
+              { value: "all", label: t("common.all") },
+              { value: "private", label: <span><LockOutlined /> {t("tasks.visibility.private")}</span> },
+              { value: "shared", label: <span><TeamOutlined /> {t("tasks.visibility.shared")}</span> },
+              { value: "public", label: <span><GlobalOutlined /> {t("tasks.visibility.public")}</span> },
+            ]}
+            placeholder={t("tasks.detail.visibility")}
+          />
+          <Select
             value={filters.sortBy}
             onChange={(value) =>
               setFilters((current) => ({ ...current, sortBy: value }))
@@ -426,6 +460,7 @@ const TaskList: React.FC<TaskListProps> = ({
                 status: "all",
                 priority: "all",
                 category: "all",
+                visibility: "all",
                 search: "",
                 sortBy: "due_date",
                 sortOrder: "asc",

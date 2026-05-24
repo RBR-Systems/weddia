@@ -208,6 +208,7 @@ export const useEventTasks = (): UseEventTasksResult => {
         startDate: values.start_date ?? null,
         priority: values.priority.charAt(0).toUpperCase() + values.priority.slice(1),
         status: values.status.charAt(0).toUpperCase() + values.status.slice(1),
+        visibility: values.visibility ?? "shared",
         estimatedCost: values.estimated_cost ?? null,
         actualCost: values.actual_cost ?? null,
       };

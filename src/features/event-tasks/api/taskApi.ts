@@ -15,6 +15,7 @@ interface ApiTask {
   startDate: string | null;
   priority: string;
   status: string;
+  visibility: string;
   taskDependencyId: number | null;
   estimatedCost: number | null;
   actualCost: number | null;
@@ -73,7 +74,7 @@ function mapApiTask(t: ApiTask, catMap: Map<number, ApiTaskCategory>): Task {
     sort_order: 0,
     attachments: [],
     tags: [],
-    visibility: "shared",
+    visibility: (t.visibility?.toLowerCase() ?? "shared") as Task["visibility"],
     location: null,
     notes: null,
     completed_at: t.status?.toLowerCase() === "completed" ? now() : null,
@@ -149,6 +150,7 @@ interface TaskWriteBody {
   startDate?: string | null;
   priority: string;
   status: string;
+  visibility: string;
   estimatedCost?: number | null;
   actualCost?: number | null;
 }
