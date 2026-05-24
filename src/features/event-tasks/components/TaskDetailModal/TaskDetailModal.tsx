@@ -20,7 +20,6 @@ import {
   DeleteOutlined,
   DollarOutlined,
   EditOutlined,
-  EnvironmentOutlined,
   FlagOutlined,
   PaperClipOutlined,
   PlusOutlined,
@@ -225,12 +224,6 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                   {task.actual_cost != null && ` / $${task.actual_cost.toLocaleString()}`}
                 </div>
               </div>
-              {task.location && (
-                <div>
-                  <div className={styles.detailLabel}><EnvironmentOutlined /> {t("tasks.detail.location")}</div>
-                  <div className={styles.detailValue}>{task.location}</div>
-                </div>
-              )}
               <div>
                 <div className={styles.detailLabel}>{t("tasks.detail.visibility")}</div>
                 <div className={styles.detailValue}>{t(`tasks.visibility.${task.visibility}`)}</div>

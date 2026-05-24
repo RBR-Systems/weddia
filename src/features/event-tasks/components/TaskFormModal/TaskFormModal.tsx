@@ -272,11 +272,7 @@ const TaskFormModal: React.FC<TaskFormModalProps> = ({
           />
         </Form.Item>
 
-        <Form.Item name="location" label={t("tasks.form.location")}>
-          <Input placeholder={t("tasks.form.locationPlaceholder")} />
-        </Form.Item>
-
-        <Form.Item name="notes" label={t("tasks.form.notes")}>
+<Form.Item name="notes" label={t("tasks.form.notes")}>
           <TextArea rows={2} />
         </Form.Item>
 
