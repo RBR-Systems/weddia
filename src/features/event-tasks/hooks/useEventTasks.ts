@@ -12,6 +12,7 @@ import type {
 } from "../models/task.models";
 import {
   fetchTasksByEvent,
+  fetchTaskCategories,
   fetchUsers,
   createTaskApi,
   updateTaskApi,
@@ -91,10 +92,20 @@ export const useEventTasks = (): UseEventTasksResult => {
     }
     setIsLoading(true);
     try {
-      const [data, users] = await Promise.all([fetchTasksByEvent(eventId), fetchUsers()]);
+      const [rawCats, users] = await Promise.all([fetchTaskCategories(), fetchUsers()]);
+      const catMap = new Map(rawCats.map((c) => [Number(c.id), { categoryId: Number(c.id), name: c.name, colorCode: c.color }]));
+      const data = await fetchTasksByEvent(eventId, catMap);
+
+      // populate count/completedCount on categories
+      const enriched = rawCats.map((cat) => ({
+        ...cat,
+        count: data.tasks.filter((t) => t.category_id === cat.id).length,
+        completedCount: data.tasks.filter((t) => t.category_id === cat.id && t.status === "completed").length,
+      }));
+
       setTasks(data.tasks);
       setSummary(data.summary);
-      setCategories(buildCategories(data.tasks));
+      setCategories(enriched);
       setMembers(users);
     } catch {
       setTasks([]);
@@ -187,11 +198,14 @@ export const useEventTasks = (): UseEventTasksResult => {
 
   const handleFormSubmit = useCallback(
     async (values: TaskFormValues) => {
+      const categoryId = values.category_id ? Number(values.category_id) : null;
       const body = {
         eventId: eventId,
+        categoryId: !isNaN(categoryId ?? NaN) ? categoryId : null,
         title: values.title,
         description: values.description ?? null,
         dueDate: values.due_date ?? null,
+        startDate: values.start_date ?? null,
         priority: values.priority.charAt(0).toUpperCase() + values.priority.slice(1),
         status: values.status.charAt(0).toUpperCase() + values.status.slice(1),
         estimatedCost: values.estimated_cost ?? null,

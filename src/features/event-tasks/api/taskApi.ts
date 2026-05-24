@@ -1,5 +1,5 @@
 import { apiGet, apiPost, apiPut, apiPatch, apiDelete } from "@/shared/api/apiClient";
-import type { Task, TaskSummary, TeamMember, WeddingTemplate, Subtask, TaskComment } from "../models/task.models";
+import type { Task, TaskCategory, TaskSummary, TeamMember, WeddingTemplate, Subtask, TaskComment } from "../models/task.models";
 import { computeTaskSummary } from "../utils/task.utils";
 
 // ── Backend shape ──
@@ -12,11 +12,18 @@ interface ApiTask {
   title: string;
   description: string | null;
   dueDate: string | null;
+  startDate: string | null;
   priority: string;
   status: string;
   taskDependencyId: number | null;
   estimatedCost: number | null;
   actualCost: number | null;
+}
+
+interface ApiTaskCategory {
+  categoryId: number;
+  name: string;
+  colorCode: string;
 }
 
 interface ApiSubtask {
@@ -39,7 +46,8 @@ interface ApiComment {
 
 const now = () => new Date().toISOString();
 
-function mapApiTask(t: ApiTask): Task {
+function mapApiTask(t: ApiTask, catMap: Map<number, ApiTaskCategory>): Task {
+  const cat = t.categoryId != null ? catMap.get(t.categoryId) : undefined;
   return {
     task_id: String(t.taskId),
     event_id: t.eventId != null ? String(t.eventId) : "",
@@ -48,7 +56,7 @@ function mapApiTask(t: ApiTask): Task {
     title: t.title,
     description: t.description ?? "",
     due_date: t.dueDate ?? now(),
-    start_date: null,
+    start_date: t.startDate ?? null,
     priority: (t.priority?.toLowerCase() ?? "medium") as Task["priority"],
     status: (t.status?.toLowerCase() ?? "pending") as Task["status"],
     completion_percentage: t.status?.toLowerCase() === "completed" ? 100 : 0,
@@ -74,8 +82,8 @@ function mapApiTask(t: ApiTask): Task {
     updated_at: now(),
     created_by: "",
     updated_by: "",
-    category_name: "",
-    category_color: "#6366f1",
+    category_name: cat?.name ?? "",
+    category_color: cat?.colorCode ?? "#6366f1",
     assignees: [],
     comments_count: 0,
     subtasks_count: 0,
@@ -105,43 +113,52 @@ function mapApiComment(c: ApiComment): TaskComment {
   };
 }
 
+// ── Task Categories ──
+
+export async function fetchTaskCategories(): Promise<TaskCategory[]> {
+  const raw = await apiGet<ApiTaskCategory[]>("/api/taskcategories");
+  return (Array.isArray(raw) ? raw : []).map((c) => ({
+    id: String(c.categoryId),
+    name: c.name,
+    color: c.colorCode,
+    count: 0,
+    completedCount: 0,
+  }));
+}
+
 // ── Tasks ──
 
-export async function fetchTasksByEvent(eventId: number): Promise<{ tasks: Task[]; summary: TaskSummary }> {
+export async function fetchTasksByEvent(
+  eventId: number,
+  catMap: Map<number, ApiTaskCategory> = new Map(),
+): Promise<{ tasks: Task[]; summary: TaskSummary }> {
   const raw = await apiGet<ApiTask[]>(`/api/tasks/event/${eventId}`);
-  const tasks = (Array.isArray(raw) ? raw : []).map(mapApiTask);
+  const tasks = (Array.isArray(raw) ? raw : []).map((t) => mapApiTask(t, catMap));
   const summary = computeTaskSummary(tasks);
   return { tasks, summary };
 }
 
-export async function createTaskApi(body: {
+
+interface TaskWriteBody {
   eventId?: number | null;
   categoryId?: number | null;
   memberId?: number | null;
   title: string;
   description?: string | null;
   dueDate?: string | null;
+  startDate?: string | null;
   priority: string;
   status: string;
   estimatedCost?: number | null;
   actualCost?: number | null;
-}): Promise<Task> {
-  const raw = await apiPost<ApiTask>("/api/tasks?adminId=1", body);
-  return mapApiTask(raw);
 }
 
-export async function updateTaskApi(taskId: number, body: {
-  eventId?: number | null;
-  categoryId?: number | null;
-  memberId?: number | null;
-  title: string;
-  description?: string | null;
-  dueDate?: string | null;
-  priority: string;
-  status: string;
-  estimatedCost?: number | null;
-  actualCost?: number | null;
-}): Promise<void> {
+export async function createTaskApi(body: TaskWriteBody): Promise<Task> {
+  const raw = await apiPost<ApiTask>("/api/tasks?adminId=1", body);
+  return mapApiTask(raw, new Map());
+}
+
+export async function updateTaskApi(taskId: number, body: TaskWriteBody): Promise<void> {
   await apiPut(`/api/tasks/${taskId}?adminId=1`, body);
 }
 
