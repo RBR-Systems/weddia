@@ -82,7 +82,6 @@ export const useEventTasks = (): UseEventTasksResult => {
 
   const recalcSummary = useCallback((allTasks: Task[]) => {
     setSummary(computeTaskSummary(allTasks));
-    setCategories(buildCategories(allTasks));
   }, []);
 
   const loadTasks = useCallback(async () => {
@@ -289,7 +288,7 @@ export const useEventTasks = (): UseEventTasksResult => {
       setFormOpen(false);
       setEditTask(null);
     },
-    [editTask, eventId, loadTasks, message, recalcSummary, t],
+    [editTask, eventId, loadTasks, message, recalcSummary, syncAssignments, t],
   );
 
   const handleTemplateApply = useCallback(
