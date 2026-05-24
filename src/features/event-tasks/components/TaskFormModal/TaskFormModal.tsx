@@ -138,19 +138,19 @@ const TaskFormModal: React.FC<TaskFormModalProps> = ({
 
         <Space className={styles.fullWidth} size="middle" wrap>
           <Form.Item
-            name="due_date"
-            label={t("tasks.form.dueDate")}
-            rules={[
-              { required: true, message: t("tasks.form.dueDateRequired") },
-            ]}
+            name="start_date"
+            label={t("tasks.form.startDate")}
             className={styles.formField}
           >
             <DatePicker className={styles.fullWidthField} />
           </Form.Item>
 
           <Form.Item
-            name="start_date"
-            label={t("tasks.form.startDate")}
+            name="due_date"
+            label={t("tasks.form.dueDate")}
+            rules={[
+              { required: true, message: t("tasks.form.dueDateRequired") },
+            ]}
             className={styles.formField}
           >
             <DatePicker className={styles.fullWidthField} />
