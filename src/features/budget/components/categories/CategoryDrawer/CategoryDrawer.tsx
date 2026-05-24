@@ -13,7 +13,6 @@ const { Text } = Typography;
 interface CategoryDrawerProps {
   readonly open: boolean;
   readonly category: Category | null;
-  readonly currency: string;
   readonly onClose: () => void;
   readonly onSave: (id: string, data: { budget_name?: string; budget_notes?: string; allocated?: number }) => Promise<void>;
   readonly onDelete: (id: string) => void;
@@ -22,7 +21,6 @@ interface CategoryDrawerProps {
 export default function CategoryDrawer({
   open,
   category,
-  currency,
   onClose,
   onSave,
   onDelete,

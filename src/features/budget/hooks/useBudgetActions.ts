@@ -7,7 +7,6 @@ import type {
   Category,
   CategoryPatchSource,
   Expense,
-  TemplateCategoryRaw,
   VendorEvent,
 } from "../models/budget.models";
 import {
@@ -221,49 +220,6 @@ export const useBudgetActions = ({
       contractedDate: data.contracted_date,
       status: data.status,
       notes: data.notes,
-    });
-  };
-
-  const applyCategoryPatch = (
-    source: CategoryPatchSource,
-    getAllocated: (c: TemplateCategoryRaw, totalBudget: number) => number,
-    getPercentage: (c: TemplateCategoryRaw, allocated: number, totalBudget: number) => number,
-  ) => {
-    const totalBudget = source.total_budget ?? state.summary?.total_budget ?? 0;
-    if (source.total_budget) dispatch({ type: "UPDATE_BUDGET", payload: source.total_budget });
-    if (!source.categories) return;
-
-    const combined = mergeTemplateCategories(
-      source.categories,
-      state.categories,
-      (c, match) => {
-        const allocated = getAllocated(c, totalBudget);
-        return {
-          id: match?.id ?? generateBudgetId(),
-          name: c.name,
-          allocated,
-          spent: match?.spent ?? (typeof c.spent === "number" ? c.spent : 0),
-          expense_count: match?.expense_count ?? 0,
-          remaining: allocated - (match?.spent ?? (c.spent ?? 0)),
-          percentage: getPercentage(c, allocated, totalBudget),
-          color: c.color ?? match?.color,
-        } as Category;
-      },
-    );
-
-    const total_allocated = computeAllocatedTotal(combined);
-    const total_spent = state.summary?.total_spent ?? 0;
-    dispatch({
-      type: "SET_DATA",
-      payload: {
-        categories: combined,
-        summary: {
-          ...(state.summary as BudgetSummary),
-          ...computeSpentSummary(totalBudget, total_spent),
-          total_allocated,
-          total_budget: totalBudget,
-        },
-      },
     });
   };
 

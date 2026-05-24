@@ -124,7 +124,6 @@ export default function CategoryList() {
       <CategoryDrawer
         open={drawerOpen}
         category={selectedCategory}
-        currency={state.currency}
         onClose={() => setDrawerOpen(false)}
         onSave={handleDrawerSave}
         onDelete={handleDrawerDelete}
