@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { ReloadOutlined, FileExcelOutlined, UploadOutlined, PlusOutlined } from "@ant-design/icons";
 import { Row, Col, Button, Tag, Space } from "antd";
-import { formatStatusLabel, statusColor, Guest } from "./models/guestList.models";
+import { formatStatusLabel, statusColor } from "./models/guestList.models";
 import Header from "@/shared/components/Header/Header";
 import { useTranslation } from "react-i18next";
 import { useEvent } from "@/shared/contexts/EventContext";
@@ -20,7 +20,7 @@ export default function GuestList() {
   const { state: { events: { selectedEvent } } } = useEvent();
   const eventId = selectedEvent?.id ?? 1;
 
-  const { guests, setGuests, relations, countryCodes, handleRemoveGuest, handleAddGuest, handleExport } = useGuestData(eventId);
+  const { guests, setGuests, relations, countryCodes, handleUpdateRsvp, handleRemoveGuest, handleAddGuest, handleExport } = useGuestData(eventId);
   const {
     filters, setFilters, filteredGuests, hasActiveFilters,
     relationIds, activeStatusList,
@@ -28,7 +28,8 @@ export default function GuestList() {
     handleRemoveSpecialFilter, handleClearAllFilters, handleStatusClick,
   } = useGuestFilters(guests);
 
-  const [selected, setSelected] = useState<Guest | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const selectedGuest = selectedId ? (guests.find((g) => g.guest_id === selectedId) ?? null) : null;
   const [addOpen, setAddOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
 
@@ -93,15 +94,22 @@ export default function GuestList() {
         guests={filteredGuests}
         allGuests={guests}
         relations={relations}
-        onSelect={setSelected}
+        onSelect={(g) => setSelectedId(g.guest_id)}
         onRemoveGuest={handleRemoveGuest}
         filters={filters}
         onFiltersChange={(v) => setFilters((prev) => ({ ...prev, ...v }))}
         countryCodes={countryCodes}
       />
 
-      {selected && (
-        <GuestDetailModal guest={selected} relations={relations} onClose={() => setSelected(null)} countryCodes={countryCodes} />
+      {selectedGuest && (
+        <GuestDetailModal
+          guest={selectedGuest}
+          event={selectedEvent ?? undefined}
+          relations={relations}
+          onClose={() => setSelectedId(null)}
+          onUpdateRsvp={handleUpdateRsvp}
+          countryCodes={countryCodes}
+        />
       )}
 
       <ImportGuestModal open={importOpen} onClose={() => setImportOpen(false)} onFile={handleFile} />

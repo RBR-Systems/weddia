@@ -3,7 +3,7 @@ import { App } from "antd";
 import { useTranslation } from "react-i18next";
 import { Guest, RsvpStatus, GuestFormValues } from "../models/guestList.models";
 import { escapeCsv } from "../utils/guestList.utils";
-import { fetchGuests, fetchRelations, removeGuest as removeGuestService, createGuest } from "../api/guestApi";
+import { fetchGuests, fetchRelations, removeGuest as removeGuestService, createGuest, updateRsvp } from "../api/guestApi";
 
 interface Relation {
   relation_id: string;
@@ -33,6 +33,19 @@ export function useGuestData(eventId: number) {
     fetchGuests(eventId).then(setGuests).catch(() => setGuests([]));
     fetchRelations().then(setRelations).catch(() => setRelations([]));
   }, [eventId]);
+
+  async function handleUpdateRsvp(guestId: string, status: RsvpStatus) {
+    const prev = guests.find((g) => g.guest_id === guestId);
+    setGuests((gs) =>
+      gs.map((g) => (g.guest_id === guestId ? { ...g, rsvp_status: status } : g)),
+    );
+    try {
+      await updateRsvp(guestId, status);
+    } catch {
+      if (prev) setGuests((gs) => gs.map((g) => (g.guest_id === guestId ? prev : g)));
+      message.error(t("guestList.rsvpUpdateFailed", "Failed to update RSVP status"));
+    }
+  }
 
   async function handleRemoveGuest(guest_id: string) {
     try {
@@ -100,5 +113,5 @@ export function useGuestData(eventId: number) {
     message.success("Guest list exported");
   }
 
-  return { guests, setGuests, relations, countryCodes, handleRemoveGuest, handleAddGuest, handleExport };
+  return { guests, setGuests, relations, countryCodes, handleUpdateRsvp, handleRemoveGuest, handleAddGuest, handleExport };
 }
