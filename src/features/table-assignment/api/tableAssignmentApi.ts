@@ -6,7 +6,7 @@ import type { Guest as TAGuest } from "../models/tableAssignment.models";
 
 export interface ApiLayout {
   layoutId: number;
-  eventId?: number;
+  eventId: number | null;
   name: string;
   description?: string;
   isActive: boolean;
