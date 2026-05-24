@@ -172,6 +172,24 @@
       "taskCreated": "Task created",
       "taskUpdated": "Task updated",
       "templateApplied": "{{count}} tasks generated from template"
+    },
+    "detailModal": {
+      "tabDetail": "Detail",
+      "tabSubtasks": "Subtasks",
+      "tabComments": "Comments",
+      "subtasksCompleted": "completed"
+    },
+    "subtasks": {
+      "empty": "No subtasks yet.",
+      "addPlaceholder": "New subtask...",
+      "added": "Subtask added",
+      "deleteError": "Failed to delete subtask"
+    },
+    "comments": {
+      "empty": "No comments yet.",
+      "addPlaceholder": "Write a comment...",
+      "post": "Post",
+      "deleteError": "Failed to delete comment"
     }
   }
 }

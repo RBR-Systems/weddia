@@ -189,3 +189,28 @@ export interface TaskCategory {
   count: number;
   completedCount: number;
 }
+
+// ── Subtask ──
+
+export type SubtaskStatus = "pending" | "in_progress" | "completed" | "cancelled" | "on_hold";
+export type SubtaskPriority = "urgent" | "high" | "medium" | "low";
+
+export interface Subtask {
+  subtask_id: number;
+  task_id: number | null;
+  title: string;
+  description: string | null;
+  due_date: string | null;
+  priority: SubtaskPriority;
+  status: SubtaskStatus;
+}
+
+// ── Task Comment ──
+
+export interface TaskComment {
+  comment_id: number;
+  task_id: number | null;
+  member_id: number | null;
+  comment: string | null;
+  created_at: string;
+}

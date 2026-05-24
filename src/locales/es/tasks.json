@@ -172,6 +172,24 @@
       "taskCreated": "Tarea creada",
       "taskUpdated": "Tarea actualizada",
       "templateApplied": "{{count}} tareas generadas desde plantilla"
+    },
+    "detailModal": {
+      "tabDetail": "Detalle",
+      "tabSubtasks": "Subtareas",
+      "tabComments": "Comentarios",
+      "subtasksCompleted": "completadas"
+    },
+    "subtasks": {
+      "empty": "Sin subtareas aún.",
+      "addPlaceholder": "Nueva subtarea...",
+      "added": "Subtarea agregada",
+      "deleteError": "Error al eliminar subtarea"
+    },
+    "comments": {
+      "empty": "Sin comentarios aún.",
+      "addPlaceholder": "Escribe un comentario...",
+      "post": "Publicar",
+      "deleteError": "Error al eliminar comentario"
     }
   }
 }

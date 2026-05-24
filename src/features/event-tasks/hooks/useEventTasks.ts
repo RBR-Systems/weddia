@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { App } from "antd";
 import { useTranslation } from "react-i18next";
+import { useEvent } from "@/shared/contexts/EventContext";
 import type {
   Task,
   TaskSummary,
@@ -8,13 +9,19 @@ import type {
   WeddingTemplate,
   TaskFormValues,
 } from "../models/task.models";
-import { fetchTasks } from "../api/taskApi";
+import {
+  fetchTasksByEvent,
+  createTaskApi,
+  updateTaskApi,
+  patchTaskStatusApi,
+  deleteTaskApi,
+} from "../api/taskApi";
 import {
   buildCategories,
   computeTaskSummary,
   generateTasksFromTemplate,
-  createTaskFromForm,
 } from "../utils/task.utils";
+
 const INITIAL_SUMMARY: TaskSummary = {
   total_tasks: 0,
   completed: 0,
@@ -53,6 +60,9 @@ export interface UseEventTasksResult {
 export const useEventTasks = (): UseEventTasksResult => {
   const { message } = App.useApp();
   const { t } = useTranslation();
+  const { state } = useEvent();
+  const eventId = state.events.selectedEvent?.id ?? null;
+
   const [tasks, setTasks] = useState<Task[]>([]);
   const [summary, setSummary] = useState<TaskSummary>(INITIAL_SUMMARY);
   const [categories, setCategories] = useState<TaskCategory[]>([]);
@@ -68,42 +78,51 @@ export const useEventTasks = (): UseEventTasksResult => {
   }, []);
 
   const loadTasks = useCallback(async () => {
+    if (eventId == null) {
+      setTasks([]);
+      setSummary(INITIAL_SUMMARY);
+      setCategories([]);
+      setIsLoading(false);
+      return;
+    }
     setIsLoading(true);
     try {
-      const data = await fetchTasks();
+      const data = await fetchTasksByEvent(eventId);
       setTasks(data.tasks);
       setSummary(data.summary);
       setCategories(buildCategories(data.tasks));
+    } catch {
+      setTasks([]);
+      setSummary(INITIAL_SUMMARY);
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [eventId]);
 
   useEffect(() => {
     loadTasks();
   }, [loadTasks]);
 
   const handleQuickComplete = useCallback(
-    (task: Task) => {
+    async (task: Task) => {
+      const taskId = Number(task.task_id);
       setTasks((prev) => {
         const updated = prev.map((t) =>
           t.task_id === task.task_id
-            ? {
-                ...t,
-                status: "completed" as const,
-                completion_percentage: 100,
-                completed_at: new Date().toISOString(),
-              }
+            ? { ...t, status: "completed" as const, completion_percentage: 100, completed_at: new Date().toISOString() }
             : t,
         );
         recalcSummary(updated);
         return updated;
       });
-      message.success(
-        t("tasks.messages.taskCompleted", { title: task.title }),
-      );
+      try {
+        await patchTaskStatusApi(taskId, "Completed");
+      } catch {
+        loadTasks();
+      }
+      message.success(t("tasks.messages.taskCompleted", { title: task.title }));
     },
-    [message, recalcSummary, t],
+    [loadTasks, message, recalcSummary, t],
   );
 
   const handleTaskClick = useCallback((task: Task) => {
@@ -112,38 +131,47 @@ export const useEventTasks = (): UseEventTasksResult => {
   }, []);
 
   const handleStatusChange = useCallback(
-    (taskId: string, status: Task["status"]) => {
+    async (taskId: string, status: Task["status"]) => {
       setTasks((prev) => {
         const updated = prev.map((t) =>
           t.task_id === taskId
             ? {
                 ...t,
                 status,
-                completion_percentage:
-                  status === "completed" ? 100 : t.completion_percentage,
-                completed_at:
-                  status === "completed" ? new Date().toISOString() : null,
+                completion_percentage: status === "completed" ? 100 : t.completion_percentage,
+                completed_at: status === "completed" ? new Date().toISOString() : null,
               }
             : t,
         );
         recalcSummary(updated);
         return updated;
       });
+      const apiStatus = status.charAt(0).toUpperCase() + status.slice(1);
+      try {
+        await patchTaskStatusApi(Number(taskId), apiStatus);
+      } catch {
+        loadTasks();
+      }
     },
-    [recalcSummary],
+    [loadTasks, recalcSummary],
   );
 
   const handleDeleteTask = useCallback(
-    (taskId: string) => {
+    async (taskId: string) => {
       setTasks((prev) => {
         const updated = prev.filter((t) => t.task_id !== taskId);
         recalcSummary(updated);
         return updated;
       });
       setDetailOpen(false);
+      try {
+        await deleteTaskApi(Number(taskId));
+      } catch {
+        loadTasks();
+      }
       message.success(t("tasks.messages.taskDeleted"));
     },
-    [message, recalcSummary, t],
+    [loadTasks, message, recalcSummary, t],
   );
 
   const handleEditFromDetail = useCallback((task: Task) => {
@@ -153,8 +181,20 @@ export const useEventTasks = (): UseEventTasksResult => {
   }, []);
 
   const handleFormSubmit = useCallback(
-    (values: TaskFormValues) => {
+    async (values: TaskFormValues) => {
+      const body = {
+        eventId: eventId,
+        title: values.title,
+        description: values.description ?? null,
+        dueDate: values.due_date ?? null,
+        priority: values.priority.charAt(0).toUpperCase() + values.priority.slice(1),
+        status: values.status.charAt(0).toUpperCase() + values.status.slice(1),
+        estimatedCost: values.estimated_cost ?? null,
+        actualCost: values.actual_cost ?? null,
+      };
+
       if (editTask) {
+        const taskId = Number(editTask.task_id);
         setTasks((prev) => {
           const updated = prev.map((t) =>
             t.task_id === editTask.task_id
@@ -164,44 +204,47 @@ export const useEventTasks = (): UseEventTasksResult => {
           recalcSummary(updated);
           return updated;
         });
+        try {
+          await updateTaskApi(taskId, body);
+        } catch {
+          loadTasks();
+        }
         message.success(t("tasks.messages.taskUpdated"));
       } else {
-        const newTask = createTaskFromForm(values, "event-123");
-        setTasks((prev) => {
-          const updated = [...prev, newTask];
-          recalcSummary(updated);
-          return updated;
-        });
-        message.success(t("tasks.messages.taskCreated"));
+        try {
+          const newTask = await createTaskApi(body);
+          setTasks((prev) => {
+            const updated = [...prev, newTask];
+            recalcSummary(updated);
+            return updated;
+          });
+          message.success(t("tasks.messages.taskCreated"));
+        } catch {
+          message.error(t("tasks.messages.taskCreateError", "Error creating task"));
+        }
       }
       setFormOpen(false);
       setEditTask(null);
     },
-    [editTask, message, recalcSummary, t],
+    [editTask, eventId, loadTasks, message, recalcSummary, t],
   );
 
   const handleTemplateApply = useCallback(
-    (
-      template: WeddingTemplate,
-      weddingDate: Date,
-      includeOptional: boolean,
-    ) => {
+    (template: WeddingTemplate, weddingDate: Date, includeOptional: boolean) => {
       const generated = generateTasksFromTemplate(
         template,
         weddingDate,
         includeOptional,
-        "event-123",
+        eventId != null ? String(eventId) : "event-unknown",
       );
       setTasks((prev) => {
         const updated = [...prev, ...generated];
         recalcSummary(updated);
         return updated;
       });
-      message.success(
-        t("tasks.messages.templateApplied", { count: generated.length }),
-      );
+      message.success(t("tasks.messages.templateApplied", { count: generated.length }));
     },
-    [message, recalcSummary, t],
+    [eventId, message, recalcSummary, t],
   );
 
   const openNewTaskForm = useCallback(() => {
