@@ -3,6 +3,7 @@ import type {
   TaskCategory,
   TaskFormValues,
   TaskSummary,
+  TeamMember,
   WeddingTemplate,
 } from "./task.models";
 
@@ -48,6 +49,7 @@ export interface TaskFormModalProps {
   readonly open: boolean;
   readonly task?: Task | null;
   readonly categories: TaskCategory[];
+  readonly members: TeamMember[];
   readonly onClose: () => void;
   readonly onSubmit: (values: TaskFormValues) => void;
 }

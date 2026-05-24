@@ -6,11 +6,13 @@ import type {
   Task,
   TaskSummary,
   TaskCategory,
+  TeamMember,
   WeddingTemplate,
   TaskFormValues,
 } from "../models/task.models";
 import {
   fetchTasksByEvent,
+  fetchUsers,
   createTaskApi,
   updateTaskApi,
   patchTaskStatusApi,
@@ -36,6 +38,7 @@ export interface UseEventTasksResult {
   tasks: Task[];
   summary: TaskSummary;
   categories: TaskCategory[];
+  members: TeamMember[];
   isLoading: boolean;
   detailTask: Task | null;
   detailOpen: boolean;
@@ -66,6 +69,7 @@ export const useEventTasks = (): UseEventTasksResult => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [summary, setSummary] = useState<TaskSummary>(INITIAL_SUMMARY);
   const [categories, setCategories] = useState<TaskCategory[]>([]);
+  const [members, setMembers] = useState<TeamMember[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [detailTask, setDetailTask] = useState<Task | null>(null);
   const [detailOpen, setDetailOpen] = useState(false);
@@ -87,10 +91,11 @@ export const useEventTasks = (): UseEventTasksResult => {
     }
     setIsLoading(true);
     try {
-      const data = await fetchTasksByEvent(eventId);
+      const [data, users] = await Promise.all([fetchTasksByEvent(eventId), fetchUsers()]);
       setTasks(data.tasks);
       setSummary(data.summary);
       setCategories(buildCategories(data.tasks));
+      setMembers(users);
     } catch {
       setTasks([]);
       setSummary(INITIAL_SUMMARY);
@@ -263,6 +268,7 @@ export const useEventTasks = (): UseEventTasksResult => {
     tasks,
     summary,
     categories,
+    members,
     isLoading,
     detailTask,
     detailOpen,

@@ -1,5 +1,5 @@
 import { apiGet, apiPost, apiPut, apiPatch, apiDelete } from "@/shared/api/apiClient";
-import type { Task, TaskSummary, WeddingTemplate, Subtask, TaskComment } from "../models/task.models";
+import type { Task, TaskSummary, TeamMember, WeddingTemplate, Subtask, TaskComment } from "../models/task.models";
 import { computeTaskSummary } from "../utils/task.utils";
 
 // ── Backend shape ──
@@ -200,6 +200,29 @@ export async function createCommentApi(body: {
 
 export async function deleteCommentApi(commentId: number): Promise<void> {
   await apiDelete(`/api/taskcomments/${commentId}`);
+}
+
+// ── Users ──
+
+interface ApiUser {
+  userId: number;
+  email: string;
+  firstName: string;
+  lastName: string;
+  isActive: boolean;
+}
+
+export async function fetchUsers(): Promise<TeamMember[]> {
+  const raw = await apiGet<ApiUser[]>("/api/users");
+  return (Array.isArray(raw) ? raw : [])
+    .filter((u) => u.isActive)
+    .map((u) => ({
+      user_id: String(u.userId),
+      user_name: `${u.firstName} ${u.lastName}`.trim(),
+      user_email: u.email,
+      user_avatar: "",
+      role: "",
+    }));
 }
 
 // ── Template (keep mock) ──

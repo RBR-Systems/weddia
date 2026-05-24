@@ -15,7 +15,6 @@ import { useTranslation } from "react-i18next";
 import dayjs from "dayjs";
 
 import { formatInputNumber } from "@/shared/utils/formatters.utils";
-import { TEAM_MEMBERS } from "../../constants/task.constants";
 import type { TaskFormModalProps } from "../../models/taskComponent.models";
 import { getInitials } from "../../utils/task.utils";
 import styles from "./TaskFormModal.module.css";
@@ -26,6 +25,7 @@ const TaskFormModal: React.FC<TaskFormModalProps> = ({
   open,
   task,
   categories,
+  members,
   onClose,
   onSubmit,
 }) => {
@@ -54,7 +54,7 @@ const TaskFormModal: React.FC<TaskFormModalProps> = ({
       const category = categories.find((item) => item.id === values.category_id);
       const assigneeIds: string[] = values.assignee_ids ?? [];
       const assignees = assigneeIds.map((userId: string) => {
-        const member = TEAM_MEMBERS.find((item) => item.user_id === userId);
+        const member = members.find((item) => item.user_id === userId);
 
         return {
           assignment_id: `assign-${Date.now()}-${userId}`,
@@ -250,12 +250,12 @@ const TaskFormModal: React.FC<TaskFormModalProps> = ({
             placeholder={t("tasks.form.assigneesPlaceholder")}
             allowClear
             optionFilterProp="label"
-            options={TEAM_MEMBERS.map((member) => ({
+            options={members.map((member) => ({
               value: member.user_id,
               label: member.user_name,
             }))}
             optionRender={(option) => {
-              const member = TEAM_MEMBERS.find(
+              const member = members.find(
                 (item) => item.user_id === option.value,
               );
 

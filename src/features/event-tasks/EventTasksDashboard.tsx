@@ -25,6 +25,7 @@ const EventTasksDashboard: React.FC = () => {
     tasks,
     summary,
     categories,
+    members,
     isLoading,
     detailTask,
     detailOpen,
@@ -132,6 +133,7 @@ const EventTasksDashboard: React.FC = () => {
         open={formOpen}
         task={editTask}
         categories={categories}
+        members={members}
         onClose={closeFormModal}
         onSubmit={handleFormSubmit}
       />
