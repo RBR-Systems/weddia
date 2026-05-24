@@ -113,7 +113,7 @@
   display: flex;
   gap: 4px;
   margin-bottom: 20px;
-  border-bottom: 1px solid var(--border-color, #e5e7eb);
+  border-bottom: 1px solid var(--divider);
 }
 
 .tabBtn {
@@ -123,7 +123,7 @@
   border-bottom: 2px solid transparent;
   cursor: pointer;
   font-size: var(--fs-sm);
-  color: var(--text-secondary, #6b7280);
+  color: var(--text-color-secondary);
   transition: color 0.2s, border-color 0.2s;
   margin-bottom: -1px;
 }
@@ -199,9 +199,10 @@
 }
 
 .commentItem {
-  background: var(--bg-subtle, #f9fafb);
+  border: 1px solid var(--divider);
   border-radius: 8px;
   padding: 10px 12px;
+  color: var(--text-color);
 }
 
 .commentMeta {
