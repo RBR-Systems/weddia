@@ -57,7 +57,7 @@ export function deleteAssignment(a: TableAssignment): void {
 
 export async function loadTableAssignmentData(eventId: number, signal: AbortSignal) {
   const [layouts, rawGuests, relations] = await Promise.all([
-    apiGet<ApiLayout[]>("/api/tablelayouts/active", { signal }),
+    apiGet<ApiLayout[]>(`/api/tablelayouts/event/${eventId}`, { signal }),
     fetchGuests(eventId),
     fetchRelations(),
   ]);
