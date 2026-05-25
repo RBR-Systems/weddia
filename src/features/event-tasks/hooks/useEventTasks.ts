@@ -292,21 +292,38 @@ export const useEventTasks = (): UseEventTasksResult => {
   );
 
   const handleTemplateApply = useCallback(
-    (template: WeddingTemplate, weddingDate: Date, includeOptional: boolean) => {
+    async (template: WeddingTemplate, weddingDate: Date, includeOptional: boolean) => {
+      if (eventId == null) return;
       const generated = generateTasksFromTemplate(
         template,
         weddingDate,
         includeOptional,
-        eventId != null ? String(eventId) : "event-unknown",
+        String(eventId),
       );
-      setTasks((prev) => {
-        const updated = [...prev, ...generated];
-        recalcSummary(updated);
-        return updated;
-      });
-      message.success(t("tasks.messages.templateApplied", { count: generated.length }));
+
+      const results = await Promise.allSettled(
+        generated.map((task) =>
+          createTaskApi({
+            eventId,
+            categoryId: null,
+            title: task.title,
+            description: task.description || null,
+            dueDate: task.due_date,
+            startDate: null,
+            priority: task.priority.charAt(0).toUpperCase() + task.priority.slice(1),
+            status: "Pending",
+            visibility: "shared",
+            estimatedCost: task.estimated_cost ?? null,
+            actualCost: null,
+          }),
+        ),
+      );
+
+      const saved = results.filter((r) => r.status === "fulfilled").length;
+      await loadTasks();
+      message.success(t("tasks.messages.templateApplied", { count: saved }));
     },
-    [eventId, message, recalcSummary, t],
+    [eventId, loadTasks, message, t],
   );
 
   const openNewTaskForm = useCallback(() => {

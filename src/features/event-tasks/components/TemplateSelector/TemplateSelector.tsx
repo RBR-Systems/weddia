@@ -39,7 +39,7 @@ import styles from "./TemplateSelector.module.css";
 
 const { Paragraph, Text, Title } = Typography;
 
-const TemplateSelector: React.FC<TemplateSelectorProps> = ({ onApply }) => {
+const TemplateSelector: React.FC<TemplateSelectorProps> = ({ eventDate, onApply }) => {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [mexicanTemplate, setMexicanTemplate] =
@@ -90,7 +90,7 @@ const TemplateSelector: React.FC<TemplateSelectorProps> = ({ onApply }) => {
 
   const handleStartApply = (card: TemplateCardData) => {
     setApplyTemplate(card);
-    setWeddingDate(null);
+    setWeddingDate(eventDate ? dayjs(eventDate) : null);
     setIncludeOptional(true);
     setSuccess(false);
   };
@@ -374,7 +374,6 @@ const TemplateSelector: React.FC<TemplateSelectorProps> = ({ onApply }) => {
                   onChange={setWeddingDate}
                   className={styles.fullWidth}
                   size="large"
-                  disabledDate={(date) => date.isBefore(dayjs(), "day")}
                   placeholder={t("tasks.template.weddingDatePlaceholder")}
                 />
                 <Text type="secondary" className={styles.helperText}>

@@ -9,6 +9,7 @@ import {
 } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import { useEventTasks } from "./hooks/useEventTasks";
+import { useEvent } from "@/shared/contexts/EventContext";
 import TaskList from "./components/TaskList/TaskList";
 import ProgressDashboard from "./components/ProgressDashboard/ProgressDashboard";
 import TaskCalendar from "./components/TaskCalendar/TaskCalendar";
@@ -21,6 +22,10 @@ const { Title } = Typography;
 
 const EventTasksDashboard: React.FC = () => {
   const { t } = useTranslation();
+  const { state } = useEvent();
+  const eventDate = state.events.selectedEvent?.rawDate
+    ? new Date(state.events.selectedEvent.rawDate)
+    : undefined;
   const {
     tasks,
     summary,
@@ -108,7 +113,7 @@ const EventTasksDashboard: React.FC = () => {
           <FileAddOutlined /> {t("tasks.tabs.templates")}
         </span>
       ),
-      children: <TemplateSelector onApply={handleTemplateApply} />,
+      children: <TemplateSelector eventDate={eventDate} onApply={handleTemplateApply} />,
     },
   ];
 

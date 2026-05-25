@@ -55,6 +55,7 @@ export interface TaskFormModalProps {
 }
 
 export interface TemplateSelectorProps {
+  readonly eventDate?: Date;
   readonly onApply: (
     template: WeddingTemplate,
     weddingDate: Date,
