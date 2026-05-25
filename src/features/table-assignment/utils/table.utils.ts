@@ -1,9 +1,7 @@
 import i18next from "i18next";
 import {
-  DEFAULT_TABLE_DIMENSION,
   DEFAULT_VENUE_HEIGHT_METERS,
   DEFAULT_VENUE_WIDTH_METERS,
-  TABLE_SHAPE_DIMENSIONS,
 } from "../constants/tableAssignment.constants";
 import type { Guest, Table, TableAssignment, TableLayout } from "../models/tableAssignment.models";
 import styles from "../components/Tables/TableTileContent/TableTile.module.css";
@@ -16,21 +14,6 @@ export function getActiveGridSize(layouts: TableLayout[]): {
   return {
     xGridSize: active?.x_grid_size ?? DEFAULT_VENUE_WIDTH_METERS,
     yGridSize: active?.y_grid_size ?? DEFAULT_VENUE_HEIGHT_METERS,
-  };
-}
-
-export function tableToMeters(
-  t: Table,
-  xGridCount: number,
-  yGridCount: number,
-): Table {
-  const dims = TABLE_SHAPE_DIMENSIONS[t.shape] ?? DEFAULT_TABLE_DIMENSION;
-  return {
-    ...t,
-    x_m: t.x_m ?? t.x_grid * (DEFAULT_VENUE_WIDTH_METERS / xGridCount),
-    y_m: t.y_m ?? t.y_grid * (DEFAULT_VENUE_HEIGHT_METERS / yGridCount),
-    width_m: dims.width_m,
-    height_m: dims.height_m,
   };
 }
 

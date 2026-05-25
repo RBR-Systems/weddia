@@ -8,10 +8,6 @@ import type {
   TableAssignment,
 } from "../models/tableAssignment.models";
 import {
-  DEFAULT_VENUE_WIDTH_METERS,
-  DEFAULT_VENUE_HEIGHT_METERS,
-} from "../constants/tableAssignment.constants";
-import {
   fullName,
   getGuestPartySize,
   parseGuestIdFromDragId,
@@ -71,27 +67,21 @@ function handleTableDrag(evt: DragEndEvent, ctx: DragContext): void {
   const table = currentState.tables.find((t) => t.table_id === tableId);
   if (!table) return;
 
-  const newX = (table.x_m ?? 0) + deltaMetersX;
-  const newY = (table.y_m ?? 0) + deltaMetersY;
-  dispatch({ type: "MOVE_TABLE", payload: { tableId, x_m: newX, y_m: newY } });
+  const newX = table.x_grid + deltaMetersX;
+  const newY = table.y_grid + deltaMetersY;
+  dispatch({ type: "MOVE_TABLE", payload: { tableId, x_grid: newX, y_grid: newY } });
 
   const activeLayout =
     currentState.layouts.find((l) => l.is_active) ?? currentState.layouts[0];
   if (activeLayout) {
-    const xGrid = Math.max(
-      0,
-      Math.round(newX / (DEFAULT_VENUE_WIDTH_METERS / activeLayout.x_grid_size)),
-    );
-    const yGrid = Math.max(
-      0,
-      Math.round(newY / (DEFAULT_VENUE_HEIGHT_METERS / activeLayout.y_grid_size)),
-    );
     apiPut(`/api/eventtables/${tableId}?adminId=1`, {
       layoutId: Number(activeLayout.layout_id),
       numberOfSeats: table.total_number ?? 8,
       shape: table.shape ?? "round",
-      xGrid,
-      yGrid,
+      xGrid: Math.max(0, Math.round(newX)),
+      yGrid: Math.max(0, Math.round(newY)),
+      widthM: table.width_m,
+      heightM: table.height_m,
     }).catch(console.error);
   }
 

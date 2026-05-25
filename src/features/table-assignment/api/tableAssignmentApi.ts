@@ -1,4 +1,5 @@
 import { apiGet, apiPost, apiPut, apiDelete } from "@/shared/api/apiClient";
+import { TABLE_SHAPE_DIMENSIONS, DEFAULT_TABLE_DIMENSION } from "../constants/tableAssignment.constants";
 import { fetchGuests, fetchRelations } from "@/shared/api/guestApi";
 import type { TableLayout, Table, TableAssignment } from "../models/tableAssignment.models";
 import type { Guest as GuestListGuest } from "../../guest-list/models/guestList.models";
@@ -22,6 +23,8 @@ export interface ApiTable {
   shape: string;
   xGrid: number;
   yGrid: number;
+  widthM?: number | null;
+  heightM?: number | null;
 }
 
 export interface ApiAssignment {
@@ -84,15 +87,20 @@ export async function loadTableAssignmentData(eventId: number, signal: AbortSign
       apiGet<ApiTable[]>(`/api/eventtables/layout/${layoutId}`, { signal }),
       apiGet<ApiAssignment[]>(`/api/tableassignments/layout/${layoutId}`, { signal }),
     ]);
-    tablesRaw = (Array.isArray(tables) ? tables : []).map((t: ApiTable) => ({
-      table_id: String(t.tableId),
-      layout_id: String(t.layoutId),
-      table_number: t.tableNumber,
-      total_number: t.numberOfSeats,
-      shape: t.shape,
-      x_grid: t.xGrid,
-      y_grid: t.yGrid,
-    }));
+    tablesRaw = (Array.isArray(tables) ? tables : []).map((t: ApiTable) => {
+      const dims = TABLE_SHAPE_DIMENSIONS[t.shape] ?? DEFAULT_TABLE_DIMENSION;
+      return {
+        table_id: String(t.tableId),
+        layout_id: String(t.layoutId),
+        table_number: t.tableNumber,
+        total_number: t.numberOfSeats,
+        shape: t.shape,
+        x_grid: t.xGrid,
+        y_grid: t.yGrid,
+        width_m: t.widthM ?? dims.width_m,
+        height_m: t.heightM ?? dims.height_m,
+      };
+    });
     assignmentsRaw = (Array.isArray(assignments) ? assignments : []).map((a: ApiAssignment) => ({
       table_id: String(a.tableId),
       guest_id: String(a.guestId),

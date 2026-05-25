@@ -1,7 +1,7 @@
 "use client";
 import styles from "./TableAssignmentPage.module.css";
 import { App, Card, Empty, Input, Space, Spin, Typography, Button, FloatButton, InputNumber, Modal, Form, Select, Tag } from "antd";
-import { DEFAULT_VENUE_WIDTH_METERS } from "./constants/tableAssignment.constants";
+import { DEFAULT_VENUE_WIDTH_METERS, TABLE_SHAPE_DIMENSIONS, DEFAULT_TABLE_DIMENSION } from "./constants/tableAssignment.constants";
 import { DndContext, DragOverlay, pointerWithin } from "@dnd-kit/core";
 import { TeamOutlined, MessageOutlined, UndoOutlined, PlusOutlined, ZoomOutOutlined, ZoomInOutlined, PlusSquareOutlined } from "@ant-design/icons";
 import React, { useState, useEffect, useRef } from "react";
@@ -378,50 +378,89 @@ function TableAssignmentContent() {
       </DragOverlay>
 
       {/* Add Table modal */}
-      <Modal
-        title={t("tableAssignment.addTable", "Add Table")}
+      <AddTableModal
         open={addTableOpen}
-        onCancel={() => { setAddTableOpen(false); addTableForm.resetFields(); }}
-        onOk={() => addTableForm.submit()}
-        okText={t("common.add", "Add")}
-        forceRender
-      >
-        <Form
-          form={addTableForm}
-          layout="vertical"
-          initialValues={{ shape: "round", seats: 8, xGrid: 5, yGrid: 5 }}
-          onFinish={async (values) => {
-            await addTable?.({
-              shape: values.shape,
-              seats: values.seats,
-              xGrid: values.xGrid,
-              yGrid: values.yGrid,
-            });
-            setAddTableOpen(false);
-            addTableForm.resetFields();
-          }}
-        >
-          <Form.Item name="shape" label={t("tableAssignment.tableShape", "Shape")} rules={[{ required: true }]}>
-            <Select options={[
-              { value: "round", label: t("tableAssignment.shapes.round", "Round") },
-              { value: "rectangular", label: t("tableAssignment.shapes.rectangular", "Rectangular") },
-              { value: "square", label: t("tableAssignment.shapes.square", "Square") },
-            ]} />
-          </Form.Item>
-          <Form.Item name="seats" label={t("tableAssignment.numberOfSeats", "Number of seats")} rules={[{ required: true }]}>
-            <InputNumber min={1} max={30} style={{ width: "100%" }} />
-          </Form.Item>
-          <Space style={{ width: "100%" }}>
-            <Form.Item name="xGrid" label={t("tableAssignment.positionX", "Position X")} style={{ flex: 1 }}>
-              <InputNumber min={0} style={{ width: "100%" }} />
-            </Form.Item>
-            <Form.Item name="yGrid" label={t("tableAssignment.positionY", "Position Y")} style={{ flex: 1 }}>
-              <InputNumber min={0} style={{ width: "100%" }} />
-            </Form.Item>
-          </Space>
-        </Form>
-      </Modal>
+        onClose={() => { setAddTableOpen(false); addTableForm.resetFields(); }}
+        form={addTableForm}
+        addTable={addTable}
+      />
     </DndContext>
+  );
+}
+
+function AddTableModal({
+  open,
+  onClose,
+  form,
+  addTable,
+}: {
+  open: boolean;
+  onClose: () => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  form: ReturnType<typeof Form.useForm<any>>[0];
+  addTable?: (opts: { shape: string; seats: number; xGrid: number; yGrid: number; widthM: number; heightM: number }) => Promise<void>;
+}) {
+  const { t } = useTranslation();
+  const shape = Form.useWatch("shape", form) as string | undefined;
+
+  useEffect(() => {
+    const dims = TABLE_SHAPE_DIMENSIONS[shape ?? ""] ?? DEFAULT_TABLE_DIMENSION;
+    form.setFieldsValue({ widthM: dims.width_m, heightM: dims.height_m });
+  }, [shape, form]);
+
+  return (
+    <Modal
+      title={t("tableAssignment.addTable", "Add Table")}
+      open={open}
+      onCancel={onClose}
+      onOk={() => form.submit()}
+      okText={t("common.add", "Add")}
+      forceRender
+    >
+      <Form
+        form={form}
+        layout="vertical"
+        initialValues={{ shape: "round", seats: 8, xGrid: 5, yGrid: 5, widthM: 1.8, heightM: 1.8 }}
+        onFinish={async (values: { shape: string; seats: number; xGrid: number; yGrid: number; widthM: number; heightM: number }) => {
+          await addTable?.({
+            shape: values.shape,
+            seats: values.seats,
+            xGrid: values.xGrid,
+            yGrid: values.yGrid,
+            widthM: values.widthM,
+            heightM: values.heightM,
+          });
+          onClose();
+        }}
+      >
+        <Form.Item name="shape" label={t("tableAssignment.tableShape", "Shape")} rules={[{ required: true }]}>
+          <Select options={[
+            { value: "round", label: t("tableAssignment.shapes.round", "Round") },
+            { value: "rectangular", label: t("tableAssignment.shapes.rectangular", "Rectangular") },
+            { value: "square", label: t("tableAssignment.shapes.square", "Square") },
+          ]} />
+        </Form.Item>
+        <Form.Item name="seats" label={t("tableAssignment.numberOfSeats", "Number of seats")} rules={[{ required: true }]}>
+          <InputNumber min={1} max={30} style={{ width: "100%" }} />
+        </Form.Item>
+        <Space style={{ width: "100%" }}>
+          <Form.Item name="widthM" label={t("tableAssignment.widthM", "Width (m)")} style={{ flex: 1 }} rules={[{ required: true }]}>
+            <InputNumber min={0.5} max={10} step={0.1} style={{ width: "100%" }} />
+          </Form.Item>
+          <Form.Item name="heightM" label={t("tableAssignment.heightM", "Height (m)")} style={{ flex: 1 }} rules={[{ required: true }]}>
+            <InputNumber min={0.5} max={10} step={0.1} style={{ width: "100%" }} />
+          </Form.Item>
+        </Space>
+        <Space style={{ width: "100%" }}>
+          <Form.Item name="xGrid" label={t("tableAssignment.positionX", "Position X")} style={{ flex: 1 }}>
+            <InputNumber min={0} style={{ width: "100%" }} />
+          </Form.Item>
+          <Form.Item name="yGrid" label={t("tableAssignment.positionY", "Position Y")} style={{ flex: 1 }}>
+            <InputNumber min={0} style={{ width: "100%" }} />
+          </Form.Item>
+        </Space>
+      </Form>
+    </Modal>
   );
 }
 

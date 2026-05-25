@@ -1,13 +1,8 @@
 import { SNAP_METERS } from "../constants/tableAssignment.constants";
 import type { Relation, State, Guest, Table, TableAssignment, TableLayout } from "../models/tableAssignment.models";
 import { applyAiSeating, moveGuestSeat } from "../utils/assignment.utils";
-import { getActiveGridSize, tableToMeters } from "../utils/table.utils";
+import { getActiveGridSize } from "../utils/table.utils";
 import type { Action } from "./actions";
-
-function convertTables(tables: Table[], layouts: TableLayout[]): Table[] {
-  const { xGridSize, yGridSize } = getActiveGridSize(layouts);
-  return tables.map((t) => tableToMeters(t, xGridSize, yGridSize));
-}
 
 export function createInitialState(
   relations: Relation[],
@@ -21,7 +16,7 @@ export function createInitialState(
     relations,
     guests,
     layouts,
-    tables: convertTables(tablesRaw, layouts),
+    tables: tablesRaw,
     assignments,
     metersToPixels: initialMetersToPixels,
     zoomScale: 1,
@@ -46,14 +41,14 @@ export function reducer(state: State, action: Action): State {
         relations,
         guests,
         layouts,
-        tables: convertTables(tables, layouts),
+        tables,
         assignments,
       };
     }
     case "ADD_TABLE":
       return {
         ...state,
-        tables: [...state.tables, ...convertTables([action.payload], state.layouts)],
+        tables: [...state.tables, action.payload],
       };
     case "REMOVE_TABLE":
       return {
@@ -68,28 +63,28 @@ export function reducer(state: State, action: Action): State {
     case "SET_PAN":
       return { ...state, pan: action.payload };
     case "SET_TABLES":
-      return { ...state, tables: convertTables(action.payload, state.layouts) };
+      return { ...state, tables: action.payload };
     case "MOVE_TABLE": {
-      const { tableId, x_m, y_m } = action.payload;
+      const { tableId, x_grid, y_grid } = action.payload;
       const tbl = state.tables.find((t) => t.table_id === tableId);
       if (!tbl) return state;
 
       const { xGridSize, yGridSize } = getActiveGridSize(state.layouts);
-      const maxX = Math.max(0, xGridSize - (tbl.width_m ?? 0));
-      const maxY = Math.max(0, yGridSize - (tbl.height_m ?? 0));
+      const maxX = Math.max(0, xGridSize - tbl.width_m);
+      const maxY = Math.max(0, yGridSize - tbl.height_m);
 
       const snappedX = Math.max(
         0,
-        Math.min(maxX, Math.round(x_m / SNAP_METERS) * SNAP_METERS),
+        Math.min(maxX, Math.round(x_grid / SNAP_METERS) * SNAP_METERS),
       );
       const snappedY = Math.max(
         0,
-        Math.min(maxY, Math.round(y_m / SNAP_METERS) * SNAP_METERS),
+        Math.min(maxY, Math.round(y_grid / SNAP_METERS) * SNAP_METERS),
       );
       return {
         ...state,
         tables: state.tables.map((t) =>
-          t.table_id === tableId ? { ...t, x_m: snappedX, y_m: snappedY } : t,
+          t.table_id === tableId ? { ...t, x_grid: snappedX, y_grid: snappedY } : t,
         ),
       };
     }

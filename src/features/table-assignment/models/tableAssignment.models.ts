@@ -37,11 +37,8 @@ export type Table = {
   shape: "round" | "rectangular" | "square" | string;
   x_grid: number;
   y_grid: number;
-  // Real-world units (meters)
-  x_m?: number;
-  y_m?: number;
-  width_m?: number;
-  height_m?: number;
+  width_m: number;
+  height_m: number;
 };
 
 export type TableAssignment = {

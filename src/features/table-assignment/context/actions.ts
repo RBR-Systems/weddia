@@ -18,7 +18,7 @@ export type Action =
   | { type: "SET_TABLES"; payload: Table[] }
   | {
       type: "MOVE_TABLE";
-      payload: { tableId: string; x_m: number; y_m: number };
+      payload: { tableId: string; x_grid: number; y_grid: number };
     }
   | { type: "SET_ASSIGNMENTS"; payload: TableAssignment[] }
   | {

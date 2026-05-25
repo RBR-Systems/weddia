@@ -78,10 +78,10 @@ export default memo(function DroppableTableTile({
     data: { tableId: table.table_id, type: "table" },
   });
 
-  const left = (table.x_m ?? 0) * metersToPixels;
-  const top = (table.y_m ?? 0) * metersToPixels;
-  const width = (table.width_m ?? 0) * metersToPixels;
-  const height = (table.height_m ?? 0) * metersToPixels;
+  const left = table.x_grid * metersToPixels;
+  const top = table.y_grid * metersToPixels;
+  const width = table.width_m * metersToPixels;
+  const height = table.height_m * metersToPixels;
 
   const style: CSSProperties = {
     left: `${left}px`,
