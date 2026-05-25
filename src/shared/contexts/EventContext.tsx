@@ -7,6 +7,10 @@ import { EventStatus } from "@/features/events-list/models/enums/eventList.model
 import { apiGet, isAbortError, ApiError } from "@/shared/api/apiClient";
 import { useAuth } from "./AuthContext";
 
+interface ApiMembership {
+  organizationId?: number | null;
+}
+
 interface ApiEvent {
   eventId: number;
   organizationId: number;
@@ -125,7 +129,7 @@ const EventContext = createContext<{
 
 export function EventProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(eventReducer, initialState);
-  const { token } = useAuth();
+  const { token, user, isPlatformAdmin } = useAuth();
 
   // Persist selected event id whenever it changes
   useEffect(() => {
@@ -136,30 +140,61 @@ export function EventProvider({ children }: { children: ReactNode }) {
   }, [state.events.selectedEvent]);
 
   useEffect(() => {
-    if (!token) return;
+    if (!token || !user) return;
     const controller = new AbortController();
-    apiGet<ApiEvent[]>("/api/events", { signal: controller.signal })
-      .then((events) => {
-        const mapped = events.map(mapApiEvent);
-        dispatch({ type: EventActions.SET_ALL_EVENTS, payload: mapped });
-        if (mapped.length > 0) {
-          const savedId = localStorage.getItem(SELECTED_EVENT_KEY);
-          const restoredIdx = savedId
-            ? mapped.findIndex((e) => String(e.id) === savedId)
-            : -1;
-          dispatch({
-            type: EventActions.SET_SELECTED_EVENT,
-            payload: restoredIdx >= 0 ? restoredIdx : 0,
+
+    async function loadEvents() {
+      let allEvents: ApiEvent[];
+
+      if (isPlatformAdmin) {
+        allEvents = await apiGet<ApiEvent[]>("/api/events", { signal: controller.signal });
+      } else {
+        const memberships = await apiGet<ApiMembership[]>(
+          `/api/organizationalteammembers/user/${user!.userId}`,
+          { signal: controller.signal },
+        );
+        const orgIds = [...new Set(memberships.map((m) => m.organizationId).filter(Boolean))] as number[];
+
+        if (orgIds.length === 0) {
+          allEvents = [];
+        } else {
+          const perOrg = await Promise.all(
+            orgIds.map((orgId) =>
+              apiGet<ApiEvent[]>(`/api/events/organization/${orgId}`, { signal: controller.signal }),
+            ),
+          );
+          const seen = new Set<number>();
+          allEvents = perOrg.flat().filter((e) => {
+            if (seen.has(e.eventId)) return false;
+            seen.add(e.eventId);
+            return true;
           });
         }
-      })
-      .catch((err) => {
-        if (isAbortError(err)) return;
-        if (err instanceof ApiError && err.status === 401) return;
-        console.error("Failed to load events:", err);
-      });
+      }
+
+      if (controller.signal.aborted) return;
+      const mapped = allEvents.map(mapApiEvent);
+      dispatch({ type: EventActions.SET_ALL_EVENTS, payload: mapped });
+      if (mapped.length > 0) {
+        const savedId = localStorage.getItem(SELECTED_EVENT_KEY);
+        const restoredIdx = savedId
+          ? mapped.findIndex((e) => String(e.id) === savedId)
+          : -1;
+        dispatch({
+          type: EventActions.SET_SELECTED_EVENT,
+          payload: restoredIdx >= 0 ? restoredIdx : 0,
+        });
+      }
+    }
+
+    loadEvents().catch((err) => {
+      if (isAbortError(err)) return;
+      if (err instanceof ApiError && err.status === 401) return;
+      console.error("Failed to load events:", err);
+    });
+
     return () => controller.abort();
-  }, [token]);
+  }, [token, user, isPlatformAdmin]);
 
   return (
     <EventContext.Provider value={{ state, dispatch }}>
