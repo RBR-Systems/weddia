@@ -172,6 +172,10 @@ export async function deleteTaskApi(taskId: number): Promise<void> {
   await apiDelete(`/api/tasks/${taskId}`);
 }
 
+export async function bulkDeleteTasksApi(taskIds: number[]): Promise<void> {
+  await apiPost("/api/tasks/bulk-delete", { taskIds });
+}
+
 // ── Subtasks ──
 
 export async function fetchSubtasksByTask(taskId: number): Promise<Subtask[]> {

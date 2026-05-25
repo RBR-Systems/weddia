@@ -19,6 +19,7 @@ import {
   updateTaskApi,
   patchTaskStatusApi,
   deleteTaskApi,
+  bulkDeleteTasksApi,
   addAssignmentApi,
   removeAssignmentApi,
 } from "../api/taskApi";
@@ -227,7 +228,7 @@ export const useEventTasks = (): UseEventTasksResult => {
         return updated;
       });
       try {
-        await Promise.all(taskIds.map((id) => deleteTaskApi(Number(id))));
+        await bulkDeleteTasksApi(taskIds.map(Number));
       } catch {
         loadTasks();
       }
