@@ -1,5 +1,5 @@
 "use client";
-import React, { createContext, ReactNode, useContext, useEffect, useReducer } from "react";
+import React, { createContext, ReactNode, useContext, useEffect, useReducer, useState } from "react";
 import { EventContextInterface } from "./InitialState";
 import { EventAction, EventActions } from "./eventActions";
 import { EventCardProps } from "@/features/events-list/models/eventCardProps.models";
@@ -122,14 +122,17 @@ function eventReducer(
 const EventContext = createContext<{
   state: EventContextInterface;
   dispatch: React.Dispatch<EventAction>;
+  userOrgId: number | null;
 }>({
   state: initialState,
   dispatch: () => null,
+  userOrgId: null,
 });
 
 export function EventProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(eventReducer, initialState);
   const { token, user, isPlatformAdmin } = useAuth();
+  const [userOrgId, setUserOrgId] = useState<number | null>(null);
 
   // Persist selected event id whenever it changes
   useEffect(() => {
@@ -154,6 +157,7 @@ export function EventProvider({ children }: { children: ReactNode }) {
           { signal: controller.signal },
         );
         const orgIds = [...new Set(memberships.map((m) => m.organizationId).filter(Boolean))] as number[];
+        setUserOrgId(orgIds[0] ?? null);
 
         if (orgIds.length === 0) {
           allEvents = [];
@@ -197,7 +201,7 @@ export function EventProvider({ children }: { children: ReactNode }) {
   }, [token, user, isPlatformAdmin]);
 
   return (
-    <EventContext.Provider value={{ state, dispatch }}>
+    <EventContext.Provider value={{ state, dispatch, userOrgId }}>
       {children}
     </EventContext.Provider>
   );

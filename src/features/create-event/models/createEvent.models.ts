@@ -21,6 +21,7 @@ export interface CreateEventPayload {
   eventAddress: string;
   budget: number;
   status: string;
+  organizationId?: number | null;
 }
 
 export interface CreateEventResponse {

@@ -8,6 +8,7 @@ import { useEvent } from "@/shared/contexts/EventContext";
 import { EventActions } from "@/shared/contexts/eventActions";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "@/theme/ThemeProvider";
+import { useAuth } from "@/shared/contexts/AuthContext";
 import type { View } from "@/shared/components/AppShell/models/appShell.models";
 
 type NavBarProps = { readonly currentView?: View };
@@ -15,6 +16,7 @@ type NavBarProps = { readonly currentView?: View };
 const NavBarComponent: React.FC<NavBarProps> = () => {
   const { t } = useTranslation();
   const { mode } = useTheme();
+  const { isPlatformAdmin, isOrgAdmin } = useAuth();
   const {
     state: {
       events: { selectedEvent, allEvents },
@@ -61,6 +63,7 @@ const NavBarComponent: React.FC<NavBarProps> = () => {
       <ActionsGroup
         onNewEvent={handleNewEvent}
         newEventLabel={t("common.newEvent")}
+        canCreateEvent={isPlatformAdmin || isOrgAdmin}
       />
     </header>
   );

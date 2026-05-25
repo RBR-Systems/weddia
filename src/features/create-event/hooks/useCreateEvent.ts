@@ -38,6 +38,7 @@ export const useCreateEvent = (): UseCreateEventResult => {
       events: { openCreateOpenModal },
     },
     dispatch,
+    userOrgId,
   } = useEvent();
 
   const handleCancel = () => {
@@ -57,7 +58,7 @@ export const useCreateEvent = (): UseCreateEventResult => {
     try {
       const values = await form.validateFields();
       setSaving(true);
-      const payload = buildCreateEventPayload(values);
+      const payload = buildCreateEventPayload(values, userOrgId);
       const created = await createEvent(payload);
 
       dispatch({

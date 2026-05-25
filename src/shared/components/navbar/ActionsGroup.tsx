@@ -11,13 +11,16 @@ import styles from "./nav-bar.module.css";
 interface ActionsGroupProps {
   readonly onNewEvent: () => void;
   readonly newEventLabel?: React.ReactNode;
+  readonly canCreateEvent?: boolean;
 }
 
-const ActionsGroup: React.FC<ActionsGroupProps> = ({ onNewEvent, newEventLabel }) => (
+const ActionsGroup: React.FC<ActionsGroupProps> = ({ onNewEvent, newEventLabel, canCreateEvent }) => (
   <div className={styles.end}>
-    <Button icon={<PlusOutlined />} size="small" type="primary" onClick={onNewEvent}>
-      {newEventLabel}
-    </Button>
+    {canCreateEvent && (
+      <Button icon={<PlusOutlined />} size="small" type="primary" onClick={onNewEvent}>
+        {newEventLabel}
+      </Button>
+    )}
     <NotificationBell />
     <LanguageSwitcher />
     <ThemeToggle />
