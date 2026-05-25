@@ -1,5 +1,5 @@
 "use client";
-import React, { useCallback, useEffect, useMemo, useReducer, useRef } from "react";
+import React, { useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { useSensor, useSensors, PointerSensor } from "@dnd-kit/core";
 import { App } from "antd";
 import type { MessageInstance } from "antd/es/message/interface";
@@ -35,8 +35,10 @@ export function TableAssignmentProvider({
 
   const emptyState = useMemo(() => createInitialState([], [], [], [], [], INITIAL_METERS_TO_PIXELS), []);
   const [state, dispatch] = useReducer(reducer, emptyState);
+  const [isLoading, setIsLoading] = useState(true);
 
   const reload = useCallback(async () => {
+    setIsLoading(true);
     const controller = new AbortController();
     try {
       const data = await loadTableAssignmentData(eventId, controller.signal);
@@ -44,12 +46,15 @@ export function TableAssignmentProvider({
     } catch (err) {
       if (isAbortError(err)) return;
       console.error("TableAssignmentProvider: failed to load data", err);
+    } finally {
+      setIsLoading(false);
     }
   }, [eventId]);
 
   useEffect(() => {
     const controller = new AbortController();
     async function load() {
+      setIsLoading(true);
       try {
         const data = await loadTableAssignmentData(eventId, controller.signal);
         if (!controller.signal.aborted) {
@@ -58,6 +63,8 @@ export function TableAssignmentProvider({
       } catch (err) {
         if (isAbortError(err)) return;
         console.error("TableAssignmentProvider: failed to load data", err);
+      } finally {
+        if (!controller.signal.aborted) setIsLoading(false);
       }
     }
     load();
@@ -265,11 +272,12 @@ export function TableAssignmentProvider({
     addTable,
     eventId,
     reload,
+    isLoading,
   }), [
     state, dispatch, activeLayout, tablesForActiveLayout, assignmentsByTable,
     guestsById, sensors, relationsById, tableOrder, tablesForActiveLayoutById,
     onDragStart, onDragEnd, onDragCancel, moveGuestSeat, addTable, notifier, getAssignments,
-    eventId, reload,
+    eventId, reload, isLoading,
   ]);
 
   return (

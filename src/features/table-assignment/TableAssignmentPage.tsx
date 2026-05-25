@@ -1,6 +1,6 @@
 "use client";
 import styles from "./TableAssignmentPage.module.css";
-import { App, Card, Empty, Input, Space, Typography, Button, FloatButton, InputNumber, Modal, Form, Select, Tag } from "antd";
+import { App, Card, Empty, Input, Space, Spin, Typography, Button, FloatButton, InputNumber, Modal, Form, Select, Tag } from "antd";
 import { DEFAULT_VENUE_WIDTH_METERS } from "./constants/tableAssignment.constants";
 import { DndContext, DragOverlay, pointerWithin } from "@dnd-kit/core";
 import { TeamOutlined, MessageOutlined, UndoOutlined, PlusOutlined, ZoomOutOutlined, ZoomInOutlined, PlusSquareOutlined } from "@ant-design/icons";
@@ -94,7 +94,19 @@ function TableAssignmentContent() {
 
   const [createLayoutOpen, setCreateLayoutOpen] = useState(false);
   const [createLayoutForm] = Form.useForm();
-  const { eventId, reload } = useTableAssignmentContext();
+  const { eventId, reload, isLoading } = useTableAssignmentContext();
+
+  if (isLoading) {
+    return (
+      <div className={styles.page}>
+        <Card>
+          <div style={{ display: "flex", justifyContent: "center", padding: "48px 0" }}>
+            <Spin size="large" />
+          </div>
+        </Card>
+      </div>
+    );
+  }
 
   if (!activeLayout) {
     return (
