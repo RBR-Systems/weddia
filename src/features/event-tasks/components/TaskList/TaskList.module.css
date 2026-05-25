@@ -179,3 +179,7 @@
   left: 10px;
   z-index: 10;
 }
+
+.selectModeIcon {
+  color: var(--text-color-secondary);
+}

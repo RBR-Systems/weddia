@@ -9,6 +9,7 @@
     },
     "searchPlaceholder": "Buscar tareas...",
     "newTask": "Nueva Tarea",
+    "select": "Seleccionar",
     "bulkDelete": {
       "button": "Eliminar ({{count}})",
       "confirm": "¿Eliminar {{count}} tarea(s)? Esta acción no se puede deshacer."

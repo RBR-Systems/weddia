@@ -87,6 +87,7 @@ const TaskList: React.FC<TaskListProps> = ({
   const [showFilters, setShowFilters] = useState(false);
   const [viewMode, setViewMode] = useState<"cards" | "table">("cards");
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [selectMode, setSelectMode] = useState(false);
   const [filters, setFilters] = useState({
     status: "all",
     priority: "all",
@@ -323,18 +324,20 @@ const TaskList: React.FC<TaskListProps> = ({
         <div className={styles.taskGrid}>
           {groupTasksList.map((task) => (
             <div key={task.task_id} className={styles.selectableCard}>
-              <Checkbox
-                className={styles.cardCheckbox}
-                checked={selectedIds.includes(task.task_id)}
-                onChange={(e) => {
-                  e.nativeEvent.stopImmediatePropagation();
-                  setSelectedIds((prev) =>
-                    e.target.checked
-                      ? [...prev, task.task_id]
-                      : prev.filter((id) => id !== task.task_id),
-                  );
-                }}
-              />
+              {selectMode && (
+                <Checkbox
+                  className={styles.cardCheckbox}
+                  checked={selectedIds.includes(task.task_id)}
+                  onChange={(e) => {
+                    e.nativeEvent.stopImmediatePropagation();
+                    setSelectedIds((prev) =>
+                      e.target.checked
+                        ? [...prev, task.task_id]
+                        : prev.filter((id) => id !== task.task_id),
+                    );
+                  }}
+                />
+              )}
               <TaskCard
                 task={task}
                 onClick={onTaskClick}
@@ -348,10 +351,10 @@ const TaskList: React.FC<TaskListProps> = ({
     );
   };
 
-  const rowSelection = {
+  const rowSelection = selectMode ? {
     selectedRowKeys: selectedIds,
     onChange: (keys: React.Key[]) => setSelectedIds(keys as string[]),
-  };
+  } : undefined;
 
   return (
     <div>
@@ -395,21 +398,33 @@ const TaskList: React.FC<TaskListProps> = ({
               {t("common.filters")}
             </Button>
           </Badge>
-          {selectedIds.length > 0 && (
-            <Popconfirm
-              title={t("tasks.bulkDelete.confirm", { count: selectedIds.length })}
-              onConfirm={() => {
-                onDeleteTasks(selectedIds);
-                setSelectedIds([]);
-              }}
-              okText={t("common.delete")}
-              cancelText={t("common.cancel")}
-              okButtonProps={{ danger: true }}
-            >
-              <Button danger icon={<DeleteOutlined />}>
-                {t("tasks.bulkDelete.button", { count: selectedIds.length })}
+          {selectMode ? (
+            <>
+              {selectedIds.length > 0 && (
+                <Popconfirm
+                  title={t("tasks.bulkDelete.confirm", { count: selectedIds.length })}
+                  onConfirm={() => {
+                    onDeleteTasks(selectedIds);
+                    setSelectedIds([]);
+                    setSelectMode(false);
+                  }}
+                  okText={t("common.delete")}
+                  cancelText={t("common.cancel")}
+                  okButtonProps={{ danger: true }}
+                >
+                  <Button danger icon={<DeleteOutlined />}>
+                    {t("tasks.bulkDelete.button", { count: selectedIds.length })}
+                  </Button>
+                </Popconfirm>
+              )}
+              <Button onClick={() => { setSelectMode(false); setSelectedIds([]); }}>
+                {t("common.cancel")}
               </Button>
-            </Popconfirm>
+            </>
+          ) : (
+            <Button icon={<CheckCircleFilled className={styles.selectModeIcon} />} onClick={() => setSelectMode(true)}>
+              {t("tasks.select")}
+            </Button>
           )}
           <Button type="primary" icon={<PlusOutlined />} onClick={onNewTask}>
             {t("tasks.newTask")}
@@ -588,18 +603,20 @@ const TaskList: React.FC<TaskListProps> = ({
                     <div className={styles.taskGrid}>
                       {groupedTasks.completed.map((task) => (
                         <div key={task.task_id} className={styles.selectableCard}>
-                          <Checkbox
-                            className={styles.cardCheckbox}
-                            checked={selectedIds.includes(task.task_id)}
-                            onChange={(e) => {
-                              e.nativeEvent.stopImmediatePropagation();
-                              setSelectedIds((prev) =>
-                                e.target.checked
-                                  ? [...prev, task.task_id]
-                                  : prev.filter((id) => id !== task.task_id),
-                              );
-                            }}
-                          />
+                          {selectMode && (
+                            <Checkbox
+                              className={styles.cardCheckbox}
+                              checked={selectedIds.includes(task.task_id)}
+                              onChange={(e) => {
+                                e.nativeEvent.stopImmediatePropagation();
+                                setSelectedIds((prev) =>
+                                  e.target.checked
+                                    ? [...prev, task.task_id]
+                                    : prev.filter((id) => id !== task.task_id),
+                                );
+                              }}
+                            />
+                          )}
                           <TaskCard
                             task={task}
                             onClick={onTaskClick}

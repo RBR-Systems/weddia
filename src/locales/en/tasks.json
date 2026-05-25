@@ -9,6 +9,7 @@
     },
     "searchPlaceholder": "Search tasks...",
     "newTask": "New Task",
+    "select": "Select",
     "bulkDelete": {
       "button": "Delete ({{count}})",
       "confirm": "Delete {{count}} task(s)? This action cannot be undone."
