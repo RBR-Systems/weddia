@@ -92,7 +92,7 @@ export async function loadTableAssignmentData(eventId: number, signal: AbortSign
       return {
         table_id: String(t.tableId),
         layout_id: String(t.layoutId),
-        table_number: t.tableNumber,
+        table_number: t.tableNumber ?? undefined,
         total_number: t.numberOfSeats,
         shape: t.shape,
         x_grid: t.xGrid,
@@ -123,4 +123,15 @@ export async function createLayoutApi(eventId: number, name: string, xGridSize: 
 
 export async function updateLayoutApi(layoutId: string, patch: { xGridSize?: number; yGridSize?: number; name?: string; eventId?: number; isActive?: boolean }): Promise<void> {
   await apiPut(`/api/tablelayouts/${layoutId}?adminId=1`, patch);
+}
+
+export async function updateTableApi(
+  tableId: string,
+  opts: { layoutId: number; tableNumber?: number; numberOfSeats: number; shape: string; xGrid: number; yGrid: number; widthM: number; heightM: number },
+): Promise<void> {
+  await apiPut(`/api/eventtables/${tableId}?adminId=1`, opts);
+}
+
+export async function deleteTableApi(tableId: string): Promise<void> {
+  await apiDelete(`/api/eventtables/${tableId}`);
 }

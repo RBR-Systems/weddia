@@ -33,6 +33,7 @@ export type TableLayout = {
 export type Table = {
   table_id: string;
   layout_id: string;
+  table_number?: number;
   total_number: number;
   shape: "round" | "rectangular" | "square" | string;
   x_grid: number;

@@ -50,6 +50,13 @@ export function reducer(state: State, action: Action): State {
         ...state,
         tables: [...state.tables, action.payload],
       };
+    case "UPDATE_TABLE":
+      return {
+        ...state,
+        tables: state.tables.map((t) =>
+          t.table_id === action.payload.table_id ? { ...t, ...action.payload } : t,
+        ),
+      };
     case "REMOVE_TABLE":
       return {
         ...state,

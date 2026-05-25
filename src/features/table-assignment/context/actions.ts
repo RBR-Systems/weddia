@@ -45,4 +45,5 @@ export type Action =
       payload: { guestId: string; tableId: string; seatNumber: number };
     }
   | { type: "ADD_TABLE"; payload: Table }
-  | { type: "REMOVE_TABLE"; payload: string };
+  | { type: "REMOVE_TABLE"; payload: string }
+  | { type: "UPDATE_TABLE"; payload: Partial<Table> & { table_id: string } };
