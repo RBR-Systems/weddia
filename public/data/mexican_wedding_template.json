@@ -208,7 +208,7 @@
       "section_name": "Proveedores",
       "section_order": 2,
       "description": "Contratación y coordinación de proveedores para la boda",
-      "task_count": 50,
+      "task_count": 15,
       "estimated_days_before_wedding": 270,
       "tasks": [
         {
@@ -443,7 +443,7 @@
       "section_name": "Despedida de Soltera",
       "section_order": 3,
       "description": "Organización completa de la despedida de soltera",
-      "task_count": 36,
+      "task_count": 3,
       "estimated_days_before_wedding": 45,
       "tasks": [
         {
@@ -498,7 +498,7 @@
       "section_name": "Getting Ready",
       "section_order": 4,
       "description": "Preparación del día de la boda",
-      "task_count": 9,
+      "task_count": 3,
       "estimated_days_before_wedding": 30,
       "tasks": [
         {
@@ -553,7 +553,7 @@
       "section_name": "Civil",
       "section_order": 7,
       "description": "Ceremonia civil y documentación legal requerida en México",
-      "task_count": 35,
+      "task_count": 8,
       "estimated_days_before_wedding": 90,
       "tasks": [
         {
@@ -683,7 +683,7 @@
       "section_name": "Ceremonia Religiosa",
       "section_order": 8,
       "description": "Ceremonia religiosa católica con tradiciones mexicanas",
-      "task_count": 45,
+      "task_count": 8,
       "estimated_days_before_wedding": 90,
       "tasks": [
         {
@@ -813,7 +813,7 @@
       "section_name": "Extras",
       "section_order": 11,
       "description": "Entretenimiento adicional y tradiciones mexicanas",
-      "task_count": 7,
+      "task_count": 5,
       "estimated_days_before_wedding": 14,
       "tasks": [
         {
