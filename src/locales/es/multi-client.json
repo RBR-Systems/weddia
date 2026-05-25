@@ -1,0 +1,29 @@
+{
+  "multiClient": {
+    "title": "Gestión de Presupuesto Multi-Cliente"
+  },
+  "multiClientView": {
+    "totalClients": "Total de Clientes",
+    "activeWeddings": "Bodas Activas",
+    "totalManaged": "Total Administrado",
+    "needsAttention": "Requiere Atención",
+    "clientBudgets": "Presupuestos de Clientes",
+    "searchClients": "Buscar clientes...",
+    "filterByStatus": "Filtrar por estado",
+    "addClient": "Agregar Cliente",
+    "columns": {
+      "client": "Cliente",
+      "budget": "Presupuesto",
+      "status": "Estado",
+      "expenses": "Gastos",
+      "daysUntil": "Días Restantes",
+      "actions": "Acciones"
+    },
+    "status": {
+      "onTrack": "En Curso",
+      "atRisk": "En Riesgo",
+      "overBudget": "Excede Presupuesto",
+      "completed": "Completado"
+    }
+  }
+}

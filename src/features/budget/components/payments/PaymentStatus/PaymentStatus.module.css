@@ -1,0 +1,86 @@
+.statsRow {
+  margin-bottom: var(--spacing-md);
+}
+
+.statCard {
+  height: 100%;
+  border-left: 3px solid var(--accent-color, var(--primary));
+  transition: box-shadow 0.2s ease;
+}
+
+.statCard:hover {
+  box-shadow: var(--shadow-warm-sm);
+}
+
+.statIcon {
+  font-size: 18px;
+  margin-bottom: 6px;
+}
+
+/* keep legacy class names */
+.paidValue :global(.ant-statistic-content-value) {
+  color: var(--status-completed);
+}
+
+.pendingValue :global(.ant-statistic-content-value) {
+  color: var(--status-delayed);
+}
+
+.overdueValue :global(.ant-statistic-content-value) {
+  color: var(--status-canceled);
+}
+
+.cardExtra {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.statusSelect {
+  width: 130px;
+}
+
+@media (max-width: 480px) {
+  .statusSelect {
+    width: 110px;
+  }
+}
+
+.statusSelectWidth {
+  width: 110px;
+}
+
+.tagNoMargin {
+  margin: 0;
+}
+
+.formSection {
+  margin-top: var(--spacing-sm);
+}
+
+.linkIconOpacity {
+  opacity: 0.45;
+}
+
+.fullWidth {
+  width: 100%;
+}
+
+.smallText {
+  font-size: var(--fs-2xs);
+}
+
+.confirmAmount {
+  font-size: var(--fs-lg);
+  color: var(--status-in-progress);
+}
+
+.expenseDesc {
+  font-weight: 600;
+}
+
+.expenseVendor {
+  font-size: var(--fs-2xs);
+  color: var(--text-color-secondary);
+}

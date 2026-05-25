@@ -1,0 +1,340 @@
+"use client";
+import { useState, useCallback, useMemo } from "react";
+import { App, Card, Row, Col, Button, Select, DatePicker, Space, Table, Divider, Typography } from "antd";
+import { PrinterOutlined, FileExcelOutlined } from "@ant-design/icons";
+import type { ColumnsType } from "antd/es/table";
+import dayjs from "dayjs";
+import { useTranslation } from "react-i18next";
+import { useBudget } from "../../../contexts/BudgetContext";
+import { formatCurrency, formatDate } from "@/shared/utils/formatters.utils";
+import type { Category, Expense, ReportType, CategoriesSummaryProps } from "../../../models/budget.models";
+import { REPORT_TABLE_PAGE_SIZE, REPORT_DATE_FORMAT, REPORT_CATEGORY_CSV_HEADERS } from "../../../constants/budget.constants";
+import { CSV_HEADERS, CSV_MIME_TYPE } from "../../../constants/planner.constants";
+import reportStyles from "./BudgetReports.module.css";
+import Statistic from "@/shared/components/AnimatedStatistic/AnimatedStatistic";
+
+const { RangePicker } = DatePicker;
+const { Title, Text } = Typography;
+
+const CategoriesSummary = ({
+  categories,
+  currency,
+  totalRemaining,
+  totalLabel,
+}: CategoriesSummaryProps) => (
+  <Table.Summary>
+    <Table.Summary.Row>
+      <Table.Summary.Cell index={0}>
+        <Text strong>{totalLabel}</Text>
+      </Table.Summary.Cell>
+      <Table.Summary.Cell index={1} align="right">
+        <Text strong>
+          {formatCurrency(
+            categories.reduce((sum: number, c: Category) => sum + c.allocated, 0),
+            currency,
+          )}
+        </Text>
+      </Table.Summary.Cell>
+      <Table.Summary.Cell index={2} align="right">
+        <Text strong>
+          {formatCurrency(
+            categories.reduce((sum: number, c: Category) => sum + c.spent, 0),
+            currency,
+          )}
+        </Text>
+      </Table.Summary.Cell>
+      <Table.Summary.Cell index={3} align="right">
+        <Text strong>{formatCurrency(totalRemaining, currency)}</Text>
+      </Table.Summary.Cell>
+      <Table.Summary.Cell index={4} />
+    </Table.Summary.Row>
+  </Table.Summary>
+);
+
+
+const percentFormatter = (value: number | string): string => String(value);
+
+export default function ReportsPage() {
+  const { message } = App.useApp();
+  const { state } = useBudget();
+  const { t } = useTranslation();
+  const [reportType, setReportType] = useState<ReportType>("summary");
+  const [dateRange, setDateRange] = useState<[dayjs.Dayjs, dayjs.Dayjs] | null>(
+    null,
+  );
+
+  const currencyFormatter = useCallback(
+    (value: number | string) => formatCurrency(Number(value), state.currency),
+    [state.currency],
+  );
+
+  const categoriesSummary = useCallback(
+    () => (
+      <CategoriesSummary
+        categories={state.categories}
+        currency={state.currency}
+        totalRemaining={state.summary?.total_remaining || 0}
+        totalLabel={t("common.total")}
+      />
+    ),
+    [state.categories, state.currency, state.summary?.total_remaining, t],
+  );
+
+  const filteredExpenses = useMemo(
+    () =>
+      dateRange
+        ? state.expenses.filter((e: Expense) => {
+            const date = dayjs(e.expense_date);
+            return date.isAfter(dateRange[0]) && date.isBefore(dateRange[1]);
+          })
+        : state.expenses,
+    [dateRange, state.expenses],
+  );
+
+  const handleExportCSV = () => {
+    // Create CSV content
+    let csvContent = "";
+
+    if (reportType === "expense") {
+      csvContent = `${CSV_HEADERS.join(',')}\n`;
+      filteredExpenses.forEach((e: Expense) => {
+        const cat = state.categories.find(
+          (c: Category) => c.id === e.category_id,
+        );
+        csvContent += `"${e.description}",${e.amount},"${cat?.name || ""}","${e.vendor_name || ""}","${e.expense_date}","${e.payment_status}"\n`;
+      });
+    } else if (reportType === "category") {
+      csvContent = `${REPORT_CATEGORY_CSV_HEADERS}\n`;
+      state.categories.forEach((c: Category) => {
+        csvContent += `"${c.name}",${c.allocated},${c.spent},${c.allocated - c.spent},${c.expense_count || 0}\n`;
+      });
+    }
+
+    const blob = new Blob([csvContent], { type: CSV_MIME_TYPE });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `budget-report-${reportType}-${dayjs().format(REPORT_DATE_FORMAT)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    message.success(t("reports.exportedCSV"));
+  };
+
+  const handlePrint = () => {
+    globalThis.print();
+    message.success(t("reports.printDialogOpened"));
+  };
+
+  const summaryData = [
+    { label: t("budgetStats.totalBudget"), value: state.summary?.total_budget || 0 },
+    { label: t("budgetStats.totalSpent"), value: state.summary?.total_spent || 0 },
+    { label: t("budgetStats.remaining"), value: state.summary?.total_remaining || 0 },
+    {
+      label: t("budgetStats.spentPercent"),
+      value: `${state.summary?.percentage_spent || 0}%`,
+      isPercent: true,
+    },
+  ];
+
+  const categoryColumns: ColumnsType<Category> = useMemo(
+    () => [
+      { title: t("common.category"), dataIndex: "name", key: "name" },
+      {
+        title: t("budgetCharts.allocated"),
+        dataIndex: "allocated",
+        key: "allocated",
+        render: (v: number) => formatCurrency(v, state.currency),
+        align: "right",
+      },
+      {
+        title: t("budgetCharts.spent"),
+        dataIndex: "spent",
+        key: "spent",
+        render: (v: number) => formatCurrency(v, state.currency),
+        align: "right",
+      },
+      {
+        title: t("budgetStats.remaining"),
+        key: "remaining",
+        render: (_: unknown, record: Category) =>
+          formatCurrency(record.allocated - record.spent, state.currency),
+        align: "right",
+      },
+      {
+        title: t("reports.usagePercent"),
+        key: "usage",
+        render: (_: unknown, record: Category) =>
+          record.allocated > 0
+            ? `${Number.parseFloat(((record.spent / record.allocated) * 100).toFixed(2))}%`
+            : "0%",
+        align: "center",
+      },
+    ],
+    [t, state.currency],
+  );
+
+  const expenseColumns: ColumnsType<Expense> = useMemo(
+    () => [
+      { title: t("common.description"), dataIndex: "description", key: "description" },
+      {
+        title: t("common.amount"),
+        dataIndex: "amount",
+        key: "amount",
+        render: (v: number) => formatCurrency(v, state.currency),
+        align: "right",
+      },
+      {
+        title: t("common.category"),
+        dataIndex: "category_id",
+        key: "category_id",
+        render: (id: string) =>
+          state.categories.find((c: Category) => c.id === id)?.name || id,
+      },
+      {
+        title: t("common.vendor"),
+        dataIndex: "vendor_name",
+        key: "vendor_name",
+        render: (v: string) => v || "—",
+      },
+      {
+        title: t("common.date"),
+        dataIndex: "expense_date",
+        key: "expense_date",
+        render: (v: string) => formatDate(v),
+      },
+      { title: t("common.status"), dataIndex: "payment_status", key: "payment_status" },
+    ],
+    [t, state.currency, state.categories],
+  );
+
+  return (
+    <div className="reports-page">
+      <Card
+        title={t("reports.title")}
+        extra={
+          <Space>
+            <Select
+              value={reportType}
+              onChange={setReportType}
+              className={reportStyles.reportSelect}
+              options={[
+                { value: "summary", label: t("reports.summaryReport") },
+                { value: "category", label: t("reports.categoryReport") },
+                { value: "expense", label: t("reports.expenseReport") },
+              ]}
+            />
+            <RangePicker
+              onChange={(dates) =>
+                setDateRange(dates as [dayjs.Dayjs, dayjs.Dayjs] | null)
+              }
+            />
+            <Button icon={<FileExcelOutlined />} onClick={handleExportCSV}>
+              {t("reports.exportCSV")}
+            </Button>
+            <Button icon={<PrinterOutlined />} onClick={handlePrint}>
+              {t("common.print")}
+            </Button>
+          </Space>
+        }
+      >
+        {/* Summary Report */}
+        {reportType === "summary" && (
+          <>
+            <Title level={4}>{t("reports.budgetSummary")}</Title>
+            <Row gutter={16}>
+              {summaryData.map((item) => (
+                <Col xs={24} sm={12} md={6} key={item.label}>
+                  <Card size="small">
+                    <Statistic
+                      title={item.label}
+                      value={item.isPercent ? item.value : Number(item.value)}
+                      formatter={item.isPercent ? percentFormatter : currencyFormatter}
+                    />
+                  </Card>
+                </Col>
+              ))}
+            </Row>
+
+            <Divider />
+
+            <Title level={5}>{t("reports.categoryBreakdown")}</Title>
+            <Table
+              columns={categoryColumns}
+              dataSource={state.categories}
+              rowKey="id"
+              pagination={false}
+              size="small"
+              summary={categoriesSummary}
+            />
+          </>
+        )}
+
+        {/* Category Report */}
+        {reportType === "category" && (
+          <>
+            <Title level={4}>{t("reports.categoryReport")}</Title>
+            <Table
+              columns={categoryColumns}
+              dataSource={state.categories}
+              rowKey="id"
+              pagination={{ pageSize: REPORT_TABLE_PAGE_SIZE }}
+            />
+          </>
+        )}
+
+        {/* Expense Report */}
+        {reportType === "expense" && (
+          <>
+            <Title level={4}>
+              {t("reports.expenseReport")}
+              {dateRange && (
+                <Text type="secondary" className={reportStyles.dateRangeLabel}>
+                  ({dateRange[0].format("MMM D")} -{" "}
+                  {dateRange[1].format("MMM D, YYYY")})
+                </Text>
+              )}
+            </Title>
+            <Row gutter={16} className={reportStyles.expenseStatsRow}>
+              <Col span={8}>
+                <Statistic
+                  title={t("reports.totalExpenses")}
+                  value={filteredExpenses.length}
+                />
+              </Col>
+              <Col span={8}>
+                <Statistic
+                  title={t("reports.totalAmount")}
+                  value={filteredExpenses.reduce(
+                    (sum: number, e: Expense) => sum + e.amount,
+                    0,
+                  )}
+                  formatter={currencyFormatter}
+                />
+              </Col>
+              <Col span={8}>
+                <Statistic
+                  title={t("reports.avgExpense")}
+                  value={
+                    filteredExpenses.length > 0
+                      ? filteredExpenses.reduce(
+                          (sum: number, e: Expense) => sum + e.amount,
+                          0,
+                        ) / filteredExpenses.length
+                      : 0
+                  }
+                  formatter={currencyFormatter}
+                />
+              </Col>
+            </Row>
+            <Table
+              columns={expenseColumns}
+              dataSource={filteredExpenses}
+              rowKey="expense_id"
+              pagination={{ pageSize: REPORT_TABLE_PAGE_SIZE }}
+            />
+          </>
+        )}
+      </Card>
+    </div>
+  );
+}

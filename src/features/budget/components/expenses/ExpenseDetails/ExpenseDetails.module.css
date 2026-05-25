@@ -1,0 +1,24 @@
+.fullWidth {
+  width: 100%;
+}
+
+.expenseDescription {
+  margin-bottom: var(--spacing-xs);
+}
+
+.expenseAmount {
+  margin: 0;
+  color: var(--status-in-progress);
+}
+
+.receiptLink {
+  word-break: break-all;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.emptyIcon {
+  font-size: var(--fs-3xl);
+  color: var(--text-color-muted);
+}

@@ -1,0 +1,12 @@
+.taskDashboard {
+  padding: var(--spacing-md);
+}
+
+.dashboardTitle {
+  margin-bottom: var(--spacing-md);
+}
+
+.loadingState {
+  padding: 80px;
+  text-align: center;
+}

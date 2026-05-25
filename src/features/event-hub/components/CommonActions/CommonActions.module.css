@@ -1,0 +1,15 @@
+.card {
+  height: 100%;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  margin: 0;
+  padding-left: 1rem;
+}
+
+.listItem {
+  color: var(--text-color-secondary);
+}

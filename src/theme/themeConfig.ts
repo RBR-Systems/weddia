@@ -2,7 +2,6 @@ import type { ThemeConfig } from "antd";
 import {
   FONT_FAMILY,
   FONT_SIZE_BASE,
-  BORDER_RADIUS,
   light,
   dark,
 } from "./tokens";
@@ -75,13 +74,8 @@ function buildTheme(t: typeof light | typeof dark): ThemeConfig {
         algorithm: true,
       },
       Modal: {
-        colorBgContainer: t.cardBg,
         contentBg: t.cardBg,
         headerBg: t.cardBg,
-        colorText: t.text,
-        colorTextHeading: t.text,
-        colorIcon: t.textSecondary,
-        colorIconHover: t.text,
         algorithm: true,
       },
       Table: {

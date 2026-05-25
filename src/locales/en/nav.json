@@ -1,0 +1,21 @@
+{
+  "nav": {
+    "eventPages": "Event Pages",
+    "eventsHub": "Events Hub",
+    "guestList": "Guest List",
+    "budget": "Budget",
+    "budgetCategories": "Budget Categories",
+    "vendorCatalog": "Vendor Catalog",
+    "tableAssignment": "Table Assignment",
+    "schedule": "Schedule",
+    "tasks": "Tasks",
+    "planner": "Planner",
+    "eventsList": "Events List",
+    "multiClient": "Multi-Client Budgets",
+    "option": "Option {{number}}"
+  },
+  "language": {
+    "en": "English",
+    "es": "Español"
+  }
+}

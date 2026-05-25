@@ -1,0 +1,1 @@
+export const VENDOR_CATALOG_PAGE_SIZE = 15;

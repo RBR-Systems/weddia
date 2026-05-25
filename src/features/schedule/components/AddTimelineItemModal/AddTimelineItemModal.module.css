@@ -1,0 +1,153 @@
+/* ── Hero title section ──────────────────────────��───────────────────── */
+.hero {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px 14px;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  bottom: -32px;
+  left: -20px;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  pointer-events: none;
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  top: -28px;
+  right: -20px;
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  pointer-events: none;
+}
+
+.hero :global(.ant-form-item) {
+  margin-bottom: 0;
+}
+
+.hero :global(.ant-form-item-label > label) {
+  font-size: var(--fs-2xs) !important;
+  font-weight: var(--semi-bold-font) !important;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.72) !important;
+}
+
+.hero :global(.ant-form-item-label > label::after) {
+  display: none;
+}
+
+.heroInput :global(.ant-input) {
+  background: transparent !important;
+  border: none !important;
+  border-bottom: 1.5px solid rgba(255, 255, 255, 0.38) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  font-size: 20px !important;
+  font-weight: var(--bold-font) !important;
+  color: #fff !important;
+  padding-left: 0 !important;
+  padding-bottom: 4px !important;
+  letter-spacing: -0.3px;
+}
+
+.heroInput :global(.ant-input:hover),
+.heroInput :global(.ant-input:focus) {
+  border-bottom-color: rgba(255, 255, 255, 0.7) !important;
+  box-shadow: none !important;
+}
+
+.heroInput :global(.ant-input::placeholder) {
+  color: rgba(255, 255, 255, 0.35) !important;
+}
+
+/* ── Section card ────────────────────────────────────────────────────── */
+.section {
+  background: var(--secondary-background);
+  border: 1px solid var(--divider-light);
+  border-radius: var(--radius-lg);
+  padding: 14px 16px 12px;
+  margin-bottom: 12px;
+}
+
+.section :global(.ant-form-item:last-child) {
+  margin-bottom: 0;
+}
+
+.sectionLabel {
+  font-size: var(--fs-2xs);
+  font-weight: var(--semi-bold-font);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-color-secondary);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sectionDivider {
+  border: none;
+  border-top: 1px solid var(--divider-light);
+  margin: 10px 0 12px;
+}
+
+/* ── Two-column grid ─────────────────────────────────────────────────── */
+.twoCol {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* ── Type chip selector ──────────────────────────────────────────────── */
+.chipGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 5px 8px;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--card-border);
+  background: var(--card-background);
+  color: var(--text-color-secondary);
+  font-size: var(--fs-xs);
+  font-weight: var(--medium-font);
+  cursor: pointer;
+  transition: border-color var(--transition-fast), background var(--transition-fast),
+    color var(--transition-fast), transform 0.1s ease;
+  line-height: 1.2;
+  white-space: nowrap;
+  outline: none;
+  width: 100%;
+  text-align: center;
+}
+
+.chip:hover {
+  border-color: var(--primary);
+  color: var(--text-color);
+  transform: translateY(-1px);
+}
+
+.chipActive {
+  border-color: var(--primary) !important;
+  background: var(--primary-background-hover) !important;
+  color: var(--text-color) !important;
+  font-weight: var(--semi-bold-font) !important;
+}

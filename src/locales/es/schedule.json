@@ -1,0 +1,133 @@
+{
+  "schedule": {
+    "title": "Cronograma",
+    "emptyState": "No se encontraron elementos. Agregue elementos para comenzar.",
+    "jumpToNow": "Ir a Ahora",
+    "adjustTimeline": "Ajustar Cronograma",
+    "messages": {
+      "timeNotInRange": "La hora actual no está dentro del rango del cronograma",
+      "setupBeginsSoon": "La preparación de \"{{title}}\" comienza en {{minutes}} minutos",
+      "setupMissed": "La preparación de \"{{title}}\" debería haber comenzado",
+      "markedCompleted": "\"{{title}}\" marcado como completado",
+      "markedDelayed": "\"{{title}}\" marcado como retrasado",
+      "markedCancelled": "\"{{title}}\" cancelado",
+      "statusUpdated": "Estado de \"{{title}}\" actualizado",
+      "itemDeleted": "\"{{title}}\" eliminado",
+      "deleteFailed": "Error al eliminar el elemento",
+      "timelineAdjusted": "Cronograma ajustado",
+      "timelineAdjustedDesc": "{{count}} actividades desplazadas {{minutes}} minutos {{direction}}",
+      "adjustFailed": "Error al aplicar los ajustes",
+      "adjustmentUndone": "Ajuste deshecho"
+    },
+    "warnings": {
+      "lateActivities": "Algunas actividades se programarán muy tarde (después de las 11 PM)",
+      "largeShift": "Gran cambio de horario ({{minutes}} minutos). Por favor verifique que sea correcto."
+    },
+    "noFilteredItems": "No se encontraron elementos {{status}}",
+    "adjustModal": {
+      "title": "Ajustar Cronograma",
+      "timelineRunning": "El cronograma está en curso:",
+      "behind": "Retrasado",
+      "ahead": "Adelantado",
+      "onTime": "A tiempo (restablecer)",
+      "adjustByMinutes": "Ajustar por (minutos):",
+      "minuteShort": "{{count}}m",
+      "applyTo": "Aplicar a:",
+      "allRemaining": "Todas las actividades restantes",
+      "fromCurrent": "Desde la actividad actual en adelante",
+      "fromNext": "Desde la siguiente actividad en adelante",
+      "fromSpecific": "Desde \"{{title}}\" en adelante",
+      "previewChanges": "Vista Previa de Cambios",
+      "itemsWillUpdate": "{{count}} elementos serán actualizados",
+      "applyChanges": "Aplicar Cambios"
+    },
+    "deleteModal": {
+      "title": "¿Eliminar \"{{title}}\"?",
+      "titleFallback": "¿Eliminar elemento?",
+      "gapWarning": "Esto creará un espacio de {{gap}} entre \"{{prev}}\" y \"{{next}}\".",
+      "cascadeShift": "Desplazar los siguientes elementos para cerrar el espacio"
+    },
+    "later": "después",
+    "earlier": "antes",
+    "addModal": {
+      "addTitle": "Agregar Elemento al Cronograma",
+      "editTitle": "Editar Elemento del Cronograma",
+      "title": "Título",
+      "type": "Tipo",
+      "startEndTime": "Hora de Inicio y Fin",
+      "setupTime": "Tiempo de Preparación (opcional)",
+      "locationName": "Nombre del lugar",
+      "locationAddress": "Dirección del lugar",
+      "description": "Descripción",
+      "notes": "Notas",
+      "guestsDescription": "Descripción de invitados",
+      "invalidTime": "Hora inválida",
+      "setupBeforeStart": "El tiempo de preparación debe ser antes de la hora de inicio",
+      "setupTooEarly": "El tiempo de preparación parece muy temprano (más de 12 horas antes). Por favor verifique."
+    },
+    "item": {
+      "setup": "Preparación: {{duration}}",
+      "details": "Detalles",
+      "notesLabel": "Notas: {{notes}}",
+      "passed": "Pasado",
+      "previousStatus": "Estado anterior",
+      "nextStatus": "Siguiente estado",
+      "eventProgress": "Progreso del evento {{percent}}%",
+      "editItem": "Editar",
+      "deleteItem": "Eliminar"
+    },
+    "statusFilter": {
+      "searchPlaceholder": "Buscar en cronograma...",
+      "filterTypes": "Filtrar tipos",
+      "filter": "Filtro:",
+      "addItem": "+ Agregar",
+      "hideCompleted": "Ocultar Completados",
+      "allStatuses": "Todos los Estados"
+    },
+    "progressBar": {
+      "eventProgress": "Progreso del Evento",
+      "completed": "Completados",
+      "inProgress": "En Progreso",
+      "pending": "Pendientes",
+      "delayed": "Retrasados",
+      "cancelled": "Cancelados"
+    },
+    "status": {
+      "pending": "Pendiente",
+      "inProgress": "En Progreso",
+      "completed": "Completado",
+      "delayed": "Retrasado",
+      "cancelled": "Cancelado"
+    },
+    "statusDesc": {
+      "pending": "Aún no iniciado",
+      "inProgress": "Sucediendo actualmente",
+      "completed": "Finalizado exitosamente",
+      "delayed": "Con retraso en el cronograma",
+      "cancelled": "No se realizará"
+    },
+    "duration": {
+      "min": "{{count}} min",
+      "hour": "{{count}} hora",
+      "hours": "{{count}} horas",
+      "minute": "{{count}} minuto",
+      "minutes": "{{count}} minutos",
+      "hoursPlural": "{{count}} horas",
+      "hoursMinutes": "{{hours}}h {{minutes}}m",
+      "invalidTime": "Hora inválida"
+    },
+    "types": {
+      "ceremony": "Ceremonia",
+      "reception": "Recepción",
+      "photos": "Fotos",
+      "entertainment": "Entretenimiento",
+      "mealService": "Servicio de Comida",
+      "speeches": "Discursos",
+      "specialMoment": "Momento Especial",
+      "vendorSetup": "Instalación de Proveedores",
+      "vendorBreakdown": "Desmontaje de Proveedores",
+      "setup": "Preparación",
+      "guestActivity": "Actividad de Invitados"
+    }
+  }
+}

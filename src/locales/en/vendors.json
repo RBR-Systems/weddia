@@ -1,0 +1,105 @@
+{
+  "eventVendors": {
+    "title": "Event Vendors",
+    "assigned": "Assigned",
+    "assignedToEvent": "Assigned to Event",
+    "totalCatalog": "Catalog Vendors",
+    "eventSpending": "Event Spending",
+    "emptyText": "No vendors in catalog. Add vendors from the Vendor Catalog section.",
+    "noVendorsAssigned": "No vendors assigned to this event yet",
+    "cannotUnassign": "Cannot remove vendor — it has expenses associated with this event",
+    "contractStatus": "Contract",
+    "contractStatusValues": {
+      "active": "Active",
+      "contracted": "Contracted",
+      "cancelled": "Cancelled",
+      "completed": "Completed"
+    }
+  },
+  "vendorCatalog": {
+    "title": "Vendor Catalog",
+    "directory": "Vendor Directory",
+    "edit": "Edit Vendor",
+    "deleteConfirm": "Delete this vendor?",
+    "deleteSuccess": "Vendor deleted",
+    "deleteFailed": "Failed to delete vendor",
+    "updateSuccess": "Vendor updated successfully",
+    "updateFailed": "Failed to update vendor",
+    "emptyText": "No vendors yet. Add your first vendor.",
+    "loadFailed": "Failed to load vendors"
+  },
+  "vendorList": {
+    "totalVendors": "Total Vendors",
+    "totalVendorSpending": "Total Vendor Spending",
+    "activeVendors": "Active Vendors",
+    "vendorDirectory": "Vendor Directory",
+    "searchPlaceholder": "Search vendors...",
+    "addVendor": "Add Vendor",
+    "emptyText": "No vendors yet. Add expenses with vendor names.",
+    "vendorAdded": "Vendor added (vendors are auto-created from expenses)",
+    "columns": {
+      "vendor": "Vendor",
+      "contact": "Contact",
+      "expenses": "Expenses",
+      "totalSpent": "Total Spent",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "active": "Active",
+    "inactive": "Inactive",
+    "form": {
+      "vendorName": "Vendor Name",
+      "vendorNamePlaceholder": "Enter vendor name",
+      "contactPerson": "Contact Person",
+      "contactPlaceholder": "Contact name",
+      "email": "Email",
+      "emailPlaceholder": "vendor@example.com",
+      "phone": "Phone",
+      "phonePlaceholder": "+1 (555) 000-0000",
+      "category": "Category",
+      "categoryPlaceholder": "e.g. Catering, Florals, Music",
+      "address": "Address",
+      "addressPlaceholder": "Vendor address",
+      "notes": "Notes",
+      "notesPlaceholder": "Additional notes",
+      "vendorCreated": "Vendor created successfully",
+      "vendorCreateFailed": "Failed to create vendor"
+    }
+  },
+  "vendorDetails": {
+    "title": "Vendor Details",
+    "totalSpent": "Total Spent",
+    "contractedAmount": "Contracted Amount",
+    "contractSection": "Event Contract",
+    "contractStatus": "Status",
+    "contractDate": "Contract Date",
+    "contractNotes": "Notes",
+    "saveContract": "Save Contract",
+    "contractSaved": "Contract saved",
+    "contractSaveFailed": "Failed to save contract",
+    "paid": "Paid",
+    "pending": "Pending",
+    "expenses": "Expenses ({{count}})",
+    "noExpenses": "No expenses from this vendor",
+    "contact": "Contact",
+    "email": "Email",
+    "phone": "Phone",
+    "category": "Category",
+    "columns": {
+      "description": "Description",
+      "amount": "Amount",
+      "date": "Date",
+      "status": "Status"
+    }
+  },
+  "statusBadge": {
+    "onTrack": "On Track",
+    "atRisk": "At Risk",
+    "overBudget": "Over Budget",
+    "notStarted": "Not Started",
+    "paid": "Paid",
+    "pending": "Pending",
+    "overdue": "Overdue",
+    "partial": "Partial"
+  }
+}

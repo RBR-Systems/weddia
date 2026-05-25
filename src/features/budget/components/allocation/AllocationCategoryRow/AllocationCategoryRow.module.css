@@ -1,0 +1,101 @@
+.rowCard {
+  padding: 14px 16px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--card-border);
+  background: var(--card-background);
+  transition: box-shadow 0.2s ease;
+}
+
+.rowCard:hover {
+  box-shadow: var(--shadow-warm-sm);
+}
+
+.categoryRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.categoryLeft {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.categoryDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.categoryRight {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.pctBadge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, var(--category-color, var(--primary)) 14%, transparent);
+  color: var(--category-color, var(--primary));
+  letter-spacing: 0.02em;
+}
+
+.remaining {
+  font-size: var(--fs-2xs);
+  color: var(--text-color-secondary);
+}
+
+.sliderRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sliderWrap {
+  flex: 1;
+  min-width: 0;
+}
+
+.inputWrap {
+  flex-shrink: 0;
+  width: 130px;
+}
+
+@media (max-width: 480px) {
+  .sliderRow {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+  }
+
+  .inputWrap {
+    width: 100%;
+  }
+}
+
+.allocatedFooter {
+  margin-top: 4px;
+  font-size: var(--fs-2xs);
+  color: var(--text-color-tertiary);
+}
+
+/* keep old names so nothing breaks */
+.categoryFooter {
+  display: flex;
+  justify-content: space-between;
+  margin-top: var(--spacing-xs);
+}
+
+.smallText {
+  font-size: var(--fs-2xs);
+}

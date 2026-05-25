@@ -1,0 +1,335 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-ms);
+  width: 100%;
+}
+
+.headerRow {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--spacing-ms);
+}
+
+.headerLeft {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.title {
+  margin: 0 !important;
+}
+
+.contentGrid {
+  display: flex;
+  gap: var(--spacing-ms);
+  min-height: 560px;
+  align-items: stretch;
+}
+
+.canvasCard {
+  height: 100%;
+  flex: 1 1 0%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.tablesCanvas {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+
+  background-image:
+    linear-gradient(0deg, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 20px 20px;
+
+  background-position:
+    top left,
+    top left,
+    center center;
+  background-repeat: repeat, repeat, no-repeat;
+
+  border-radius: var(--radius-md);
+  overflow: auto;
+}
+
+.tableTile {
+  position: absolute;
+  border: 1px solid var(--tile-border);
+  background: linear-gradient(
+    180deg,
+    var(--tile-bg-from),
+    var(--primary-background)
+  );
+  cursor: grab;
+  transition:
+    transform 120ms ease,
+    border-color 120ms ease,
+    box-shadow 120ms ease;
+  pointer-events: auto;
+  z-index: 1;
+  padding: var(--spacing-sm);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.tableTile:active {
+  cursor: grabbing;
+}
+
+.tableTile:hover {
+  transform: translateY(-1px);
+  border-color: var(--tile-hover-border);
+  box-shadow: var(--tile-hover-shadow);
+}
+
+.tableTileSelected {
+  border-color: var(--tile-selected-border);
+  box-shadow: var(--tile-selected-shadow);
+}
+
+.tableTileOver {
+  border-color: var(--tile-over-border);
+  box-shadow: var(--tile-over-shadow);
+}
+
+/* === SHAPES === */
+.tableRound {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  text-align: center;
+}
+
+.tableSquare {
+  width: 120px;
+  height: 120px;
+  border-radius: var(--radius-lg);
+}
+
+.tableRectangular {
+  width: 180px;
+  height: 100px;
+  border-radius: var(--radius-lg);
+}
+
+.tableRound .tableTileHeader {
+  justify-content: center;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.tableRound .tableMeta {
+  text-align: center;
+}
+
+.tableTileHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+}
+
+.occupancyBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.occupancyBadge :global(.ant-badge-count) {
+  font-size: var(--fs-xs);
+  font-weight: var(--bold-font);
+  min-width: 44px;
+  height: 28px;
+  padding: 0 var(--spacing-sm);
+  border-radius: 14px;
+  box-shadow: var(--shadow-sm);
+}
+
+.tableMeta {
+  display: inline-block;
+  margin-top: var(--spacing-xs);
+}
+
+.shapeIcon {
+  display: inline-flex;
+  width: 22px;
+  height: 22px;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  background: var(--subtle-bg);
+}
+
+.shapeIconLarge {
+  display: inline-flex;
+  width: 34px;
+  height: 34px;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-lg);
+  background: var(--subtle-bg);
+}
+
+/* (rest unchanged) */
+.sideCard {
+  height: 100%;
+}
+
+.sideTop {
+  margin-bottom: var(--spacing-sm);
+}
+
+.sideBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-ms);
+  height: calc(100% - 44px);
+}
+
+.sideList {
+  flex: 1;
+  overflow: auto;
+  padding-right: var(--spacing-xs);
+}
+
+.guestRow :global(.ant-list-item-meta-title) {
+  margin-bottom: 2px;
+}
+
+.unassignedDropZone {
+  border: 1px dashed var(--tile-hover-border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-ms);
+  background: var(--subtle-bg-hover);
+}
+
+.dropZoneOver {
+  border-color: var(--tile-selected-border);
+  background: var(--status-in-progress-bg);
+}
+
+.dropZoneHint {
+  display: inline-block;
+  margin-top: var(--spacing-xs);
+}
+
+.draggableGuest {
+  width: 100%;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+}
+
+.dragging {
+  cursor: grabbing;
+  opacity: 0.6;
+}
+
+.dragOverlay {
+  border: 1px solid var(--tile-border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-sm) var(--spacing-ms);
+  background: var(--primary-background);
+  box-shadow: var(--shadow-lg);
+  z-index: 2000;
+  pointer-events: none;
+}
+
+.tableDetailsHeader {
+  padding: var(--spacing-sm) var(--spacing-sm) 0 var(--spacing-sm);
+}
+
+.tableTitle {
+  margin: 0 !important;
+}
+
+@media (max-width: 1100px) {
+  .contentGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.aiChatColumn {
+  height: 100%;
+}
+
+.contentGridFull {
+  height: calc(100vh - 120px);
+  min-height: 560px;
+  display: flex;
+  flex-direction: row;
+  gap: var(--spacing-lg);
+}
+
+.canvasWrapper {
+  width: 100%;
+  height: 100%;
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  position: relative;
+}
+
+.zoomControls {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+}
+
+.floatButtonFixed {
+  right: var(--spacing-xl);
+  bottom: var(--spacing-xl);
+  z-index: 1000;
+}
+
+.aiChatContainer {
+  position: fixed;
+  right: var(--spacing-xl);
+  bottom: 96px;
+  z-index: 1100;
+  width: 400px;
+  max-width: 90vw;
+  height: 520px;
+  box-shadow: var(--shadow-xl);
+  border-radius: var(--radius-lg);
+  background: var(--card-background);
+  display: flex;
+  flex-direction: column;
+}
+
+.aiChatHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-ms);
+  border-bottom: 1px solid var(--divider-light);
+}
+
+.aiChatTitle {
+  font-weight: var(--bold-font);
+  font-size: var(--fs-lg);
+}
+
+.floatButtonClose {
+  box-shadow: none;
+  background: transparent;
+}
+
+.aiChatIcon {
+  margin-right: var(--spacing-sm);
+}
+
+.aiChatContent {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}

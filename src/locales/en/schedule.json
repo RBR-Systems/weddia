@@ -1,0 +1,133 @@
+{
+  "schedule": {
+    "title": "Schedule",
+    "emptyState": "No schedule items found. Add items to get started.",
+    "jumpToNow": "Jump to Now",
+    "adjustTimeline": "Adjust Timeline",
+    "messages": {
+      "timeNotInRange": "Current time is not within the timeline range",
+      "setupBeginsSoon": "Setup for \"{{title}}\" begins in {{minutes}} minutes",
+      "setupMissed": "Setup for \"{{title}}\" should have started",
+      "markedCompleted": "\"{{title}}\" marked as completed",
+      "markedDelayed": "\"{{title}}\" marked as delayed",
+      "markedCancelled": "\"{{title}}\" cancelled",
+      "statusUpdated": "\"{{title}}\" status updated",
+      "itemDeleted": "\"{{title}}\" deleted",
+      "deleteFailed": "Failed to delete item",
+      "timelineAdjusted": "Timeline adjusted",
+      "timelineAdjustedDesc": "{{count}} activities shifted {{minutes}} minutes {{direction}}",
+      "adjustFailed": "Failed to apply adjustments",
+      "adjustmentUndone": "Adjustment undone"
+    },
+    "warnings": {
+      "lateActivities": "Some activities will be scheduled very late (after 11 PM)",
+      "largeShift": "Large time shift ({{minutes}} minutes). Please verify this is correct."
+    },
+    "noFilteredItems": "No {{status}} items found",
+    "adjustModal": {
+      "title": "Adjust Timeline",
+      "timelineRunning": "Timeline is running:",
+      "behind": "Behind",
+      "ahead": "Ahead",
+      "onTime": "On Time (reset)",
+      "adjustByMinutes": "Adjust by (minutes):",
+      "minuteShort": "{{count}}m",
+      "applyTo": "Apply to:",
+      "allRemaining": "All remaining activities",
+      "fromCurrent": "From current activity onward",
+      "fromNext": "From next activity onward",
+      "fromSpecific": "From \"{{title}}\" onward",
+      "previewChanges": "Preview Changes",
+      "itemsWillUpdate": "{{count}} items will be updated",
+      "applyChanges": "Apply Changes"
+    },
+    "deleteModal": {
+      "title": "Delete \"{{title}}\"?",
+      "titleFallback": "Delete item?",
+      "gapWarning": "This will create a gap of {{gap}} between \"{{prev}}\" and \"{{next}}\".",
+      "cascadeShift": "Shift following items earlier to close the gap"
+    },
+    "later": "later",
+    "earlier": "earlier",
+    "addModal": {
+      "addTitle": "Add Timeline Item",
+      "editTitle": "Edit Timeline Item",
+      "title": "Title",
+      "type": "Type",
+      "startEndTime": "Start & End Time",
+      "setupTime": "Setup Time (optional)",
+      "locationName": "Location name",
+      "locationAddress": "Location address",
+      "description": "Description",
+      "notes": "Notes",
+      "guestsDescription": "Guests description",
+      "invalidTime": "Invalid time",
+      "setupBeforeStart": "Setup time must be before start time",
+      "setupTooEarly": "Setup time seems too early (more than 12 hours before). Please verify."
+    },
+    "item": {
+      "setup": "Setup: {{duration}}",
+      "details": "Details",
+      "notesLabel": "Notes: {{notes}}",
+      "passed": "Passed",
+      "previousStatus": "Previous status",
+      "nextStatus": "Next status",
+      "eventProgress": "Event progress {{percent}}%",
+      "editItem": "Edit",
+      "deleteItem": "Delete"
+    },
+    "statusFilter": {
+      "searchPlaceholder": "Search timeline...",
+      "filterTypes": "Filter types",
+      "filter": "Filter:",
+      "addItem": "+ Add",
+      "hideCompleted": "Hide Completed",
+      "allStatuses": "All Statuses"
+    },
+    "progressBar": {
+      "eventProgress": "Event Progress",
+      "completed": "Completed",
+      "inProgress": "In Progress",
+      "pending": "Pending",
+      "delayed": "Delayed",
+      "cancelled": "Cancelled"
+    },
+    "status": {
+      "pending": "Pending",
+      "inProgress": "In Progress",
+      "completed": "Completed",
+      "delayed": "Delayed",
+      "cancelled": "Cancelled"
+    },
+    "statusDesc": {
+      "pending": "Not yet started",
+      "inProgress": "Currently happening",
+      "completed": "Finished successfully",
+      "delayed": "Running behind schedule",
+      "cancelled": "Will not happen"
+    },
+    "duration": {
+      "min": "{{count}} min",
+      "hour": "{{count}} hour",
+      "hours": "{{count}} hours",
+      "minute": "{{count}} minute",
+      "minutes": "{{count}} minutes",
+      "hoursPlural": "{{count}} hours",
+      "hoursMinutes": "{{hours}}h {{minutes}}m",
+      "invalidTime": "Invalid time"
+    },
+    "types": {
+      "ceremony": "Ceremony",
+      "reception": "Reception",
+      "photos": "Photos",
+      "entertainment": "Entertainment",
+      "mealService": "Meal Service",
+      "speeches": "Speeches",
+      "specialMoment": "Special Moment",
+      "vendorSetup": "Vendor Setup",
+      "vendorBreakdown": "Vendor Breakdown",
+      "setup": "Setup",
+      "guestActivity": "Guest Activity"
+    }
+  }
+}

@@ -1,0 +1,170 @@
+.taskListHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+.taskListActions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+.searchInput {
+  max-width: 300px;
+}
+
+.filterRow {
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+  margin-bottom: var(--spacing-md);
+}
+
+.taskGroup {
+  margin-bottom: var(--spacing-lg);
+}
+
+.taskGroupTitle {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+  font-size: var(--fs-lg);
+  font-weight: var(--semi-bold-font);
+}
+
+.taskGroupCount {
+  font-size: var(--fs-xs);
+  opacity: 0.6;
+  font-weight: var(--regular-font);
+}
+
+.taskGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.overdueGroupTitle {
+  color: #ef4444;
+}
+
+.thisWeekGroupTitle {
+  color: #3b82f6;
+}
+
+.nextWeekGroupTitle {
+  color: #8b5cf6;
+}
+
+.laterGroupTitle {
+  color: #6b7280;
+}
+
+.linkButton {
+  padding: 0;
+  height: auto;
+  white-space: normal;
+  text-align: left;
+}
+
+.overdueDate {
+  color: #ef4444;
+  font-weight: 600;
+}
+
+.tableAvatar {
+  font-size: 11px;
+}
+
+.avatarColor0 {
+  background-color: #c9a38c;
+}
+
+.avatarColor1 {
+  background-color: #5b6bc1;
+}
+
+.avatarColor2 {
+  background-color: #5cb68a;
+}
+
+.avatarColor3 {
+  background-color: #d4a29a;
+}
+
+.avatarColor4 {
+  background-color: #f59e0b;
+}
+
+.avatarColor5 {
+  background-color: #8b5cf6;
+}
+
+.completeIcon {
+  color: #22c55e;
+}
+
+.minWidth140 {
+  min-width: 140px;
+}
+
+.minWidth160 {
+  min-width: 160px;
+}
+
+.minWidth180 {
+  min-width: 180px;
+}
+
+.emptyState {
+  padding: var(--spacing-2xl) var(--spacing-md);
+  text-align: center;
+}
+
+.clickableRow {
+  cursor: pointer;
+}
+
+.completedLabel {
+  color: #22c55e;
+}
+
+.visPrivate {
+  color: #ef4444;
+  font-size: var(--fs-xs);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.visPublic {
+  color: #10b981;
+  font-size: var(--fs-xs);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.visShared {
+  color: var(--text-color-secondary);
+  font-size: var(--fs-xs);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+@media (max-width: 768px) {
+  .taskGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .filterRow {
+    flex-direction: column;
+  }
+}

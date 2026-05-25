@@ -1,0 +1,80 @@
+/* ── Vendor name hero ────────────────────────────────────────────────── */
+.amountSection {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px 14px;
+  margin-bottom: 18px;
+  position: relative;
+  overflow: hidden;
+}
+
+.amountSection::after {
+  content: '';
+  position: absolute;
+  top: -24px;
+  right: -24px;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  pointer-events: none;
+}
+
+.amountSection :global(.ant-form-item) {
+  margin-bottom: 0;
+}
+
+.amountSection :global(.ant-form-item-label > label) {
+  font-size: var(--fs-2xs) !important;
+  font-weight: var(--semi-bold-font) !important;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.72) !important;
+}
+
+.amountSection :global(.ant-form-item-label > label::after) {
+  display: none;
+}
+
+/* ── Vendor name input ───────────────────────────────────────────────── */
+.nameInput {
+  background: transparent !important;
+  border: none !important;
+  border-bottom: 1.5px solid rgba(255, 255, 255, 0.38) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  font-size: 22px;
+  font-weight: 700;
+  color: #fff;
+  padding-left: 0 !important;
+}
+
+.nameInput:hover,
+.nameInput:focus-within {
+  border-bottom-color: rgba(255, 255, 255, 0.7) !important;
+  box-shadow: none !important;
+}
+
+/* ── Two-column grid ─────────────────────────────────────────────────── */
+.twoCol {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* ── Section card ────────────────────────────────────────────────────── */
+.paymentSection {
+  background: var(--secondary-background);
+  border: 1px solid var(--divider-light);
+  border-radius: var(--radius-lg);
+  padding: 14px 16px 12px;
+}
+
+.sectionLabel {
+  font-size: var(--fs-2xs);
+  font-weight: var(--semi-bold-font);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-color-secondary);
+  margin-bottom: 10px;
+}

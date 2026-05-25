@@ -1,0 +1,141 @@
+{
+  "eventsHub": {
+    "yearToGo": "Falta 1 año",
+    "startedOn": "Comenzó el {{date}}",
+    "weddingDay": "Día de la boda el {{date}}",
+    "statusInProgress": "Estado en progreso",
+    "status": "Estado: {{status}}",
+    "emptyState": "Selecciona un evento para ver su centro",
+    "event": "Evento {{number}}",
+    "sections": {
+      "statistics": "Estadísticas",
+      "upcomingTasks": "Próximas tareas",
+      "reminders": "Recordatorios",
+      "commonActions": "Acciones comunes"
+    },
+    "statistics": {
+      "date": "Fecha",
+      "location": "Ubicación",
+      "budget": "Presupuesto",
+      "tasks": "Tareas"
+    },
+    "upcomingTasks": {
+      "empty": "Aún no hay tareas registradas",
+      "count_one": "1 tarea registrada para este evento",
+      "count_other": "{{count}} tareas registradas para este evento"
+    },
+    "reminders": {
+      "empty": "Aún no hay recordatorios"
+    }
+  },
+  "eventList": {
+    "title": "Eventos",
+    "subheader": "Centro de Planificación",
+    "columns": {
+      "event": "Evento",
+      "date": "Fecha",
+      "clients": "Clientes",
+      "location": "Ubicación",
+      "invites": "Invitaciones",
+      "rsvp": "RSVP",
+      "tasks": "Tareas",
+      "budget": "Presupuesto",
+      "status": "Estado",
+      "actions": "Acciones"
+    },
+    "editEvent": "Editar Evento",
+    "totalBudget": "Presupuesto Total",
+    "overBudget": "¡Excede el Presupuesto!",
+    "remaining": "Restante",
+    "spent": "Gastado: {{amount}}",
+    "form": {
+      "eventName": "Nombre del evento",
+      "date": "Fecha",
+      "clients": "Clientes",
+      "location": "Ubicación",
+      "invites": "Invitaciones",
+      "rsvp": "RSVP",
+      "tasks": "Tareas",
+      "sits": "Asientos",
+      "budget": "Presupuesto ($)",
+      "spent": "Gastado ($)",
+      "status": "Estado"
+    },
+    "status": {
+      "Not Started": "No Iniciado",
+      "In Progress": "En Progreso",
+      "Completed": "Completado",
+      "Canceled": "Cancelado"
+    }
+  },
+  "createEvent": {
+    "title": "Crear Evento",
+    "closeButton": "Botón de cerrar",
+    "sections": {
+      "eventInfo": "Información del Evento",
+      "details": "Detalles",
+      "clients": "Clientes"
+    },
+    "form": {
+      "eventName": "Nombre del Evento",
+      "eventNamePlaceholder": "Boda de Sara y Miguel",
+      "dateTime": "Fecha y Hora",
+      "dateTimePlaceholder": "Seleccionar fecha y hora",
+      "location": "Ubicación",
+      "locationPlaceholder": "Ubicación",
+      "description": "Descripción",
+      "descriptionPlaceholder": "Dar una breve descripción",
+      "theme": "Tema",
+      "themePlaceholder": "Seleccionar un tema de boda",
+      "budget": "Presupuesto",
+      "comments": "Comentarios",
+      "commentsPlaceholder": "Comentarios sobre el evento"
+    },
+    "clients": {
+      "bride": "Novia",
+      "groom": "Novio",
+      "brideEmail": "Email de la novia",
+      "bridePhone": "Teléfono de la novia",
+      "groomEmail": "Email del novio",
+      "groomPhone": "Teléfono del novio",
+      "email": "Email",
+      "phoneNumber": "Número de Teléfono",
+      "emailRequired": "¡Por favor ingrese el email!",
+      "emailInvalid": "¡Por favor ingrese un email válido!",
+      "phoneRequired": "¡Por favor ingrese el número de teléfono!",
+      "phoneInvalid": "¡Por favor ingrese un número de teléfono válido!"
+    }
+  },
+  "weddingThemes": {
+    "classic": "Clásica y Elegante",
+    "rustic": "Rústica y Campestre",
+    "vintage": "Vintage y Retro",
+    "modern": "Moderna y Minimalista",
+    "bohemian": "Bohemia y Boho",
+    "garden": "Jardín y Exterior",
+    "beach": "Playa y Costera",
+    "industrial": "Industrial y Urbana",
+    "romantic": "Romántica y Suave",
+    "tropical": "Tropical y Exótica",
+    "winter": "País de las Maravillas Invernal",
+    "spring": "Primavera y Floral",
+    "summer": "Verano y Brillante",
+    "autumn": "Otoño y Cálida",
+    "mediterranean": "Mediterránea",
+    "asian": "Asiática y Oriental",
+    "french": "Campiña Francesa",
+    "tuscany": "Toscana e Italiana",
+    "nordic": "Nórdica y Escandinava",
+    "artDeco": "Art Deco y Glamurosa",
+    "barn": "Granero y Granja",
+    "winery": "Bodega y Viñedo",
+    "castle": "Castillo y Cuento de Hadas",
+    "destination": "Boda de Destino",
+    "cultural": "Cultural y Tradicional",
+    "eclectic": "Ecléctica y Única",
+    "luxury": "Lujosa y Opulenta",
+    "intimate": "Íntima y Acogedora",
+    "grand": "Gran y Extravagante",
+    "casual": "Casual y Relajada"
+  }
+}

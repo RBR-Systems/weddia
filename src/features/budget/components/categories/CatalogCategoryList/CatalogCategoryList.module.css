@@ -1,0 +1,75 @@
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.categoryCard {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--divider);
+  background: var(--primary-background);
+  transition: box-shadow 150ms ease, transform 100ms ease;
+}
+
+.categoryCard:hover {
+  box-shadow: var(--shadow-warm-sm);
+  transform: translateY(-1px);
+}
+
+.categoryIcon {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-md);
+  background: rgba(201, 163, 140, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.categoryInfo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.categoryName {
+  font-size: var(--fs-sm);
+  font-weight: var(--semi-bold-font);
+  color: var(--text-color);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.categoryDesc {
+  font-size: var(--fs-xs);
+  color: var(--text-color-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.categoryDescEmpty {
+  font-style: italic;
+}
+
+.categoryActions {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.emptyWrap {
+  padding: var(--spacing-xl) 0;
+  display: flex;
+  justify-content: center;
+}

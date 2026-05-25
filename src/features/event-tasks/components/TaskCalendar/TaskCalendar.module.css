@@ -1,0 +1,123 @@
+.fullWidth {
+  width: 100%;
+}
+
+.calendarHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+.calendarTitle {
+  margin: 0;
+}
+
+.calendarLayout {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-md);
+}
+
+.calendarMain {
+  flex: 1;
+  min-width: 0;
+  max-width: 60%;
+}
+
+.calendarSidebar {
+  width: 380px;
+  flex-shrink: 0;
+}
+
+.calendarCell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.calendarBadge {
+  font-size: 10px;
+}
+
+.calendarDots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+
+.dotOverflowText {
+  font-size: 10px;
+}
+
+.calendarIcon {
+  color: #c9a38c;
+}
+
+.taskRow {
+  cursor: pointer;
+  padding: 8px 0;
+}
+
+.taskRowContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.taskName {
+  font-weight: 500;
+}
+
+.smallTag {
+  margin: 0;
+  font-size: 11px;
+}
+
+.smallAvatar {
+  font-size: 10px;
+}
+
+.completeIcon {
+  color: #22c55e;
+}
+
+.avatarColor0 {
+  background-color: #c9a38c;
+}
+
+.avatarColor1 {
+  background-color: #5b6bc1;
+}
+
+.avatarColor2 {
+  background-color: #5cb68a;
+}
+
+.avatarColor3 {
+  background-color: #d4a29a;
+}
+
+.avatarColor4 {
+  background-color: #f59e0b;
+}
+
+.avatarColor5 {
+  background-color: #8b5cf6;
+}
+
+@media (max-width: 768px) {
+  .calendarLayout {
+    flex-direction: column;
+  }
+
+  .calendarMain {
+    max-width: 100%;
+  }
+
+  .calendarSidebar {
+    width: 100%;
+  }
+}

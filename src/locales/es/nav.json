@@ -1,0 +1,21 @@
+{
+  "nav": {
+    "eventPages": "Páginas de Eventos",
+    "eventsHub": "Centro de Eventos",
+    "guestList": "Lista de invitados",
+    "budget": "Presupuesto",
+    "budgetCategories": "Categorías de Presupuesto",
+    "vendorCatalog": "Catálogo de Proveedores",
+    "tableAssignment": "Asignación de Mesas",
+    "schedule": "Cronograma",
+    "tasks": "Tareas",
+    "planner": "Planificador",
+    "eventsList": "Lista de Eventos",
+    "multiClient": "Presupuestos Multi-Cliente",
+    "option": "Opción {{number}}"
+  },
+  "language": {
+    "en": "English",
+    "es": "Español"
+  }
+}
