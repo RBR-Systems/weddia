@@ -32,6 +32,7 @@ const TaskFormModal: React.FC<TaskFormModalProps> = ({
   const { t } = useTranslation();
   const [form] = Form.useForm();
   const isEdit = Boolean(task);
+  const visibility = Form.useWatch("visibility", form);
 
   useEffect(() => {
     if (open) {
@@ -52,7 +53,7 @@ const TaskFormModal: React.FC<TaskFormModalProps> = ({
     try {
       const values = await form.validateFields();
       const category = categories.find((item) => item.id === values.category_id);
-      const assigneeIds: string[] = values.assignee_ids ?? [];
+      const assigneeIds: string[] = values.visibility === "private" ? [] : (values.assignee_ids ?? []);
       const assignees = assigneeIds.map((userId: string) => {
         const member = members.find((item) => item.user_id === userId);
 
@@ -244,33 +245,35 @@ const TaskFormModal: React.FC<TaskFormModalProps> = ({
           </Form.Item>
         </Space>
 
-        <Form.Item name="assignee_ids" label={t("tasks.form.assignees")}>
-          <Select
-            mode="multiple"
-            placeholder={t("tasks.form.assigneesPlaceholder")}
-            allowClear
-            optionFilterProp="label"
-            options={members.map((member) => ({
-              value: member.user_id,
-              label: member.user_name,
-            }))}
-            optionRender={(option) => {
-              const member = members.find(
-                (item) => item.user_id === option.value,
-              );
+        {visibility !== "private" && (
+          <Form.Item name="assignee_ids" label={t("tasks.form.assignees")}>
+            <Select
+              mode="multiple"
+              placeholder={t("tasks.form.assigneesPlaceholder")}
+              allowClear
+              optionFilterProp="label"
+              options={members.map((member) => ({
+                value: member.user_id,
+                label: member.user_name,
+              }))}
+              optionRender={(option) => {
+                const member = members.find(
+                  (item) => item.user_id === option.value,
+                );
 
-              return (
-                <Space>
-                  <Avatar size={20} className={styles.memberAvatar}>
-                    {member ? getInitials(member.user_name) : "?"}
-                  </Avatar>
-                  <span>{member?.user_name}</span>
-                  <Tag className={styles.memberRoleTag}>{member?.role}</Tag>
-                </Space>
-              );
-            }}
-          />
-        </Form.Item>
+                return (
+                  <Space>
+                    <Avatar size={20} className={styles.memberAvatar}>
+                      {member ? getInitials(member.user_name) : "?"}
+                    </Avatar>
+                    <span>{member?.user_name}</span>
+                    <Tag className={styles.memberRoleTag}>{member?.role}</Tag>
+                  </Space>
+                );
+              }}
+            />
+          </Form.Item>
+        )}
 
 <Form.Item name="notes" label={t("tasks.form.notes")}>
           <TextArea rows={2} />
