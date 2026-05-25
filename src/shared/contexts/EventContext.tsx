@@ -122,17 +122,17 @@ function eventReducer(
 const EventContext = createContext<{
   state: EventContextInterface;
   dispatch: React.Dispatch<EventAction>;
-  userOrgId: number | null;
+  userOrgIds: number[];
 }>({
   state: initialState,
   dispatch: () => null,
-  userOrgId: null,
+  userOrgIds: [],
 });
 
 export function EventProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(eventReducer, initialState);
   const { token, user, isPlatformAdmin } = useAuth();
-  const [userOrgId, setUserOrgId] = useState<number | null>(null);
+  const [userOrgIds, setUserOrgIds] = useState<number[]>([]);
 
   // Persist selected event id whenever it changes
   useEffect(() => {
@@ -157,7 +157,7 @@ export function EventProvider({ children }: { children: ReactNode }) {
           { signal: controller.signal },
         );
         const orgIds = [...new Set(memberships.map((m) => m.organizationId).filter(Boolean))] as number[];
-        setUserOrgId(orgIds[0] ?? null);
+        setUserOrgIds(orgIds);
 
         if (orgIds.length === 0) {
           allEvents = [];
@@ -201,7 +201,7 @@ export function EventProvider({ children }: { children: ReactNode }) {
   }, [token, user, isPlatformAdmin]);
 
   return (
-    <EventContext.Provider value={{ state, dispatch, userOrgId }}>
+    <EventContext.Provider value={{ state, dispatch, userOrgIds }}>
       {children}
     </EventContext.Provider>
   );

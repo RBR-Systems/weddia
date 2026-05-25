@@ -11,6 +11,7 @@ export interface CreateEventFormValues {
   theme?: string;
   budget: number;
   comments?: string;
+  organizationId?: number;
 }
 
 export interface CreateEventPayload {

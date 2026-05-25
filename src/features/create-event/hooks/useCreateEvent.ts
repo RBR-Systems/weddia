@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { App, Form } from "antd";
 import { useTranslation } from "react-i18next";
 import { useEvent } from "@/shared/contexts/EventContext";
@@ -11,12 +11,16 @@ import {
 } from "../utils/createEvent.utils";
 import type { CreateEventFormValues, RequiredMark } from "../models/createEvent.models";
 import { DEFAULT_REQUIRED_MARK } from "../constants/createEvent.constants";
+import { fetchOrganizations } from "@/features/organizations/api/organizationsApi";
+import type { Organization } from "@/features/organizations/models/organizations.models";
+import { useAuth } from "@/shared/contexts/AuthContext";
 
 interface UseCreateEventResult {
   form: ReturnType<typeof Form.useForm<CreateEventFormValues>>[0];
   saving: boolean;
   requiredMark: RequiredMark;
   isOpen: boolean;
+  orgOptions: { value: number; label: string }[];
   handleOk: () => Promise<void>;
   handleCancel: () => void;
   onValuesChange: (
@@ -30,16 +34,30 @@ export const useCreateEvent = (): UseCreateEventResult => {
   const { t } = useTranslation();
   const [form] = Form.useForm<CreateEventFormValues>();
   const [saving, setSaving] = useState(false);
-  const [requiredMark, setRequiredMark] =
-    useState<RequiredMark>(DEFAULT_REQUIRED_MARK);
+  const [requiredMark, setRequiredMark] = useState<RequiredMark>(DEFAULT_REQUIRED_MARK);
+  const [orgs, setOrgs] = useState<Organization[]>([]);
 
+  const { isPlatformAdmin } = useAuth();
   const {
-    state: {
-      events: { openCreateOpenModal },
-    },
+    state: { events: { openCreateOpenModal } },
     dispatch,
-    userOrgId,
+    userOrgIds,
   } = useEvent();
+
+  useEffect(() => {
+    fetchOrganizations()
+      .then((all) => {
+        const filtered = isPlatformAdmin ? all : all.filter((o) => userOrgIds.includes(o.organization_id));
+        setOrgs(filtered);
+      })
+      .catch(() => {});
+  }, [isPlatformAdmin, userOrgIds]);
+
+  useEffect(() => {
+    if (openCreateOpenModal && userOrgIds.length > 0) {
+      form.setFieldValue("organizationId", userOrgIds[0]);
+    }
+  }, [openCreateOpenModal, userOrgIds, form]);
 
   const handleCancel = () => {
     dispatch({ type: EventActions.SET_OPEN_CREATE_EVENT_MODAL, payload: false });
@@ -58,7 +76,7 @@ export const useCreateEvent = (): UseCreateEventResult => {
     try {
       const values = await form.validateFields();
       setSaving(true);
-      const payload = buildCreateEventPayload(values, userOrgId);
+      const payload = buildCreateEventPayload(values);
       const created = await createEvent(payload);
 
       dispatch({
@@ -92,11 +110,14 @@ export const useCreateEvent = (): UseCreateEventResult => {
     }
   };
 
+  const orgOptions = orgs.map((o) => ({ value: o.organization_id, label: o.name }));
+
   return {
     form,
     saving,
     requiredMark,
     isOpen: openCreateOpenModal,
+    orgOptions,
     handleOk,
     handleCancel,
     onValuesChange,

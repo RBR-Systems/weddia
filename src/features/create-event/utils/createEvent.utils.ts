@@ -37,7 +37,6 @@ export const formatEventDate = (isoDate: string): string =>
 
 export const buildCreateEventPayload = (
   values: CreateEventFormValues,
-  organizationId?: number | null,
 ): CreateEventPayload => {
   const isoDate = values.eventDate
     ? values.eventDate.toISOString()
@@ -51,6 +50,6 @@ export const buildCreateEventPayload = (
     eventAddress: values.eventAddress ?? "",
     budget: values.budget ?? 0,
     status: CREATE_EVENT_DEFAULT_STATUS,
-    organizationId: organizationId ?? null,
+    organizationId: values.organizationId ?? null,
   };
 };

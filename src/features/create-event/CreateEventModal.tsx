@@ -1,4 +1,5 @@
 "use client";
+import { ApartmentOutlined } from "@ant-design/icons";
 import { DatePicker, Form, Input, InputNumber, Modal, Select } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import { DollarOutlined, EditOutlined, PushpinOutlined } from "@ant-design/icons";
@@ -19,6 +20,7 @@ const CreateEventModal = () => {
     saving,
     requiredMark,
     isOpen,
+    orgOptions,
     handleOk,
     handleCancel,
     onValuesChange,
@@ -45,6 +47,21 @@ const CreateEventModal = () => {
           requiredMark={requiredMark}
         >
           <FormSection title={t("createEvent.sections.eventInfo")}>
+            {orgOptions.length > 0 && (
+              <Form.Item
+                label={t("organizations.title")}
+                name="organizationId"
+                rules={[{ required: true }]}
+              >
+                <Select
+                  options={orgOptions}
+                  placeholder={t("organizations.title")}
+                  prefix={<ApartmentOutlined />}
+                  showSearch
+                  optionFilterProp="label"
+                />
+              </Form.Item>
+            )}
             <Form.Item
               label={t("createEvent.form.eventName")}
               name="eventName"
