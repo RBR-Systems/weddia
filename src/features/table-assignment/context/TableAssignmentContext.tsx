@@ -174,6 +174,37 @@ export function TableAssignmentProvider({
   const moveGuestSeat = useMoveGuestSeat({ notifier, guestsById, tablesForActiveLayout, seatsFitAt, persistAssignment, getAssignments, dispatch });
   const addTable = useAddTable({ activeLayout, getTables, dispatch });
 
+  const updateTable = useCallback(async (tableId: string, opts: { shape: string; seats: number; xGrid: number; yGrid: number; widthM: number; heightM: number }) => {
+    const tbl = stateRef.current.tables.find((t: Table) => t.table_id === tableId);
+    if (!tbl) return;
+    dispatch({ type: "UPDATE_TABLE", payload: {
+      table_id: tableId,
+      total_number: opts.seats,
+      shape: opts.shape,
+      x_grid: opts.xGrid,
+      y_grid: opts.yGrid,
+      width_m: opts.widthM,
+      height_m: opts.heightM,
+    }});
+    await updateTableApi(tableId, {
+      layoutId: Number(tbl.layout_id),
+      tableNumber: tbl.table_number,
+      numberOfSeats: opts.seats,
+      shape: opts.shape,
+      xGrid: opts.xGrid,
+      yGrid: opts.yGrid,
+      widthM: opts.widthM,
+      heightM: opts.heightM,
+    }).catch((e) => console.error("[updateTable] failed:", e));
+  }, [dispatch]);
+
+  const deleteTable = useCallback(async (tableId: string) => {
+    const assignments = stateRef.current.assignments.filter((a: TableAssignment) => a.table_id === tableId);
+    await Promise.all(assignments.map(deleteAssignment));
+    dispatch({ type: "REMOVE_TABLE", payload: tableId });
+    await deleteTableApi(tableId).catch((e) => console.error("[deleteTable] failed:", e));
+  }, [dispatch]);
+
   const { onDragStart, onDragEnd, onDragCancel } = useDragHandlers({
     dispatch,
     stateRef,
@@ -288,42 +319,15 @@ export function TableAssignmentProvider({
     tablesForActiveLayoutById,
     messageApi: notifier,
     addTable,
-    updateTable: useCallback(async (tableId: string, opts: { shape: string; seats: number; xGrid: number; yGrid: number; widthM: number; heightM: number }) => {
-      const tbl = stateRef.current.tables.find((t: import("../models/tableAssignment.models").Table) => t.table_id === tableId);
-      if (!tbl) return;
-      dispatch({ type: "UPDATE_TABLE", payload: {
-        table_id: tableId,
-        total_number: opts.seats,
-        shape: opts.shape,
-        x_grid: opts.xGrid,
-        y_grid: opts.yGrid,
-        width_m: opts.widthM,
-        height_m: opts.heightM,
-      }});
-      await updateTableApi(tableId, {
-        layoutId: Number(tbl.layout_id),
-        tableNumber: tbl.table_number,
-        numberOfSeats: opts.seats,
-        shape: opts.shape,
-        xGrid: opts.xGrid,
-        yGrid: opts.yGrid,
-        widthM: opts.widthM,
-        heightM: opts.heightM,
-      }).catch((e) => console.error("[updateTable] failed:", e));
-    }, [dispatch]),
-    deleteTable: useCallback(async (tableId: string) => {
-      const assignments = stateRef.current.assignments.filter((a: import("../models/tableAssignment.models").TableAssignment) => a.table_id === tableId);
-      await Promise.all(assignments.map(deleteAssignment));
-      dispatch({ type: "REMOVE_TABLE", payload: tableId });
-      await deleteTableApi(tableId).catch((e) => console.error("[deleteTable] failed:", e));
-    }, [dispatch]),
+    updateTable,
+    deleteTable,
     eventId,
     reload,
     isLoading,
   }), [
     state, dispatch, activeLayout, tablesForActiveLayout, assignmentsByTable,
     guestsById, sensors, relationsById, tableOrder, tablesForActiveLayoutById,
-    onDragStart, onDragEnd, onDragCancel, moveGuestSeat, addTable, notifier, getAssignments,
+    onDragStart, onDragEnd, onDragCancel, moveGuestSeat, addTable, updateTable, deleteTable, notifier, getAssignments,
     eventId, reload, isLoading,
   ]);
 
