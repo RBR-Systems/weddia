@@ -71,9 +71,9 @@ const TemplateSelector: React.FC<TemplateSelectorProps> = ({ eventDate, onApply 
       name: "Plantilla de Boda Mexicana",
       flag: "🇲🇽",
       description: t("tasks.template.mexicanDesc"),
-      total_tasks: mexicanTemplate?.template_metadata.total_tasks ?? 201,
-      required_tasks: mexicanTemplate?.template_metadata.required_tasks ?? 171,
-      optional_tasks: mexicanTemplate?.template_metadata.optional_tasks ?? 30,
+      total_tasks: mexicanTemplate?.template_metadata.total_tasks ?? 54,
+      required_tasks: mexicanTemplate?.template_metadata.required_tasks ?? 48,
+      optional_tasks: mexicanTemplate?.template_metadata.optional_tasks ?? 6,
       sections: mexicanTemplate?.sections.length ?? 11,
       highlights: [
         t("tasks.template.feature1"),
