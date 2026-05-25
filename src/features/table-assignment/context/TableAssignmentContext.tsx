@@ -36,6 +36,17 @@ export function TableAssignmentProvider({
   const emptyState = useMemo(() => createInitialState([], [], [], [], [], INITIAL_METERS_TO_PIXELS), []);
   const [state, dispatch] = useReducer(reducer, emptyState);
 
+  const reload = useCallback(async () => {
+    const controller = new AbortController();
+    try {
+      const data = await loadTableAssignmentData(eventId, controller.signal);
+      dispatch({ type: "INIT_DATA", payload: data });
+    } catch (err) {
+      if (isAbortError(err)) return;
+      console.error("TableAssignmentProvider: failed to load data", err);
+    }
+  }, [eventId]);
+
   useEffect(() => {
     const controller = new AbortController();
     async function load() {
@@ -252,10 +263,13 @@ export function TableAssignmentProvider({
     tablesForActiveLayoutById,
     messageApi: notifier,
     addTable,
+    eventId,
+    reload,
   }), [
     state, dispatch, activeLayout, tablesForActiveLayout, assignmentsByTable,
     guestsById, sensors, relationsById, tableOrder, tablesForActiveLayoutById,
     onDragStart, onDragEnd, onDragCancel, moveGuestSeat, addTable, notifier, getAssignments,
+    eventId, reload,
   ]);
 
   return (

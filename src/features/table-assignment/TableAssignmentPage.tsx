@@ -1,6 +1,6 @@
 "use client";
 import styles from "./TableAssignmentPage.module.css";
-import { App, Card, Empty, Space, Typography, Button, FloatButton, InputNumber, Modal, Form, Select, Tag } from "antd";
+import { App, Card, Empty, Input, Space, Typography, Button, FloatButton, InputNumber, Modal, Form, Select, Tag } from "antd";
 import { DEFAULT_VENUE_WIDTH_METERS } from "./constants/tableAssignment.constants";
 import { DndContext, DragOverlay, pointerWithin } from "@dnd-kit/core";
 import { TeamOutlined, MessageOutlined, UndoOutlined, PlusOutlined, ZoomOutOutlined, ZoomInOutlined, PlusSquareOutlined } from "@ant-design/icons";
@@ -92,12 +92,60 @@ function TableAssignmentContent() {
   }, [tablesForActiveLayout.length, handleZoomFit]);
   const [addTableForm] = Form.useForm();
 
+  const [createLayoutOpen, setCreateLayoutOpen] = useState(false);
+  const [createLayoutForm] = Form.useForm();
+  const { eventId, reload } = useTableAssignmentContext();
+
   if (!activeLayout) {
     return (
       <div className={styles.page}>
         <Card>
-          <Empty description={t("tableAssignment.emptyState")} />
+          <Empty description={t("tableAssignment.emptyState")}>
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={() => setCreateLayoutOpen(true)}
+            >
+              {t("tableAssignment.createLayout", "Create Layout")}
+            </Button>
+          </Empty>
         </Card>
+        <Modal
+          title={t("tableAssignment.createLayout", "Create Layout")}
+          open={createLayoutOpen}
+          onCancel={() => { setCreateLayoutOpen(false); createLayoutForm.resetFields(); }}
+          onOk={() => createLayoutForm.submit()}
+          okText={t("common.create", "Create")}
+        >
+          <Form
+            form={createLayoutForm}
+            layout="vertical"
+            initialValues={{ name: "", xGridSize: 20, yGridSize: 15 }}
+            onFinish={async (values) => {
+              try {
+                const { createLayoutApi } = await import("./api/tableAssignmentApi");
+                await createLayoutApi(eventId, values.name, values.xGridSize, values.yGridSize);
+                setCreateLayoutOpen(false);
+                createLayoutForm.resetFields();
+                await reload();
+              } catch {
+                // error handled silently
+              }
+            }}
+          >
+            <Form.Item name="name" label={t("tableAssignment.layoutName", "Layout name")} rules={[{ required: true }]}>
+              <Input placeholder={t("tableAssignment.layoutNamePlaceholder", "e.g. Main Hall")} />
+            </Form.Item>
+            <Space style={{ width: "100%" }}>
+              <Form.Item name="xGridSize" label={t("tableAssignment.gridWidth", "Grid width")} style={{ flex: 1 }}>
+                <InputNumber min={5} max={50} style={{ width: "100%" }} />
+              </Form.Item>
+              <Form.Item name="yGridSize" label={t("tableAssignment.gridHeight", "Grid height")} style={{ flex: 1 }}>
+                <InputNumber min={5} max={50} style={{ width: "100%" }} />
+              </Form.Item>
+            </Space>
+          </Form>
+        </Modal>
       </div>
     );
   }

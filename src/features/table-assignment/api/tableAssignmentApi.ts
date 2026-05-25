@@ -1,4 +1,4 @@
-import { apiGet, apiDelete } from "@/shared/api/apiClient";
+import { apiGet, apiPost, apiDelete } from "@/shared/api/apiClient";
 import { fetchGuests, fetchRelations } from "@/shared/api/guestApi";
 import type { TableLayout, Table, TableAssignment } from "../models/tableAssignment.models";
 import type { Guest as GuestListGuest } from "../../guest-list/models/guestList.models";
@@ -101,4 +101,14 @@ export async function loadTableAssignmentData(eventId: number, signal: AbortSign
   }
 
   return { guests, relations, layouts: mappedLayouts, tables: tablesRaw, assignments: assignmentsRaw };
+}
+
+export async function createLayoutApi(eventId: number, name: string, xGridSize: number, yGridSize: number): Promise<ApiLayout> {
+  return apiPost<ApiLayout>("/api/tablelayouts?adminId=1", {
+    eventId,
+    name,
+    xGridSize,
+    yGridSize,
+    isActive: true,
+  });
 }
