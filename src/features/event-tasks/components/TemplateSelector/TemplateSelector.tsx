@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import {
+  Alert,
   Button,
   Card,
   Col,
@@ -379,6 +380,13 @@ const TemplateSelector: React.FC<TemplateSelectorProps> = ({ eventDate, onApply 
                 <Text type="secondary" className={styles.helperText}>
                   {t("tasks.template.weddingDateHelp")}
                 </Text>
+                {weddingDate && weddingDate.isBefore(dayjs(), "day") && (
+                  <Alert
+                    type="warning"
+                    showIcon
+                    message={t("tasks.template.pastDateWarning")}
+                  />
+                )}
               </Space>
             </Card>
 

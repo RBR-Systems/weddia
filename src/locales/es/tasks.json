@@ -152,6 +152,7 @@
       "weddingDate": "Fecha de tu boda",
       "weddingDatePlaceholder": "Selecciona la fecha de boda",
       "weddingDateHelp": "Las tareas se programarán automáticamente basadas en esta fecha",
+      "pastDateWarning": "La fecha del evento ya pasó. Las tareas generadas tendrán fechas en el pasado.",
       "includeOptional": "Incluir tareas opcionales",
       "includeOptionalDesc": "Agrega extras como cabina fotográfica, mariachi, pirotecnia, etc.",
       "tasks": "tareas",

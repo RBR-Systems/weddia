@@ -152,6 +152,7 @@
       "weddingDate": "Your wedding date",
       "weddingDatePlaceholder": "Select wedding date",
       "weddingDateHelp": "Tasks will be automatically scheduled based on this date",
+      "pastDateWarning": "The event date has already passed. Generated tasks will have dates in the past.",
       "includeOptional": "Include optional tasks",
       "includeOptionalDesc": "Adds extras like photo booth, mariachi, fireworks, etc.",
       "tasks": "tasks",
