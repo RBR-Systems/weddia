@@ -92,19 +92,28 @@ export default function ReportsPage() {
   );
 
   const handleExportCSV = () => {
-    // Create CSV content
     let csvContent = "";
 
     if (reportType === "expense") {
-      csvContent = `${CSV_HEADERS.join(',')}\n`;
+      csvContent = `${CSV_HEADERS.join(",")}\n`;
       filteredExpenses.forEach((e: Expense) => {
-        const cat = state.categories.find(
-          (c: Category) => c.id === e.category_id,
-        );
+        const cat = state.categories.find((c: Category) => c.id === e.category_id);
         csvContent += `"${e.description}",${e.amount},"${cat?.name || ""}","${e.vendor_name || ""}","${e.expense_date}","${e.payment_status}"\n`;
       });
     } else if (reportType === "category") {
       csvContent = `${REPORT_CATEGORY_CSV_HEADERS}\n`;
+      state.categories.forEach((c: Category) => {
+        csvContent += `"${c.name}",${c.allocated},${c.spent},${c.allocated - c.spent},${c.expense_count || 0}\n`;
+      });
+    } else {
+      // summary
+      csvContent = "Metric,Value\n";
+      csvContent += `"Total Budget",${state.summary?.total_budget || 0}\n`;
+      csvContent += `"Total Spent",${state.summary?.total_spent || 0}\n`;
+      csvContent += `"Remaining",${state.summary?.total_remaining || 0}\n`;
+      csvContent += `"% Spent",${state.summary?.percentage_spent || 0}%\n`;
+      csvContent += "\n";
+      csvContent += `${REPORT_CATEGORY_CSV_HEADERS}\n`;
       state.categories.forEach((c: Category) => {
         csvContent += `"${c.name}",${c.allocated},${c.spent},${c.allocated - c.spent},${c.expense_count || 0}\n`;
       });
@@ -115,8 +124,10 @@ export default function ReportsPage() {
     const a = document.createElement("a");
     a.href = url;
     a.download = `budget-report-${reportType}-${dayjs().format(REPORT_DATE_FORMAT)}.csv`;
+    document.body.appendChild(a);
     a.click();
-    URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 100);
     message.success(t("reports.exportedCSV"));
   };
 
