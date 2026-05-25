@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Spin } from "antd";
+import { Result, Spin } from "antd";
 import { useAuth } from "@/shared/contexts/AuthContext";
 import LoginPage from "@/features/auth/LoginPage";
 import AppShell from "@/shared/components/AppShell/AppShell";
@@ -15,6 +15,12 @@ import GuestList from "@/features/guest-list/GuestList";
 import BudgetCategoriesPage from "@/features/budget/BudgetCategoriesPage";
 import EventTasksDashboard from "@/features/event-tasks/EventTasksDashboard";
 import VendorCatalog from "@/features/vendors/VendorCatalog";
+import OrganizationsPage from "@/features/organizations/OrganizationsPage";
+import TeamPage from "@/features/team/TeamPage";
+
+function Unauthorized() {
+  return <Result status="403" title="403" subTitle="No tienes permiso para acceder a esta sección." />;
+}
 
 const VALID_VIEWS = new Set([
   "events-hub",
@@ -27,6 +33,8 @@ const VALID_VIEWS = new Set([
   "events-list",
   "multi-client",
   "tasks",
+  "organizations",
+  "team",
 ]);
 
 const DEFAULT_VIEW = "events-list";
@@ -38,7 +46,7 @@ function getViewFromPath(): string {
 }
 
 export default function Home() {
-  const { token, isLoading } = useAuth();
+  const { token, isLoading, isPlatformAdmin, isOrgAdmin } = useAuth();
   const [currentView, setCurrentView] = useState(DEFAULT_VIEW);
 
   // Sync URL → view on mount + back/forward
@@ -78,6 +86,10 @@ export default function Home() {
         return <VendorCatalog />;
       case "tasks":
         return <EventTasksDashboard />;
+      case "organizations":
+        return isPlatformAdmin ? <OrganizationsPage /> : <Unauthorized />;
+      case "team":
+        return isOrgAdmin ? <TeamPage /> : <Unauthorized />;
       default:
         return <EventsHub />;
     }

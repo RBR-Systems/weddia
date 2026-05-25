@@ -23,6 +23,8 @@ interface AuthContextValue {
   token: string | null;
   isLoading: boolean;
   sessionExpired: boolean;
+  isPlatformAdmin: boolean;
+  isOrgAdmin: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
 }
@@ -72,9 +74,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(null);
   };
 
+  const isPlatformAdmin = user?.userType === "platform_admin";
+  const isOrgAdmin = isPlatformAdmin || (user?.isOrgAdmin ?? false);
+
   return (
     <AuthContext.Provider
-      value={{ user, token, isLoading, sessionExpired, login, logout }}
+      value={{ user, token, isLoading, sessionExpired, isPlatformAdmin, isOrgAdmin, login, logout }}
     >
       {children}
     </AuthContext.Provider>

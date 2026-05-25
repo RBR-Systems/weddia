@@ -8,6 +8,8 @@ export interface AuthUser {
   email: string;
   firstName: string;
   lastName: string;
+  userType: string;
+  isOrgAdmin: boolean;
 }
 
 export interface AuthResponse {

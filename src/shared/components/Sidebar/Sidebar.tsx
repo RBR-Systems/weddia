@@ -1,7 +1,7 @@
 "use client";
 import { useMemo, type ReactNode } from "react";
 import { Tooltip, Avatar } from "antd";
-import { TeamOutlined, AppstoreOutlined, DollarOutlined, TagsOutlined, UnorderedListOutlined, MenuFoldOutlined, MenuUnfoldOutlined, LogoutOutlined, CalendarOutlined, ShopOutlined, CheckSquareOutlined } from "@ant-design/icons";
+import { TeamOutlined, AppstoreOutlined, DollarOutlined, TagsOutlined, UnorderedListOutlined, MenuFoldOutlined, MenuUnfoldOutlined, LogoutOutlined, CalendarOutlined, ShopOutlined, CheckSquareOutlined, ApartmentOutlined, UsergroupAddOutlined } from "@ant-design/icons";
 import { useAuth } from "@/shared/contexts/AuthContext";
 import { useTranslation } from "react-i18next";
 import styles from "./Sidebar.module.css";
@@ -12,6 +12,8 @@ interface NavItem {
   key: View;
   icon: ReactNode;
   label: string;
+  dividerBefore?: boolean;
+  adminOnly?: boolean;
 }
 
 interface SidebarProps {
@@ -27,7 +29,7 @@ export default function Sidebar({
   onNavigate,
   onToggle,
 }: SidebarProps) {
-  const { user, logout } = useAuth();
+  const { user, logout, isPlatformAdmin, isOrgAdmin } = useAuth();
   const { t } = useTranslation();
 
   const navItems = useMemo<NavItem[]>(
@@ -60,9 +62,28 @@ export default function Sidebar({
         icon: <CheckSquareOutlined />,
         label: t("nav.tasks"),
       },
+      {
+        key: "organizations",
+        icon: <ApartmentOutlined />,
+        label: t("nav.organizations"),
+        dividerBefore: true,
+        adminOnly: true,
+      },
+      {
+        key: "team",
+        icon: <UsergroupAddOutlined />,
+        label: t("nav.team"),
+        adminOnly: true,
+      },
     ],
     [t],
   );
+
+  const visibleNavItems = navItems.filter((item) => {
+    if (!item.adminOnly) return true;
+    if (item.key === "team") return isOrgAdmin;
+    return isPlatformAdmin;
+  });
 
   const initials = useMemo(() => {
     if (!user) return "?";
@@ -94,7 +115,7 @@ export default function Sidebar({
         aria-label={t("nav.primary", "Main navigation")}
       >
         <ul className={styles.navList}>
-          {navItems.map((item) => {
+          {visibleNavItems.map((item) => {
             const isActive = currentView === item.key;
 
             const btn = (
@@ -112,6 +133,9 @@ export default function Sidebar({
 
             return (
               <li key={item.key} className={styles.navListItem}>
+                {item.dividerBefore && (
+                  <div style={{ borderTop: "1px solid var(--divider)", margin: "6px 0" }} />
+                )}
                 {collapsed ? (
                   <Tooltip title={item.label} placement="right">
                     {btn}

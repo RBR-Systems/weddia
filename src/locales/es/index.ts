@@ -5,6 +5,7 @@ import events from "./events.json";
 import guestList from "./guest-list.json";
 import multiClient from "./multi-client.json";
 import nav from "./nav.json";
+import organizations from "./organizations.json";
 import schedule from "./schedule.json";
 import tableAssignment from "./table-assignment.json";
 import tasks from "./tasks.json";
@@ -18,6 +19,7 @@ export const es = {
   ...guestList,
   ...multiClient,
   ...nav,
+  ...organizations,
   ...schedule,
   ...tableAssignment,
   ...tasks,
