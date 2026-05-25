@@ -1,4 +1,4 @@
-import { apiGet, apiPost, apiDelete } from "@/shared/api/apiClient";
+import { apiGet, apiPost, apiPut, apiDelete } from "@/shared/api/apiClient";
 import { fetchGuests, fetchRelations } from "@/shared/api/guestApi";
 import type { TableLayout, Table, TableAssignment } from "../models/tableAssignment.models";
 import type { Guest as GuestListGuest } from "../../guest-list/models/guestList.models";
@@ -111,4 +111,8 @@ export async function createLayoutApi(eventId: number, name: string, xGridSize: 
     yGridSize,
     isActive: true,
   });
+}
+
+export async function updateLayoutApi(layoutId: string, patch: { xGridSize?: number; yGridSize?: number; name?: string; eventId?: number; isActive?: boolean }): Promise<void> {
+  await apiPut(`/api/tablelayouts/${layoutId}?adminId=1`, patch);
 }

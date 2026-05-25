@@ -12,7 +12,7 @@ import { apiDelete } from "@/shared/api/apiClient";
 import { useEvent } from "@/shared/contexts/EventContext";
 import { reducer, createInitialState } from "./tableAssignmentReducer";
 import { useDragHandlers } from "../hooks/useDragHandlers";
-import { loadTableAssignmentData, deleteAssignment } from "../api/tableAssignmentApi";
+import { loadTableAssignmentData, deleteAssignment, updateLayoutApi } from "../api/tableAssignmentApi";
 import { usePersistAssignment } from "../hooks/usePersistAssignment";
 import { useMoveGuestSeat } from "../hooks/useMoveGuestSeat";
 import { useAddTable } from "../hooks/useAddTable";
@@ -92,6 +92,24 @@ export function TableAssignmentProvider({
     () => state.layouts.find((l: TableLayout) => l.is_active) ?? (state.layouts.length ? state.layouts[0] : null),
     [state.layouts],
   );
+
+  const gridDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    if (!activeLayout) return;
+    if (gridDebounceRef.current) clearTimeout(gridDebounceRef.current);
+    gridDebounceRef.current = setTimeout(() => {
+      updateLayoutApi(activeLayout.layout_id, {
+        xGridSize: activeLayout.x_grid_size,
+        yGridSize: activeLayout.y_grid_size,
+        name: activeLayout.name,
+        eventId: activeLayout.event_id ? Number(activeLayout.event_id) : undefined,
+        isActive: activeLayout.is_active,
+      }).catch((e) => console.error("[updateLayout] failed:", e));
+    }, 600);
+    return () => { if (gridDebounceRef.current) clearTimeout(gridDebounceRef.current); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeLayout?.x_grid_size, activeLayout?.y_grid_size, activeLayout?.layout_id]);
+
   const tablesForActiveLayout = useMemo(() => {
     if (!activeLayout) return [];
     return state.tables
