@@ -50,6 +50,10 @@
     "capacity": "Capacidad {{count}}",
     "seated": "{{count}} sentados",
     "now": "AHORA",
-    "budget": "Presupuesto"
+    "budget": "Presupuesto",
+    "created": "Creado exitosamente",
+    "saved": "Guardado exitosamente",
+    "deleted": "Eliminado exitosamente",
+    "error": "Ocurrió un error"
   }
 }
