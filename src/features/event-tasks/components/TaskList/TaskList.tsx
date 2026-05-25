@@ -3,9 +3,11 @@ import {
   Avatar,
   Badge,
   Button,
+  Checkbox,
   Collapse,
   Empty,
   Input,
+  Popconfirm,
   Progress,
   Segmented,
   Select,
@@ -14,6 +16,7 @@ import {
   Tag,
   Tooltip,
 } from "antd";
+import { DeleteOutlined } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import {
   AppstoreOutlined,
@@ -78,10 +81,12 @@ const TaskList: React.FC<TaskListProps> = ({
   onTaskClick,
   onQuickComplete,
   onNewTask,
+  onDeleteTasks,
 }) => {
   const { t } = useTranslation();
   const [showFilters, setShowFilters] = useState(false);
   const [viewMode, setViewMode] = useState<"cards" | "table">("cards");
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [filters, setFilters] = useState({
     status: "all",
     priority: "all",
@@ -317,17 +322,35 @@ const TaskList: React.FC<TaskListProps> = ({
         </div>
         <div className={styles.taskGrid}>
           {groupTasksList.map((task) => (
-            <TaskCard
-              key={task.task_id}
-              task={task}
-              onClick={onTaskClick}
-              onQuickComplete={onQuickComplete}
-              isOverdue={isOverdue}
-            />
+            <div key={task.task_id} className={styles.selectableCard}>
+              <Checkbox
+                className={styles.cardCheckbox}
+                checked={selectedIds.includes(task.task_id)}
+                onChange={(e) => {
+                  e.nativeEvent.stopImmediatePropagation();
+                  setSelectedIds((prev) =>
+                    e.target.checked
+                      ? [...prev, task.task_id]
+                      : prev.filter((id) => id !== task.task_id),
+                  );
+                }}
+              />
+              <TaskCard
+                task={task}
+                onClick={onTaskClick}
+                onQuickComplete={onQuickComplete}
+                isOverdue={isOverdue}
+              />
+            </div>
           ))}
         </div>
       </div>
     );
+  };
+
+  const rowSelection = {
+    selectedRowKeys: selectedIds,
+    onChange: (keys: React.Key[]) => setSelectedIds(keys as string[]),
   };
 
   return (
@@ -372,6 +395,22 @@ const TaskList: React.FC<TaskListProps> = ({
               {t("common.filters")}
             </Button>
           </Badge>
+          {selectedIds.length > 0 && (
+            <Popconfirm
+              title={t("tasks.bulkDelete.confirm", { count: selectedIds.length })}
+              onConfirm={() => {
+                onDeleteTasks(selectedIds);
+                setSelectedIds([]);
+              }}
+              okText={t("common.delete")}
+              cancelText={t("common.cancel")}
+              okButtonProps={{ danger: true }}
+            >
+              <Button danger icon={<DeleteOutlined />}>
+                {t("tasks.bulkDelete.button", { count: selectedIds.length })}
+              </Button>
+            </Popconfirm>
+          )}
           <Button type="primary" icon={<PlusOutlined />} onClick={onNewTask}>
             {t("tasks.newTask")}
           </Button>
@@ -497,6 +536,7 @@ const TaskList: React.FC<TaskListProps> = ({
           size="middle"
           pagination={{ pageSize: 15, showSizeChanger: true }}
           rowClassName={() => styles.clickableRow}
+          rowSelection={rowSelection}
           onRow={(record) => ({
             onClick: () => onTaskClick(record),
           })}
@@ -547,12 +587,25 @@ const TaskList: React.FC<TaskListProps> = ({
                   children: (
                     <div className={styles.taskGrid}>
                       {groupedTasks.completed.map((task) => (
-                        <TaskCard
-                          key={task.task_id}
-                          task={task}
-                          onClick={onTaskClick}
-                          onQuickComplete={onQuickComplete}
-                        />
+                        <div key={task.task_id} className={styles.selectableCard}>
+                          <Checkbox
+                            className={styles.cardCheckbox}
+                            checked={selectedIds.includes(task.task_id)}
+                            onChange={(e) => {
+                              e.nativeEvent.stopImmediatePropagation();
+                              setSelectedIds((prev) =>
+                                e.target.checked
+                                  ? [...prev, task.task_id]
+                                  : prev.filter((id) => id !== task.task_id),
+                              );
+                            }}
+                          />
+                          <TaskCard
+                            task={task}
+                            onClick={onTaskClick}
+                            onQuickComplete={onQuickComplete}
+                          />
+                        </div>
                       ))}
                     </div>
                   ),

@@ -52,6 +52,7 @@ export interface UseEventTasksResult {
   handleTaskClick: (task: Task) => void;
   handleStatusChange: (taskId: string, status: Task["status"]) => void;
   handleDeleteTask: (taskId: string) => void;
+  handleBulkDelete: (taskIds: string[]) => void;
   handleEditFromDetail: (task: Task) => void;
   handleFormSubmit: (values: TaskFormValues) => void;
   handleTemplateApply: (
@@ -218,6 +219,23 @@ export const useEventTasks = (): UseEventTasksResult => {
     [loadTasks, message, recalcSummary, t],
   );
 
+  const handleBulkDelete = useCallback(
+    async (taskIds: string[]) => {
+      setTasks((prev) => {
+        const updated = prev.filter((t) => !taskIds.includes(t.task_id));
+        recalcSummary(updated);
+        return updated;
+      });
+      try {
+        await Promise.all(taskIds.map((id) => deleteTaskApi(Number(id))));
+      } catch {
+        loadTasks();
+      }
+      message.success(t("tasks.messages.tasksDeleted", { count: taskIds.length }));
+    },
+    [loadTasks, message, recalcSummary, t],
+  );
+
   const handleEditFromDetail = useCallback((task: Task) => {
     setDetailOpen(false);
     setEditTask(task);
@@ -352,6 +370,7 @@ export const useEventTasks = (): UseEventTasksResult => {
     handleTaskClick,
     handleStatusChange,
     handleDeleteTask,
+    handleBulkDelete,
     handleEditFromDetail,
     handleFormSubmit,
     handleTemplateApply,

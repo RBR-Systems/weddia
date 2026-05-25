@@ -9,6 +9,10 @@
     },
     "searchPlaceholder": "Search tasks...",
     "newTask": "New Task",
+    "bulkDelete": {
+      "button": "Delete ({{count}})",
+      "confirm": "Delete {{count}} task(s)? This action cannot be undone."
+    },
     "createFirst": "Create First Task",
     "emptyState": "No tasks yet. Create your first task or generate from template.",
     "groups": {
@@ -170,6 +174,7 @@
     "messages": {
       "taskCompleted": "\"{{title}}\" completed",
       "taskDeleted": "Task deleted",
+      "tasksDeleted": "{{count}} tasks deleted",
       "taskCreated": "Task created",
       "taskUpdated": "Task updated",
       "templateApplied": "{{count}} tasks generated from template"

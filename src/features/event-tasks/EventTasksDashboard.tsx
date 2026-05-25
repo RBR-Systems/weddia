@@ -43,6 +43,7 @@ const EventTasksDashboard: React.FC = () => {
     handleEditFromDetail,
     handleFormSubmit,
     handleTemplateApply,
+    handleBulkDelete,
     openNewTaskForm,
     closeDetailModal,
     closeFormModal,
@@ -86,6 +87,7 @@ const EventTasksDashboard: React.FC = () => {
           onTaskClick={handleTaskClick}
           onQuickComplete={handleQuickComplete}
           onNewTask={openNewTaskForm}
+          onDeleteTasks={handleBulkDelete}
         />
       ),
     },

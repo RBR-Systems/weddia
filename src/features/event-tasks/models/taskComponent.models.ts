@@ -26,6 +26,7 @@ export interface TaskListProps {
   readonly onTaskClick: (task: Task) => void;
   readonly onQuickComplete: (task: Task) => void;
   readonly onNewTask: () => void;
+  readonly onDeleteTasks: (taskIds: string[]) => void;
 }
 
 export interface TaskCalendarProps {
