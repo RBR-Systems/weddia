@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { App } from "antd";
-import type { Guest } from "../models/guestList.models";
+import type { BulkGuestError, Guest, ImportWarning } from "../models/guestList.models";
 import { parseCsvToGuests } from "../utils/guestList.utils";
+import { bulkCreateGuests, fetchRelations } from "../api/guestApi";
 
 interface UseGuestImportOptions {
-  onImported: (guests: Guest[]) => void;
-  onClose: () => void;
+  eventId: number;
+  onImported: (created: Guest[], warnings: ImportWarning[], errors: BulkGuestError[]) => void;
 }
 
 interface UseGuestImportResult {
@@ -13,32 +14,33 @@ interface UseGuestImportResult {
   importing: boolean;
 }
 
-export const useGuestImport = ({ onImported, onClose }: UseGuestImportOptions): UseGuestImportResult => {
+export const useGuestImport = ({ eventId, onImported }: UseGuestImportOptions): UseGuestImportResult => {
   const { message } = App.useApp();
   const [importing, setImporting] = useState(false);
 
   const handleFile = (file: File): false => {
     setImporting(true);
-    file.text()
-      .then((text) => {
-        try {
-          const guests = parseCsvToGuests(String(text ?? ""));
-          onImported(guests);
-          message.success(`Imported ${guests.length} guests`);
-        } catch (err) {
-          console.error(err);
-          message.error("Failed to import CSV");
-        } finally {
-          setImporting(false);
-          onClose();
+    (async () => {
+      try {
+        const text = await file.text();
+        const relations = await fetchRelations();
+        const { guests, warnings } = parseCsvToGuests(String(text ?? ""), relations);
+        const result = await bulkCreateGuests(eventId, guests);
+        onImported(result.created, warnings, result.errors);
+        if (result.errors.length) {
+          message.warning(
+            `Imported ${result.created.length} guests, ${result.errors.length} failed`,
+          );
+        } else {
+          message.success(`Imported ${result.created.length} guests`);
         }
-      })
-      .catch((err) => {
+      } catch (err) {
         console.error(err);
-        message.error("Failed to read file");
+        message.error("Failed to import CSV");
+      } finally {
         setImporting(false);
-        onClose();
-      });
+      }
+    })();
     return false;
   };
 

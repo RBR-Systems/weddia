@@ -60,12 +60,14 @@ export const mapApiDataToBudgetState = (
 ) => {
   const totalBudget = eventBudget ?? data.summary.total_budget;
   const totalSpent = data.summary.total_spent;
+  const totalPaid = data.analytics?.payment_status_breakdown?.paid?.total ?? 0;
 
   return {
     summary: {
       total_budget: totalBudget,
       total_allocated: data.summary.total_allocated ?? 0,
       total_spent: totalSpent,
+      total_paid: totalPaid,
       ...computeSpentSummary(totalBudget, totalSpent),
       status: data.summary.status,
       currency: data.budget.currency as Currency,

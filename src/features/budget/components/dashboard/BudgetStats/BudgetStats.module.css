@@ -67,6 +67,13 @@
   flex-shrink: 0;
 }
 
+.infoHint {
+  font-size: 11px;
+  color: var(--text-color-muted);
+  flex-shrink: 0;
+  cursor: help;
+}
+
 .cardValue {
   line-height: 1.1;
   margin-bottom: 10px;

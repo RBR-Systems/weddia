@@ -19,6 +19,7 @@ export interface BudgetSummary {
   total_budget: number;
   total_allocated: number;
   total_spent: number;
+  total_paid: number;
   total_remaining: number;
   percentage_spent: number;
   status: BudgetStatus;

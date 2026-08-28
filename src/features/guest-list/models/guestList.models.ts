@@ -61,3 +61,19 @@ export interface GuestFormValues {
   accesability_needs?: string;
   notes?: string;
 }
+
+export interface ImportWarning {
+  row: number;
+  field: "relation_id" | "rsvp_status";
+  rawValue: string;
+}
+
+export interface BulkGuestError {
+  index: number;
+  reason: string;
+}
+
+export interface BulkCreateGuestsResult {
+  created: Guest[];
+  errors: BulkGuestError[];
+}

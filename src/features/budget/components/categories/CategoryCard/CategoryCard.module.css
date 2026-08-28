@@ -130,11 +130,19 @@
 }
 
 .statLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
   font-size: 10px;
   color: var(--text-color-muted);
   text-transform: uppercase;
   letter-spacing: 0.03em;
   white-space: nowrap;
+}
+
+.infoHint {
+  font-size: 10px;
+  cursor: help;
 }
 
 .statValue {

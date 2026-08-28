@@ -175,6 +175,13 @@
 
 .formRowItem {
   margin-bottom: 0;
+  min-width: 0;
+}
+
+@media (max-width: 768px) {
+  .formRow {
+    grid-template-columns: 1fr;
+  }
 }
 
 .formActionsItem {

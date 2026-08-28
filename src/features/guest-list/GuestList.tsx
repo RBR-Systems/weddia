@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { ReloadOutlined, FileExcelOutlined, UploadOutlined, PlusOutlined } from "@ant-design/icons";
 import { Row, Col, Button, Tag, Space } from "antd";
-import { formatStatusLabel, statusColor } from "./models/guestList.models";
+import { BulkGuestError, formatStatusLabel, ImportWarning, statusColor } from "./models/guestList.models";
 import Header from "@/shared/components/Header/Header";
 import { useTranslation } from "react-i18next";
 import { useEvent } from "@/shared/contexts/EventContext";
@@ -32,10 +32,18 @@ export default function GuestList() {
   const selectedGuest = selectedId ? (guests.find((g) => g.guest_id === selectedId) ?? null) : null;
   const [addOpen, setAddOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
+  const [importSummary, setImportSummary] = useState<{
+    createdCount: number;
+    warnings: ImportWarning[];
+    errors: BulkGuestError[];
+  } | null>(null);
 
-  const { handleFile } = useGuestImport({
-    onImported: (imported) => setGuests((prev) => [...imported, ...prev]),
-    onClose: () => setImportOpen(false),
+  const { handleFile, importing } = useGuestImport({
+    eventId,
+    onImported: (created, warnings, errors) => {
+      setGuests((prev) => [...created, ...prev]);
+      setImportSummary({ createdCount: created.length, warnings, errors });
+    },
   });
 
   return (
@@ -50,7 +58,7 @@ export default function GuestList() {
           <Button icon={<FileExcelOutlined />} onClick={handleExport}>{t("guestList.exportCsv", "Export CSV")}</Button>
         </Col>
         <Col style={{ marginRight: 8 }}>
-          <Button icon={<UploadOutlined />} onClick={() => setImportOpen(true)}>{t("guestList.importCsv", "Import CSV")}</Button>
+          <Button icon={<UploadOutlined />} onClick={() => { setImportSummary(null); setImportOpen(true); }}>{t("guestList.importCsv", "Import CSV")}</Button>
         </Col>
       </Row>
 
@@ -112,7 +120,13 @@ export default function GuestList() {
         />
       )}
 
-      <ImportGuestModal open={importOpen} onClose={() => setImportOpen(false)} onFile={handleFile} />
+      <ImportGuestModal
+        open={importOpen}
+        onClose={() => setImportOpen(false)}
+        onFile={handleFile}
+        importing={importing}
+        summary={importSummary}
+      />
 
       <AddGuestModal
         open={addOpen}

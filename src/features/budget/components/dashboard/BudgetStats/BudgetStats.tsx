@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { Row, Col, Tooltip, InputNumber } from "antd";
-import { EditOutlined, CheckOutlined, CloseOutlined, WalletOutlined, PieChartOutlined, ArrowDownOutlined, SafetyOutlined, PercentageOutlined, FileTextOutlined, BarChartOutlined, TrophyOutlined } from "@ant-design/icons";
+import { EditOutlined, CheckOutlined, CloseOutlined, WalletOutlined, PieChartOutlined, ArrowDownOutlined, SafetyOutlined, PercentageOutlined, FileTextOutlined, BarChartOutlined, TrophyOutlined, CheckCircleOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import AnimatedStatistic from "@/shared/components/AnimatedStatistic/AnimatedStatistic";
 import { useBudget } from "../../../contexts/BudgetContext";
 import { formatCurrency, formatInputNumber, parseInputNumber } from "@/shared/utils/formatters.utils";
@@ -55,6 +55,7 @@ interface StatCardProps {
   readonly progressColor?: string;
   readonly onClick?: () => void;
   readonly showEditHint?: boolean;
+  readonly labelTooltip?: string;
 }
 
 function StatCard({
@@ -67,6 +68,7 @@ function StatCard({
   progressColor,
   onClick,
   showEditHint,
+  labelTooltip,
 }: StatCardProps) {
   const className = `${styles.primaryCard} ${onClick ? styles.clickable : ""}`;
 
@@ -77,6 +79,11 @@ function StatCard({
         <div className={styles.cardHeader}>
           <span className={styles.cardIcon}>{icon}</span>
           <span className={styles.cardLabel}>{label}</span>
+          {labelTooltip && (
+            <Tooltip title={labelTooltip}>
+              <InfoCircleOutlined className={styles.infoHint} />
+            </Tooltip>
+          )}
           {showEditHint && <EditOutlined className={styles.editHint} />}
         </div>
         <div className={styles.cardValue}>{content}</div>
@@ -166,6 +173,7 @@ export default function BudgetStats() {
 
   const allocatedPct = pctOfBudget(totalAllocated, summary.total_budget);
   const spentPct = pctOfBudget(summary.total_spent, summary.total_budget);
+  const paidPct = pctOfBudget(summary.total_paid, summary.total_spent);
 
   const remainingColor = getRemainingColor(summary.total_remaining, summary.total_budget);
   const spentProgressColor = getSpentProgressColor(spentPct);
@@ -289,6 +297,7 @@ export default function BudgetStats() {
           <StatCard
             icon={<ArrowDownOutlined />}
             label={t("budgetStats.totalSpent")}
+            labelTooltip={t("budgetStats.spentTooltip")}
             content={
               <AnimatedStatistic
                 value={formatCurrency(summary.total_spent, currency)}
@@ -306,6 +315,31 @@ export default function BudgetStats() {
             progress={spentPct}
             progressColor={spentProgressColor}
             subLabel={`${Number.parseFloat(spentPct.toFixed(2))}% ${t("budgetStats.ofBudget")}`}
+          />
+        </Col>
+
+        {/* ── Total Paid ── */}
+        <Col xs={24} sm={12} lg={6}>
+          <StatCard
+            icon={<CheckCircleOutlined />}
+            label={t("budgetStats.totalPaid")}
+            labelTooltip={t("budgetStats.paidTooltip")}
+            content={
+              <AnimatedStatistic
+                value={formatCurrency(summary.total_paid, currency)}
+                styles={{
+                  content: {
+                    fontSize: 26,
+                    fontWeight: 700,
+                    lineHeight: 1.1,
+                  },
+                }}
+              />
+            }
+            accentColor="var(--budget-success)"
+            progress={paidPct}
+            progressColor="var(--budget-success)"
+            subLabel={`${Number.parseFloat(paidPct.toFixed(2))}% ${t("budgetStats.ofSpent")}`}
           />
         </Col>
 

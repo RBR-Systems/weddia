@@ -263,6 +263,7 @@ export const BUDGET_INITIAL_STATE: BudgetState = {
     total_budget: 0,
     total_allocated: 0,
     total_spent: 0,
+    total_paid: 0,
     total_remaining: 0,
     percentage_spent: 0,
     status: "not_started",

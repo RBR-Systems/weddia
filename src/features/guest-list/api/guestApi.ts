@@ -1,4 +1,4 @@
-import { Guest } from "../models/guestList.models";
+import { BulkCreateGuestsResult, Guest } from "../models/guestList.models";
 import { apiGet, apiPost, apiDelete, apiPatch, ApiError } from "@/shared/api/apiClient";
 
 interface ApiGuest {
@@ -103,11 +103,10 @@ export async function updateRsvp(
   await apiPatch(`/api/guests/${guestId}/rsvp?adminId=1`, { rsvpStatus: apiStatus });
 }
 
-export async function createGuest(
-  eventId: number,
-  data: Omit<Guest, "guest_id" | "event_id">,
-): Promise<Guest> {
-  const body = {
+export type CreateGuestPayload = Omit<Guest, "guest_id" | "event_id">;
+
+function toCreateGuestBody(eventId: number, data: CreateGuestPayload) {
+  return {
     eventId,
     firstName: data.first_name,
     lastName: data.last_name,
@@ -128,6 +127,29 @@ export async function createGuest(
     accessibilityNeeds: data.accesability_needs ?? null,
     notes: data.notes ?? null,
   };
-  const created = await apiPost<ApiGuest>(`/api/guests?adminId=1`, body);
+}
+
+export async function createGuest(
+  eventId: number,
+  data: CreateGuestPayload,
+): Promise<Guest> {
+  const created = await apiPost<ApiGuest>(`/api/guests?adminId=1`, toCreateGuestBody(eventId, data));
   return mapApiGuest(created);
+}
+
+interface ApiBulkCreateGuestsResult {
+  created: ApiGuest[];
+  errors: { index: number; reason: string }[];
+}
+
+export async function bulkCreateGuests(
+  eventId: number,
+  guests: CreateGuestPayload[],
+): Promise<BulkCreateGuestsResult> {
+  const body = { guests: guests.map((g) => toCreateGuestBody(eventId, g)) };
+  const result = await apiPost<ApiBulkCreateGuestsResult>(`/api/guests/bulk?adminId=1`, body);
+  return {
+    created: result.created.map(mapApiGuest),
+    errors: result.errors.map((e) => ({ index: e.index, reason: e.reason })),
+  };
 }

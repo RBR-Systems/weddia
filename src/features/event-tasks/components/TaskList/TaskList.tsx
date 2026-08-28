@@ -182,15 +182,18 @@ const TaskList: React.FC<TaskListProps> = ({
       title: t("tasks.form.title"),
       dataIndex: "title",
       key: "title",
-      ellipsis: true,
+      width: 220,
+      ellipsis: { showTitle: false },
       render: (text: string, record: Task) => (
-        <Button
-          type="link"
-          onClick={() => onTaskClick(record)}
-          className={styles.linkButton}
-        >
-          {text}
-        </Button>
+        <Tooltip title={text}>
+          <Button
+            type="link"
+            onClick={() => onTaskClick(record)}
+            className={styles.linkButton}
+          >
+            {text}
+          </Button>
+        </Tooltip>
       ),
     },
     {
@@ -549,6 +552,7 @@ const TaskList: React.FC<TaskListProps> = ({
           columns={tableColumns}
           rowKey="task_id"
           size="middle"
+          scroll={{ x: 1100 }}
           pagination={{ pageSize: 15, showSizeChanger: true }}
           rowClassName={() => styles.clickableRow}
           rowSelection={rowSelection}

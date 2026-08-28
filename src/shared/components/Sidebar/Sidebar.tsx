@@ -39,6 +39,11 @@ export default function Sidebar({
         icon: <UnorderedListOutlined />,
         label: t("nav.eventsList"),
       },
+      {
+        key: "tasks",
+        icon: <CheckSquareOutlined />,
+        label: t("nav.tasks"),
+      },
       { key: "guest-list", icon: <TeamOutlined />, label: t("nav.guestList") },
       { key: "schedule", icon: <CalendarOutlined />, label: t("nav.schedule") },
       {
@@ -56,11 +61,6 @@ export default function Sidebar({
         key: "vendor-catalog",
         icon: <ShopOutlined />,
         label: t("nav.vendorCatalog"),
-      },
-      {
-        key: "tasks",
-        icon: <CheckSquareOutlined />,
-        label: t("nav.tasks"),
       },
       {
         key: "organizations",

@@ -26,10 +26,12 @@
   display: flex;
   justify-content: space-between;
   gap: var(--spacing-md);
+  flex-wrap: wrap;
 }
 
 .eventInfoItem {
   flex-grow: 1;
+  min-width: 220px;
 }
 
 .datePicker {

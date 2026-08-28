@@ -1,6 +1,7 @@
 "use client";
 
-import { Progress } from "antd";
+import { Progress, Tooltip } from "antd";
+import { InfoCircleOutlined } from "@ant-design/icons";
 import { formatCurrency } from "@/shared/utils/formatters.utils";
 import type { Category } from "../../../models/budget.models";
 import {
@@ -78,7 +79,12 @@ export default function CategoryCard({
         {/* Stats */}
         <div className={styles.statsRow}>
           <div className={styles.stat}>
-            <span className={styles.statLabel}>{t("categoryCard.spent")}</span>
+            <span className={styles.statLabel}>
+              {t("categoryCard.spent")}
+              <Tooltip title={t("categoryCard.spentTooltip")}>
+                <InfoCircleOutlined className={styles.infoHint} />
+              </Tooltip>
+            </span>
             <span className={styles.statValue}>
               {formatCurrency(spent, currency)}
             </span>

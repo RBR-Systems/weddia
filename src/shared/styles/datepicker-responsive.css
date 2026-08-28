@@ -1,0 +1,33 @@
+/*
+ * Responsive overrides for Ant Design's DatePicker dropdown panel.
+ *
+ * The panel is rendered via a React portal outside the component tree
+ * (appended near <body>), so these rules must live in GLOBAL CSS —
+ * a CSS Module's scoped/hashed class names cannot reliably target it.
+ *
+ * Scope: mobile only (<=480px). Desktop/tablet layout (>=1024px per the
+ * project's "no visual changes" requirement) is completely untouched
+ * since everything here is nested inside the media query.
+ */
+@media (max-width: 480px) {
+  /* Panel wrapper: keep the whole popup inside the viewport and let it
+     scroll internally instead of overflowing horizontally. */
+  .ant-picker-panel-container {
+    max-width: 92vw;
+    overflow-x: auto;
+  }
+
+  /* showTime layout: calendar + time columns side-by-side by default.
+     Stack them vertically so the time columns aren't squeezed unusable. */
+  .ant-picker-datetime-panel {
+    flex-direction: column;
+  }
+
+  /* Time column: let it take the full stacked width instead of a fixed
+     narrow column, and allow internal scroll for the hour/minute lists. */
+  .ant-picker-time-panel {
+    width: 100%;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+}

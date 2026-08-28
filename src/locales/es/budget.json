@@ -50,6 +50,7 @@
     "totalBudget": "Presupuesto Total",
     "totalAllocated": "Total Asignado",
     "totalSpent": "Total Gastado",
+    "totalPaid": "Total Pagado",
     "remaining": "Restante",
     "spentPercent": "% Gastado",
     "expensesCount": "Cantidad de Gastos",
@@ -58,7 +59,10 @@
     "topCategory": "Categoría Principal",
     "clickToEdit": "Clic para editar presupuesto",
     "ofBudget": "del presupuesto",
-    "overBudget": "Sobre presupuesto"
+    "ofSpent": "de lo gastado",
+    "overBudget": "Sobre presupuesto",
+    "spentTooltip": "Gasto: monto total registrado de los ítems, sin importar si ya se pagó.",
+    "paidTooltip": "Pagado: monto de los gastos marcados con estado de pago 'Pagado'."
   },
   "expenseModal": {
     "title": "Agregar Gasto",
@@ -156,6 +160,7 @@
   },
   "categoryCard": {
     "spent": "Gastado",
+    "spentTooltip": "Gasto: monto total registrado de los ítems, sin importar si ya se pagó.",
     "allocated": "Asignado",
     "remaining": "Restante",
     "expenses": "gastos"

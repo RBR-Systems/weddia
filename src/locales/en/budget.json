@@ -50,6 +50,7 @@
     "totalBudget": "Total Budget",
     "totalAllocated": "Total Allocated",
     "totalSpent": "Total Spent",
+    "totalPaid": "Total Paid",
     "remaining": "Remaining",
     "spentPercent": "Spent %",
     "expensesCount": "Expenses Count",
@@ -58,7 +59,10 @@
     "topCategory": "Top Category",
     "clickToEdit": "Click to edit budget",
     "ofBudget": "of budget",
-    "overBudget": "Over budget"
+    "ofSpent": "of spent",
+    "overBudget": "Over budget",
+    "spentTooltip": "Spent: total amount recorded for the items, regardless of whether it has been paid yet.",
+    "paidTooltip": "Paid: amount of expenses marked with payment status 'Paid'."
   },
   "expenseModal": {
     "title": "Add Expense",
@@ -156,6 +160,7 @@
   },
   "categoryCard": {
     "spent": "Spent",
+    "spentTooltip": "Spent: total amount recorded for the items, regardless of whether it has been paid yet.",
     "allocated": "Allocated",
     "remaining": "Remaining",
     "expenses": "expenses"
