@@ -1,0 +1,4 @@
+first_name,last_name,email,phone,party_size,relation_id,rsvp_status
+Ana,E2E Test,ana.e2e.playwright@example.com,+528110000001,2,Familia del Novio,confirmed
+Luis,E2E Test,luis.e2e.playwright@example.com,+528110000002,1,Amigos,attending
+Sofia,E2E Test,sofia.e2e.playwright@example.com,+528110000003,3,Familia del Novio,pendiente
